@@ -1,8 +1,5 @@
-﻿#ifndef LIB_WEBRTC_RTC_MEDIA_TRACK_HXX
+#ifndef LIB_WEBRTC_RTC_MEDIA_TRACK_HXX
 #define LIB_WEBRTC_RTC_MEDIA_TRACK_HXX
-
-#include <stdint.h>
-#include <string>
 
 #include "rtc_types.h"
 
