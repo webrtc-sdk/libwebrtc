@@ -9,10 +9,10 @@ namespace libwebrtc {
 class RTCMediaTrack : public RefCountInterface {
  public:
   /*track type: audio/video*/
-  virtual const char *kind() const = 0;
+  virtual const char* kind() const = 0;
 
   /*track id*/
-  virtual const char*id() const = 0;
+  virtual const char* id() const = 0;
 
   virtual bool enabled() const = 0;
 
