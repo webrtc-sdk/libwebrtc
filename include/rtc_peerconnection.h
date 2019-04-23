@@ -46,10 +46,10 @@ enum RTCIceConnectionState {
   RTCIceConnectionStateChecking,
   RTCIceConnectionStateCompleted,
   RTCIceConnectionStateConnected,
-  RTCIceConnectionStateCount,
   RTCIceConnectionStateFailed,
   RTCIceConnectionStateDisconnected,
   RTCIceConnectionStateClosed,
+  RTCIceConnectionStateMax,
 };
 
 class MediaTrackStatistics {
@@ -114,25 +114,25 @@ typedef std::function<void(const char* error)> OnSetSdpFailure;
 
 class RTCPeerConnectionObserver {
  public:
-  virtual void onSignalingState(RTCSignalingState state) = 0;
+  virtual void OnSignalingState(RTCSignalingState state) = 0;
 
-  virtual void onIceGatheringState(RTCIceGatheringState state) = 0;
+  virtual void OnIceGatheringState(RTCIceGatheringState state) = 0;
 
-  virtual void onIceConnectionState(RTCIceConnectionState state) = 0;
+  virtual void OnIceConnectionState(RTCIceConnectionState state) = 0;
 
-  virtual void onIceCandidate(RTCIceCandidate* candidate) = 0;
+  virtual void OnIceCandidate(RTCIceCandidate* candidate) = 0;
 
-  virtual void onAddStream(RTCMediaStream* stream) = 0;
+  virtual void OnAddStream(RTCMediaStream* stream) = 0;
 
-  virtual void onRemoveStream(RTCMediaStream* stream) = 0;
+  virtual void OnRemoveStream(RTCMediaStream* stream) = 0;
 
-  virtual void onAddTrack(RTCMediaStream* stream, RTCMediaTrack* track) = 0;
+  virtual void OnAddTrack(RTCMediaStream* stream, RTCMediaTrack* track) = 0;
 
-  virtual void onRemoveTrack(RTCMediaStream* stream, RTCMediaTrack* track) = 0;
+  virtual void OnRemoveTrack(RTCMediaStream* stream, RTCMediaTrack* track) = 0;
 
-  virtual void onDataChannel(RTCDataChannel* data_channel) = 0;
+  virtual void OnDataChannel(RTCDataChannel* data_channel) = 0;
 
-  virtual void onRenegotiationNeeded() = 0;
+  virtual void OnRenegotiationNeeded() = 0;
 
  protected:
   virtual ~RTCPeerConnectionObserver() {}

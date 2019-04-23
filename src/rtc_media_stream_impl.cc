@@ -129,7 +129,7 @@ void MediaStreamImpl::OnChanged() {
 
   for (auto track : removed_video_tracks) {
     if (observer_)
-      observer_->onRemoveTrack(this, track);
+      observer_->OnRemoveTrack(this, track);
   }
 
   VideoTrackVector new_video_tracks;
@@ -142,7 +142,7 @@ void MediaStreamImpl::OnChanged() {
 
   for (auto track : new_video_tracks) {
     if (observer_)
-      observer_->onAddTrack(this, track);
+      observer_->OnAddTrack(this, track);
   }
 
   video_tracks_ = video_tracks;

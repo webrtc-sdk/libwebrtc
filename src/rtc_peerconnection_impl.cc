@@ -59,6 +59,53 @@ static std::map<libwebrtc::TcpCandidatePolicy,
         {libwebrtc::TcpCandidatePolicy::kTcpCandidatePolicyEnabled,
          webrtc::PeerConnectionInterface::kTcpCandidatePolicyDisabled}};
 
+static std::map<webrtc::PeerConnectionInterface::IceGatheringState,
+                libwebrtc::RTCIceGatheringState>
+    ice_gathering_state_map = {
+        {webrtc::PeerConnectionInterface::kIceGatheringNew,
+         libwebrtc::RTCIceGatheringState::RTCIceGatheringStateNew},
+        {webrtc::PeerConnectionInterface::kIceGatheringGathering,
+         libwebrtc::RTCIceGatheringState::RTCIceGatheringStateGathering},
+        {webrtc::PeerConnectionInterface::kIceGatheringComplete,
+         libwebrtc::RTCIceGatheringState::RTCIceGatheringStateComplete}};
+
+static std::map<webrtc::PeerConnectionInterface::IceConnectionState,
+                libwebrtc::RTCIceConnectionState>
+    ice_connection_state_map = {
+        {webrtc::PeerConnectionInterface::kIceConnectionNew,
+         libwebrtc::RTCIceConnectionState::RTCIceConnectionStateNew},
+        {webrtc::PeerConnectionInterface::kIceConnectionChecking,
+         libwebrtc::RTCIceConnectionState::RTCIceConnectionStateChecking},
+        {webrtc::PeerConnectionInterface::kIceConnectionCompleted,
+         libwebrtc::RTCIceConnectionState::RTCIceConnectionStateCompleted},
+        {webrtc::PeerConnectionInterface::kIceConnectionConnected,
+         libwebrtc::RTCIceConnectionState::RTCIceConnectionStateConnected},
+        {webrtc::PeerConnectionInterface::kIceConnectionDisconnected,
+         libwebrtc::RTCIceConnectionState::RTCIceConnectionStateDisconnected},
+        {webrtc::PeerConnectionInterface::kIceConnectionFailed,
+         libwebrtc::RTCIceConnectionState::RTCIceConnectionStateFailed},
+        {webrtc::PeerConnectionInterface::kIceConnectionClosed,
+         libwebrtc::RTCIceConnectionState::RTCIceConnectionStateClosed},
+        {webrtc::PeerConnectionInterface::kIceConnectionMax,
+         libwebrtc::RTCIceConnectionState::RTCIceConnectionStateMax}};
+
+static std::map<webrtc::PeerConnectionInterface::SignalingState,
+                libwebrtc::RTCSignalingState>
+    signaling_state_map = {
+        {webrtc::PeerConnectionInterface::kStable,
+         libwebrtc::RTCSignalingState::RTCSignalingStateStable},
+        {webrtc::PeerConnectionInterface::kHaveLocalOffer,
+         libwebrtc::RTCSignalingState::RTCSignalingStateHaveLocalOffer},
+        {webrtc::PeerConnectionInterface::kHaveLocalPrAnswer,
+         libwebrtc::RTCSignalingState::RTCSignalingStateHaveLocalPrAnswer},
+        {webrtc::PeerConnectionInterface::kHaveRemoteOffer,
+         libwebrtc::RTCSignalingState::RTCSignalingStateHaveRemoteOffer},
+        {webrtc::PeerConnectionInterface::kHaveRemotePrAnswer,
+         libwebrtc::RTCSignalingState::RTCSignalingStateHaveRemotePrAnswer},
+        {webrtc::PeerConnectionInterface::kClosed,
+         libwebrtc::RTCSignalingState::RTCSignalingStateClosed}};
+
+
 namespace libwebrtc {
 class SetSessionDescriptionObserverProxy
     : public webrtc::SetSessionDescriptionObserver {
@@ -153,14 +200,14 @@ void RTCPeerConnectionImpl::OnAddStream(
   remote_streams_.push_back(remote_stream);
 
   if (observer_) {
-    observer_->onAddStream(remote_stream.get());
+    observer_->OnAddStream(remote_stream.get());
 
     for (auto track : remote_stream->GetAudioTracks()) {
-      observer_->onAddTrack(remote_stream, track);
+      observer_->OnAddTrack(remote_stream, track);
     }
 
     for (auto track : remote_stream->GetVideoTracks()) {
-      observer_->onAddTrack(remote_stream, track);
+      observer_->OnAddTrack(remote_stream, track);
     }
   }
 }
@@ -180,14 +227,14 @@ void RTCPeerConnectionImpl::OnRemoveStream(
 
   if (nullptr != recv_stream) {
     if (observer_) {
-      observer_->onRemoveStream(recv_stream);
+      observer_->OnRemoveStream(recv_stream);
     }
 
     for (auto track : recv_stream->GetVideoTracks()) {
-      observer_->onRemoveTrack(recv_stream, track);
+      observer_->OnRemoveTrack(recv_stream, track);
     }
     for (auto track : recv_stream->GetVideoTracks()) {
-      observer_->onRemoveTrack(recv_stream, track);
+      observer_->OnRemoveTrack(recv_stream, track);
     }
     remote_streams_.erase(
         std::find(remote_streams_.begin(), remote_streams_.end(), recv_stream));
@@ -200,20 +247,26 @@ void RTCPeerConnectionImpl::OnDataChannel(
       new RefCountedObject<RTCDataChannelImpl>(rtc_data_channel));
 
   if (observer_)
-    observer_->onDataChannel(data_channel_);
+    observer_->OnDataChannel(data_channel_);
 }
 
 void RTCPeerConnectionImpl::OnIceGatheringChange(
     webrtc::PeerConnectionInterface::IceGatheringState new_state) {
-  // if (observer_)
-  //  observer_->onIceGatheringState();
+   if (observer_)
+    observer_->OnIceGatheringState(ice_gathering_state_map[new_state]);
 }
 
 void RTCPeerConnectionImpl::OnIceConnectionChange(
-    webrtc::PeerConnectionInterface::IceConnectionState new_state) {}
+    webrtc::PeerConnectionInterface::IceConnectionState new_state) {
+  if (observer_)
+    observer_->OnIceConnectionState(ice_connection_state_map[new_state]);
+}
 
 void RTCPeerConnectionImpl::OnSignalingChange(
-    webrtc::PeerConnectionInterface::SignalingState new_state) {}
+    webrtc::PeerConnectionInterface::SignalingState new_state) {
+  if (observer_)
+    observer_->OnSignalingState(signaling_state_map[new_state]);
+}
 
 void RTCPeerConnectionImpl::AddCandidate(const char* mid,
                                          int midx,
@@ -250,7 +303,7 @@ void RTCPeerConnectionImpl::OnIceCandidate(
     scoped_refptr<RTCIceCandidate> cand =
         CreateRTCIceCandidate(cand_sdp.c_str(), candidate->sdp_mid().c_str(),
                               candidate->sdp_mline_index(), &error);
-    observer_->onIceCandidate(cand.get());
+    observer_->OnIceCandidate(cand.get());
   }
 
   RTC_LOG(INFO) << __FUNCTION__ << ", mid " << candidate->sdp_mid()
@@ -452,13 +505,13 @@ void RTCPeerConnectionImpl::Close() {
     local_streams_.clear();
     for (auto stream : remote_streams_) {
       if (observer_) {
-        observer_->onRemoveStream(stream);
+        observer_->OnRemoveStream(stream);
       }
       for (auto track : stream->GetAudioTracks()) {
-        observer_->onRemoveTrack(stream, track);
+        observer_->OnRemoveTrack(stream, track);
       }
       for (auto track : stream->GetVideoTracks()) {
-        observer_->onRemoveTrack(stream, track);
+        observer_->OnRemoveTrack(stream, track);
       }
     }
     remote_streams_.clear();

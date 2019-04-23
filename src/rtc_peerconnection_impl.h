@@ -110,7 +110,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
 
   virtual void OnRenegotiationNeeded() override {
     if (observer_)
-      observer_->onRenegotiationNeeded();
+      observer_->OnRenegotiationNeeded();
   }
 
   virtual void OnIceCandidate(
