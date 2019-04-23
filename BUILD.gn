@@ -28,7 +28,6 @@ rtc_shared_library("libwebrtc"){
     "include/rtc_video_device.h",
     "include/rtc_video_frame.h",
     "include/rtc_video_source.h",
-    "include/rtc_video_sink.h",
     "include/rtc_video_renderer.h",
 
     "include/base/atomicops.h",
