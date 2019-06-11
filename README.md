@@ -1,6 +1,9 @@
 # libwebrtc
 WebRTC dynamic library wrapper for flutter desktop plugin.
 
+## Note
+Use the WebRTC branch M74 to compile.
+
 ## Usage
 ```
 git clone https://github.com/cloudwebrtc/libwebrtc.git
