@@ -82,6 +82,6 @@ struct SdpParseError {
 
 #define Vector bsp::inlined_vector
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_TYPES_HXX

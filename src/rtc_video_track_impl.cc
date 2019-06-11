@@ -26,4 +26,4 @@ void VideoTrackImpl::RemoveRenderer(
   return video_sink_->RemoveRenderer(renderer);
 }
 
-};  // namespace libwebrtc
+} // namespace libwebrtc

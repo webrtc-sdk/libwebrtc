@@ -51,6 +51,6 @@ class RTCVideoFrame : public RefCountInterface {
   virtual ~RTCVideoFrame() {}
 };
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_VIDEO_FRAME_HXX

@@ -1,8 +1,7 @@
 #include "libwebrtc.h"
 
-#include "rtc_base/ipaddress.h"
-#include "rtc_base/scoped_ref_ptr.h"
-#include "rtc_base/ssladapter.h"
+#include "api/scoped_refptr.h"
+#include "rtc_base/ssl_adapter.h"
 #include "rtc_base/thread.h"
 #ifdef WIN32
 #include "rtc_base/win32socketinit.h"
@@ -98,4 +97,4 @@ LibWebRTC::CreateRTCPeerConnectionFactory() {
   return rtc_peerconnection_factory;
 }
 
-};  // namespace libwebrtc
+} // namespace libwebrtc

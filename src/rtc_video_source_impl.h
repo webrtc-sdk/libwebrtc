@@ -6,9 +6,9 @@
 #include "rtc_video_track.h"
 #include "rtc_peerconnection_factory_impl.h"
 
-#include "api/mediastreaminterface.h"
-#include "media/base/videobroadcaster.h"
-#include "media/base/videosourcebase.h"
+#include "api/media_stream_interface.h"
+#include "media/base/video_broadcaster.h"
+#include "media/base/video_source_base.h"
 
 namespace libwebrtc {
 

@@ -74,4 +74,4 @@ void RTCDataChannelImpl::OnMessage(const webrtc::DataBuffer& buffer) {
     observer_->OnMessage(buffer.data.data<char>(), buffer.data.size(), buffer.binary);
  }
 
-};  // namespace libwebrtc
+} // namespace libwebrtc

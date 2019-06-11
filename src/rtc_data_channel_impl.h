@@ -4,8 +4,8 @@
 #include "rtc_data_channel.h"
 #include "rtc_types.h"
 
-#include "api/datachannelinterface.h"
-#include "rtc_base/criticalsection.h"
+#include "api/data_channel_interface.h"
+#include "rtc_base/critical_section.h"
 
 namespace libwebrtc {
 
@@ -44,6 +44,6 @@ class RTCDataChannelImpl : public RTCDataChannel, public webrtc::DataChannelObse
   RTCDataChannelState state_;
 };
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
 
 #endif  // !LIB_WEBRTC_RTC_DATA_CHANNEL_IMPL_HXX

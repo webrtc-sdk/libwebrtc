@@ -190,6 +190,7 @@ public:
 
 public:
 	inlined_vector() = default;
+	virtual ~inlined_vector() = default;
 
 	inlined_vector(size_type count, const T& value = T()):data_internal_(std::min(count, max_size()), value){
 		if (count > max_size()) {

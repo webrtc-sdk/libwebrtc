@@ -9,15 +9,15 @@
 #include "rtc_video_source_impl.h"
 #include "rtc_video_track_impl.h"
 
-#include "api/datachannelinterface.h"
-#include "api/mediastreaminterface.h"
-#include "api/peerconnectioninterface.h"
-#include "api/peerconnectionproxy.h"
+#include "api/data_channel_interface.h"
+#include "api/media_stream_interface.h"
+#include "api/peer_connection_interface.h"
+#include "api/peer_connection_proxy.h"
 
-#include "media/base/videocapturer.h"
+#include "src/internal/video_capturer.h"
 #include "modules/video_capture/video_capture.h"
-#include "rtc_base/criticalsection.h"
-#include "rtc_base/scoped_ref_ptr.h"
+#include "rtc_base/critical_section.h"
+#include "api/scoped_refptr.h"
 
 #include <deque>
 #include <map>
@@ -140,6 +140,6 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   scoped_refptr<RTCDataChannel> data_channel_;
 };
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_MEDIA_SESSION_IMPL_HXX

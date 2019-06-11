@@ -4,9 +4,9 @@
 #include "rtc_peerconnection.h"
 #include "rtc_video_frame.h"
 
-#include "api/mediastreaminterface.h"
-#include "api/peerconnectioninterface.h"
-#include "rtc_base/criticalsection.h"
+#include "api/media_stream_interface.h"
+#include "api/peer_connection_interface.h"
+#include "rtc_base/critical_section.h"
 
 namespace libwebrtc {
 

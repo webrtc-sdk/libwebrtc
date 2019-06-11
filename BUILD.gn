@@ -1,5 +1,14 @@
 import("../webrtc.gni")
 
+if (is_android) {
+  import("//build/config/android/config.gni")
+  import("//build/config/android/rules.gni")
+} else if (is_mac) {
+  import("//build/config/mac/rules.gni")
+} else if (is_ios) {
+  import("//build/config/ios/rules.gni")
+}
+
 config("external_config") {
   include_dirs = [
       "include",
@@ -67,6 +76,10 @@ rtc_shared_library("libwebrtc"){
     "src/rtc_media_stream_impl.cc",
     "src/rtc_mediaconstraints_impl.h",
     "src/rtc_mediaconstraints_impl.cc",
+    "src/internal/video_capturer.h",
+    "src/internal/video_capturer.cc",
+    "src/internal/vcm_capturer.h",
+    "src/internal/vcm_capturer.h",
   ]
 
   include_dirs = [
@@ -82,7 +95,7 @@ rtc_shared_library("libwebrtc"){
 
   if (is_clang) {
     # Suppress warnings from the Chromium Clang plugin (bugs.webrtc.org/163).
-    suppressed_configs += [ "//build/config/clang:find_bad_constructs" ]
+    #suppressed_configs += [ "//build/config/clang:find_bad_constructs" ]
   }
 
   if(is_win){

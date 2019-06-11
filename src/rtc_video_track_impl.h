@@ -6,9 +6,7 @@
 #include "rtc_video_source_impl.h"
 #include "rtc_video_track.h"
 
-#include "api/mediastreaminterface.h"
-#include "api/test/fakeconstraints.h"
-#include "media/engine/webrtcvideocapturerfactory.h"
+#include "api/media_stream_interface.h"
 #include "modules/video_capture/video_capture_factory.h"
 
 namespace libwebrtc {
@@ -49,6 +47,6 @@ class VideoTrackImpl : public RTCVideoTrack {
   scoped_refptr<VideoSinkAdapter> video_sink_;
 };
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_VIDEO_TRACK_IMPL_HXX

@@ -9,11 +9,9 @@
 #include "api/audio_codecs/builtin_audio_decoder_factory.h"
 #include "api/audio_codecs/builtin_audio_encoder_factory.h"
 #include "api/create_peerconnection_factory.h"
-#include "api/mediastreaminterface.h"
+#include "api/media_stream_interface.h"
 #include "api/video_codecs/builtin_video_decoder_factory.h"
 #include "api/video_codecs/builtin_video_encoder_factory.h"
-#include "media/engine/webrtcvideodecoderfactory.h"
-#include "media/engine/webrtcvideoencoderfactory.h"
 #include "modules/audio_device/audio_device_impl.h"
 #include "rtc_base/bind.h"
 
@@ -74,8 +72,7 @@ bool RTCPeerConnectionFactoryImpl::Terminate() {
 
 void RTCPeerConnectionFactoryImpl::CreateAudioDeviceModule_w() {
   if (!audio_device_module_)
-    audio_device_module_ = webrtc::AudioDeviceModule::Create(
-        0, webrtc::AudioDeviceModule::kPlatformDefaultAudio);
+    audio_device_module_ = webrtc::AudioDeviceModule::Create(webrtc::AudioDeviceModule::kPlatformDefaultAudio);
 }
 
 void RTCPeerConnectionFactoryImpl::DestroyAudioDeviceModule_w() {
@@ -160,12 +157,10 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
     scoped_refptr<RTCMediaConstraints> constraints) {
   RTCVideoCapturerImpl* capturer_impl =
       static_cast<RTCVideoCapturerImpl*>(capturer.get());
-  RTCMediaConstraintsImpl* media_constraints =
-          static_cast<RTCMediaConstraintsImpl*>(constraints.get());
+  /*RTCMediaConstraintsImpl* media_constraints =
+          static_cast<RTCMediaConstraintsImpl*>(constraints.get());*/
   rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
-      rtc_peerconnection_factory_->CreateVideoSource(
-          std::unique_ptr<cricket::VideoCapturer>(capturer_impl->video_capturer()),
-                                                     media_constraints);
+  new rtc::RefCountedObject<webrtc::internal::CapturerTrackSource>(capturer_impl->video_capturer());
   scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(
       new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
   return source;
@@ -222,4 +217,4 @@ scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
   return track;
 }
 
-};  // namespace libwebrtc
+} // namespace libwebrtc

@@ -1,8 +1,6 @@
 #include "rtc_video_source_impl.h"
 #include "rtc_video_frame_impl.h"
 
-#include "api/test/fakeconstraints.h"
-#include "media/engine/webrtcvideocapturerfactory.h"
 #include "modules/video_capture/video_capture_factory.h"
 #include "rtc_base/logging.h"
 
@@ -18,4 +16,4 @@ RTCVideoSourceImpl::~RTCVideoSourceImpl() {
   RTC_LOG(INFO) << __FUNCTION__ << ": dtor ";
 }
 
-};  // namespace libwebrtc
+} // namespace libwebrtc

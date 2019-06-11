@@ -148,4 +148,4 @@ scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width,
   return frame;
 }
 
-};  // namespace libwebrtc
+} // namespace libwebrtc

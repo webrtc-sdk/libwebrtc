@@ -44,4 +44,4 @@ bool RTCIceCandidateImpl::ToString(char* out, int length) {
   return false;
 }
 
-};  // namespace libwebrtc
+} // namespace libwebrtc

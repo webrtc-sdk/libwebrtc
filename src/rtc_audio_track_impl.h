@@ -3,15 +3,15 @@
 
 #include "rtc_audio_track.h"
 
-#include "api/mediastreaminterface.h"
-#include "api/peerconnectioninterface.h"
-#include "api/peerconnectionproxy.h"
+#include "api/media_stream_interface.h"
+#include "api/peer_connection_interface.h"
+#include "api/peer_connection_proxy.h"
 #include "common_audio/resampler/include/push_resampler.h"
 #include "common_audio/vad/include/webrtc_vad.h"
-#include "media/engine/webrtcvideoengine.h"
-#include "media/engine/webrtcvoiceengine.h"
-#include "pc/mediasession.h"
-#include "rtc_base/criticalsection.h"
+#include "media/engine/webrtc_video_engine.h"
+#include "media/engine/webrtc_voice_engine.h"
+#include "pc/media_session.h"
+#include "rtc_base/critical_section.h"
 #include "rtc_base/logging.h"
 
 namespace libwebrtc {
@@ -40,6 +40,6 @@ class AudioTrackImpl : public RTCAudioTrack {
   rtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track_;
 };
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_AUDIO_TRACK_IMPL_HXX

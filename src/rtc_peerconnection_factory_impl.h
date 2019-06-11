@@ -6,8 +6,8 @@
 #include "rtc_peerconnection_factory.h"
 #include "rtc_video_device_impl.h"
 
-#include "api/mediastreaminterface.h"
-#include "api/peerconnectioninterface.h"
+#include "api/media_stream_interface.h"
+#include "api/peer_connection_interface.h"
 #include "rtc_base/thread.h"
 
 namespace libwebrtc {
@@ -80,6 +80,6 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   std::list<scoped_refptr<RTCPeerConnection>> peerconnections_;
 };
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_MEDIA_SESSION_FACTORY_IMPL_HXX

@@ -58,6 +58,6 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
   webrtc::VideoRotation rotation_ = webrtc::kVideoRotation_0;
 };
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_VIDEO_FRAME_IMPL_HXX

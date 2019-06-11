@@ -32,6 +32,6 @@ class RTCSessionDescriptionImpl : public RTCSessionDescription {
   std::string type_;
 };
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_SESSION_DESCRIPTION_IMPL_HXX

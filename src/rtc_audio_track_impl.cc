@@ -12,4 +12,4 @@ AudioTrackImpl::~AudioTrackImpl() {
   RTC_LOG(INFO) << __FUNCTION__ << ": dtor ";
 }
 
-};  // namespace libwebrtc
+} // namespace libwebrtc

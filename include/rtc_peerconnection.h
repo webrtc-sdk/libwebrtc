@@ -191,6 +191,6 @@ class RTCPeerConnection : public RefCountInterface {
   virtual ~RTCPeerConnection() {}
 };
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_PEERCONNECTION_HXX

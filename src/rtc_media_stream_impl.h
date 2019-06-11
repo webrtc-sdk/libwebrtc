@@ -1,9 +1,9 @@
 #ifndef LIB_WEBRTC_MEDIA_STREAM_IMPL_HXX
 #define LIB_WEBRTC_MEDIA_STREAM_IMPL_HXX
 
-#include "api/mediastreaminterface.h"
-#include "api/peerconnectioninterface.h"
-#include "api/statstypes.h"
+#include "api/media_stream_interface.h"
+#include "api/peer_connection_interface.h"
+#include "api/stats_types.h"
 
 #include "rtc_media_stream.h"
 #include "rtc_peerconnection.h"
@@ -83,5 +83,5 @@ class MediaStreamImpl : public RTCMediaStream,
   RTCPeerConnectionObserver* observer_ = nullptr;
 };
 
-};      // namespace libwebrtc
+} // namespace libwebrtc
 #endif  //! LIB_WEBRTC_MEDIA_STREAM_IMPL_HXX

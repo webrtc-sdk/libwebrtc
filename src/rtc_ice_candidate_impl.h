@@ -29,6 +29,6 @@ class RTCIceCandidateImpl : public RTCIceCandidate {
   std::string sdp_;
 };
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_ICE_CANDIDATE_IMPL_HXX

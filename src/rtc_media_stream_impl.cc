@@ -148,4 +148,4 @@ void MediaStreamImpl::OnChanged() {
   video_tracks_ = video_tracks;
 }
 
-};  // namespace libwebrtc
+} // namespace libwebrtc

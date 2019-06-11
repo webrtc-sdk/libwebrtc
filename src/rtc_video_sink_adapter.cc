@@ -65,4 +65,4 @@ void VideoSinkAdapter::RemoveRenderer(
   rtc_track_->RemoveSink(renderer);
 }
 
-};  // namespace libwebrtc
+} // namespace libwebrtc

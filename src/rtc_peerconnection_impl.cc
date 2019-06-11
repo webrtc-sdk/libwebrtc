@@ -3,9 +3,9 @@
 #include "rtc_ice_candidate_impl.h"
 #include "rtc_media_stream_impl.h"
 #include "rtc_mediaconstraints_impl.h"
-#include "api/datachannelinterface.h"
+#include "api/data_channel_interface.h"
 #include "base/callback_forward.h"
-#include "pc/mediasession.h"
+#include "pc/media_session.h"
 #include "rtc_base/bind.h"
 #include "rtc_base/callback.h"
 #include "rtc_base/logging.h"
@@ -14,8 +14,6 @@
 #include <utility>
 #include <vector>
 
-using cricket::WebRtcVideoDecoderFactory;
-using cricket::WebRtcVideoEncoderFactory;
 using rtc::Thread;
 
 static std::map<libwebrtc::RtcpMuxPolicy,
@@ -661,4 +659,4 @@ void WebRTCStatsObserver::OnComplete(const webrtc::StatsReports& reports) {
   this->Release();
 }
 
-};  // namespace libwebrtc
+} // namespace libwebrtc
