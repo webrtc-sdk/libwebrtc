@@ -79,7 +79,7 @@ rtc_shared_library("libwebrtc"){
     "src/internal/video_capturer.h",
     "src/internal/video_capturer.cc",
     "src/internal/vcm_capturer.h",
-    "src/internal/vcm_capturer.h",
+    "src/internal/vcm_capturer.cc",
   ]
 
   include_dirs = [
@@ -111,6 +111,7 @@ rtc_shared_library("libwebrtc"){
       "../../api/video_codecs:builtin_video_decoder_factory",
       "../../api/video_codecs:builtin_video_encoder_factory",
       "../../api/video:video_frame",
+      "../../sdk:media_constraints",
       "../../media:rtc_audio_video",
       "../../media:rtc_internal_video_codecs",
       "../../media:rtc_media",

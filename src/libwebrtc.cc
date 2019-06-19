@@ -4,8 +4,8 @@
 #include "rtc_base/ssl_adapter.h"
 #include "rtc_base/thread.h"
 #ifdef WIN32
-#include "rtc_base/win32socketinit.h"
-#include "rtc_base/win32socketserver.h"
+#include "rtc_base/win32_socket_init.h"
+#include "rtc_base/win32_socket_server.h"
 #else
 #include "rtc_base/thread.h"
 #endif
