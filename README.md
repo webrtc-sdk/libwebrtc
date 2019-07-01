@@ -8,15 +8,14 @@ Use the WebRTC branch M74 to compile.
 
 ## Usage
 
-Download webrtc source into webrtc_src_m74.
-Please refer to https://webrtc.org/native-code/development/.
+- Download webrtc source into webrtc_src_m74, Please refer to https://webrtc.org/native-code/development/.
 
 ```
 cd webrtc_src_m74/src
 git clone https://github.com/cloudwebrtc/libwebrtc.git
 ```
 
-Modify webrtc's src/BUILD.gn file and add libwebrtc to group("default").
+- Modify webrtc's src/BUILD.gn file and add libwebrtc to group("default").
 
 ```patch
 diff --git a/BUILD.gn b/BUILD.gn
@@ -33,7 +32,7 @@ index bfe6d02ab9..2c0eaaa631 100644
        deps += [ "examples" ]
 ```
 
-Compile
+- Compile
 
 ```
 ninja -C out/Default libwebrtc
