@@ -27,6 +27,7 @@ class RTCIceCandidateImpl : public RTCIceCandidate {
  private:
   std::unique_ptr<webrtc::IceCandidateInterface> candidate_;
   std::string sdp_;
+  std::string sdp_mid_;
 };
 
 } // namespace libwebrtc

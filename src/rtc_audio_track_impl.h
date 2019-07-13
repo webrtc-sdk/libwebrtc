@@ -22,9 +22,9 @@ class AudioTrackImpl : public RTCAudioTrack {
 
   virtual ~AudioTrackImpl();
 
-  virtual const char* kind() const override { return rtc_track_->kind().c_str(); }
+  virtual const char* kind() const override { return kind_; }
 
-  virtual const char* id() const override { return rtc_track_->id().c_str(); }
+  virtual const char* id() const override { return id_; }
 
   virtual bool enabled() const override { return rtc_track_->enabled(); }
 
@@ -38,6 +38,7 @@ class AudioTrackImpl : public RTCAudioTrack {
 
  private:
   rtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track_;
+  char id_[kMaxStringLength], kind_[kShortStringLength];
 };
 
 } // namespace libwebrtc

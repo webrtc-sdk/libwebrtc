@@ -42,6 +42,7 @@ class RTCDataChannelImpl : public RTCDataChannel, public webrtc::DataChannelObse
   RTCDataChannelObserver* observer_ = nullptr;
   std::unique_ptr<rtc::CriticalSection> crit_sect_;
   RTCDataChannelState state_;
+  char label_[kMaxStringLength];
 };
 
 } // namespace libwebrtc

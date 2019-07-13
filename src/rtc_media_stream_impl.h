@@ -62,7 +62,9 @@ class MediaStreamImpl : public RTCMediaStream,
   virtual scoped_refptr<RTCVideoTrack> FindVideoTrack(
       const char* track_id) override;
 
-  virtual const char* label() override { return rtc_media_stream_->id().c_str(); }
+  virtual const char* label() override {
+    return label_;
+  }
 
   virtual void OnChanged() override;
 
@@ -81,6 +83,7 @@ class MediaStreamImpl : public RTCMediaStream,
   AudioTrackVector audio_tracks_;
   VideoTrackVector video_tracks_;
   RTCPeerConnectionObserver* observer_ = nullptr;
+  char label_[kMaxStringLength];
 };
 
 } // namespace libwebrtc

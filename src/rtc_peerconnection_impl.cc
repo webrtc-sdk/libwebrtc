@@ -198,7 +198,7 @@ void RTCPeerConnectionImpl::OnAddStream(
   remote_streams_.push_back(remote_stream);
 
   if (observer_) {
-    observer_->OnAddStream(remote_stream.get());
+    observer_->OnAddStream(remote_stream);
 
     for (auto track : remote_stream->GetAudioTracks()) {
       observer_->OnAddTrack(remote_stream, track);
@@ -301,7 +301,7 @@ void RTCPeerConnectionImpl::OnIceCandidate(
     scoped_refptr<RTCIceCandidate> cand =
         CreateRTCIceCandidate(cand_sdp.c_str(), candidate->sdp_mid().c_str(),
                               candidate->sdp_mline_index(), &error);
-    observer_->OnIceCandidate(cand.get());
+    observer_->OnIceCandidate(cand);
   }
 
   RTC_LOG(INFO) << __FUNCTION__ << ", mid " << candidate->sdp_mid()
@@ -361,10 +361,15 @@ bool RTCPeerConnectionImpl::Initialize() {
 
   offer_answer_options_.use_rtp_mux = configuration_.use_rtp_mux;
 
+  RTCMediaConstraintsImpl* media_constraints =
+      static_cast<RTCMediaConstraintsImpl*>(constraints_.get());
+  CopyConstraintsIntoRtcConfiguration(media_constraints, &config);
+
   webrtc::PeerConnectionFactoryInterface::Options options;
   options.disable_encryption = (configuration_.srtp_type == kSRTP_None);
   // options.network_ignore_mask |= ADAPTER_TYPE_CELLULAR;
   rtc_peerconnection_factory_->SetOptions(options);
+
   rtc_peerconnection_ = rtc_peerconnection_factory_->CreatePeerConnection(
       config, nullptr, nullptr, this);
 

@@ -9,6 +9,13 @@ class RTCVideoFrame : public RefCountInterface {
  public:
   enum class Type { kARGB, kBGRA, kABGR, kRGBA };
 
+  enum VideoRotation {
+    kVideoRotation_0 = 0,
+    kVideoRotation_90 = 90,
+    kVideoRotation_180 = 180,
+    kVideoRotation_270 = 270
+  };
+
  public:
   LIB_WEBRTC_API static scoped_refptr<RTCVideoFrame>
   Create(int width, int height, const uint8_t* buffer, int length);
@@ -29,6 +36,8 @@ class RTCVideoFrame : public RefCountInterface {
   // subsampled, this is the highest-resolution plane.
   virtual int width() const = 0;
   virtual int height() const = 0;
+
+  virtual VideoRotation rotation() = 0;
 
   // Returns pointer to the pixel data for a given plane. The memory is owned by
   // the VideoFrameBuffer object and must not be freed by the caller.

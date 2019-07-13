@@ -120,17 +120,19 @@ class RTCPeerConnectionObserver {
 
   virtual void OnIceConnectionState(RTCIceConnectionState state) = 0;
 
-  virtual void OnIceCandidate(RTCIceCandidate* candidate) = 0;
+  virtual void OnIceCandidate(scoped_refptr<RTCIceCandidate> candidate) = 0;
 
-  virtual void OnAddStream(RTCMediaStream* stream) = 0;
+  virtual void OnAddStream(scoped_refptr<RTCMediaStream> stream) = 0;
 
-  virtual void OnRemoveStream(RTCMediaStream* stream) = 0;
+  virtual void OnRemoveStream(scoped_refptr<RTCMediaStream> stream) = 0;
 
-  virtual void OnAddTrack(RTCMediaStream* stream, RTCMediaTrack* track) = 0;
+  virtual void OnAddTrack(scoped_refptr<RTCMediaStream> stream,
+                          scoped_refptr<RTCMediaTrack> track) = 0;
 
-  virtual void OnRemoveTrack(RTCMediaStream* stream, RTCMediaTrack* track) = 0;
+  virtual void OnRemoveTrack(scoped_refptr<RTCMediaStream> stream,
+                             scoped_refptr<RTCMediaTrack> track) = 0;
 
-  virtual void OnDataChannel(RTCDataChannel* data_channel) = 0;
+  virtual void OnDataChannel(scoped_refptr<RTCDataChannel> data_channel) = 0;
 
   virtual void OnRenegotiationNeeded() = 0;
 

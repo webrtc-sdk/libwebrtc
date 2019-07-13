@@ -5,7 +5,9 @@ namespace libwebrtc {
 RTCDataChannelImpl::RTCDataChannelImpl(
     rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel)
     : rtc_data_channel_(rtc_data_channel),
-      crit_sect_(new rtc::CriticalSection()) {}
+      crit_sect_(new rtc::CriticalSection()) {
+  snprintf(label_, kMaxStringLength, rtc_data_channel_->label().data());
+}
 
 void RTCDataChannelImpl::Send(const char* data,
 	int length,
@@ -35,7 +37,7 @@ void RTCDataChannelImpl::UnregisterObserver() {
 }
 
 const char* RTCDataChannelImpl::label() const {
-  return rtc_data_channel_->label().data();
+  return label_;
 }
 
 int RTCDataChannelImpl::id() const {

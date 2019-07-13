@@ -26,10 +26,12 @@ class VideoTrackImpl : public RTCVideoTrack {
       RTCVideoRenderer<scoped_refptr<RTCVideoFrame>>* renderer) override;
 
   virtual const char* kind() const override {
-    return rtc_track_->kind().c_str();
+    return kind_;
   }
 
-  virtual const char* id() const override { return rtc_track_->id().c_str(); }
+  virtual const char* id() const override { 
+      return id_;
+  }
 
   virtual bool enabled() const override { return rtc_track_->enabled(); }
 
@@ -45,6 +47,7 @@ class VideoTrackImpl : public RTCVideoTrack {
   rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track_;
   scoped_refptr<RTCVideoSourceImpl> video_source_;
   scoped_refptr<VideoSinkAdapter> video_sink_;
+  char id_[kMaxStringLength], kind_[kShortStringLength];
 };
 
 } // namespace libwebrtc
