@@ -49,7 +49,10 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
   int64_t timestamp_us() const { return timestamp_us_; }
   void set_timestamp_us(int64_t timestamp_us) { timestamp_us_ = timestamp_us; }
 
+  virtual RTCVideoFrame::VideoRotation rotation() override;
+
   webrtc::VideoRotation rotation() const { return rotation_; }
+
   void set_rotation(webrtc::VideoRotation rotation) { rotation_ = rotation; }
 
  private:

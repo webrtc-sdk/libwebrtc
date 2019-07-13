@@ -23,6 +23,8 @@ MediaStreamImpl::MediaStreamImpl(
         new RefCountedObject<VideoTrackImpl>(track));
     video_tracks_.push_back(video_track);
   }
+
+  snprintf(label_, kMaxStringLength, rtc_media_stream_->id().c_str());
 }
 
 MediaStreamImpl::~MediaStreamImpl() {

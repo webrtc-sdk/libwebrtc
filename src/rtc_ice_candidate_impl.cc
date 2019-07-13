@@ -20,7 +20,9 @@ scoped_refptr<RTCIceCandidate> CreateRTCIceCandidate(const char* sdp,
 
 RTCIceCandidateImpl::RTCIceCandidateImpl(
     std::unique_ptr<webrtc::IceCandidateInterface> rtc_candidate)
-    : candidate_(std::move(rtc_candidate)) {}
+    : candidate_(std::move(rtc_candidate)) {
+  sdp_mid_ = candidate_->sdp_mid();
+}
 
 const char* RTCIceCandidateImpl::candidate() const {
   candidate_->ToString((std::string*)&sdp_);
@@ -28,7 +30,7 @@ const char* RTCIceCandidateImpl::candidate() const {
 }
 
 const char* RTCIceCandidateImpl::sdp_mid() const {
-  return candidate_->sdp_mid().c_str();
+  return sdp_mid_.c_str();
 }
 
 int RTCIceCandidateImpl::sdp_mline_index() const {
