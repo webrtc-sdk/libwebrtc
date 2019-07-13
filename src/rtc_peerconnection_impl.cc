@@ -650,10 +650,10 @@ void WebRTCStatsObserver::OnComplete(const webrtc::StatsReports& reports) {
 
     kv = report->FindValue(webrtc::StatsReport::kStatsValueNameMediaType);
     if (kv) {
-      strncpy(stats.kind, kv->static_string_val(), kMaxStringLength);
+      strncpy(stats.kind, kv->static_string_val(), kShortStringLength);
     }
 
-    strncpy(stats.direction, direction_.c_str(), kMaxStringLength);
+    strncpy(stats.direction, direction_.c_str(), kShortStringLength);
   }
 
   if (observer_)
