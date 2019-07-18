@@ -9,8 +9,8 @@ VideoTrackImpl::VideoTrackImpl(
     rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track)
     : rtc_track_(rtc_track),
       video_sink_(new RefCountedObject<VideoSinkAdapter>(rtc_track)) {
-  snprintf(id_, kMaxStringLength, rtc_track_->id().c_str());
-  snprintf(kind_, kMaxStringLength, rtc_track_->kind().c_str());
+  strncpy(id_, rtc_track_->id().c_str(), kMaxStringLength);
+  strncpy(kind_, rtc_track_->kind().c_str(), kMaxStringLength);
   RTC_LOG(INFO) << __FUNCTION__ << ": ctor ";
 }
 
