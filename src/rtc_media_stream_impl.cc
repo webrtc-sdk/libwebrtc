@@ -24,7 +24,7 @@ MediaStreamImpl::MediaStreamImpl(
     video_tracks_.push_back(video_track);
   }
 
-  strncpy(label_, rtc_media_stream_->id().c_str(), kMaxStringLength);
+  strncpy(label_, rtc_media_stream_->id().c_str(), sizeof(label_));
 }
 
 MediaStreamImpl::~MediaStreamImpl() {
