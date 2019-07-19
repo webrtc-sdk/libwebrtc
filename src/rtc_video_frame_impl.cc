@@ -99,9 +99,6 @@ int VideoFrameBufferImpl::ConvertToARGB(Type type,
     default:
       break;
   }
-
-
-
   return buf_size;
 }
 

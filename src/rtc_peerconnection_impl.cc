@@ -647,15 +647,15 @@ void WebRTCStatsObserver::OnComplete(const webrtc::StatsReports& reports) {
 
     kv = report->FindValue(webrtc::StatsReport::kStatsValueNameTrackId);
     if (kv) {
-      strncpy(stats.msid, kv->static_string_val(), kMaxStringLength);
+      strncpy(stats.msid, kv->static_string_val(), sizeof(stats.msid));
     }
 
     kv = report->FindValue(webrtc::StatsReport::kStatsValueNameMediaType);
     if (kv) {
-      strncpy(stats.kind, kv->static_string_val(), kMaxStringLength);
+      strncpy(stats.kind, kv->static_string_val(), sizeof(stats.kind));
     }
 
-    strncpy(stats.direction, direction_.c_str(), kMaxStringLength);
+    strncpy(stats.direction, direction_.c_str(), sizeof(stats.direction));
   }
 
   if (observer_)
