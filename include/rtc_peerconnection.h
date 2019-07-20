@@ -2,7 +2,6 @@
 #define LIB_WEBRTC_RTC_PEERCONNECTION_HXX
 
 #include "rtc_types.h"
-
 #include "rtc_audio_track.h"
 #include "rtc_data_channel.h"
 #include "rtc_ice_candidate.h"
@@ -12,11 +11,7 @@
 #include "rtc_video_source.h"
 #include "rtc_video_track.h"
 
-#include <functional>
-
-#ifdef WIN32
-#define strncpy strncpy_s
-#endif
+#include <string.h>
 
 namespace libwebrtc {
 
@@ -103,14 +98,14 @@ class TrackStatsObserver : public RefCountInterface {
   ~TrackStatsObserver() {}
 };
 
-typedef std::function<void(const char* sdp, const char* type)>
+typedef fixed_size_function<void(const char* sdp, const char* type)>
     OnSdpCreateSuccess;
 
-typedef std::function<void(const char* erro)> OnSdpCreateFailure;
+typedef fixed_size_function<void(const char* erro)> OnSdpCreateFailure;
 
-typedef std::function<void()> OnSetSdpSuccess;
+typedef fixed_size_function<void()> OnSetSdpSuccess;
 
-typedef std::function<void(const char* error)> OnSetSdpFailure;
+typedef fixed_size_function<void(const char* error)> OnSetSdpFailure;
 
 class RTCPeerConnectionObserver {
  public:
