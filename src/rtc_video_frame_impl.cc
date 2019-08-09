@@ -64,7 +64,7 @@ int VideoFrameBufferImpl::ConvertToARGB(Type type,
                                         int dest_width,
                                         int dest_height) {
   rtc::scoped_refptr<webrtc::I420Buffer> i420 =
-      webrtc::I420Buffer::Rotate(*buffer_.get(), webrtc::kVideoRotation_0);
+      webrtc::I420Buffer::Rotate(*buffer_.get(), rotation_);
 
   rtc::scoped_refptr<webrtc::I420Buffer> dest =
       webrtc::I420Buffer::Create(dest_width, dest_height);
@@ -99,9 +99,6 @@ int VideoFrameBufferImpl::ConvertToARGB(Type type,
     default:
       break;
   }
-
-
-
   return buf_size;
 }
 

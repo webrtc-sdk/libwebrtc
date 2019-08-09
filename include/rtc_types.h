@@ -11,9 +11,10 @@
 #define LIB_WEBRTC_API
 #endif
 
+#include "base/fixed_size_function.h"
+#include "base/inlined_vector.h"
 #include "base/refcount.h"
 #include "base/scoped_ref_ptr.h"
-#include "base/inlined_vector.h"
 
 namespace libwebrtc {
 

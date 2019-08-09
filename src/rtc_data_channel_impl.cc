@@ -6,7 +6,8 @@ RTCDataChannelImpl::RTCDataChannelImpl(
     rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel)
     : rtc_data_channel_(rtc_data_channel),
       crit_sect_(new rtc::CriticalSection()) {
-  strncpy(label_, rtc_data_channel_->label().data(), kMaxStringLength);
+  rtc_data_channel_->RegisterObserver(this);
+  strncpy(label_, rtc_data_channel_->label().data(), sizeof(label_));
 }
 
 void RTCDataChannelImpl::Send(const char* data,
@@ -23,6 +24,7 @@ void RTCDataChannelImpl::Send(const char* data,
 }
 
 void RTCDataChannelImpl::Close() {
+  rtc_data_channel_->UnregisterObserver();
   rtc_data_channel_->Close();
 }
 

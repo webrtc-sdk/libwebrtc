@@ -11,7 +11,7 @@
 #ifndef LIB_WEBRTC_ATOMICOPS_H_
 #define LIB_WEBRTC_ATOMICOPS_H_
 
-#if defined(WIN32)
+#if defined(WIN32) || defined(_WINDOWS)
 // Include winsock2.h before including <windows.h> to maintain consistency with
 // win32.h.  We can't include win32.h directly here since it pulls in
 // headers such as basictypes.h which causes problems in Chromium where webrtc
@@ -22,7 +22,7 @@
 namespace libwebrtc {
 class AtomicOps {
  public:
-#if defined(WIN32)
+#if defined(WIN32) || defined(_WINDOWS)
   // Assumes sizeof(int) == sizeof(LONG), which it is on Win32 and Win64.
   static int Increment(volatile int* i) {
     return ::InterlockedIncrement(reinterpret_cast<volatile LONG*>(i));

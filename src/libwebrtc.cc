@@ -3,44 +3,19 @@
 #include "api/scoped_refptr.h"
 #include "rtc_base/ssl_adapter.h"
 #include "rtc_base/thread.h"
-#ifdef WIN32
-#include "rtc_base/win32_socket_init.h"
-#include "rtc_base/win32_socket_server.h"
-#else
-#include "rtc_base/thread.h"
-#endif
 
 #include "rtc_peerconnection_factory_impl.h"
 
 namespace libwebrtc {
 
 static bool g_is_initialized = false;
-static std::unique_ptr<rtc::Thread> g_main_thread;
 std::unique_ptr<rtc::Thread> worker_thread;
 std::unique_ptr<rtc::Thread> signaling_thread;
 std::unique_ptr<rtc::Thread> network_thread;
-#ifdef WIN32
-std::unique_ptr<rtc::WinsockInitializer> winsocket_initializer;
-std::unique_ptr<rtc::Win32SocketServer> win32_socket_server;
-#endif
 
 bool LibWebRTC::Initialize() {
+ 
   if (!g_is_initialized) {
-#ifdef WIN32
-    win32_socket_server.reset(new rtc::Win32SocketServer());
-    winsocket_initializer.reset(new rtc::WinsockInitializer());
-#endif
-    if (!g_main_thread.get()) {
-      g_main_thread.reset(
-#ifdef WIN32
-          new rtc::Win32Thread(win32_socket_server.get())
-#else
-          new rtc::Thread()
-#endif
-      );
-    }
-
-    rtc::ThreadManager::Instance()->SetCurrentThread(g_main_thread.get());
     rtc::InitializeSSL();
     g_is_initialized = true;
 
