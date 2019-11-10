@@ -142,11 +142,11 @@ namespace libwebrtc {
 		return source;
 	}
 
-	scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource(scoped_refptr<RTCDesktopCapturer> capturer, scoped_refptr<RTCMediaConstraints> constraints)
+	/*scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource(scoped_refptr<RTCVideoCapturer> capturer, scoped_refptr<RTCMediaConstraints> constraints)
 	{
 		if (rtc::Thread::Current() != worker_thread_) {
 			scoped_refptr<RTCVideoSource> source =
-				worker_thread_->Invoke<scoped_refptr<RTCVideoSource>>(
+				signaling_thread_->Invoke<scoped_refptr<RTCVideoSource>>(
 					RTC_FROM_HERE,
 					rtc::Bind(&RTCPeerConnectionFactoryImpl::CreateDesktopSource_s, this, capturer, constraints));
 			return source;
@@ -154,7 +154,7 @@ namespace libwebrtc {
 
 		return CreateDesktopSource_s(capturer, constraints);
 	}
-
+*/
 
 	scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource(
 		scoped_refptr<RTCVideoCapturer> capturer,
@@ -172,15 +172,15 @@ namespace libwebrtc {
 		return CreateVideoSource_s(capturer, video_source_label, constraints);
 	}
 
-	scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource_s(scoped_refptr<RTCDesktopCapturer> capturer, scoped_refptr<RTCMediaConstraints> constraints)
-	{
-		RTCDesktopCapturerImpl* capturer_impl = static_cast<RTCDesktopCapturerImpl*>(capturer.get());
-		RTCMediaConstraintsImpl* media_constraints = static_cast<RTCMediaConstraintsImpl*>(constraints.get());
-		rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
-			rtc_peerconnection_factory_->CreateVideoSource(std::unique_ptr<cricket::VideoCapturer>(capturer_impl), media_constraints);
-		scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
-		return source;
-	}
+	//scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource_s(scoped_refptr<RTCDesktopCapturer> capturer, scoped_refptr<RTCMediaConstraints> constraints)
+	//{
+	//	RTCDesktopCapturerImpl* capturer_impl = static_cast<RTCDesktopCapturerImpl*>(capturer.get());
+	//	RTCMediaConstraintsImpl* media_constraints = static_cast<RTCMediaConstraintsImpl*>(constraints.get());
+	//	rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
+	//		rtc_peerconnection_factory_->CreateVideoSource(std::unique_ptr<cricket::VideoCapturer>(capturer_impl), media_constraints);
+	//	scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
+	//	return source;
+	//}
 
 	scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
 		scoped_refptr<RTCVideoCapturer> capturer,

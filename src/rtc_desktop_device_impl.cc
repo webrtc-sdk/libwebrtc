@@ -1,43 +1,33 @@
 #include "rtc_desktop_device_impl.h" 
- 
+#include "rtc_video_device_impl.h"
 
 namespace libwebrtc {
 
 	DesktopDeviceImpl::DesktopDeviceImpl()
-	{ 
-	} 
-	 
+	{
+	}
+
 	DesktopCaptureOptions DesktopDeviceImpl::CreateOptions()
 	{
 		webrtc::DesktopCaptureOptions options = webrtc::DesktopCaptureOptions::CreateDefault();
-		options.set_allow_directx_capturer(true);
+		options.set_allow_directx_capturer(false);
 		return options;
-	}
-	/*auto options = webrtc::DesktopCaptureOptions::CreateDefault();
-	 options.set_allow_directx_capturer(true);*/
-
-	/*	×ÀÃæÍ¼Ïñ£ºwebrtc::DesktopCapturer::CreateScreenCapturer
-		´°¿ÚÍ¼Ïñ£ºwebrtc::DesktopCapturer::CreateWindowCapturer*/
-
-	/*×ÀÃæÍ¼Ïñ*/
-	scoped_refptr<RTCDesktopCapturer> DesktopDeviceImpl::CreateScreenCapturer(const webrtc::DesktopCaptureOptions& options)
-	{   
-		scoped_refptr<RTCDesktopCapturerImpl> screen_capturer =
-			scoped_refptr<RTCDesktopCapturerImpl>(
-				new RefCountedObject<RTCDesktopCapturerImpl>(
-					webrtc::DesktopCapturer::CreateScreenCapturer(options))); 
-		//scoped_refptr<DesktopCapturer> screen_capturer = scoped_refptr<DesktopCapturer>(webrtc::DesktopCapturer::CreateScreenCapturer(options).get());
-		return screen_capturer;
+	} 
+    /*×ÀÃæÍ¼Ïñ*/
+	scoped_refptr<RTCVideoCapturer> DesktopDeviceImpl::CreateScreenCapturer(const webrtc::DesktopCaptureOptions& options)
+	{
+		RTCDesktopCapturer* desktopCapturer = new RTCDesktopCapturer(webrtc::DesktopCapturer::CreateScreenCapturer(options)); 
+		scoped_refptr<RTCVideoCapturerImpl> video_capturer = scoped_refptr<RTCVideoCapturerImpl>(new RefCountedObject<RTCVideoCapturerImpl>(
+			std::unique_ptr<cricket::VideoCapturer>(desktopCapturer)));
+		return video_capturer;
 	}
 	/*Ó¦ÓÃÍ¼Ïñ*/
-	scoped_refptr<RTCDesktopCapturer> DesktopDeviceImpl::CreateWindowCapturer(const webrtc::DesktopCaptureOptions& options)
+	scoped_refptr<RTCVideoCapturer> DesktopDeviceImpl::CreateWindowCapturer(const webrtc::DesktopCaptureOptions& options)
 	{
-		scoped_refptr<RTCDesktopCapturerImpl> window_capturer =
-			scoped_refptr<RTCDesktopCapturerImpl>(
-				new RefCountedObject<RTCDesktopCapturerImpl>(
-					webrtc::DesktopCapturer::CreateWindowCapturer(options)));
+		RTCDesktopCapturer* desktopCapturer = new RTCDesktopCapturer(webrtc::DesktopCapturer::CreateWindowCapturer(options)); 
+		scoped_refptr<RTCVideoCapturerImpl> video_capturer = scoped_refptr<RTCVideoCapturerImpl>(new RefCountedObject<RTCVideoCapturerImpl>(
+			std::unique_ptr<cricket::VideoCapturer>(desktopCapturer)));
+		return video_capturer;
 
-		//scoped_refptr<DesktopCapturer> window_capturer = scoped_refptr<DesktopCapturer>(webrtc::DesktopCapturer::CreateWindowCapturer(options).get());
-		return window_capturer;
 	}
 }

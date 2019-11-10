@@ -37,7 +37,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
 
   virtual scoped_refptr<RTCAudioSource> CreateAudioSource(const char* audio_source_label) override;
 
-  virtual scoped_refptr<RTCVideoSource> CreateDesktopSource(scoped_refptr<RTCDesktopCapturer> capturer , scoped_refptr<RTCMediaConstraints> constraints) override;
+  //virtual scoped_refptr<RTCVideoSource> CreateDesktopSource(scoped_refptr<RTCVideoCapturer> capturer , scoped_refptr<RTCMediaConstraints> constraints) override;
    
   virtual scoped_refptr<RTCVideoSource> CreateVideoSource(scoped_refptr<RTCVideoCapturer> capturer,const char* video_source_label,scoped_refptr<RTCMediaConstraints> constraints) override;
 
@@ -59,7 +59,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   void DestroyAudioDeviceModule_w();
 
   scoped_refptr<RTCVideoSource> CreateVideoSource_s(scoped_refptr<RTCVideoCapturer> capturer,const char* video_source_label,scoped_refptr<RTCMediaConstraints> constraints);
-  scoped_refptr<RTCVideoSource> CreateDesktopSource_s(scoped_refptr<RTCDesktopCapturer> capturer,  scoped_refptr<RTCMediaConstraints> constraints);
+  //scoped_refptr<RTCVideoSource> CreateDesktopSource_s(scoped_refptr<RTCDesktopCapturer> capturer,  scoped_refptr<RTCMediaConstraints> constraints);
 
  private:
   rtc::Thread* worker_thread_ = nullptr;

@@ -21,14 +21,13 @@
 
 namespace libwebrtc
 {
-	class RTCDesktopCapturerImpl : public cricket::VideoCapturer,
+	class RTCDesktopCapturer : public cricket::VideoCapturer,
 		public rtc::MessageHandler,
-		public webrtc::DesktopCapturer::Callback,
-		public RTCDesktopCapturer
+		public webrtc::DesktopCapturer::Callback 
 	{
 	public:
-		RTCDesktopCapturerImpl(std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer);
-		~RTCDesktopCapturerImpl();
+		RTCDesktopCapturer(std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer);
+		~RTCDesktopCapturer();
 
 		void CaptureFrame();
 		virtual cricket::CaptureState Start(const cricket::VideoFormat& capture_format);

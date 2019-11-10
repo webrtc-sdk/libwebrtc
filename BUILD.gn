@@ -50,11 +50,10 @@ rtc_shared_library("libwebrtc"){
     "src/rtc_data_channel_impl.cc",
     "src/rtc_desktop_device_impl.h",
     "src/rtc_desktop_device_impl.cc",
-    "src/rtc_desktop_capturer_impl.h",
-    "src/rtc_desktop_capturer_impl.cc",
+    "src/rtc_desktop_capturer.h",
+    "src/rtc_desktop_capturer.cc",
 
-
-
+ 
     "src/rtc_ice_candidate_impl.h",
     "src/rtc_ice_candidate_impl.cc",
     "src/rtc_peerconnection_impl.h",

@@ -1,18 +1,18 @@
-#include "rtc_desktop_capturer_impl.h" 
+#include "rtc_desktop_capturer.h" 
 
 
 namespace libwebrtc {
 
-	RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer) :capturer(std::move(desktopcapturer))
+	RTCDesktopCapturer::RTCDesktopCapturer(std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer) :capturer(std::move(desktopcapturer))
 	{
 		std::vector<cricket::VideoFormat> formats;
 		formats.push_back(cricket::VideoFormat(800, 600, cricket::VideoFormat::FpsToInterval(30), cricket::FOURCC_I420));
 		SetSupportedFormats(formats);
 	}
 
-	RTCDesktopCapturerImpl ::~RTCDesktopCapturerImpl() {}
+	RTCDesktopCapturer ::~RTCDesktopCapturer() {}
 
-	cricket::CaptureState RTCDesktopCapturerImpl::Start(const cricket::VideoFormat& capture_format)
+	cricket::CaptureState RTCDesktopCapturer::Start(const cricket::VideoFormat& capture_format)
 	{
 		cricket::VideoFormat supported;
 		if (GetBestCaptureFormat(capture_format, &supported))
@@ -26,22 +26,22 @@ namespace libwebrtc {
 		return cricket::CS_RUNNING;
 	}
 
-	void RTCDesktopCapturerImpl::Stop() {
+	void RTCDesktopCapturer::Stop() {
 		SetCaptureState(cricket::CS_STOPPED);
 		SetCaptureFormat(NULL);
 	}
 
-	bool RTCDesktopCapturerImpl::IsRunning() {
+	bool RTCDesktopCapturer::IsRunning() {
 		return capture_state() == cricket::CS_RUNNING;
 	}
 
-	bool RTCDesktopCapturerImpl::GetPreferredFourccs(std::vector<uint32_t>* fourccs) {
+	bool RTCDesktopCapturer::GetPreferredFourccs(std::vector<uint32_t>* fourccs) {
 		fourccs->push_back(cricket::FOURCC_I420);
 		fourccs->push_back(cricket::FOURCC_MJPG);
 		return true;
 	}
 
-	void RTCDesktopCapturerImpl::OnCaptureResult(webrtc::DesktopCapturer::Result result, std::unique_ptr<webrtc::DesktopFrame> frame) {
+	void RTCDesktopCapturer::OnCaptureResult(webrtc::DesktopCapturer::Result result, std::unique_ptr<webrtc::DesktopFrame> frame) {
 		if (result != webrtc::DesktopCapturer::Result::SUCCESS)
 		{
 			return;
@@ -63,14 +63,14 @@ namespace libwebrtc {
 		OnFrame(webrtc::VideoFrame(i420_buffer_, 0, 0, webrtc::kVideoRotation_0), width, height);
 	}
 
-	void RTCDesktopCapturerImpl::OnMessage(rtc::Message* msg) {
+	void RTCDesktopCapturer::OnMessage(rtc::Message* msg) {
 		if (msg->message_id == 0)
 		{
 			CaptureFrame();
 		}
 	}
 
-	void RTCDesktopCapturerImpl::CaptureFrame() {
+	void RTCDesktopCapturer::CaptureFrame() {
 		capturer->CaptureFrame();
 		rtc::Location loc(__FUNCTION__, __FILE__);
 		rtc::Thread::Current()->PostDelayed(loc, 33, this, 0);
