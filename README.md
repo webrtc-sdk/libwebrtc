@@ -8,7 +8,7 @@ Use the WebRTC branch M74 to compile.
 
 ## Usage
 
-- Download webrtc source into webrtc_src_m74, Please refer to https://webrtc.org/native-code/development/.
+- Download webrtc source into webrtc_src_m74, Please refer to https://webrtc.github.io/webrtc-org/native-code/development/.
 
 ```
 cd webrtc_src_m74/src
