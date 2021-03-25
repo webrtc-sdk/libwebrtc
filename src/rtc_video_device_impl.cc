@@ -28,7 +28,7 @@ int32_t RTCVideoDeviceImpl::GetDeviceName(
 
   if (device_info_->GetDeviceName(deviceNumber, deviceNameUTF8,
                                   deviceNameLength, deviceUniqueIdUTF8,
-                                  productUniqueIdUTF8Length) != -1) {
+                                  deviceUniqueIdUTF8Length) != -1) {
     return 0;
   }
   return 0;
