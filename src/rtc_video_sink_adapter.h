@@ -6,7 +6,7 @@
 
 #include "api/media_stream_interface.h"
 #include "api/peer_connection_interface.h"
-#include "rtc_base/critical_section.h"
+#include "rtc_base/synchronization/mutex.h"
 
 namespace libwebrtc {
 
@@ -31,7 +31,7 @@ class VideoSinkAdapter : public rtc::VideoSinkInterface<webrtc::VideoFrame>, pub
   // VideoSinkInterface implementation
   void OnFrame(const webrtc::VideoFrame& frame) override;
   rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track_;
-  std::unique_ptr<rtc::CriticalSection> crt_sec_;
+  std::unique_ptr<webrtc::Mutex> crt_sec_;
   std::vector<RTCVideoRenderer<scoped_refptr<RTCVideoFrame>>*> renderers_;
 };
 

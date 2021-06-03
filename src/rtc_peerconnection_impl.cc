@@ -6,8 +6,6 @@
 #include "api/data_channel_interface.h"
 #include "base/callback_forward.h"
 #include "pc/media_session.h"
-#include "rtc_base/bind.h"
-#include "rtc_base/callback.h"
 #include "rtc_base/logging.h"
 
 #include <functional>
@@ -118,9 +116,9 @@ class SetSessionDescriptionObserverProxy
     RTC_LOG(INFO) << __FUNCTION__;
     success_callback_();
   }
-  virtual void OnFailure(const std::string& error) {
-    RTC_LOG(INFO) << __FUNCTION__ << " " << error;
-    failure_callback_(error.c_str());
+  virtual void OnFailure(webrtc::RTCError error) {
+    RTC_LOG(INFO) << __FUNCTION__ << " " << error.message();
+    failure_callback_(error.message());
   }
 
  protected:
@@ -158,8 +156,8 @@ class CreateSessionDescriptionObserverProxy
     success_callback_(sdp.c_str(), type.c_str());
   }
 
-  virtual void OnFailure(const std::string& error) {
-    failure_callback_(error.c_str());
+  virtual void OnFailure(webrtc::RTCError error) {
+    failure_callback_(error.message());
   }
 
  private:
@@ -175,7 +173,7 @@ RTCPeerConnectionImpl::RTCPeerConnectionImpl(
     : rtc_peerconnection_factory_(peer_connection_factory),
       configuration_(configuration),
       constraints_(constraints),
-      callback_crt_sec_(new rtc::CriticalSection()) {
+      callback_crt_sec_(new webrtc::Mutex()) {
   RTC_LOG(INFO) << __FUNCTION__ << ": ctor";
   Initialize();
 }
@@ -311,12 +309,12 @@ void RTCPeerConnectionImpl::OnIceCandidate(
 
 void RTCPeerConnectionImpl::RegisterRTCPeerConnectionObserver(
     RTCPeerConnectionObserver* observer) {
-  rtc::CritScope cs(callback_crt_sec_.get());
+  webrtc::MutexLock  cs(callback_crt_sec_.get());
   observer_ = observer;
 }
 
 void RTCPeerConnectionImpl::DeRegisterRTCPeerConnectionObserver() {
-  rtc::CritScope cs(callback_crt_sec_.get());
+  webrtc::MutexLock  cs(callback_crt_sec_.get());
   observer_ = nullptr;
 }
 
@@ -438,7 +436,7 @@ void RTCPeerConnectionImpl::SetRemoteDescription(const char* sdp,
     return;
   }
 
-  cricket::ContentDescription* content_desc =
+  cricket::MediaContentDescription* content_desc =
       session_description->description()->GetContentDescriptionByName("video");
   cricket::MediaContentDescription* media_content_desc =
       (cricket::MediaContentDescription*)content_desc;
@@ -459,7 +457,7 @@ void RTCPeerConnectionImpl::CreateOffer(
     OnSdpCreateFailure failure,
     scoped_refptr<RTCMediaConstraints> constraints) {
   if (!rtc_peerconnection_.get() || !rtc_peerconnection_factory_.get()) {
-    rtc::CritScope cs(callback_crt_sec_.get());
+    webrtc::MutexLock  cs(callback_crt_sec_.get());
     failure("Failed to initialize PeerConnection");
     return;
   }
@@ -483,7 +481,7 @@ void RTCPeerConnectionImpl::CreateAnswer(
     OnSdpCreateFailure failure,
     scoped_refptr<RTCMediaConstraints> constraints) {
   if (!rtc_peerconnection_.get() || !rtc_peerconnection_factory_.get()) {
-    rtc::CritScope cs(callback_crt_sec_.get());
+    webrtc::MutexLock  cs(callback_crt_sec_.get());
     failure("Failed to initialize PeerConnection");
     return;
   }

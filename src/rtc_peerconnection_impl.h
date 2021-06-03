@@ -12,11 +12,10 @@
 #include "api/data_channel_interface.h"
 #include "api/media_stream_interface.h"
 #include "api/peer_connection_interface.h"
-#include "api/peer_connection_proxy.h"
 
 #include "src/internal/video_capturer.h"
 #include "modules/video_capture/video_capture.h"
-#include "rtc_base/critical_section.h"
+#include "rtc_base/synchronization/mutex.h"
 #include "api/scoped_refptr.h"
 
 #include <deque>
@@ -133,7 +132,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   scoped_refptr<RTCMediaConstraints> constraints_;
   webrtc::PeerConnectionInterface::RTCOfferAnswerOptions offer_answer_options_;
   RTCPeerConnectionObserver* observer_ = nullptr;
-  std::unique_ptr<rtc::CriticalSection> callback_crt_sec_;
+  std::unique_ptr<webrtc::Mutex> callback_crt_sec_;
   bool initialize_offer_sent = false;
   MediaStreamVector local_streams_;
   MediaStreamVector remote_streams_;

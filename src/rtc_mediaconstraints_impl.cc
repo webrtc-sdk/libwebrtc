@@ -10,8 +10,6 @@ scoped_refptr<RTCMediaConstraints> RTCMediaConstraints::Create() {
 }
 
 const char* RTCMediaConstraints::kGoogEchoCancellation = webrtc::MediaConstraints::kGoogEchoCancellation;
-const char* RTCMediaConstraints::kExtendedFilterEchoCancellation = webrtc::MediaConstraints::kExtendedFilterEchoCancellation;
-const char* RTCMediaConstraints::kDAEchoCancellation = webrtc::MediaConstraints::kDAEchoCancellation;
 const char* RTCMediaConstraints::kAutoGainControl = webrtc::MediaConstraints::kAutoGainControl;
 const char* RTCMediaConstraints::kExperimentalAutoGainControl = webrtc::MediaConstraints::kExperimentalAutoGainControl;
 const char* RTCMediaConstraints::kNoiseSuppression = webrtc::MediaConstraints::kNoiseSuppression;
@@ -28,7 +26,6 @@ const char* RTCMediaConstraints::kUseRtpMux = webrtc::MediaConstraints::kUseRtpM
 const char* RTCMediaConstraints::kValueTrue = webrtc::MediaConstraints::kValueTrue;
 const char* RTCMediaConstraints::kValueFalse = webrtc::MediaConstraints::kValueFalse;
 const char* RTCMediaConstraints::kEnableDtlsSrtp = webrtc::MediaConstraints::kEnableDtlsSrtp;
-const char* RTCMediaConstraints::kEnableRtpDataChannels = webrtc::MediaConstraints::kEnableRtpDataChannels;
 const char* RTCMediaConstraints::kEnableDscp = webrtc::MediaConstraints::kEnableDscp;
 const char* RTCMediaConstraints::kEnableIPv6 = webrtc::MediaConstraints::kEnableIPv6;
 const char* RTCMediaConstraints::kEnableVideoSuspendBelowMinBitrate = webrtc::MediaConstraints::kEnableVideoSuspendBelowMinBitrate;

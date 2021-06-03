@@ -5,7 +5,7 @@ namespace libwebrtc {
 RTCDataChannelImpl::RTCDataChannelImpl(
     rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel)
     : rtc_data_channel_(rtc_data_channel),
-      crit_sect_(new rtc::CriticalSection()) {
+      crit_sect_(new webrtc::Mutex()) {
   rtc_data_channel_->RegisterObserver(this);
   strncpy(label_, rtc_data_channel_->label().data(), sizeof(label_));
 }
@@ -29,12 +29,12 @@ void RTCDataChannelImpl::Close() {
 }
 
 void RTCDataChannelImpl::RegisterObserver(RTCDataChannelObserver* observer) {
-  rtc::CritScope(crit_sect_.get());
+  webrtc::MutexLock (crit_sect_.get());
   observer_ = observer;
 }
 
 void RTCDataChannelImpl::UnregisterObserver() {
-  rtc::CritScope(crit_sect_.get());
+  webrtc::MutexLock (crit_sect_.get());
   observer_ = nullptr;
 }
 
@@ -64,7 +64,7 @@ void RTCDataChannelImpl::OnStateChange() {
     default:
       break;
   }
-  rtc::CritScope(crit_sect_.get());
+  webrtc::MutexLock (crit_sect_.get());
   if (observer_)
     observer_->OnStateChange(state_);
 }

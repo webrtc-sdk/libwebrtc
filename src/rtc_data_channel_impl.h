@@ -5,7 +5,7 @@
 #include "rtc_types.h"
 
 #include "api/data_channel_interface.h"
-#include "rtc_base/critical_section.h"
+#include "rtc_base/synchronization/mutex.h"
 
 namespace libwebrtc {
 
@@ -40,7 +40,7 @@ class RTCDataChannelImpl : public RTCDataChannel, public webrtc::DataChannelObse
  private:
   rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel_;
   RTCDataChannelObserver* observer_ = nullptr;
-  std::unique_ptr<rtc::CriticalSection> crit_sect_;
+  std::unique_ptr<webrtc::Mutex> crit_sect_;
   RTCDataChannelState state_;
   char label_[kMaxStringLength];
 };
