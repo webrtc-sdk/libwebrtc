@@ -17,6 +17,7 @@
 #if defined(WEBRTC_IOS)
 #include "engine/sdk/objc/Framework/Classes/videotoolboxvideocodecfactory.h"
 #endif
+#include <api/task_queue/default_task_queue_factory.h>
 
 namespace libwebrtc {
 
@@ -32,12 +33,13 @@ RTCPeerConnectionFactoryImpl::~RTCPeerConnectionFactoryImpl() {}
 
 bool RTCPeerConnectionFactoryImpl::Initialize() {
   if (!audio_device_module_) {
+    task_queue_factory_ = webrtc::CreateDefaultTaskQueueFactory();
     worker_thread_->Invoke<void>(
         RTC_FROM_HERE,[=]{
             CreateAudioDeviceModule_w();
         });
   }
-
+  
   if (!rtc_peerconnection_factory_) {
     rtc_peerconnection_factory_ = webrtc::CreatePeerConnectionFactory(
         network_thread_, worker_thread_, signaling_thread_,
@@ -71,7 +73,8 @@ bool RTCPeerConnectionFactoryImpl::Terminate() {
 
 void RTCPeerConnectionFactoryImpl::CreateAudioDeviceModule_w() {
   if (!audio_device_module_)
-    audio_device_module_ = webrtc::AudioDeviceModule::Create(webrtc::AudioDeviceModule::kPlatformDefaultAudio, nullptr);
+    audio_device_module_ = webrtc::AudioDeviceModule::Create(
+        webrtc::AudioDeviceModule::kPlatformDefaultAudio, task_queue_factory_.get());
 }
 
 void RTCPeerConnectionFactoryImpl::DestroyAudioDeviceModule_w() {
