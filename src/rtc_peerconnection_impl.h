@@ -58,6 +58,12 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
                                     OnSetSdpSuccess success,
                                     OnSetSdpFailure failure) override;
 
+  virtual void GetLocalDescription(OnGetSdpSuccess success,
+                                   OnGetSdpFailure failure) override;
+
+  virtual void GetRemoteDescription(OnGetSdpSuccess success,
+                                    OnGetSdpFailure failure) override;
+
   virtual void AddCandidate(const char* mid,
                             int midx,
                             const char* candiate) override;

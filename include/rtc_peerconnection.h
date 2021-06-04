@@ -107,6 +107,13 @@ typedef fixed_size_function<void()> OnSetSdpSuccess;
 
 typedef fixed_size_function<void(const char* error)> OnSetSdpFailure;
 
+typedef fixed_size_function<void(const char* sdp, const char* type)>
+    OnGetSdpSuccess;
+
+typedef fixed_size_function<void(const char* error)> OnGetSdpFailure;
+
+
+
 class RTCPeerConnectionObserver {
  public:
   virtual void OnSignalingState(RTCSignalingState state) = 0;
@@ -164,6 +171,13 @@ class RTCPeerConnection : public RefCountInterface {
                                     const char* type,
                                     OnSetSdpSuccess success,
                                     OnSetSdpFailure failure) = 0;
+
+  
+  virtual void GetLocalDescription(OnGetSdpSuccess success,
+                                    OnGetSdpFailure failure) = 0;
+
+  virtual void GetRemoteDescription(OnGetSdpSuccess success,
+                                    OnGetSdpFailure failure) = 0;
 
   virtual void AddCandidate(const char* mid,
                             int midx,

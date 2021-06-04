@@ -452,6 +452,41 @@ void RTCPeerConnectionImpl::SetRemoteDescription(const char* sdp,
   return;
 }
 
+
+void RTCPeerConnectionImpl::GetLocalDescription(OnGetSdpSuccess success,
+                                                OnGetSdpFailure failure) {
+  auto local_description = rtc_peerconnection_->local_description();
+  if  (!local_description ) {
+    if (failure) {
+      failure("not local description");
+    }
+    return;
+  }
+
+  if (success) {
+    std::string dsp;
+    local_description->ToString(&dsp);
+    success(dsp.c_str(), webrtc::SdpTypeToString(local_description->GetType()));
+  }
+}
+
+void RTCPeerConnectionImpl::GetRemoteDescription(OnGetSdpSuccess success,
+                                                 OnGetSdpFailure failure) {
+  auto local_description = rtc_peerconnection_->local_description();
+  if (!local_description) {
+    if (failure) {
+      failure("not remote description");
+    }
+    return;
+  }
+
+  if (success) {
+    std::string dsp;
+    local_description->ToString(&dsp);
+    success(dsp.c_str(), webrtc::SdpTypeToString(local_description->GetType()));
+  }
+}
+
 void RTCPeerConnectionImpl::CreateOffer(
     OnSdpCreateSuccess success,
     OnSdpCreateFailure failure,
