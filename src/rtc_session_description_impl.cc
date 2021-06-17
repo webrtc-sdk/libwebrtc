@@ -36,10 +36,10 @@ const char* RTCSessionDescriptionImpl::type(){
   return type_.c_str();
 }
 
-bool RTCSessionDescriptionImpl::ToString(char* out, int length) {
+bool RTCSessionDescriptionImpl::ToString(char out[], int length) {
   std::string tmp;
   if (description_->ToString(&tmp)) {
-    strncpy(out, tmp.c_str(), length);
+    strncpy(out, length, tmp.c_str(), tmp.size());
     return true;
   }
   return false;

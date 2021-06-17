@@ -40,7 +40,7 @@ int RTCIceCandidateImpl::sdp_mline_index() const {
 bool RTCIceCandidateImpl::ToString(char* out, int length) {
   std::string tmp;
   if (candidate_->ToString(&tmp)) {
-    strncpy(out, tmp.c_str(), length);
+    strncpy(out, length, tmp.c_str(), tmp.size());
     return true;
   }
   return false;

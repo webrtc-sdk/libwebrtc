@@ -75,6 +75,22 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
 
   virtual void DeRegisterRTCPeerConnectionObserver() override;
 
+
+  virtual void AddTransceiver(scoped_refptr<RTCMediaTrack> track,
+                              scoped_refptr<RTCRtpTransceiverInit> init,
+                              OnAddTransceiver onAdd) override;
+
+  virtual void AddTransceiver(scoped_refptr<RTCMediaTrack> track,
+                              OnAddTransceiver onAdd) override;
+
+  virtual void AddTrack(scoped_refptr<RTCMediaTrack> track,
+                        const Vector<std::string>& streamIds,
+                        libwebrtc::OnAddTrack onAdd) override;
+
+  virtual bool RemoveTrack(scoped_refptr<RTCRtpSender> render) override;
+
+  virtual Vector<scoped_refptr<RTCRtpSender>> GetSenders() override;
+
  public:
   virtual int AddStream(scoped_refptr<RTCMediaStream> stream) override;
 
@@ -86,7 +102,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
 
   virtual scoped_refptr<RTCDataChannel> CreateDataChannel(
       const char* label,
-      const RTCDataChannelInit *dataChannelDict) override;
+      const RTCDataChannelInit* dataChannelDict) override;
 
   virtual bool GetStats(const RTCAudioTrack* track,
                         scoped_refptr<TrackStatsObserver> observer) override;
@@ -113,10 +129,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   virtual void OnDataChannel(
       rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel) override;
 
-  virtual void OnRenegotiationNeeded() override {
-    if (observer_)
-      observer_->OnRenegotiationNeeded();
-  }
+  virtual void OnRenegotiationNeeded() override;
 
   virtual void OnIceCandidate(
       const webrtc::IceCandidateInterface* candidate) override;

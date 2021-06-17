@@ -38,6 +38,13 @@ rtc_shared_library("libwebrtc"){
     "include/rtc_video_frame.h",
     "include/rtc_video_source.h",
     "include/rtc_video_renderer.h",
+    "include/rtc_rtp_sender.h",
+    "include/rtc_rtp_transceiver.h",
+    "include/rtc_rtp_parameters.h",
+    "include/rtc_rtp_transceiver_direction.h",
+    "include/rtc_priority.h",
+    "include/rtc_media_types.h",
+    "include/rtc_rtp_receiver.h",
 
     "include/base/atomicops.h",
     "include/base/fixed_size_function.h",
@@ -81,6 +88,14 @@ rtc_shared_library("libwebrtc"){
     "src/internal/video_capturer.cc",
     "src/internal/vcm_capturer.h",
     "src/internal/vcm_capturer.cc",
+    "src/rtc_rtp_sender_impl.cc",
+    "src/rtc_rtp_sender_impl.h",
+    "src/rtc_rtp_transceiver_impl.cc",
+    "src/rtc_rtp_transceiver_impl.h",
+    "src/rtc_rtp_parameters_impl.cc",
+    "src/rtc_rtp_parameters_impl.h",
+    "src/rtc_rtp_receive_imp.cc",
+    "src/rtc_rtp_receive_imp.h",
   ]
 
   include_dirs = [

@@ -1,6 +1,5 @@
 #ifndef LIB_WEBRTC_RTC_SESSION_DESCRIPTION_IMPL_HXX
 #define LIB_WEBRTC_RTC_SESSION_DESCRIPTION_IMPL_HXX
-
 #include "rtc_types.h"
 
 #include "rtc_session_description.h"
