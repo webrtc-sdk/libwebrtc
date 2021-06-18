@@ -45,6 +45,9 @@ rtc_shared_library("libwebrtc"){
     "include/rtc_priority.h",
     "include/rtc_media_types.h",
     "include/rtc_rtp_receiver.h",
+    "include/rtc_dtls_transport.h",
+    "include/rtc_dtmf_sender.h",
+
 
     "include/base/atomicops.h",
     "include/base/fixed_size_function.h",
@@ -96,6 +99,11 @@ rtc_shared_library("libwebrtc"){
     "src/rtc_rtp_parameters_impl.h",
     "src/rtc_rtp_receive_imp.cc",
     "src/rtc_rtp_receive_imp.h",
+    "src/rtc_dtls_transport_impl.cc",
+    "src/rtc_dtls_transport_impl.h",
+    "src/rtc_dtmf_sender_impl.cc",
+    "src/rtc_dtmf_sender_impl.h",
+
   ]
 
   include_dirs = [

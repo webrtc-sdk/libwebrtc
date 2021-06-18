@@ -6,34 +6,102 @@
 
 namespace libwebrtc {
 
-class RtpParametersImpl : public RTCRtpParameters {
+class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
  public:
-  RtpParametersImpl(webrtc::RtpParameters rtp_parameters);
-  /* ~RtpParametersImpl();
+  RTCRtpCodecParametersImpl(webrtc::RtpCodecParameters rtp_codec_parameters);
 
-   virtual String GetTransactionId() override;
-   virtual void SetTransactionId(String value) override;
+  virtual String GetMimeType() const override;
+  virtual String GetName() override;
+  virtual void SetName(String value) override;
+  virtual RTCMediaType GetKind() override;
+  virtual void SetKind(RTCMediaType value) override;
+  virtual int GetPayloadType() override;
+  virtual void SetPayloadType(int value) override;
+  virtual int GetClockRate() override;
+  virtual void SetClockRate(int value) override;
+  virtual int GetNumChannels() override;
+  virtual void SetNumChannels(int value) override;
+  virtual int GetMaxPtime() override;
+  virtual void GetMaxPtime(int value) override;
+  virtual int Getptime() override;
+  virtual void Setptime(int value) override;
+  virtual Vector<scoped_refptr<RTCRtcpFeedback>> GetRtcpFeedback() override;
+  virtual void SetRtcpFeedback(
+      Vector<scoped_refptr<RTCRtcpFeedback>> value) override;
+  virtual Map<String, String> GetParameters() override;
+  virtual void SetParameters(Map<String, String> value) override;
+  virtual bool operator==(scoped_refptr<RTCRtpCodecParameters> o) override;
+  virtual bool operator!=(scoped_refptr<RTCRtpCodecParameters> o) override;
 
-   virtual String GetMid() override;
-   virtual void SetMid(String value) override;
+  webrtc::RtpCodecParameters rtp_codec_parameters();
 
-   virtual std::vector<RtpCodecParameters> GetCodecs() override;
-   virtual void SetCodecs(std::vector<RtpCodecParameters> value) override;
+ private:
+  webrtc::RtpCodecParameters rtp_codec_parameters_;
+};
 
-   virtual std::vector<RtpExtension> GetHeaderExtensions() override;
-   virtual void SetHeaderExtensions(std::vector<RtpExtension> value) override;
+class RTCRtpExtensionImpl : public RTCRtpExtension {
+ public:
+  RTCRtpExtensionImpl(webrtc::RtpExtension rtp_extension);
 
-   virtual std::vector<RtpEncodingParameters> GetEncodings() override;
-   virtual void SetEncodings(std::vector<RtpEncodingParameters> value) override;
+  virtual bool operator==(scoped_refptr<RTCRtpExtension> o) const override;
+  virtual String GetUri() override;
+  virtual void SetUri(String value) override;
+  virtual int GetId() override;
+  virtual void SetId(int value) override;
+  virtual bool GetEncrypt() override;
+  virtual void etEncrypt(bool value) override;
+  virtual String ToString() const override;
 
-   virtual RtcpParameters GetRtcp() override;
-   virtual void SetRtcp(RtcpParameters value) override;
+  webrtc::RtpExtension rtp_extension();
 
-   virtual DegradationPreference GetDegradationPreference() override;
-   virtual void SetDegradationPreference(DegradationPreference value) override;
+ private:
+  webrtc::RtpExtension rtp_extension_;
 
-   virtual bool operator==(const RtpParameters& o) const override;
-   virtual bool operator!=(const RtpParameters& o) const override;*/
+};
+
+class RTCRtcpParametersImpl : public RTCRtcpParameters {
+ public:
+  RTCRtcpParametersImpl(webrtc::RtcpParameters rtcp_parameters);
+
+  virtual uint32_t GetSsrc() override;
+  virtual uint32_t SetSsrc() override;
+  virtual String GetCname() override;
+  virtual void SetCname(String value) override;
+  virtual bool GetReducedSize() override;
+  virtual void SetReducedSize(bool value) override;
+  virtual bool GetMux() override;
+  virtual void SetMux(bool value) override;
+  virtual bool operator==(scoped_refptr<RTCRtcpParameters> o) const override;
+  virtual bool operator!=(scoped_refptr<RTCRtcpParameters> o) const override;
+
+  webrtc::RtcpParameters rtcp_parameters();
+
+ private:
+  webrtc::RtcpParameters rtcp_parameters_;
+};
+
+class RTCRtpParametersImpl : public RTCRtpParameters {
+ public:
+  RTCRtpParametersImpl(webrtc::RtpParameters rtp_parameters);
+
+  virtual String GetTransactionId() override;
+  virtual void SetTransactionId(String value) override;
+  virtual String GetMid() override;
+  virtual void SetMid(String value) override;
+  virtual Vector<scoped_refptr<RTCRtpCodecParameters>> GetCodecs() override;
+  virtual void SetCodecs(
+      Vector<scoped_refptr<RTCRtpCodecParameters>> value) override;
+  virtual Vector<scoped_refptr<RTCRtpExtension>> GetHeaderExtensions() override;
+  virtual void SetHeaderExtensions(
+      Vector<scoped_refptr<RTCRtpExtension>> value) override;
+  virtual Vector<scoped_refptr<RTCRtpEncodingParameters>> GetEncodings()
+      override;
+  virtual void SetEncodings(
+      Vector<scoped_refptr<RTCRtpEncodingParameters>> value) override;
+  virtual scoped_refptr<RTCRtcpParameters> GetRtcp() override;
+  virtual void SetRtcp(scoped_refptr<RTCRtcpParameters> value) override;
+  virtual bool operator==(scoped_refptr<RTCRtpParameters> o) const override;
+  virtual bool operator!=(scoped_refptr<RTCRtpParameters> o) const override;
 
   webrtc::RtpParameters rtp_parameters();
 

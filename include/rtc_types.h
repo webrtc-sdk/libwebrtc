@@ -16,6 +16,7 @@
 #include "base/refcount.h"
 #include "base/scoped_ref_ptr.h"
 #include <string.h>
+#include <map>
 
 #ifdef WIN32
 #undef strncpy
@@ -88,6 +89,8 @@ struct SdpParseError {
 };
 
 #define Vector bsp::inlined_vector
+
+#define Map std::map
 
 #define String std::string
 
