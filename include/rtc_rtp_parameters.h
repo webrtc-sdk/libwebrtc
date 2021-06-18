@@ -264,6 +264,7 @@ class RTCRtpCapabilities : public RefCountInterface {
 };
 
 class RTCRtcpParameters : public RefCountInterface {
+ public:
   virtual uint32_t GetSsrc() = 0;
   virtual uint32_t SetSsrc() = 0;
 

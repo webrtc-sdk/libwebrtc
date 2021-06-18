@@ -49,7 +49,7 @@ class RTCRtpExtensionImpl : public RTCRtpExtension {
   virtual int GetId() override;
   virtual void SetId(int value) override;
   virtual bool GetEncrypt() override;
-  virtual void etEncrypt(bool value) override;
+  virtual void SetEncrypt(bool value) override;
   virtual String ToString() const override;
 
   webrtc::RtpExtension rtp_extension();
