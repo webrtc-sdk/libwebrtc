@@ -7,45 +7,45 @@
 
 namespace libwebrtc {
 
-class RTCDtlsTransportInformation : public RefCountInterface {
- public:
-  enum class RTCDtlsTransportState {
-    kNew,         // Has not started negotiating yet.
-    kConnecting,  // In the process of negotiating a secure connection.
-    kConnected,   // Completed negotiation and verified fingerprints.
-    kClosed,      // Intentionally closed.
-    kFailed,      // Failure due to an error or failing to verify a remote
-                  // fingerprint.
-    kNumValues
-  };
-  virtual RTCDtlsTransportInformation& operator=(
-      scoped_refptr<RTCDtlsTransportInformation> c) = 0;
+    class RTCDtlsTransportInformation : public RefCountInterface {
+    public:
+        enum class RTCDtlsTransportState {
+            kNew,         // Has not started negotiating yet.
+            kConnecting,  // In the process of negotiating a secure connection.
+            kConnected,   // Completed negotiation and verified fingerprints.
+            kClosed,      // Intentionally closed.
+            kFailed,      // Failure due to an error or failing to verify a remote
+            // fingerprint.
+            kNumValues
+        };
+        virtual RTCDtlsTransportInformation& operator=(
+                scoped_refptr<RTCDtlsTransportInformation> c) = 0;
 
-  virtual RTCDtlsTransportState GetState() const = 0;
-  virtual int GetSslCipherSuite() const = 0;
-  virtual int GetSrtpCipherSuite() const = 0;
-};
+        virtual RTCDtlsTransportState GetState() const = 0;
+        virtual int GetSslCipherSuite() const = 0;
+        virtual int GetSrtpCipherSuite() const = 0;
+    };
 
-class RTCDtlsTransportObserver {
- public:
-  virtual void OnStateChange(RTCDtlsTransportInformation info) = 0;
+    class RTCDtlsTransportObserver {
+    public:
+        virtual void OnStateChange(RTCDtlsTransportInformation info) = 0;
 
-  virtual void OnError(const int type, const char* message) = 0;
+        virtual void OnError(const int type, const char* message) = 0;
 
- protected:
-  virtual ~RTCDtlsTransportObserver() = default;
-};
+    protected:
+        virtual ~RTCDtlsTransportObserver() = default;
+    };
 
-class RTCDtlsTransport : public RefCountInterface {
-  LIB_WEBRTC_API static scoped_refptr<RTCDtlsTransport> Create();
+    class RTCDtlsTransport : public RefCountInterface {
+        LIB_WEBRTC_API static scoped_refptr<RTCDtlsTransport> Create();
 
- public:
-  virtual scoped_refptr<RTCDtlsTransportInformation> GetInformation() = 0;
+    public:
+        virtual scoped_refptr<RTCDtlsTransportInformation> GetInformation() = 0;
 
-  virtual void RegisterObserver(RTCDtlsTransportObserver* observer) = 0;
+        virtual void RegisterObserver(RTCDtlsTransportObserver* observer) = 0;
 
-  virtual void UnregisterObserver() = 0;
-};
+        virtual void UnregisterObserver() = 0;
+    };
 
 }  // namespace libwebrtc
 

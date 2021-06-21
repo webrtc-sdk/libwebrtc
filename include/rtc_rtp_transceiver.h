@@ -18,7 +18,7 @@ class RTCRtpTransceiverInit : public RefCountInterface {
   virtual void SetDirection(RTCRtpTransceiverDirection value) = 0;
 
   virtual Vector<String> GetStreamIds() = 0;
-  virtual void SetStreamIds(Vector<String> value) = 0;
+  virtual void SetStreamIds(Vector<String>& value) = 0;
 
   virtual Vector<scoped_refptr<RTCRtpEncodingParameters>>
   GetSendEncodings() = 0;

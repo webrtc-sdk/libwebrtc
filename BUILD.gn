@@ -48,7 +48,6 @@ rtc_shared_library("libwebrtc"){
     "include/rtc_dtls_transport.h",
     "include/rtc_dtmf_sender.h",
 
-
     "include/base/atomicops.h",
     "include/base/fixed_size_function.h",
     "include/base/inlined_vector.h",
@@ -103,7 +102,6 @@ rtc_shared_library("libwebrtc"){
     "src/rtc_dtls_transport_impl.h",
     "src/rtc_dtmf_sender_impl.cc",
     "src/rtc_dtmf_sender_impl.h",
-
   ]
 
   include_dirs = [

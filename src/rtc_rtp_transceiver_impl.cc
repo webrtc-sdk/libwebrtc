@@ -34,7 +34,7 @@ Vector<String> RTCRtpTransceiverInitImpl::GetStreamIds() {
   return ret;
 }
 
-void RTCRtpTransceiverInitImpl::SetStreamIds(Vector<String> value) {
+void RTCRtpTransceiverInitImpl::SetStreamIds(Vector<String>& value) {
   std::vector<String> list;
   for (auto item : value) {
     list.push_back(item);

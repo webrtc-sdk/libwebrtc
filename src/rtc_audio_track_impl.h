@@ -35,6 +35,10 @@ class AudioTrackImpl : public RTCAudioTrack {
     return rtc_track_;
   }
 
+  virtual RTCTrackState state() const override {
+    return static_cast<RTCTrackState>(rtc_track_->state());
+  }
+
  private:
   rtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track_;
   char id_[kMaxStringLength], kind_[kShortStringLength];

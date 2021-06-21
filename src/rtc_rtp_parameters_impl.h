@@ -6,6 +6,24 @@
 
 namespace libwebrtc {
 
+class RTCRtcpFeedbackImpl : public RTCRtcpFeedback {
+ public:
+  RTCRtcpFeedbackImpl(webrtc::RtcpFeedback rtcp_feedback);
+
+  virtual RTCRtcpFeedbackType GetType() override;
+  virtual void GetType(RTCRtcpFeedbackType value) override;
+  virtual RTCRtcpFeedbackMessageType GetMessageType() override;
+  virtual void GetMessageType(RTCRtcpFeedbackMessageType value) override;
+  virtual bool operator==(scoped_refptr<RTCRtcpFeedback> o) override;
+  virtual bool operator!=(scoped_refptr<RTCRtcpFeedback> o) override;
+
+  webrtc::RtcpFeedback rtcp_feedback();
+
+ private:
+  webrtc::RtcpFeedback rtcp_feedback_;
+
+};
+
 class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
  public:
   RTCRtpCodecParametersImpl(webrtc::RtpCodecParameters rtp_codec_parameters);
@@ -23,8 +41,8 @@ class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
   virtual void SetNumChannels(int value) override;
   virtual int GetMaxPtime() override;
   virtual void GetMaxPtime(int value) override;
-  virtual int Getptime() override;
-  virtual void Setptime(int value) override;
+  virtual int GetPtime() override;
+  virtual void SetPtime(int value) override;
   virtual Vector<scoped_refptr<RTCRtcpFeedback>> GetRtcpFeedback() override;
   virtual void SetRtcpFeedback(
       Vector<scoped_refptr<RTCRtcpFeedback>> value) override;
@@ -64,7 +82,7 @@ class RTCRtcpParametersImpl : public RTCRtcpParameters {
   RTCRtcpParametersImpl(webrtc::RtcpParameters rtcp_parameters);
 
   virtual uint32_t GetSsrc() override;
-  virtual uint32_t SetSsrc() override;
+  virtual void SetSsrc(uint32_t value) override;
   virtual String GetCname() override;
   virtual void SetCname(String value) override;
   virtual bool GetReducedSize() override;

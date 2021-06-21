@@ -43,6 +43,10 @@ class VideoTrackImpl : public RTCVideoTrack {
     return rtc_track_;
   }
 
+  virtual RTCTrackState state() const override{
+    return static_cast<RTCTrackState>(rtc_track_->state());
+  }
+
  private:
   rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track_;
   scoped_refptr<RTCVideoSourceImpl> video_source_;

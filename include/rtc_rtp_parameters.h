@@ -232,8 +232,8 @@ class RTCRtpCodecParameters : public RefCountInterface {
   virtual int GetMaxPtime() = 0;
   virtual void GetMaxPtime(int value) = 0;
 
-  virtual int Getptime() = 0;
-  virtual void Setptime(int value) = 0;
+  virtual int GetPtime() = 0;
+  virtual void SetPtime(int value) = 0;
 
   virtual Vector<scoped_refptr<RTCRtcpFeedback>> GetRtcpFeedback() = 0;
   virtual void SetRtcpFeedback(
@@ -266,7 +266,7 @@ class RTCRtpCapabilities : public RefCountInterface {
 class RTCRtcpParameters : public RefCountInterface {
  public:
   virtual uint32_t GetSsrc() = 0;
-  virtual uint32_t SetSsrc() = 0;
+  virtual void SetSsrc(uint32_t value) = 0;
 
   virtual String GetCname() = 0;
   virtual void SetCname(String value) = 0;

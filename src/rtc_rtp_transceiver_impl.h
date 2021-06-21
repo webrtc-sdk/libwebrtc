@@ -13,7 +13,7 @@ class RTCRtpTransceiverInitImpl : public RTCRtpTransceiverInit {
   virtual RTCRtpTransceiverDirection GetDirection() override;
   virtual void SetDirection(RTCRtpTransceiverDirection value) override;
   virtual Vector<String> GetStreamIds() override;
-  virtual void SetStreamIds(Vector<String> value) override;
+  virtual void SetStreamIds(Vector<String>& value) override;
   virtual Vector<scoped_refptr<RTCRtpEncodingParameters>> GetSendEncodings()
       override;
   virtual void SetSendEncodings(

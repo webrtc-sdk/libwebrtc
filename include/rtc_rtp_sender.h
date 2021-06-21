@@ -10,7 +10,7 @@
 
 namespace libwebrtc {
 class RTCRtpSender : public RefCountInterface {
-
+ public:
   virtual bool SetTrack(scoped_refptr<RTCMediaTrack> track) = 0;
 
   virtual scoped_refptr<RTCMediaTrack> GetTrack() const = 0;

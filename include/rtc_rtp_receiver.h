@@ -2,11 +2,14 @@
 #define LIB_WEBRTC_RTP_RECEIVER_HXX
 
 //#include <string.h>
-//#include "rtc_types.h"
+#include "rtc_types.h"
 #include "base/refcount.h"
-//#include "dtls_transport.h"
-//#include "rtc_media_stream.h"
+#include "base/scoped_ref_ptr.h"
+#include "rtc_dtls_transport.h"
+#include "rtc_media_stream.h"
 #include "rtc_media_types.h"
+#include "rtc_rtp_parameters.h"
+#include "rtc_media_track.h"
 //#include "rtc_frame_decryptor.h"
 //#include "rtc_frame_encryptor.h"
 
@@ -22,38 +25,36 @@ class RTCRtpReceiverObserver {
 
 class RTCRtpReceiver : public RefCountInterface {
  public:
-  /*virtual scoped_refptr<RTCMediaStream> track() const = 0;
+  virtual scoped_refptr<RTCMediaTrack> Track() const = 0;
 
-  virtual scoped_refptr<DtlsTransport> dtls_transport() const = 0;
+  virtual scoped_refptr<RTCDtlsTransport> DtlsTransport() const = 0;
 
-  virtual std::vector<std::string> stream_ids() const = 0;
-  virtual std::vector<scoped_refptr<RTCMediaStream>> streams() const = 0;
+  virtual Vector<String> StreamIds() const = 0;
+  virtual Vector<scoped_refptr<RTCMediaStream>> Streams() const = 0;
 
-  virtual MediaType media_type() const = 0;
+  virtual RTCMediaType MediaType() const = 0;
 
-  virtual std::string id() const = 0;
+  virtual String Id() const = 0;
 
-  virtual RtpParameters GetParameters() const = 0;
+  virtual scoped_refptr<RTCRtpParameters> GetParameters() const = 0;
 
-  virtual bool SetParameters(const RtpParameters& parameters) = 0;
+  virtual bool SetParameters(scoped_refptr<RTCRtpParameters> parameters) = 0;
 
-  virtual void SetObserver(RtpReceiverObserver* observer) = 0;
+  virtual void SetObserver(RTCRtpReceiverObserver* observer) = 0;
 
   virtual void SetJitterBufferMinimumDelay(
-      absl::optional<double> delay_seconds) = 0;
+     double delay_seconds) = 0;
 
-  virtual std::vector<RtpSource> GetSources() const = 0;
+  //virtual Vector<RtpSource> GetSources() const = 0;
 
-  virtual void SetFrameDecryptor(
-      scoped_refptr<FrameDecryptor> frame_decryptor);
+  //virtual void SetFrameDecryptor(
+  //    scoped_refptr<FrameDecryptor> frame_decryptor);
 
-  virtual scoped_refptr<FrameDecryptor> GetFrameDecryptor() const = 0;
+  //virtual scoped_refptr<FrameDecryptor> GetFrameDecryptor() const = 0;
 
-  virtual void SetDepacketizerToDecoderFrameTransformer(
-      scoped_refptr<FrameTransformerInterface> frame_transformer) = 0;
+  //virtual void SetDepacketizerToDecoderFrameTransformer(
+  //    scoped_refptr<FrameTransformerInterface> frame_transformer) = 0;
 
- protected:
-  ~RtpReceiver() override = default;*/
 };
 }  // namespace libwebrtc
 
