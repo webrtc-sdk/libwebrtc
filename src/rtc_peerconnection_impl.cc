@@ -634,60 +634,71 @@ void RTCPeerConnectionImpl::AddTransceiver(
 
   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpTransceiverInterface>>
       errorOr;
-  if (track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
+  std::string kind = track->kind();
+  if (0 == kind.compare(webrtc::MediaStreamTrackInterface::kVideoKind)) {
     VideoTrackImpl* impl = static_cast<VideoTrackImpl*>(track.get());
     errorOr = rtc_peerconnection_->AddTransceiver(
         impl->rtc_track(), initImpl->rtp_transceiver_init());
-  } else if (track->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
+  } else if (0 == kind.compare(webrtc::MediaStreamTrackInterface::kAudioKind)) {
     AudioTrackImpl* impl = static_cast<AudioTrackImpl*>(track.get());
     errorOr = rtc_peerconnection_->AddTransceiver(
         impl->rtc_track(), initImpl->rtp_transceiver_init());
   }
   if (onAdd) {
-    scoped_refptr<RTCRtpTransceiverImpl> ret =
-        new RefCountedObject<RTCRtpTransceiverImpl>(errorOr.value());
-    onAdd(ret, errorOr.error().message());
+    if (errorOr.ok()) {
+      onAdd(new RefCountedObject<RTCRtpTransceiverImpl>(errorOr.value()),
+            nullptr);
+    } else {
+      onAdd(scoped_refptr<RTCRtpTransceiver>(), errorOr.error().message());
+    }
   }
 }
 void RTCPeerConnectionImpl::AddTransceiver(scoped_refptr<RTCMediaTrack> track,
                                            OnAddTransceiver onAdd) {
   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpTransceiverInterface>>
       errorOr;
-  if (track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
+  std::string kind = track->kind();
+  if (0 == kind.compare(webrtc::MediaStreamTrackInterface::kVideoKind)) {
     VideoTrackImpl* impl = static_cast<VideoTrackImpl*>(track.get());
     errorOr = rtc_peerconnection_->AddTransceiver(impl->rtc_track());
-  } else if (track->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
+  } else if (0 == kind.compare(webrtc::MediaStreamTrackInterface::kAudioKind)) {
     AudioTrackImpl* impl = static_cast<AudioTrackImpl*>(track.get());
     errorOr = rtc_peerconnection_->AddTransceiver(impl->rtc_track());
   }
   if (onAdd) {
-    scoped_refptr<RTCRtpTransceiverImpl> ret =
-        new RefCountedObject<RTCRtpTransceiverImpl>(errorOr.value());
-    onAdd(ret, errorOr.error().message());
+    if (errorOr.ok()) {
+      onAdd(new RefCountedObject<RTCRtpTransceiverImpl>(errorOr.value()),
+            nullptr);
+    } else {
+      onAdd(scoped_refptr<RTCRtpTransceiver>(), errorOr.error().message());
+    }
   }
 }
 
 void RTCPeerConnectionImpl::AddTrack(scoped_refptr<RTCMediaTrack> track,
-                                     const Vector<String>& streamIds,
+                                     OnVectorString streamIds,
                                      libwebrtc ::OnAddTrack onAdd) {
   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpSenderInterface>> errorOr;
 
   std::vector<std::string> stream_ids;
-  for (String item : streamIds) {
-    stream_ids.push_back(item);
-  }
-
-  if (track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
+  streamIds([&](char* p, size_t size) {
+    stream_ids.push_back(std::string(p, size));
+  });
+  std::string kind = track->kind();
+  if (0 == kind.compare(webrtc::MediaStreamTrackInterface::kVideoKind)) {
     VideoTrackImpl* impl = static_cast<VideoTrackImpl*>(track.get());
     errorOr = rtc_peerconnection_->AddTrack(impl->rtc_track(), stream_ids);
-  } else if (track->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
+  } else if (0 == kind.compare(webrtc::MediaStreamTrackInterface::kAudioKind)) {
     AudioTrackImpl* impl = static_cast<AudioTrackImpl*>(track.get());
     errorOr = rtc_peerconnection_->AddTrack(impl->rtc_track(), stream_ids);
   }
 
   if (onAdd) {
-    onAdd(new RefCountedObject<RTCRtpSenderImpl>(errorOr.value()),
-          errorOr.error().message());
+    if (errorOr.ok()) {
+      onAdd(new RefCountedObject<RTCRtpSenderImpl>(errorOr.value()), nullptr);
+    } else {
+      onAdd(scoped_refptr<RTCRtpSender>(), errorOr.error().message());
+    }
   };
 }
 

@@ -19,20 +19,24 @@ class RTCDtmfSenderImpl : public RTCDtmfSender,
   virtual void RegisterObserver(RTCDtmfSenderObserver* observer) override;
   virtual void UnregisterObserver() override;
   virtual bool CanInsertDtmf() override;
-  virtual bool InsertDtmf(const String& tones,
-                          int duration,
-                          int inter_tone_gap) override;
-  virtual bool InsertDtmf(const String& tones,
-                          int duration,
-                          int inter_tone_gap,
-                          int comma_delay) override;
-  virtual String Tones() const override;
   virtual int Duration() const override;
   virtual int InterToneGap() const override;
   virtual int CommaDelay() const override;
-  virtual void OnToneChange(const String& tone,
-                            const String& tone_buffer) override;
-  virtual void OnToneChange(const String& tone) override;
+  virtual bool InsertDtmf(const char* tones,
+                          size_t size,
+                          int duration,
+                          int inter_tone_gap) override;
+  virtual bool InsertDtmf(const char* tones,
+                          size_t size,
+                          int duration,
+                          int inter_tone_gap,
+                          int comma_delay) override;
+  virtual void Tones(OnString on) const override;
+
+  virtual void OnToneChange(const std::string& tone,
+                            const std::string& tone_buffer) override;
+
+  virtual void OnToneChange(const std::string& tone) override;
 
   rtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender();
 

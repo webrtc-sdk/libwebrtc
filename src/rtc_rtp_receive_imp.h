@@ -13,10 +13,10 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
 
   virtual scoped_refptr<RTCMediaTrack> Track() const override;
   virtual scoped_refptr<RTCDtlsTransport> DtlsTransport() const override;
-  virtual Vector<String> StreamIds() const override;
+  virtual void StreamIds(OnString on) const override;
   virtual Vector<scoped_refptr<RTCMediaStream>> Streams() const override;
   virtual RTCMediaType MediaType() const override;
-  virtual String Id() const override;
+  virtual void Id(OnString on) const override;
   virtual scoped_refptr<RTCRtpParameters> GetParameters() const override;
   virtual bool SetParameters(
       scoped_refptr<RTCRtpParameters> parameters) override;

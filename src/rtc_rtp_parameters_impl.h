@@ -28,9 +28,9 @@ class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
  public:
   RTCRtpCodecParametersImpl(webrtc::RtpCodecParameters rtp_codec_parameters);
 
-  virtual String GetMimeType() const override;
-  virtual String GetName() override;
-  virtual void SetName(String value) override;
+  virtual void GetMimeType(OnString on) const override;
+  virtual void GetName(OnString on) override;
+  virtual void SetName(char* p ,size_t size) override;
   virtual RTCMediaType GetKind() override;
   virtual void SetKind(RTCMediaType value) override;
   virtual int GetPayloadType() override;
@@ -46,8 +46,8 @@ class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
   virtual Vector<scoped_refptr<RTCRtcpFeedback>> GetRtcpFeedback() override;
   virtual void SetRtcpFeedback(
       Vector<scoped_refptr<RTCRtcpFeedback>> value) override;
-  virtual Map<String, String> GetParameters() override;
-  virtual void SetParameters(Map<String, String> value) override;
+  virtual void GetParameters(OnStringAndString on) override;
+  virtual void SetParameters(OnMapStringAndString on) override;
   virtual bool operator==(scoped_refptr<RTCRtpCodecParameters> o) override;
   virtual bool operator!=(scoped_refptr<RTCRtpCodecParameters> o) override;
 
@@ -62,13 +62,13 @@ class RTCRtpExtensionImpl : public RTCRtpExtension {
   RTCRtpExtensionImpl(webrtc::RtpExtension rtp_extension);
 
   virtual bool operator==(scoped_refptr<RTCRtpExtension> o) const override;
-  virtual String GetUri() override;
-  virtual void SetUri(String value) override;
+  virtual void GetUri(OnString on) override;
+  virtual void SetUri(char* uri,size_t size) override;
   virtual int GetId() override;
   virtual void SetId(int value) override;
   virtual bool GetEncrypt() override;
   virtual void SetEncrypt(bool value) override;
-  virtual String ToString() const override;
+  virtual void ToString(OnString on) const override;
 
   webrtc::RtpExtension rtp_extension();
 
@@ -83,8 +83,8 @@ class RTCRtcpParametersImpl : public RTCRtcpParameters {
 
   virtual uint32_t GetSsrc() override;
   virtual void SetSsrc(uint32_t value) override;
-  virtual String GetCname() override;
-  virtual void SetCname(String value) override;
+  virtual void GetCname(OnString on) override;
+  virtual void SetCname(char* p, size_t size) override;
   virtual bool GetReducedSize() override;
   virtual void SetReducedSize(bool value) override;
   virtual bool GetMux() override;
@@ -102,10 +102,10 @@ class RTCRtpParametersImpl : public RTCRtpParameters {
  public:
   RTCRtpParametersImpl(webrtc::RtpParameters rtp_parameters);
 
-  virtual String GetTransactionId() override;
-  virtual void SetTransactionId(String value) override;
-  virtual String GetMid() override;
-  virtual void SetMid(String value) override;
+  virtual void GetTransactionId(OnString on) override;
+  virtual void SetTransactionId(char* p, size_t size) override;
+  virtual void GetMid(OnString on) override;
+  virtual void SetMid(char* p, size_t size) override;
   virtual Vector<scoped_refptr<RTCRtpCodecParameters>> GetCodecs() override;
   virtual void SetCodecs(
       Vector<scoped_refptr<RTCRtpCodecParameters>> value) override;
@@ -158,14 +158,14 @@ class RTCRtpEncodingParametersImpl : public RTCRtpEncodingParameters {
   virtual double GetScaleResolutionDownBy() override;
   virtual void SetScaleResolutionDownBy(double value) override;
 
-  virtual String GetScalabilityMode() override;
-  virtual void SetScalabilityMode(String value) override;
+  virtual void GetScalabilityMode(OnString on) override;
+  virtual void SetScalabilityMode(char* p, size_t size) override;
 
   virtual bool GetActive() override;
   virtual void SetActive(bool value) override;
 
-  virtual String GetRid() override;
-  virtual void SetRid(String value) override;
+  virtual void GetRid(OnString on) override;
+  virtual void SetRid(char* p, size_t size) override;
 
   virtual bool GetAdaptivePtime() override;
   virtual void SetAdaptivePtime(bool value) override;

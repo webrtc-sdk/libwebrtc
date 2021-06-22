@@ -8,6 +8,7 @@
 #include "rtc_types.h"
 #include "rtc_rtp_receiver.h"
 #include "rtc_rtp_sender.h"
+#include "rtc_string.h"
 
 namespace libwebrtc {
 class RTCRtpTransceiverInit : public RefCountInterface {
@@ -17,8 +18,8 @@ class RTCRtpTransceiverInit : public RefCountInterface {
   virtual RTCRtpTransceiverDirection GetDirection() = 0;
   virtual void SetDirection(RTCRtpTransceiverDirection value) = 0;
 
-  virtual Vector<String> GetStreamIds() = 0;
-  virtual void SetStreamIds(Vector<String>& value) = 0;
+  virtual void GetStreamIds(OnString on) = 0;
+  virtual void SetStreamIds(OnVectorString on) = 0;
 
   virtual Vector<scoped_refptr<RTCRtpEncodingParameters>>
   GetSendEncodings() = 0;
@@ -30,7 +31,7 @@ class RTCRtpTransceiver : public RefCountInterface {
  public:
   virtual RTCMediaType GetMediaType() const = 0;
 
-  virtual String GetMid() const = 0;
+  virtual void GetMid(OnString on) const = 0;
 
   virtual scoped_refptr<RTCRtpSender> Sender() const = 0;
 
@@ -42,14 +43,14 @@ class RTCRtpTransceiver : public RefCountInterface {
 
   virtual RTCRtpTransceiverDirection Direction() const = 0;
 
-  virtual String SetDirectionWithError(
-      RTCRtpTransceiverDirection new_direction) = 0;
+  virtual void SetDirectionWithError(RTCRtpTransceiverDirection new_direction,
+                                     OnString on) = 0;
 
   virtual RTCRtpTransceiverDirection CurrentDirection() const = 0;
 
   virtual RTCRtpTransceiverDirection FiredDirection() const = 0;
 
-  virtual String StopStandard() = 0;
+  virtual void StopStandard(OnString on) = 0;
 
   virtual void StopInternal() = 0;
 

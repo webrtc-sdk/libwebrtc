@@ -54,10 +54,10 @@ class RTCRtcpFeedback : public RefCountInterface {
 };
 
 class RTCRtpCodecCapability : public RefCountInterface {
-  virtual String GetMimeType() const = 0;
+  virtual void GetMimeType(OnString on) const = 0;
 
-  virtual String GetName() = 0;
-  virtual void SetName(String value) = 0;
+  virtual void GetName(OnString on) = 0;
+  virtual void SetName(char* p,size_t size) = 0;
 
   virtual RTCMediaType GetKind() = 0;
   virtual void SetKind(RTCMediaType value) = 0;
@@ -80,11 +80,11 @@ class RTCRtpCodecCapability : public RefCountInterface {
   virtual Vector<RTCRtcpFeedback> GetRtcpFeedback() = 0;
   virtual void SetRtcpFeedback(Vector<RTCRtcpFeedback> value) = 0;
 
-  virtual Map<String, String> GetParameters() = 0;
-  virtual void SetParameters(Map<String, String> value) = 0;
+  virtual void GetParameters(OnStringAndString on) = 0;
+  virtual void SetParameters(OnMapStringAndString on) = 0;
 
-  virtual Map<String, String> GetOptions() = 0;
-  virtual void SetOptions(Map<String, String> value) = 0;
+  virtual void GetOptions(OnStringAndString on) = 0;
+  virtual void SetOptions(OnMapStringAndString on) = 0;
 
   virtual int GetMaxTemporalLayerExtensions() = 0;
   virtual void SetMaxTemporalLayerExtensions(int value) = 0;
@@ -100,8 +100,8 @@ class RTCRtpCodecCapability : public RefCountInterface {
 };
 
 class RTCRtpHeaderExtensionCapability : public RefCountInterface {
-  virtual String GetUri() = 0;
-  virtual void SetUri(String value) = 0;
+  virtual void GetUri(OnString on) = 0;
+  virtual void SetUri(char* p, size_t size) = 0;
 
   virtual int GetPreferredId() = 0;
   virtual void SetPreferredId(int value) = 0;
@@ -126,23 +126,26 @@ class RTCRtpExtension : public RefCountInterface {
     kRequireEncryptedExtension,
   };
 
-  static bool IsSupportedForAudio(String uri);
-  static bool IsSupportedForVideo(String uri);
-  static bool IsEncryptionSupported(String uri);
+  static bool IsSupportedForAudio(char* uri, size_t size);
+  static bool IsSupportedForVideo(char* uri, size_t size);
+  static bool IsEncryptionSupported(char* uri, size_t size);
 
   static const scoped_refptr<RTCRtpExtension> FindHeaderExtensionByUri(
       const Vector<scoped_refptr<RTCRtpExtension>>& extensions,
-      String uri,
+      char* uri,
+      size_t size,
       RTCFilter filter);
 
   static const scoped_refptr<RTCRtpExtension> FindHeaderExtensionByUri(
       const Vector<scoped_refptr<RTCRtpExtension>>& extensions,
-      String uri);
+      char* uri,
+      size_t size);
 
   static const scoped_refptr<RTCRtpExtension>
   FindHeaderExtensionByUriAndEncryption(
       const Vector<scoped_refptr<RTCRtpExtension>>& extensions,
-      String uri,
+      char* uri,
+      size_t size,
       bool encrypt);
 
   static const Vector<scoped_refptr<RTCRtpExtension>>
@@ -177,11 +180,11 @@ class RTCRtpExtension : public RefCountInterface {
   static int GetkOneByteHeaderExtensionMaxId();
   static int GetkOneByteHeaderExtensionMaxValueSize();
 
-  virtual String ToString() const = 0;
+  virtual void ToString(OnString on) const = 0;
   virtual bool operator==(scoped_refptr<RTCRtpExtension> o) const = 0;
 
-  virtual String GetUri() = 0;
-  virtual void SetUri(String value) = 0;
+  virtual void GetUri(OnString on) = 0;
+  virtual void SetUri(char* uri, size_t size) = 0;
 
   virtual int GetId() = 0;
   virtual void SetId(int value) = 0;
@@ -212,10 +215,10 @@ class RTCRtpRtxParameters : public RefCountInterface {
 
 class RTCRtpCodecParameters : public RefCountInterface {
  public:
-  virtual String GetMimeType() const = 0;
+  virtual void GetMimeType(OnString on) const = 0;
 
-  virtual String GetName() = 0;
-  virtual void SetName(String value) = 0;
+  virtual void GetName(OnString on) = 0;
+  virtual void SetName(char* p, size_t size) = 0;
 
   virtual RTCMediaType GetKind() = 0;
   virtual void SetKind(RTCMediaType value) = 0;
@@ -239,8 +242,8 @@ class RTCRtpCodecParameters : public RefCountInterface {
   virtual void SetRtcpFeedback(
       Vector<scoped_refptr<RTCRtcpFeedback>> value) = 0;
 
-  virtual Map<String, String> GetParameters() = 0;
-  virtual void SetParameters(Map<String, String> value) = 0;
+  virtual void GetParameters(OnStringAndString on) = 0;
+  virtual void SetParameters(OnMapStringAndString on) = 0;
 
   virtual bool operator==(scoped_refptr<RTCRtpCodecParameters> o) = 0;
   virtual bool operator!=(scoped_refptr<RTCRtpCodecParameters> o) = 0;
@@ -268,8 +271,8 @@ class RTCRtcpParameters : public RefCountInterface {
   virtual uint32_t GetSsrc() = 0;
   virtual void SetSsrc(uint32_t value) = 0;
 
-  virtual String GetCname() = 0;
-  virtual void SetCname(String value) = 0;
+  virtual void GetCname(OnString on) = 0;
+  virtual void SetCname(char* p, size_t size) = 0;
 
   virtual bool GetReducedSize() = 0;
   virtual void SetReducedSize(bool value) = 0;
@@ -309,14 +312,14 @@ class RTCRtpEncodingParameters : public RefCountInterface {
   virtual double GetScaleResolutionDownBy() = 0;
   virtual void SetScaleResolutionDownBy(double value) = 0;
 
-  virtual String GetScalabilityMode() = 0;
-  virtual void SetScalabilityMode(String value) = 0;
+  virtual void GetScalabilityMode(OnString on) = 0;
+  virtual void SetScalabilityMode(char* p,size_t size) = 0;
 
   virtual bool GetActive() = 0;
   virtual void SetActive(bool value) = 0;
 
-  virtual String GetRid() = 0;
-  virtual void SetRid(String value) = 0;
+  virtual void GetRid(OnString on) = 0;
+  virtual void SetRid(char* p, size_t size) = 0;
 
   virtual bool GetAdaptivePtime() = 0;
   virtual void SetAdaptivePtime(bool value) = 0;
@@ -328,11 +331,11 @@ class RTCRtpEncodingParameters : public RefCountInterface {
 struct RTCRtpParameters : public RefCountInterface {
  public:
   // static scoped_refptr<RTCRtpParameters> Create();
-  virtual String GetTransactionId() = 0;
-  virtual void SetTransactionId(String value) = 0;
+  virtual void GetTransactionId(OnString on) = 0;
+  virtual void SetTransactionId(char* p, size_t size) = 0;
 
-  virtual String GetMid() = 0;
-  virtual void SetMid(String value) = 0;
+  virtual void GetMid(OnString on) = 0;
+  virtual void SetMid(char* p, size_t size) = 0;
 
   virtual Vector<scoped_refptr<RTCRtpCodecParameters>> GetCodecs() = 0;
   virtual void SetCodecs(

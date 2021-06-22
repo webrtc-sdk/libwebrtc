@@ -29,12 +29,12 @@ class RTCRtpReceiver : public RefCountInterface {
 
   virtual scoped_refptr<RTCDtlsTransport> DtlsTransport() const = 0;
 
-  virtual Vector<String> StreamIds() const = 0;
+  virtual void StreamIds(OnString on) const = 0;
   virtual Vector<scoped_refptr<RTCMediaStream>> Streams() const = 0;
 
   virtual RTCMediaType MediaType() const = 0;
 
-  virtual String Id() const = 0;
+  virtual void Id(OnString on) const = 0;
 
   virtual scoped_refptr<RTCRtpParameters> GetParameters() const = 0;
 
@@ -42,20 +42,19 @@ class RTCRtpReceiver : public RefCountInterface {
 
   virtual void SetObserver(RTCRtpReceiverObserver* observer) = 0;
 
-  virtual void SetJitterBufferMinimumDelay(
-     double delay_seconds) = 0;
+  virtual void SetJitterBufferMinimumDelay(double delay_seconds) = 0;
 
-  //virtual Vector<RtpSource> GetSources() const = 0;
+  // virtual Vector<RtpSource> GetSources() const = 0;
 
-  //virtual void SetFrameDecryptor(
+  // virtual void SetFrameDecryptor(
   //    scoped_refptr<FrameDecryptor> frame_decryptor);
 
-  //virtual scoped_refptr<FrameDecryptor> GetFrameDecryptor() const = 0;
+  // virtual scoped_refptr<FrameDecryptor> GetFrameDecryptor() const = 0;
 
-  //virtual void SetDepacketizerToDecoderFrameTransformer(
+  // virtual void SetDepacketizerToDecoderFrameTransformer(
   //    scoped_refptr<FrameTransformerInterface> frame_transformer) = 0;
-
 };
+
 }  // namespace libwebrtc
 
 #endif  // !LIB_WEBRTC_RTP_RECEIVER_H_

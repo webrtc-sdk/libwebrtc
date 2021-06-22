@@ -84,7 +84,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
                               OnAddTransceiver onAdd) override;
 
   virtual void AddTrack(scoped_refptr<RTCMediaTrack> track,
-                        const Vector<std::string>& streamIds,
+                        OnVectorString streamIds,
                         libwebrtc::OnAddTrack onAdd) override;
 
   virtual bool RemoveTrack(scoped_refptr<RTCRtpSender> render) override;

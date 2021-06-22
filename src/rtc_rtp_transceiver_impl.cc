@@ -26,19 +26,18 @@ void RTCRtpTransceiverInitImpl::SetDirection(RTCRtpTransceiverDirection value) {
       static_cast<webrtc::RtpTransceiverDirection>(value);
 }
 
-Vector<String> RTCRtpTransceiverInitImpl::GetStreamIds() {
-  Vector<String> ret;
-  for (auto item : rtp_transceiver_init_.stream_ids) {
-    ret.push_back(item);
+void RTCRtpTransceiverInitImpl::GetStreamIds(OnString on) {
+  for (std::string item : rtp_transceiver_init_.stream_ids) {
+    on((char*)item.c_str(), item.size());
   }
-  return ret;
 }
 
-void RTCRtpTransceiverInitImpl::SetStreamIds(Vector<String>& value) {
-  std::vector<String> list;
-  for (auto item : value) {
-    list.push_back(item);
-  }
+void RTCRtpTransceiverInitImpl::SetStreamIds(OnVectorString on) {
+  std::vector<std::string> list;
+  on([&](char* p, size_t size) {
+    std::string id(p, size);
+    list.push_back(id);
+  });
   rtp_transceiver_init_.stream_ids = list;
 }
 
@@ -90,37 +89,49 @@ RTCRtpTransceiverDirection RTCRtpTransceiverImpl::Direction() const {
       rtp_transceiver_->direction());
 }
 
-String RTCRtpTransceiverImpl::SetDirectionWithError(
-    RTCRtpTransceiverDirection new_direction) {
-  return rtp_transceiver_
-      ->SetDirectionWithError(
-          static_cast<webrtc::RtpTransceiverDirection>(new_direction))
-      .message();
+void RTCRtpTransceiverImpl::SetDirectionWithError(
+    RTCRtpTransceiverDirection new_direction,
+    OnString on) {
+  std::string val =
+      rtp_transceiver_
+          ->SetDirectionWithError(
+              static_cast<webrtc::RtpTransceiverDirection>(new_direction))
+          .message();
+  on((char*)val.c_str(), val.size());
 }
 
 RTCRtpTransceiverDirection RTCRtpTransceiverImpl::CurrentDirection() const {
-  return static_cast<RTCRtpTransceiverDirection>(
-      rtp_transceiver_->current_direction().value());
+  auto temp = rtp_transceiver_->current_direction();
+  if (temp.has_value()) {
+    return static_cast<RTCRtpTransceiverDirection>(temp.value());
+  }
+  return RTCRtpTransceiverDirection::kInactive;
 }
 
 RTCRtpTransceiverDirection RTCRtpTransceiverImpl::FiredDirection() const {
-  return static_cast<RTCRtpTransceiverDirection>(
-      rtp_transceiver_->fired_direction().value());
+  auto temp = rtp_transceiver_->fired_direction();
+  if (temp.has_value()) {
+    return static_cast<RTCRtpTransceiverDirection>(temp.value());
+  }
+  return RTCRtpTransceiverDirection::kInactive;
 }
 
-String RTCRtpTransceiverImpl::StopStandard() {
-  return rtp_transceiver_->StopStandard().message();
+void RTCRtpTransceiverImpl::StopStandard(OnString on) {
+  std::string val = rtp_transceiver_->StopStandard().message();
+  on((char*)val.c_str(), val.size());
 }
 
 void RTCRtpTransceiverImpl::StopInternal() {
   rtp_transceiver_->StopInternal();
 }
 
-
-String RTCRtpTransceiverImpl::GetMid() const {
-  return rtp_transceiver_->mid().value();
+void RTCRtpTransceiverImpl::GetMid(OnString on) const {
+  auto temp = rtp_transceiver_->mid();
+  if (temp.has_value()) {
+    std::string val = temp.value();
+    on((char*)val.c_str(), val.size());
+  }
 }
-
 
 RTCMediaType RTCRtpTransceiverImpl::GetMediaType() const {
   return static_cast<RTCMediaType>(rtp_transceiver_->media_type());

@@ -40,12 +40,10 @@ scoped_refptr<RTCDtlsTransport> RTCRtpReceiverImpl::DtlsTransport() const {
   return new RefCountedObject<RTCDtlsTransportImpl>(
       rtp_receiver_->dtls_transport());
 }
-Vector<String> RTCRtpReceiverImpl::StreamIds() const {
-  Vector<String> ret;
+void RTCRtpReceiverImpl::StreamIds(OnString on) const {
   for (auto item : rtp_receiver_->stream_ids()) {
-    ret.push_back(item);
+    on((char*)item.c_str(), item.size());
   }
-  return ret;
 }
 Vector<scoped_refptr<RTCMediaStream>> RTCRtpReceiverImpl::Streams() const {
   Vector<scoped_refptr<RTCMediaStream>> ret;
@@ -57,8 +55,9 @@ Vector<scoped_refptr<RTCMediaStream>> RTCRtpReceiverImpl::Streams() const {
 RTCMediaType RTCRtpReceiverImpl::MediaType() const {
   return static_cast<RTCMediaType>(rtp_receiver_->media_type());
 }
-String RTCRtpReceiverImpl::Id() const {
-  return rtp_receiver_->id();
+void RTCRtpReceiverImpl::Id(OnString on) const {
+  auto temp = rtp_receiver_->id();
+  on((char*)temp.c_str(), temp.size());
 }
 scoped_refptr<RTCRtpParameters> RTCRtpReceiverImpl::GetParameters() const {
   return new RefCountedObject<RTCRtpParametersImpl>(

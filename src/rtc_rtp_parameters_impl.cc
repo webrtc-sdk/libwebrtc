@@ -78,12 +78,13 @@ void RTCRtpEncodingParametersImpl::SetScaleResolutionDownBy(double value) {
   rtp_encoding_parameters_.scale_resolution_down_by = value;
 }
 
-String RTCRtpEncodingParametersImpl::GetScalabilityMode() {
-  return rtp_encoding_parameters_.scalability_mode.value();
+void RTCRtpEncodingParametersImpl::GetScalabilityMode(OnString on) {
+  auto temp= rtp_encoding_parameters_.scalability_mode.value();
+  on((char*)temp.c_str(), temp.size());
 }
 
-void RTCRtpEncodingParametersImpl::SetScalabilityMode(String value) {
-  rtp_encoding_parameters_.scalability_mode = value;
+void RTCRtpEncodingParametersImpl::SetScalabilityMode(char* p, size_t size) {
+  rtp_encoding_parameters_.scalability_mode = std::string(p,size);
 }
 
 bool RTCRtpEncodingParametersImpl::GetActive() {
@@ -94,12 +95,13 @@ void RTCRtpEncodingParametersImpl::SetActive(bool value) {
   rtp_encoding_parameters_.active = value;
 }
 
-String RTCRtpEncodingParametersImpl::GetRid() {
-  return rtp_encoding_parameters_.rid;
+void RTCRtpEncodingParametersImpl::GetRid(OnString on) {
+  auto temp = rtp_encoding_parameters_.rid;
+  on((char*)temp.c_str(), temp.size());
 }
 
-void RTCRtpEncodingParametersImpl::SetRid(String value) {
-  rtp_encoding_parameters_.rid = value;
+void RTCRtpEncodingParametersImpl::SetRid(char* p, size_t size) {
+  rtp_encoding_parameters_.rid = std::string(p,size);
 }
 
 bool RTCRtpEncodingParametersImpl::GetAdaptivePtime() {
@@ -131,17 +133,19 @@ webrtc::RtpParameters RTCRtpParametersImpl::rtp_parameters() {
   return rtp_parameters_;
 }
 
-String RTCRtpParametersImpl::GetTransactionId() {
-  return rtp_parameters_.transaction_id;
+void RTCRtpParametersImpl::GetTransactionId(OnString on) {
+  auto temp= rtp_parameters_.transaction_id;
+  on((char*)temp.c_str(), temp.size());
 }
-void RTCRtpParametersImpl::SetTransactionId(String value) {
-  rtp_parameters_.transaction_id = value;
+void RTCRtpParametersImpl::SetTransactionId(char* p, size_t size) {
+  rtp_parameters_.transaction_id = std::string(p, size);
 }
-String RTCRtpParametersImpl::GetMid() {
-  return rtp_parameters_.mid;
+void RTCRtpParametersImpl::GetMid(OnString on) {
+  auto temp = rtp_parameters_.mid;
+  on((char*)temp.c_str(), temp.size());
 }
-void RTCRtpParametersImpl::SetMid(String value) {
-  rtp_parameters_.mid = value;
+void RTCRtpParametersImpl::SetMid(char* p, size_t size) {
+  rtp_parameters_.mid = std::string(p,size);
 }
 
 Vector<scoped_refptr<RTCRtpCodecParameters>> RTCRtpParametersImpl::GetCodecs() {
@@ -227,11 +231,12 @@ uint32_t RTCRtcpParametersImpl::GetSsrc() {
 void RTCRtcpParametersImpl::SetSsrc(uint32_t value) {
    rtcp_parameters_.ssrc = value;
 }
-String RTCRtcpParametersImpl::GetCname() {
-  return rtcp_parameters_.cname;
+void RTCRtcpParametersImpl::GetCname(OnString on) {
+  auto temp= rtcp_parameters_.cname;
+  on((char*)temp.c_str(), temp.size());
 }
-void RTCRtcpParametersImpl::SetCname(String value) {
-  rtcp_parameters_.cname = value;
+void RTCRtcpParametersImpl::SetCname(char* p, size_t size) {
+  rtcp_parameters_.cname = std::string(p,size);
 }
 bool RTCRtcpParametersImpl::GetReducedSize() {
   return rtcp_parameters_.reduced_size;
@@ -264,12 +269,13 @@ bool RTCRtpExtensionImpl::operator==(scoped_refptr<RTCRtpExtension> o) const {
   return rtp_extension_ == static_cast<RTCRtpExtensionImpl*>(o.get())->rtp_extension();
 }
 
-String RTCRtpExtensionImpl::GetUri() {
-  return rtp_extension_.uri;
+void RTCRtpExtensionImpl::GetUri(OnString on) {
+  auto temp= rtp_extension_.uri;
+  on((char*)temp.c_str(), temp.size());
 }
 
-void RTCRtpExtensionImpl::SetUri(String value) {
-  rtp_extension_.uri = value;
+void RTCRtpExtensionImpl::SetUri(char* uri, size_t size) {
+  rtp_extension_.uri = std::string(uri,size);
 }
 
 int RTCRtpExtensionImpl::GetId() {
@@ -292,23 +298,28 @@ webrtc::RtpExtension RTCRtpExtensionImpl::rtp_extension() {
   return rtp_extension_;
 }
 
-String RTCRtpExtensionImpl::ToString() const {
-  return rtp_extension_.ToString();
+void RTCRtpExtensionImpl::ToString(OnString on) const {
+  auto temp =  rtp_extension_.ToString();
+  on((char*)temp.c_str(), temp.size());
 }
 
 RTCRtpCodecParametersImpl::RTCRtpCodecParametersImpl(
     webrtc::RtpCodecParameters rtp_codec_parameters)
     : rtp_codec_parameters_(rtp_codec_parameters) {}
 
-String RTCRtpCodecParametersImpl::GetMimeType() const {
-  return rtp_codec_parameters_.mime_type();
+
+void RTCRtpCodecParametersImpl::GetMimeType(OnString on) const {
+  auto val = rtp_codec_parameters_.mime_type();
+  on((char*)val.c_str(), val.size());
 }
 
-String RTCRtpCodecParametersImpl::GetName() {
-  return rtp_codec_parameters_.name;
+void RTCRtpCodecParametersImpl::GetName(OnString on) {
+  auto val = rtp_codec_parameters_.name;
+  on((char*)val.c_str(), val.size());
 }
 
-void RTCRtpCodecParametersImpl::SetName(String value) {
+void RTCRtpCodecParametersImpl::SetName(char* p,size_t size) {
+  std::string value(p, size);
   rtp_codec_parameters_.name = value;
 }
 
@@ -378,12 +389,19 @@ void RTCRtpCodecParametersImpl::SetRtcpFeedback(Vector<scoped_refptr<RTCRtcpFeed
   rtp_codec_parameters_.rtcp_feedback = rtcp_feedback;
 }
 
-Map<String, String> RTCRtpCodecParametersImpl::GetParameters() {
-  return rtp_codec_parameters_.parameters;
+void RTCRtpCodecParametersImpl::GetParameters(OnStringAndString on) {
+  for (auto item : rtp_codec_parameters_.parameters) {
+    on((char*)item.first.c_str(), item.first.size(), (char*)item.second.c_str(),
+       item.second.size());
+  }
 }
 
-void RTCRtpCodecParametersImpl::SetParameters(Map<String, String> value) {
-  rtp_codec_parameters_.parameters = value;
+void RTCRtpCodecParametersImpl::SetParameters(OnMapStringAndString on) {
+  std::map<std::string, std::string> parameters;
+  on([&](char* key, size_t key_size, char* val, size_t val_size) {
+    parameters[std::string(key, key_size)] = std::string(val, val_size);
+  });
+  rtp_codec_parameters_.parameters = parameters;
 }
 
 bool RTCRtpCodecParametersImpl::operator==(

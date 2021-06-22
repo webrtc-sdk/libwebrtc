@@ -21,11 +21,11 @@ class RTCRtpSender : public RefCountInterface {
 
   virtual RTCMediaType GetMediaType() const = 0;
 
-  virtual String Id() const = 0;
+  virtual void Id(OnString on) const = 0;
 
-  virtual Vector<String> GetStreamIds() const = 0;
+  virtual void GetStreamIds(OnString on) const = 0;
 
-  virtual void SetStreams(const Vector<String>& stream_ids) {}
+  virtual void SetStreams(OnVectorString on) const = 0;
 
   virtual Vector<scoped_refptr<RTCRtpEncodingParameters>> InitSendEncodings()
       const = 0;

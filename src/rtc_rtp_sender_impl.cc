@@ -54,17 +54,24 @@ RTCMediaType RTCRtpSenderImpl::GetMediaType() const {
   return static_cast<RTCMediaType>(rtp_sender_->media_type());
 }
 
-std::string RTCRtpSenderImpl::Id() const {
-  return rtp_sender_->id();
+void RTCRtpSenderImpl::Id(OnString on) const {
+  auto id = rtp_sender_->id();
+  on((char*)id.c_str(), id.size());
 }
 
-Vector<String> RTCRtpSenderImpl::GetStreamIds() const {
-  Vector<String> ret;
-  for (std::string item :
-       rtp_sender_->stream_ids()) {
-    ret.push_back(item);
+void RTCRtpSenderImpl::GetStreamIds(OnString on) const {
+  for (std::string item : rtp_sender_->stream_ids()) {
+    on((char*)item.c_str(), item.size());
   }
-  return ret;
+}
+
+void RTCRtpSenderImpl::SetStreams(OnVectorString on) const {
+  std::vector<std::string> list;
+  on([&](char* p, size_t size) {
+    std::string id(p, size);
+    list.push_back(id);
+  });
+  rtp_sender_->SetStreams(list);
 }
 
 Vector<scoped_refptr<RTCRtpEncodingParameters>>
