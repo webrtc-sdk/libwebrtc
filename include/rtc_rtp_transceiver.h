@@ -8,7 +8,6 @@
 #include "rtc_types.h"
 #include "rtc_rtp_receiver.h"
 #include "rtc_rtp_sender.h"
-#include "rtc_string.h"
 
 namespace libwebrtc {
 
