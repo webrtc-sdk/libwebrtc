@@ -30,7 +30,7 @@ class RTCRtpReceiver : public RefCountInterface {
   virtual scoped_refptr<RTCDtlsTransport> DtlsTransport() const = 0;
 
   virtual void StreamIds(OnString on) const = 0;
-  virtual Vector<scoped_refptr<RTCMediaStream>> Streams() const = 0;
+  virtual void Streams(OnRTCMediaStream on) const = 0;
 
   virtual RTCMediaType MediaType() const = 0;
 
@@ -54,6 +54,13 @@ class RTCRtpReceiver : public RefCountInterface {
   // virtual void SetDepacketizerToDecoderFrameTransformer(
   //    scoped_refptr<FrameTransformerInterface> frame_transformer) = 0;
 };
+
+
+typedef fixed_size_function<void(scoped_refptr<RTCRtpReceiver> param)>
+    OnRTCRtpReceiver;
+
+typedef fixed_size_function<void(OnRTCRtpReceiver param)>
+    OnVectorRTCRtpReceiver;
 
 }  // namespace libwebrtc
 

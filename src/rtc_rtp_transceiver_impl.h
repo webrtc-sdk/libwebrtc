@@ -14,10 +14,8 @@ class RTCRtpTransceiverInitImpl : public RTCRtpTransceiverInit {
   virtual void SetDirection(RTCRtpTransceiverDirection value) override;
   virtual void GetStreamIds(OnString on) override;
   virtual void SetStreamIds(OnVectorString on) override;
-  virtual Vector<scoped_refptr<RTCRtpEncodingParameters>> GetSendEncodings()
-      override;
-  virtual void SetSendEncodings(
-      Vector<scoped_refptr<RTCRtpEncodingParameters>> value) override;
+  virtual void GetSendEncodings(OnRTCRtpEncodingParameters on) override;
+  virtual void SetSendEncodings(OnVectorRTCRtpEncodingParameters on) override;
 
   webrtc::RtpTransceiverInit rtp_transceiver_init();
 

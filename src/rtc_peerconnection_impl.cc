@@ -14,6 +14,7 @@
 #include "rtc_mediaconstraints_impl.h"
 #include "rtc_rtp_sender_impl.h"
 #include "rtc_rtp_transceiver_impl.h"
+#include "rtc_rtp_receive_imp.h"
 
 using rtc::Thread;
 
@@ -185,6 +186,36 @@ RTCPeerConnectionImpl::~RTCPeerConnectionImpl() {
   RTC_LOG(INFO) << __FUNCTION__ << ": dtor";
 }
 
+void RTCPeerConnectionImpl::OnAddTrack(
+    rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
+    const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>&
+        streams) {
+  if (nullptr != observer_) {
+    observer_->OnAddTrack(
+        [&](OnRTCMediaStream on) {
+          for (auto item : streams) {
+            on(new RefCountedObject<MediaStreamImpl>(item));
+          }
+        },
+        new RefCountedObject<RTCRtpReceiverImpl>(receiver));
+  }
+}
+
+void RTCPeerConnectionImpl::OnTrack(
+    rtc::scoped_refptr<webrtc::RtpTransceiverInterface> transceiver) {
+  if (nullptr != observer_) {
+    observer_->OnTrack(new RefCountedObject<RTCRtpTransceiverImpl>(transceiver));
+  }
+}
+
+void RTCPeerConnectionImpl::OnRemoveTrack(
+    rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) {
+  if (nullptr != observer_) {
+    observer_->OnRemoveTrack(
+        new RefCountedObject<RTCRtpReceiverImpl>(receiver));
+  }
+}
+
 // Called when a remote stream is added
 void RTCPeerConnectionImpl::OnAddStream(
     rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
@@ -199,14 +230,16 @@ void RTCPeerConnectionImpl::OnAddStream(
 
   if (observer_) {
     observer_->OnAddStream(remote_stream);
+    
+ /*   remote_stream->GetAudioTracks([&](scoped_refptr<RTCMediaTrack> track) {
+      observer_->OnAddTrack([&](OnRTCMediaStream on) { on(remote_stream); },
+                            track);
+    });
 
-    for (auto track : remote_stream->GetAudioTracks()) {
-      observer_->OnAddTrack(remote_stream, track);
-    }
-
-    for (auto track : remote_stream->GetVideoTracks()) {
-      observer_->OnAddTrack(remote_stream, track);
-    }
+    remote_stream->GetVideoTracks([&](scoped_refptr<RTCMediaTrack> track) {
+      observer_->OnAddTrack([&](OnRTCMediaStream on) { on(remote_stream); },
+                            track);
+    });*/
   }
 }
 
@@ -228,12 +261,16 @@ void RTCPeerConnectionImpl::OnRemoveStream(
       observer_->OnRemoveStream(recv_stream);
     }
 
-    for (auto track : recv_stream->GetVideoTracks()) {
-      observer_->OnRemoveTrack(recv_stream, track);
-    }
-    for (auto track : recv_stream->GetVideoTracks()) {
-      observer_->OnRemoveTrack(recv_stream, track);
-    }
+ /*   recv_stream->GetVideoTracks([&](scoped_refptr<RTCMediaTrack> track) {
+      observer_->OnRemoveTrack([&](OnRTCMediaStream on) { on(recv_stream); },
+                               track);
+    });
+
+    recv_stream->GetAudioTracks([&](scoped_refptr<RTCMediaTrack> track) {
+      observer_->OnRemoveTrack([&](OnRTCMediaStream on) { on(recv_stream); },
+                               track);
+    });*/
+    
     remote_streams_.erase(
         std::find(remote_streams_.begin(), remote_streams_.end(), recv_stream));
   }
@@ -548,23 +585,30 @@ void RTCPeerConnectionImpl::Close() {
       if (observer_) {
         observer_->OnRemoveStream(stream);
       }
-      for (auto track : stream->GetAudioTracks()) {
-        observer_->OnRemoveTrack(stream, track);
-      }
-      for (auto track : stream->GetVideoTracks()) {
-        observer_->OnRemoveTrack(stream, track);
-      }
+   /*   stream->GetAudioTracks([&](scoped_refptr<RTCMediaTrack> track) {
+        observer_->OnRemoveTrack([&](OnRTCMediaStream on) { on(stream); },
+                                 track);
+      });
+      stream->GetVideoTracks([&](scoped_refptr<RTCMediaTrack> track) {
+        observer_->OnRemoveTrack([&](OnRTCMediaStream on) { on(stream); },
+                                 track);
+      });*/
     }
     remote_streams_.clear();
   }
 }
 
-MediaStreamVector RTCPeerConnectionImpl::local_streams() {
-  return local_streams_;
+void RTCPeerConnectionImpl::local_streams(OnRTCMediaStream on) {
+
+  for (auto item : local_streams_) {
+    on(item);
+  }
 }
 
-MediaStreamVector RTCPeerConnectionImpl::remote_streams() {
-  return remote_streams_;
+void RTCPeerConnectionImpl::remote_streams(OnRTCMediaStream on) {
+  for (auto item : remote_streams_) {
+    on(item);
+  }
 }
 
 int RTCPeerConnectionImpl::AddStream(scoped_refptr<RTCMediaStream> stream) {
@@ -677,7 +721,7 @@ void RTCPeerConnectionImpl::AddTransceiver(scoped_refptr<RTCMediaTrack> track,
 
 void RTCPeerConnectionImpl::AddTrack(scoped_refptr<RTCMediaTrack> track,
                                      OnVectorString streamIds,
-                                     libwebrtc ::OnAddTrack onAdd) {
+                                     libwebrtc::OnAddTrack onAdd) {
   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpSenderInterface>> errorOr;
 
   std::vector<std::string> stream_ids;
@@ -707,14 +751,29 @@ bool RTCPeerConnectionImpl::RemoveTrack(scoped_refptr<RTCRtpSender> render) {
   return rtc_peerconnection_->RemoveTrack(impl->rtp_sender());
 }
 
-Vector<scoped_refptr<RTCRtpSender>> RTCPeerConnectionImpl::GetSenders() {
-  Vector<scoped_refptr<RTCRtpSender>> ret;
+void RTCPeerConnectionImpl::GetSenders(OnRTCRtpSender on) {
   for (rtc::scoped_refptr<webrtc::RtpSenderInterface> item :
        rtc_peerconnection_->GetSenders()) {
-    ret.push_back(new RefCountedObject<RTCRtpSenderImpl>(item));
+    on(new RefCountedObject<RTCRtpSenderImpl>(item));
   }
-  return ret;
 }
+
+void RTCPeerConnectionImpl::GetTransceivers(OnRTCRtpTransceiver on) {
+  for (rtc::scoped_refptr<webrtc::RtpTransceiverInterface> item :
+       rtc_peerconnection_->GetTransceivers()) {
+    on(new RefCountedObject<RTCRtpTransceiverImpl>(item));
+  }
+}
+
+
+void RTCPeerConnectionImpl::GetReceivers(OnRTCRtpReceiver on) {
+  for (rtc::scoped_refptr<webrtc::RtpReceiverInterface> item :
+       rtc_peerconnection_->GetReceivers()) {
+    on(new RefCountedObject<RTCRtpReceiverImpl>(item));
+  }
+ 
+}
+
 
 void WebRTCStatsObserver::OnComplete(const webrtc::StatsReports& reports) {
   MediaTrackStatistics stats;

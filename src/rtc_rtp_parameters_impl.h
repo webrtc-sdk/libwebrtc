@@ -43,9 +43,8 @@ class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
   virtual void GetMaxPtime(int value) override;
   virtual int GetPtime() override;
   virtual void SetPtime(int value) override;
-  virtual Vector<scoped_refptr<RTCRtcpFeedback>> GetRtcpFeedback() override;
-  virtual void SetRtcpFeedback(
-      Vector<scoped_refptr<RTCRtcpFeedback>> value) override;
+  virtual void GetRtcpFeedback(OnRTCRtcpFeedback on) override;
+  virtual void SetRtcpFeedback(OnVectorRTCRtcpFeedback on) override;
   virtual void GetParameters(OnStringAndString on) override;
   virtual void SetParameters(OnMapStringAndString on) override;
   virtual bool operator==(scoped_refptr<RTCRtpCodecParameters> o) override;
@@ -106,16 +105,13 @@ class RTCRtpParametersImpl : public RTCRtpParameters {
   virtual void SetTransactionId(char* p, size_t size) override;
   virtual void GetMid(OnString on) override;
   virtual void SetMid(char* p, size_t size) override;
-  virtual Vector<scoped_refptr<RTCRtpCodecParameters>> GetCodecs() override;
-  virtual void SetCodecs(
-      Vector<scoped_refptr<RTCRtpCodecParameters>> value) override;
-  virtual Vector<scoped_refptr<RTCRtpExtension>> GetHeaderExtensions() override;
-  virtual void SetHeaderExtensions(
-      Vector<scoped_refptr<RTCRtpExtension>> value) override;
-  virtual Vector<scoped_refptr<RTCRtpEncodingParameters>> GetEncodings()
+  virtual void GetCodecs(OnRTCRtpCodecParameters on) override;
+  virtual void SetCodecs(OnVectorRTCRtpCodecParameters on) override;
+  virtual void GetHeaderExtensions(OnRTCRtpExtension on) override;
+  virtual void SetHeaderExtensions(OnVectorRTCRtpExtension on) override;
+  virtual void GetEncodings(OnRTCRtpEncodingParameters on)
       override;
-  virtual void SetEncodings(
-      Vector<scoped_refptr<RTCRtpEncodingParameters>> value) override;
+  virtual void SetEncodings(OnVectorRTCRtpEncodingParameters on) override;
   virtual scoped_refptr<RTCRtcpParameters> GetRtcp() override;
   virtual void SetRtcp(scoped_refptr<RTCRtcpParameters> value) override;
   virtual bool operator==(scoped_refptr<RTCRtpParameters> o) const override;

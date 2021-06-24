@@ -31,6 +31,10 @@ scoped_refptr<RTCMediaTrack> RTCRtpSenderImpl::GetTrack() const {
   rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track =
       rtp_sender_->track();
 
+  if (nullptr == track.get()) {
+    return scoped_refptr<RTCMediaTrack>();
+  }
+
   if (track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
     return new RefCountedObject<VideoTrackImpl>(
         static_cast<webrtc::VideoTrackInterface*>(track.get()));
@@ -42,6 +46,9 @@ scoped_refptr<RTCMediaTrack> RTCRtpSenderImpl::GetTrack() const {
 }
 
 scoped_refptr<RTCDtlsTransport> RTCRtpSenderImpl::GetDtlsTransport() const {
+  if (nullptr == rtp_sender_->dtls_transport().get()) {
+    return scoped_refptr<RTCDtlsTransport>();
+  }
   return new RefCountedObject<RTCDtlsTransportImpl>(
       rtp_sender_->dtls_transport());
 }
@@ -74,14 +81,11 @@ void RTCRtpSenderImpl::SetStreams(OnVectorString on) const {
   rtp_sender_->SetStreams(list);
 }
 
-Vector<scoped_refptr<RTCRtpEncodingParameters>>
-RTCRtpSenderImpl::InitSendEncodings() const {
-  Vector<scoped_refptr<RTCRtpEncodingParameters>> ret;
+void RTCRtpSenderImpl::InitSendEncodings(OnRTCRtpEncodingParameters on) const {
   for (webrtc::RtpEncodingParameters item :
        rtp_sender_->init_send_encodings()) {
-    ret.push_back(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
+    on(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
   }
-  return ret;
 }
 
 scoped_refptr<RTCRtpParameters> RTCRtpSenderImpl::GetParameters() const {
@@ -89,14 +93,18 @@ scoped_refptr<RTCRtpParameters> RTCRtpSenderImpl::GetParameters() const {
       rtp_sender_->GetParameters());
 }
 
-const char* RTCRtpSenderImpl::SetParameters(
+bool RTCRtpSenderImpl::SetParameters(
     const scoped_refptr<RTCRtpParameters> parameters) {
   RTCRtpParametersImpl* impl =
       static_cast<RTCRtpParametersImpl*>(parameters.get());
-  return rtp_sender_->SetParameters(impl->rtp_parameters()).message();
+  return rtp_sender_->SetParameters(impl->rtp_parameters()).ok();
 }
 
 scoped_refptr<RTCDtmfSender> RTCRtpSenderImpl::GetDtmfSender() const {
+ 
+  if (nullptr == rtp_sender_->GetDtmfSender().get()){
+    return scoped_refptr<RTCDtmfSender>();
+  }
   return new RefCountedObject<RTCDtmfSenderImpl>(rtp_sender_->GetDtmfSender());
 }
 

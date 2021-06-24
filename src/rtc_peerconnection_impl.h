@@ -89,16 +89,21 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
 
   virtual bool RemoveTrack(scoped_refptr<RTCRtpSender> render) override;
 
-  virtual Vector<scoped_refptr<RTCRtpSender>> GetSenders() override;
+  virtual void GetSenders(OnRTCRtpSender on) override;
+
+  virtual void GetTransceivers(OnRTCRtpTransceiver on) override;
+
+  virtual void GetReceivers(OnRTCRtpReceiver on) override;
+
 
  public:
   virtual int AddStream(scoped_refptr<RTCMediaStream> stream) override;
 
   virtual int RemoveStream(scoped_refptr<RTCMediaStream> stream) override;
 
-  virtual MediaStreamVector local_streams() override;
+  virtual void local_streams(OnRTCMediaStream on) override;
 
-  virtual MediaStreamVector remote_streams() override;
+  virtual void remote_streams(OnRTCMediaStream on) override;
 
   virtual scoped_refptr<RTCDataChannel> CreateDataChannel(
       const char* label,
@@ -119,6 +124,17 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
 
  protected:
   ~RTCPeerConnectionImpl();
+   
+  virtual void OnAddTrack(
+      rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
+      const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>&
+          streams) override;
+
+  virtual void OnTrack(
+      rtc::scoped_refptr<webrtc::RtpTransceiverInterface> transceiver) override;
+
+  virtual void OnRemoveTrack(
+      rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) override;
 
   virtual void OnAddStream(
       rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
@@ -153,8 +169,8 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   RTCPeerConnectionObserver* observer_ = nullptr;
   std::unique_ptr<webrtc::Mutex> callback_crt_sec_;
   bool initialize_offer_sent = false;
-  MediaStreamVector local_streams_;
-  MediaStreamVector remote_streams_;
+  std::vector<scoped_refptr<RTCMediaStream>> local_streams_;
+  std::vector<scoped_refptr<RTCMediaStream>> remote_streams_;
   scoped_refptr<RTCDataChannel> data_channel_;
 };
 

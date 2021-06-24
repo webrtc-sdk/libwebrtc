@@ -1,9 +1,10 @@
 ﻿#include "rtc_media_stream_impl.h"
+
+#include <algorithm>
+
 #include "rtc_audio_track_impl.h"
 #include "rtc_peerconnection.h"
 #include "rtc_video_track_impl.h"
-
-#include <algorithm>
 
 namespace libwebrtc {
 
@@ -74,12 +75,16 @@ bool MediaStreamImpl::RemoveTrack(scoped_refptr<RTCVideoTrack> track) {
   return false;
 }
 
-AudioTrackVector MediaStreamImpl::GetAudioTracks() {
-  return audio_tracks_;
+void MediaStreamImpl::GetAudioTracks(OnRTCAudioTrack on) {
+  for (auto item : audio_tracks_) {
+    on(item);
+  }
 }
 
-VideoTrackVector MediaStreamImpl::GetVideoTracks() {
-  return video_tracks_;
+void MediaStreamImpl::GetVideoTracks(OnRTCVideoTrack on) {
+  for (auto item : video_tracks_) {
+    on(item);
+  }
 }
 
 scoped_refptr<RTCAudioTrack> MediaStreamImpl::FindAudioTrack(
@@ -89,7 +94,7 @@ scoped_refptr<RTCAudioTrack> MediaStreamImpl::FindAudioTrack(
       return track;
   }
 
-  return nullptr;
+  return scoped_refptr<RTCAudioTrack>();
 }
 
 scoped_refptr<RTCVideoTrack> MediaStreamImpl::FindVideoTrack(
@@ -99,11 +104,16 @@ scoped_refptr<RTCVideoTrack> MediaStreamImpl::FindVideoTrack(
       return track;
   }
 
-  return nullptr;
+  return scoped_refptr<RTCVideoTrack>();
+}
+
+void MediaStreamImpl::GetId(OnString on) {
+   std::string id= rtc_media_stream_->id();
+  on((char*)id.c_str(), id.size());
 }
 
 void MediaStreamImpl::OnChanged() {
-  AudioTrackVector audio_tracks;
+  std::vector<scoped_refptr<RTCAudioTrack>> audio_tracks;
   for (auto track : rtc_media_stream_->GetAudioTracks()) {
     scoped_refptr<AudioTrackImpl> audio_track = scoped_refptr<AudioTrackImpl>(
         new RefCountedObject<AudioTrackImpl>(track));
@@ -112,7 +122,7 @@ void MediaStreamImpl::OnChanged() {
 
   audio_tracks_ = audio_tracks;
 
-  VideoTrackVector video_tracks;
+  std::vector<scoped_refptr<RTCVideoTrack>> video_tracks;
   for (auto track : rtc_media_stream_->GetVideoTracks()) {
     scoped_refptr<VideoTrackImpl> video_track = scoped_refptr<VideoTrackImpl>(
         new RefCountedObject<VideoTrackImpl>(track));
@@ -120,7 +130,7 @@ void MediaStreamImpl::OnChanged() {
   }
 
   /*对比流，回调OnAddTrack 或 OnRemoveTrack*/
-  VideoTrackVector removed_video_tracks;
+  std::vector<scoped_refptr<RTCVideoTrack>> removed_video_tracks;
 
   for (auto track : video_tracks_) {
     if (std::find(video_tracks.begin(), video_tracks.end(), track) ==
@@ -130,11 +140,12 @@ void MediaStreamImpl::OnChanged() {
   }
 
   for (auto track : removed_video_tracks) {
-    if (observer_)
-      observer_->OnRemoveTrack(this, track);
+  /*  if (observer_) {
+      observer_->OnRemoveTrack([&](OnRTCMediaStream on) { on(this); }, track);
+    }*/
   }
 
-  VideoTrackVector new_video_tracks;
+  std::vector<scoped_refptr<RTCVideoTrack>> new_video_tracks;
   for (auto track : video_tracks) {
     if (std::find(video_tracks_.begin(), video_tracks_.end(), track) ==
         video_tracks_.end()) {
@@ -142,12 +153,12 @@ void MediaStreamImpl::OnChanged() {
     }
   }
 
-  for (auto track : new_video_tracks) {
-    if (observer_)
-      observer_->OnAddTrack(this, track);
-  }
+  //for (auto track : new_video_tracks) {
+  //  if (observer_)
+  //    observer_->OnAddTrack([&](OnRTCMediaStream on) { on(this); }, track);
+  //}
 
   video_tracks_ = video_tracks;
 }
 
-} // namespace libwebrtc
+}  // namespace libwebrtc

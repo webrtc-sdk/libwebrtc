@@ -43,6 +43,7 @@ RTCDtlsTransportImpl::RTCDtlsTransportImpl(
 
 scoped_refptr<RTCDtlsTransportInformation>
 RTCDtlsTransportImpl::GetInformation() {
+
   return new RefCountedObject<RTCDtlsTransportInformationImpl>(
       dtls_transport_->Information());
 }

@@ -19,10 +19,10 @@ class RTCRtpSenderImpl : public RTCRtpSender {
   virtual void GetStreamIds(OnString on) const override;
   virtual void SetStreams(OnVectorString on) const override;
 
-  virtual Vector<scoped_refptr<RTCRtpEncodingParameters>> InitSendEncodings()
+  virtual void InitSendEncodings(OnRTCRtpEncodingParameters on)
       const override;
   virtual scoped_refptr<RTCRtpParameters> GetParameters() const override;
-  virtual const char* SetParameters(
+  virtual bool SetParameters(
       const scoped_refptr<RTCRtpParameters> parameters) override;
   virtual scoped_refptr<RTCDtmfSender> GetDtmfSender() const override;
 

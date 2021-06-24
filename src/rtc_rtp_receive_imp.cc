@@ -26,7 +26,9 @@ void RTCRtpReceiverImpl::OnFirstPacketReceived(cricket::MediaType media_type) {
 scoped_refptr<RTCMediaTrack> RTCRtpReceiverImpl::Track() const {
   rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track =
       rtp_receiver_->track();
-
+  if (nullptr == track.get()) {
+    return scoped_refptr<RTCMediaTrack>();
+  }
   if (track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
     return new RefCountedObject<VideoTrackImpl>(
         static_cast<webrtc::VideoTrackInterface*>(track.get()));
@@ -37,6 +39,10 @@ scoped_refptr<RTCMediaTrack> RTCRtpReceiverImpl::Track() const {
   return scoped_refptr<RTCMediaTrack>();
 }
 scoped_refptr<RTCDtlsTransport> RTCRtpReceiverImpl::DtlsTransport() const {
+  if (nullptr == rtp_receiver_->dtls_transport().get()) {
+    return scoped_refptr<RTCDtlsTransport>();
+  }
+
   return new RefCountedObject<RTCDtlsTransportImpl>(
       rtp_receiver_->dtls_transport());
 }
@@ -45,16 +51,17 @@ void RTCRtpReceiverImpl::StreamIds(OnString on) const {
     on((char*)item.c_str(), item.size());
   }
 }
-Vector<scoped_refptr<RTCMediaStream>> RTCRtpReceiverImpl::Streams() const {
-  Vector<scoped_refptr<RTCMediaStream>> ret;
+
+void RTCRtpReceiverImpl::Streams(OnRTCMediaStream on) const {
   for (auto item : rtp_receiver_->streams()) {
-    ret.push_back(new RefCountedObject<MediaStreamImpl>(item));
+    on(new RefCountedObject<MediaStreamImpl>(item));
   }
-  return ret;
 }
+
 RTCMediaType RTCRtpReceiverImpl::MediaType() const {
   return static_cast<RTCMediaType>(rtp_receiver_->media_type());
 }
+
 void RTCRtpReceiverImpl::Id(OnString on) const {
   auto temp = rtp_receiver_->id();
   on((char*)temp.c_str(), temp.size());

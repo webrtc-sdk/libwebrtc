@@ -52,9 +52,9 @@ class MediaStreamImpl : public RTCMediaStream,
 
   virtual bool RemoveTrack(scoped_refptr<RTCVideoTrack> track) override;
 
-  virtual AudioTrackVector GetAudioTracks() override;
+  virtual void GetAudioTracks(OnRTCAudioTrack on) override;
 
-  virtual VideoTrackVector GetVideoTracks() override;
+  virtual void GetVideoTracks(OnRTCVideoTrack on) override;
 
   virtual scoped_refptr<RTCAudioTrack> FindAudioTrack(
       const char* track_id) override;
@@ -65,6 +65,8 @@ class MediaStreamImpl : public RTCMediaStream,
   virtual const char* label() override {
     return label_;
   }
+
+  void GetId(OnString on) override;
 
   virtual void OnChanged() override;
 
@@ -80,8 +82,8 @@ class MediaStreamImpl : public RTCMediaStream,
  private:
   rtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_media_stream_;
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> rtc_peerconnection_;
-  AudioTrackVector audio_tracks_;
-  VideoTrackVector video_tracks_;
+  std::vector<scoped_refptr<RTCAudioTrack>> audio_tracks_;
+  std::vector<scoped_refptr<RTCVideoTrack>> video_tracks_;
   RTCPeerConnectionObserver* observer_ = nullptr;
   char label_[kMaxStringLength];
 };

@@ -41,21 +41,23 @@ void RTCRtpTransceiverInitImpl::SetStreamIds(OnVectorString on) {
   rtp_transceiver_init_.stream_ids = list;
 }
 
-Vector<scoped_refptr<RTCRtpEncodingParameters>>
-RTCRtpTransceiverInitImpl::GetSendEncodings() {
-  Vector<scoped_refptr<RTCRtpEncodingParameters>> ret;
+void
+RTCRtpTransceiverInitImpl::GetSendEncodings(OnRTCRtpEncodingParameters on) {
   for (auto item : rtp_transceiver_init_.send_encodings) {
-    ret.push_back(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
+    on(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
   }
-  return ret;
 }
 
 void RTCRtpTransceiverInitImpl::SetSendEncodings(
-    Vector<scoped_refptr<RTCRtpEncodingParameters>> value) {
+    OnVectorRTCRtpEncodingParameters on) {
+
   std::vector<webrtc::RtpEncodingParameters> list;
-  for (auto item : value) {
-    list.push_back(static_cast<RTCRtpEncodingParametersImpl*>(item.get())->rtp_parameters());
-  }
+
+  on([&](scoped_refptr<RTCRtpEncodingParameters> param) {
+    auto impl = static_cast<RTCRtpEncodingParametersImpl*>(param.get());
+    list.push_back(impl->rtp_parameters());
+  });
+
   rtp_transceiver_init_.send_encodings = list;
 }
 
@@ -69,10 +71,16 @@ libwebrtc::RTCRtpTransceiverImpl::rtp_transceiver() {
 }
 
 scoped_refptr<RTCRtpSender> RTCRtpTransceiverImpl::Sender() const {
+  if (nullptr == rtp_transceiver_->sender().get()) {
+    return scoped_refptr<RTCRtpSender>();
+  }
   return new RefCountedObject<RTCRtpSenderImpl>(rtp_transceiver_->sender());
 }
 
 scoped_refptr<RTCRtpReceiver> RTCRtpTransceiverImpl::Receiver() const {
+  if (nullptr == rtp_transceiver_->receiver().get()) {
+    return scoped_refptr<RTCRtpReceiver>();
+  }
   return new RefCountedObject<RTCRtpReceiverImpl>(rtp_transceiver_->receiver());
 }
 
@@ -85,19 +93,20 @@ bool RTCRtpTransceiverImpl::Stopping() const {
 }
 
 RTCRtpTransceiverDirection RTCRtpTransceiverImpl::Direction() const {
-  return static_cast<RTCRtpTransceiverDirection>(
-      rtp_transceiver_->direction());
+  return static_cast<RTCRtpTransceiverDirection>(rtp_transceiver_->direction());
 }
 
 void RTCRtpTransceiverImpl::SetDirectionWithError(
     RTCRtpTransceiverDirection new_direction,
     OnString on) {
-  std::string val =
-      rtp_transceiver_
-          ->SetDirectionWithError(
-              static_cast<webrtc::RtpTransceiverDirection>(new_direction))
-          .message();
-  on((char*)val.c_str(), val.size());
+  auto error = rtp_transceiver_->SetDirectionWithError(
+      static_cast<webrtc::RtpTransceiverDirection>(new_direction));
+  if (error.ok()) {
+    on(nullptr, 0);
+  } else {
+    std::string val = error.message();
+    on((char*)val.c_str(), val.size());
+  }
 }
 
 RTCRtpTransceiverDirection RTCRtpTransceiverImpl::CurrentDirection() const {

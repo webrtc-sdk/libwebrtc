@@ -11,6 +11,7 @@
 #include "rtc_string.h"
 
 namespace libwebrtc {
+
 class RTCRtpTransceiverInit : public RefCountInterface {
  public:
   LIB_WEBRTC_API static scoped_refptr<RTCRtpTransceiverInit> Create();
@@ -21,10 +22,8 @@ class RTCRtpTransceiverInit : public RefCountInterface {
   virtual void GetStreamIds(OnString on) = 0;
   virtual void SetStreamIds(OnVectorString on) = 0;
 
-  virtual Vector<scoped_refptr<RTCRtpEncodingParameters>>
-  GetSendEncodings() = 0;
-  virtual void SetSendEncodings(
-      Vector<scoped_refptr<RTCRtpEncodingParameters>> value) = 0;
+  virtual void GetSendEncodings(OnRTCRtpEncodingParameters on) = 0;
+  virtual void SetSendEncodings(OnVectorRTCRtpEncodingParameters on) = 0;
 };
 
 class RTCRtpTransceiver : public RefCountInterface {
@@ -70,6 +69,14 @@ class RTCRtpTransceiver : public RefCountInterface {
   //    rtc::ArrayView<const RTCRtpHeaderExtensionCapability>
   //        header_extensions_to_offer);
 };
+
+typedef fixed_size_function<void(scoped_refptr<RTCRtpTransceiver> param)>
+    OnRTCRtpTransceiver;
+
+typedef fixed_size_function<void(OnRTCRtpTransceiver param)>
+    OnVectorRTCRtpTransceiver;
+
+
 }  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_TYPES_HXX
