@@ -6,31 +6,31 @@
 #include "rtc_rtp_sender.h"
 
 namespace libwebrtc {
+
 class RTCRtpSenderImpl : public RTCRtpSender {
  public:
   RTCRtpSenderImpl(rtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender);
 
-  virtual bool SetTrack(scoped_refptr<RTCMediaTrack> track) override;
-  virtual scoped_refptr<RTCMediaTrack> GetTrack() const override;
-  virtual scoped_refptr<RTCDtlsTransport> GetDtlsTransport() const override;
-  virtual uint32_t GetSsrc() const override;
-  virtual RTCMediaType GetMediaType() const override;
-  virtual void Id(OnString on) const override;
-  virtual void GetStreamIds(OnString on) const override;
-  virtual void SetStreams(OnVectorString on) const override;
-
-  virtual void InitSendEncodings(OnRTCRtpEncodingParameters on)
-      const override;
-  virtual scoped_refptr<RTCRtpParameters> GetParameters() const override;
-  virtual bool SetParameters(
+  virtual bool set_track(scoped_refptr<RTCMediaTrack> track) override;
+  virtual scoped_refptr<RTCMediaTrack> track() const override;
+  virtual scoped_refptr<RTCDtlsTransport> dtls_transport() const override;
+  virtual uint32_t ssrc() const override;
+  virtual RTCMediaType media_type() const override;
+  virtual const string id() const override;
+  virtual const vector<string> stream_ids() const override;
+  virtual void set_stream_ids(const vector<string> stream_ids) const override;
+  virtual const vector<scoped_refptr<RTCRtpEncodingParameters>>
+  init_send_encodings() const override;
+  virtual scoped_refptr<RTCRtpParameters> parameters() const override;
+  virtual bool set_parameters(
       const scoped_refptr<RTCRtpParameters> parameters) override;
-  virtual scoped_refptr<RTCDtmfSender> GetDtmfSender() const override;
+  virtual scoped_refptr<RTCDtmfSender> dtmf_sender() const override;
 
-  rtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender();
-
+  rtc::scoped_refptr<webrtc::RtpSenderInterface> rtc_rtp_sender() {
+    return rtp_sender_;
+  }
  private:
   rtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender_;
-
 };
 }  // namespace libwebrtc
 

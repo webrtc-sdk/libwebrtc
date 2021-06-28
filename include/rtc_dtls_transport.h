@@ -2,7 +2,6 @@
 #define LIB_WEBRTC_DTLS_TRANSPORT_H_
 
 #include "base/refcount.h"
-//#include "rtc_ice_transport.h"
 #include "rtc_types.h"
 
 namespace libwebrtc {
@@ -21,9 +20,9 @@ namespace libwebrtc {
         virtual RTCDtlsTransportInformation& operator=(
                 scoped_refptr<RTCDtlsTransportInformation> c) = 0;
 
-        virtual RTCDtlsTransportState GetState() const = 0;
-        virtual int GetSslCipherSuite() const = 0;
-        virtual int GetSrtpCipherSuite() const = 0;
+        virtual RTCDtlsTransportState state() const = 0;
+        virtual int ssl_cipher_suite() const = 0;
+        virtual int srtp_cipher_suite() const = 0;
     };
 
     class RTCDtlsTransportObserver {

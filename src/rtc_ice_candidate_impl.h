@@ -11,13 +11,13 @@ class RTCIceCandidateImpl : public RTCIceCandidate {
  public:
   RTCIceCandidateImpl(std::unique_ptr<webrtc::IceCandidateInterface> candidate);
 
-  virtual const char* candidate() const override;
+  virtual const string candidate() const override;
 
-  virtual const char* sdp_mid() const override;
+  virtual const string sdp_mid() const override;
 
   virtual int sdp_mline_index() const override;
 
-  virtual bool ToString(char* out, int length) override;
+  virtual bool ToString(string& out) override;
 
   webrtc::IceCandidateInterface* candidate() { return candidate_.get(); }
 

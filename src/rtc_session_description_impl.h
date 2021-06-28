@@ -13,13 +13,13 @@ class RTCSessionDescriptionImpl : public RTCSessionDescription {
       std::unique_ptr<webrtc::SessionDescriptionInterface> description);
   virtual ~RTCSessionDescriptionImpl() {}
 
-  virtual const char* sdp() const override;
+  virtual const string sdp() const override;
 
   virtual SdpType GetType() override;
 
-  virtual const char* type() override;
+  virtual const string type() override;
 
-  virtual bool ToString(char* out, int length) override;
+  virtual bool ToString(string& out) override;
 
   webrtc::SessionDescriptionInterface* description() {
     return description_.get();

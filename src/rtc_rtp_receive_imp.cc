@@ -23,7 +23,7 @@ void RTCRtpReceiverImpl::OnFirstPacketReceived(cricket::MediaType media_type) {
   }
 }
 
-scoped_refptr<RTCMediaTrack> RTCRtpReceiverImpl::Track() const {
+scoped_refptr<RTCMediaTrack> RTCRtpReceiverImpl::track() const {
   rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track =
       rtp_receiver_->track();
   if (nullptr == track.get()) {
@@ -38,7 +38,7 @@ scoped_refptr<RTCMediaTrack> RTCRtpReceiverImpl::Track() const {
   }
   return scoped_refptr<RTCMediaTrack>();
 }
-scoped_refptr<RTCDtlsTransport> RTCRtpReceiverImpl::DtlsTransport() const {
+scoped_refptr<RTCDtlsTransport> RTCRtpReceiverImpl::dtls_transport() const {
   if (nullptr == rtp_receiver_->dtls_transport().get()) {
     return scoped_refptr<RTCDtlsTransport>();
   }
@@ -46,31 +46,35 @@ scoped_refptr<RTCDtlsTransport> RTCRtpReceiverImpl::DtlsTransport() const {
   return new RefCountedObject<RTCDtlsTransportImpl>(
       rtp_receiver_->dtls_transport());
 }
-void RTCRtpReceiverImpl::StreamIds(OnString on) const {
+
+const vector<string> RTCRtpReceiverImpl::stream_ids() const {
+  vector<string> vec;
   for (auto item : rtp_receiver_->stream_ids()) {
-    on((char*)item.c_str(), item.size());
+    vec.push_back(item.c_str());
   }
+  return vec;
 }
 
-void RTCRtpReceiverImpl::Streams(OnRTCMediaStream on) const {
+vector<scoped_refptr<RTCMediaStream>> RTCRtpReceiverImpl::streams() const {
+  vector<scoped_refptr<RTCMediaStream>> streams;
   for (auto item : rtp_receiver_->streams()) {
-    on(new RefCountedObject<MediaStreamImpl>(item));
+    streams.push_back(new RefCountedObject<MediaStreamImpl>(item));
   }
+ return streams;
 }
 
-RTCMediaType RTCRtpReceiverImpl::MediaType() const {
+RTCMediaType RTCRtpReceiverImpl::media_type() const {
   return static_cast<RTCMediaType>(rtp_receiver_->media_type());
 }
 
-void RTCRtpReceiverImpl::Id(OnString on) const {
-  auto temp = rtp_receiver_->id();
-  on((char*)temp.c_str(), temp.size());
+const string RTCRtpReceiverImpl::id() const {
+  return rtp_receiver_->id().c_str();
 }
-scoped_refptr<RTCRtpParameters> RTCRtpReceiverImpl::GetParameters() const {
+scoped_refptr<RTCRtpParameters> RTCRtpReceiverImpl::parameters() const {
   return new RefCountedObject<RTCRtpParametersImpl>(
       rtp_receiver_->GetParameters());
 }
-bool RTCRtpReceiverImpl::SetParameters(
+bool RTCRtpReceiverImpl::set_parameters(
     scoped_refptr<RTCRtpParameters> parameters) {
   return rtp_receiver_->SetParameters(
       static_cast<RTCRtpParametersImpl*>(parameters.get())->rtp_parameters());

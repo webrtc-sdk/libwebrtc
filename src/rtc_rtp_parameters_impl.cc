@@ -13,102 +13,102 @@ RTCRtpEncodingParametersImpl::RTCRtpEncodingParametersImpl(
     webrtc::RtpEncodingParameters& rtp_encoding_parameters)
     : rtp_encoding_parameters_(rtp_encoding_parameters) {}
 
-uint32_t RTCRtpEncodingParametersImpl::GetSsrc() {
+uint32_t RTCRtpEncodingParametersImpl::ssrc() {
   return rtp_encoding_parameters_.ssrc.value();
 }
 
-void RTCRtpEncodingParametersImpl::SetSsrc(uint32_t value) {
+void RTCRtpEncodingParametersImpl::set_ssrc(uint32_t value) {
   rtp_encoding_parameters_.ssrc = value;
 }
 
-double RTCRtpEncodingParametersImpl::GetBitratePriority() {
+double RTCRtpEncodingParametersImpl::bitrate_priority() {
   return rtp_encoding_parameters_.bitrate_priority;
 }
 
-void RTCRtpEncodingParametersImpl::SetBitratePriority(double value) {
+void RTCRtpEncodingParametersImpl::set_bitrate_priority(double value) {
   rtp_encoding_parameters_.bitrate_priority = value;
 }
 
-RTCPriority RTCRtpEncodingParametersImpl::GetNetworkPriority() {
+RTCPriority RTCRtpEncodingParametersImpl::network_priority() {
   return static_cast<RTCPriority>(rtp_encoding_parameters_.network_priority);
 }
 
-void RTCRtpEncodingParametersImpl::SetNetworkPriority(RTCPriority value) {
+void RTCRtpEncodingParametersImpl::set_network_priority(RTCPriority value) {
   rtp_encoding_parameters_.network_priority =
       static_cast<webrtc::Priority>(value);
 }
 
-int RTCRtpEncodingParametersImpl::GetMaxBitrateBps() {
+int RTCRtpEncodingParametersImpl::max_bitrate_bps() {
   return rtp_encoding_parameters_.max_bitrate_bps.value();
 }
 
-void RTCRtpEncodingParametersImpl::SetMaxBitrateBps(int value) {
+void RTCRtpEncodingParametersImpl::set_max_bitrate_bps(int value) {
   rtp_encoding_parameters_.max_bitrate_bps = value;
 }
 
-int RTCRtpEncodingParametersImpl::GetMinBitrateBps() {
+int RTCRtpEncodingParametersImpl::min_bitrate_bps() {
   return rtp_encoding_parameters_.min_bitrate_bps.value();
 }
 
-void RTCRtpEncodingParametersImpl::SetMinBitrateBps(int value) {
+void RTCRtpEncodingParametersImpl::set_min_bitrate_bps(int value) {
   rtp_encoding_parameters_.min_bitrate_bps = value;
 }
 
-double RTCRtpEncodingParametersImpl::GetMaxFramerate() {
+double RTCRtpEncodingParametersImpl::max_framerate() {
   return rtp_encoding_parameters_.max_framerate.value();
 }
 
-void RTCRtpEncodingParametersImpl::SetMaxFramerate(double value) {
+void RTCRtpEncodingParametersImpl::set_max_framerate(double value) {
   rtp_encoding_parameters_.max_framerate = value;
 }
 
-int RTCRtpEncodingParametersImpl::GetNumTemporalLayers() {
+int RTCRtpEncodingParametersImpl::num_temporal_layers() {
   return rtp_encoding_parameters_.num_temporal_layers.value();
 }
 
-void RTCRtpEncodingParametersImpl::SetNumTemporalLayers(int value) {
+void RTCRtpEncodingParametersImpl::set_num_temporal_layers(int value) {
   rtp_encoding_parameters_.num_temporal_layers = value;
 }
 
-double RTCRtpEncodingParametersImpl::GetScaleResolutionDownBy() {
+double RTCRtpEncodingParametersImpl::scale_resolution_down_by() {
   return rtp_encoding_parameters_.scale_resolution_down_by.value();
 }
 
-void RTCRtpEncodingParametersImpl::SetScaleResolutionDownBy(double value) {
+void RTCRtpEncodingParametersImpl::set_scale_resolution_down_by(double value) {
   rtp_encoding_parameters_.scale_resolution_down_by = value;
 }
 
-void RTCRtpEncodingParametersImpl::GetScalabilityMode(OnString on) {
-  auto temp= rtp_encoding_parameters_.scalability_mode.value();
-  on((char*)temp.c_str(), temp.size());
+const string RTCRtpEncodingParametersImpl::scalability_mode() {
+  auto temp = rtp_encoding_parameters_.scalability_mode.value();
+  return temp.c_str();
 }
 
-void RTCRtpEncodingParametersImpl::SetScalabilityMode(char* p, size_t size) {
-  rtp_encoding_parameters_.scalability_mode = std::string(p,size);
+void RTCRtpEncodingParametersImpl::set_scalability_mode(const string mode) {
+  rtp_encoding_parameters_.scalability_mode = mode.str();
 }
 
-bool RTCRtpEncodingParametersImpl::GetActive() {
+bool RTCRtpEncodingParametersImpl::active() {
   return rtp_encoding_parameters_.active;
 }
 
-void RTCRtpEncodingParametersImpl::SetActive(bool value) {
+void RTCRtpEncodingParametersImpl::set_active(bool value) {
   rtp_encoding_parameters_.active = value;
 }
 
-void RTCRtpEncodingParametersImpl::GetRid(OnString on) {
+const string RTCRtpEncodingParametersImpl::rid() {
   auto temp = rtp_encoding_parameters_.rid;
-  on((char*)temp.c_str(), temp.size());
+  return temp.c_str();
 }
 
-void RTCRtpEncodingParametersImpl::SetRid(char* p, size_t size) {
-  rtp_encoding_parameters_.rid = std::string(p,size);
+void RTCRtpEncodingParametersImpl::set_rid(const string rid) {
+  rtp_encoding_parameters_.rid = rid.str();
 }
 
-bool RTCRtpEncodingParametersImpl::GetAdaptivePtime() {
+bool RTCRtpEncodingParametersImpl::adaptive_ptime() {
   return rtp_encoding_parameters_.adaptive_ptime;
 }
 
-void RTCRtpEncodingParametersImpl::SetAdaptivePtime(bool value) {
+void RTCRtpEncodingParametersImpl::set_adaptive_ptime(bool value) {
   rtp_encoding_parameters_.adaptive_ptime = value;
 }
 
@@ -133,72 +133,83 @@ webrtc::RtpParameters RTCRtpParametersImpl::rtp_parameters() {
   return rtp_parameters_;
 }
 
-void RTCRtpParametersImpl::GetTransactionId(OnString on) {
-  auto temp= rtp_parameters_.transaction_id;
-  on((char*)temp.c_str(), temp.size());
+const string RTCRtpParametersImpl::transaction_id() {
+  auto temp = rtp_parameters_.transaction_id;
+  return temp.c_str();
 }
-void RTCRtpParametersImpl::SetTransactionId(char* p, size_t size) {
-  rtp_parameters_.transaction_id = std::string(p, size);
+
+void RTCRtpParametersImpl::set_transaction_id(const string id) {
+  rtp_parameters_.transaction_id = id.str();
 }
-void RTCRtpParametersImpl::GetMid(OnString on) {
+
+const string RTCRtpParametersImpl::mid() {
   auto temp = rtp_parameters_.mid;
-  on((char*)temp.c_str(), temp.size());
+  return temp.c_str();
 }
-void RTCRtpParametersImpl::SetMid(char* p, size_t size) {
-  rtp_parameters_.mid = std::string(p,size);
+void RTCRtpParametersImpl::set_mid(const string mid) {
+  rtp_parameters_.mid = mid.str();
 }
 
-void RTCRtpParametersImpl::GetCodecs(OnRTCRtpCodecParameters on) {
-  for (webrtc::RtpCodecParameters item : rtp_parameters_.codecs) {
-    on(new RefCountedObject<RTCRtpCodecParametersImpl>(item));
+const vector<scoped_refptr<RTCRtpCodecParameters>> RTCRtpParametersImpl::codecs() {
+  vector<scoped_refptr<RTCRtpCodecParameters>> vec;
+  for (auto item : rtp_parameters_.codecs) {
+    vec.push_back(new RefCountedObject<RTCRtpCodecParametersImpl>(item));
   }
+  return vec;
 }
 
-void RTCRtpParametersImpl::SetCodecs(OnVectorRTCRtpCodecParameters on) {
+void RTCRtpParametersImpl::set_codecs( const vector<scoped_refptr<RTCRtpCodecParameters>> codecs) {
   std::vector<webrtc::RtpCodecParameters> list;
-  on([&](scoped_refptr<RTCRtpCodecParameters> item) {
+  for (auto item : codecs) {
     auto impl = static_cast<RTCRtpCodecParametersImpl*>(item.get());
     list.push_back(impl->rtp_codec_parameters());
-  });
+  }
   rtp_parameters_.codecs = list;
 }
 
-void
-RTCRtpParametersImpl::GetHeaderExtensions(OnRTCRtpExtension on) {
-  for (webrtc::RtpExtension item : rtp_parameters_.header_extensions) {
-    on(new RefCountedObject<RTCRtpExtensionImpl>(item));
+const vector<scoped_refptr<RTCRtpExtension>> RTCRtpParametersImpl::header_extensions() {
+  vector<scoped_refptr<RTCRtpExtension>> vec;
+  for (auto item : rtp_parameters_.header_extensions) {
+    vec.push_back(new RefCountedObject<RTCRtpExtensionImpl>(item));
   }
+  return vec;
 }
 
-void RTCRtpParametersImpl::SetHeaderExtensions(OnVectorRTCRtpExtension on) {
+void RTCRtpParametersImpl::set_header_extensions(
+    vector<scoped_refptr<RTCRtpExtension>> header_extensions) {
   std::vector<webrtc::RtpExtension> list;
-  on([&](scoped_refptr<RTCRtpExtension> item) {
+  for (auto item : header_extensions) {
     auto impl = static_cast<RTCRtpExtensionImpl*>(item.get());
     list.push_back(impl->rtp_extension());
-  });
-
+  }
   rtp_parameters_.header_extensions = list;
 }
 
-void RTCRtpParametersImpl::GetEncodings(OnRTCRtpEncodingParameters on) {
-  for (webrtc::RtpEncodingParameters item : rtp_parameters_.encodings) {
-    on(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
+const vector<scoped_refptr<RTCRtpEncodingParameters>>
+RTCRtpParametersImpl::encodings() {
+  vector<scoped_refptr<RTCRtpEncodingParameters>> vec;
+  for (auto item : rtp_parameters_.encodings) {
+    vec.push_back(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
   }
+  return vec;
 }
 
-void RTCRtpParametersImpl::SetEncodings(OnVectorRTCRtpEncodingParameters on) {
+void RTCRtpParametersImpl::set_encodings(
+    vector<scoped_refptr<RTCRtpEncodingParameters>> encodings) {
   std::vector<webrtc::RtpEncodingParameters> list;
-  on([&](scoped_refptr<RTCRtpEncodingParameters> item) {
+  for (auto item : encodings) {
     auto impl = static_cast<RTCRtpEncodingParametersImpl*>(item.get());
     list.push_back(impl->rtp_parameters());
-  });
+  }
   rtp_parameters_.encodings = list;
 }
 
-scoped_refptr<RTCRtcpParameters> RTCRtpParametersImpl::GetRtcp() {
+scoped_refptr<RTCRtcpParameters> RTCRtpParametersImpl::rtcp_parameters() {
   return new RefCountedObject<RTCRtcpParametersImpl>(rtp_parameters_.rtcp);
 }
-void RTCRtpParametersImpl::SetRtcp(scoped_refptr<RTCRtcpParameters> value) {
+
+void RTCRtpParametersImpl::set_rtcp_parameters(
+    scoped_refptr<RTCRtcpParameters> value) {
   rtp_parameters_.rtcp =
       static_cast<RTCRtcpParametersImpl*>(value.get())->rtcp_parameters();
 }
@@ -216,28 +227,33 @@ RTCRtcpParametersImpl::RTCRtcpParametersImpl(
     webrtc::RtcpParameters rtcp_parameters)
     : rtcp_parameters_(rtcp_parameters) {}
 
-uint32_t RTCRtcpParametersImpl::GetSsrc() {
+uint32_t RTCRtcpParametersImpl::ssrc() {
   return rtcp_parameters_.ssrc.value();
 }
-void RTCRtcpParametersImpl::SetSsrc(uint32_t value) {
+
+void RTCRtcpParametersImpl::set_ssrc(uint32_t value) {
    rtcp_parameters_.ssrc = value;
 }
-void RTCRtcpParametersImpl::GetCname(OnString on) {
-  auto temp= rtcp_parameters_.cname;
-  on((char*)temp.c_str(), temp.size());
+
+const string RTCRtcpParametersImpl::cname() {
+  return rtcp_parameters_.cname.c_str();
 }
-void RTCRtcpParametersImpl::SetCname(char* p, size_t size) {
-  rtcp_parameters_.cname = std::string(p,size);
+void RTCRtcpParametersImpl::set_cname(const string cname) {
+  rtcp_parameters_.cname = cname.str();
 }
-bool RTCRtcpParametersImpl::GetReducedSize() {
+
+bool RTCRtcpParametersImpl::reduced_size() {
   return rtcp_parameters_.reduced_size;
 }
-void RTCRtcpParametersImpl::SetReducedSize(bool value) {}
 
-bool RTCRtcpParametersImpl::GetMux() {
+void RTCRtcpParametersImpl::set_reduced_size(bool value) {
+  rtcp_parameters_.reduced_size = value;
+}
+
+bool RTCRtcpParametersImpl::mux() {
   return rtcp_parameters_.mux;
 }
-void RTCRtcpParametersImpl::SetMux(bool value) {}
+void RTCRtcpParametersImpl::set_mux(bool value) {}
 bool RTCRtcpParametersImpl::operator==(
     scoped_refptr<RTCRtcpParameters> o) const {
   return rtcp_parameters_ ==
@@ -260,28 +276,27 @@ bool RTCRtpExtensionImpl::operator==(scoped_refptr<RTCRtpExtension> o) const {
   return rtp_extension_ == static_cast<RTCRtpExtensionImpl*>(o.get())->rtp_extension();
 }
 
-void RTCRtpExtensionImpl::GetUri(OnString on) {
-  auto temp= rtp_extension_.uri;
-  on((char*)temp.c_str(), temp.size());
+const string RTCRtpExtensionImpl::uri() {
+  return rtp_extension_.uri.c_str();
 }
 
-void RTCRtpExtensionImpl::SetUri(char* uri, size_t size) {
-  rtp_extension_.uri = std::string(uri,size);
+void RTCRtpExtensionImpl::set_uri(const string uri) {
+  rtp_extension_.uri = uri.c_str();
 }
 
-int RTCRtpExtensionImpl::GetId() {
+int RTCRtpExtensionImpl::id() {
   return rtp_extension_.id;
 }
 
-void RTCRtpExtensionImpl::SetId(int value) {
+void RTCRtpExtensionImpl::set_id(int value) {
   rtp_extension_.id = value;
 }
 
-bool RTCRtpExtensionImpl::GetEncrypt() {
+bool RTCRtpExtensionImpl::encrypt() {
   return rtp_extension_.encrypt;
 }
 
-void RTCRtpExtensionImpl::SetEncrypt(bool value) {
+void RTCRtpExtensionImpl::set_encrypt(bool value) {
   rtp_extension_.encrypt = value;
 }
 
@@ -289,9 +304,9 @@ webrtc::RtpExtension RTCRtpExtensionImpl::rtp_extension() {
   return rtp_extension_;
 }
 
-void RTCRtpExtensionImpl::ToString(OnString on) const {
+const string RTCRtpExtensionImpl::ToString() const {
   auto temp =  rtp_extension_.ToString();
-  on((char*)temp.c_str(), temp.size());
+  return temp;
 }
 
 RTCRtpCodecParametersImpl::RTCRtpCodecParametersImpl(
@@ -299,96 +314,101 @@ RTCRtpCodecParametersImpl::RTCRtpCodecParametersImpl(
     : rtp_codec_parameters_(rtp_codec_parameters) {}
 
 
-void RTCRtpCodecParametersImpl::GetMimeType(OnString on) const {
-  auto val = rtp_codec_parameters_.mime_type();
-  on((char*)val.c_str(), val.size());
+const string RTCRtpCodecParametersImpl::mime_type() const {
+  return rtp_codec_parameters_.mime_type();
 }
 
-void RTCRtpCodecParametersImpl::GetName(OnString on) {
-  auto val = rtp_codec_parameters_.name;
-  on((char*)val.c_str(), val.size());
+const string RTCRtpCodecParametersImpl::name() {
+  return rtp_codec_parameters_.name;
 }
 
-void RTCRtpCodecParametersImpl::SetName(char* p,size_t size) {
-  std::string value(p, size);
-  rtp_codec_parameters_.name = value;
+void RTCRtpCodecParametersImpl::set_name(const string name) {
+  rtp_codec_parameters_.name = name.str();
 }
 
-RTCMediaType RTCRtpCodecParametersImpl::GetKind() {
+RTCMediaType RTCRtpCodecParametersImpl::kind() {
   return static_cast<RTCMediaType>(rtp_codec_parameters_.kind);
 }
 
-void RTCRtpCodecParametersImpl::SetKind(RTCMediaType value) {
+void RTCRtpCodecParametersImpl::set_kind(RTCMediaType value) {
   rtp_codec_parameters_.kind = static_cast<cricket::MediaType>(value);
 }
 
-int RTCRtpCodecParametersImpl::GetPayloadType() {
+int RTCRtpCodecParametersImpl::payload_type() {
   return rtp_codec_parameters_.payload_type;
 }
 
-void RTCRtpCodecParametersImpl::SetPayloadType(int value) {
+void RTCRtpCodecParametersImpl::set_payload_type(int value) {
   rtp_codec_parameters_.payload_type = value;
 }
 
-int RTCRtpCodecParametersImpl::GetClockRate() {
+int RTCRtpCodecParametersImpl::clock_rate() {
   return rtp_codec_parameters_.clock_rate.value();
 }
 
-void RTCRtpCodecParametersImpl::SetClockRate(int value) {
+void RTCRtpCodecParametersImpl::set_clock_rate(int value) {
   rtp_codec_parameters_.clock_rate = value;
 }
 
-int RTCRtpCodecParametersImpl::GetNumChannels() {
+int RTCRtpCodecParametersImpl::num_channels() {
   return rtp_codec_parameters_.num_channels.value();
 }
 
-void RTCRtpCodecParametersImpl::SetNumChannels(int value) {
+void RTCRtpCodecParametersImpl::set_num_channels(int value) {
   rtp_codec_parameters_.num_channels = value;
 }
 
-int RTCRtpCodecParametersImpl::GetMaxPtime() {
+int RTCRtpCodecParametersImpl::max_ptime() {
   return rtp_codec_parameters_.max_ptime.value();
 }
 
-void RTCRtpCodecParametersImpl::GetMaxPtime(int value) {
+void RTCRtpCodecParametersImpl::set_max_ptime(int value) {
   rtp_codec_parameters_.max_ptime = value;
 }
 
-int RTCRtpCodecParametersImpl::GetPtime() {
+int RTCRtpCodecParametersImpl::ptime() {
  return rtp_codec_parameters_.ptime.value();
 }
 
-void RTCRtpCodecParametersImpl::SetPtime(int value) {
+void RTCRtpCodecParametersImpl::set_ptime(int value) {
   rtp_codec_parameters_.ptime = value;
 }
-void RTCRtpCodecParametersImpl::GetRtcpFeedback(OnRTCRtcpFeedback on) {
+
+const vector<scoped_refptr<RTCRtcpFeedback>>
+RTCRtpCodecParametersImpl::rtcp_feedback() {
+  vector<scoped_refptr<RTCRtcpFeedback>> vec;
   for (auto item : rtp_codec_parameters_.rtcp_feedback) {
-   on(new RefCountedObject<RTCRtcpFeedbackImpl>(item));
+   vec.push_back(new RefCountedObject<RTCRtcpFeedbackImpl>(item));
   }
+  return vec;
 }
 
-void RTCRtpCodecParametersImpl::SetRtcpFeedback(OnVectorRTCRtcpFeedback on) {
+void RTCRtpCodecParametersImpl::set_rtcp_feedback(
+    const vector<scoped_refptr<RTCRtcpFeedback>> rtcp_feedbacks) {
   std::vector<webrtc::RtcpFeedback> rtcp_feedback;
-  on([&](scoped_refptr<RTCRtcpFeedback> item) {
+  for (scoped_refptr<RTCRtcpFeedback> item : rtcp_feedbacks) {
     auto impl = static_cast<RTCRtcpFeedbackImpl*>(item.get());
     rtcp_feedback.push_back(impl->rtcp_feedback());
-  });
-
+  }
   rtp_codec_parameters_.rtcp_feedback = rtcp_feedback;
 }
 
-void RTCRtpCodecParametersImpl::GetParameters(OnStringAndString on) {
+const vector<std::pair<string, string>>
+RTCRtpCodecParametersImpl::parameters() {
+  vector<std::pair<string, string>> els{};
   for (auto item : rtp_codec_parameters_.parameters) {
-    on((char*)item.first.c_str(), item.first.size(), (char*)item.second.c_str(),
-       item.second.size());
+    els.push_back(
+        std::pair<string, string>{item.first.c_str(), item.second.c_str()});
   }
+  return els;
 }
 
-void RTCRtpCodecParametersImpl::SetParameters(OnMapStringAndString on) {
+void RTCRtpCodecParametersImpl::set_parameters(
+    const map<string, string> map) {
   std::map<std::string, std::string> parameters;
-  on([&](char* key, size_t key_size, char* val, size_t val_size) {
-    parameters[std::string(key, key_size)] = std::string(val, val_size);
-  });
+  for (auto item : map) {
+    parameters[item.key.str()] = item.value.str();
+  }
   rtp_codec_parameters_.parameters = parameters;
 }
 
@@ -417,19 +437,19 @@ webrtc::RtcpFeedback RTCRtcpFeedbackImpl::rtcp_feedback() {
   return rtcp_feedback_;
 }
 
-RTCRtcpFeedbackType RTCRtcpFeedbackImpl::GetType() {
+RTCRtcpFeedbackType RTCRtcpFeedbackImpl::type() {
   return static_cast<RTCRtcpFeedbackType>(rtcp_feedback_.type);
 }
 
-void RTCRtcpFeedbackImpl::GetType(RTCRtcpFeedbackType value) {
+void RTCRtcpFeedbackImpl::set_type(RTCRtcpFeedbackType value) {
   rtcp_feedback_.type = static_cast<webrtc::RtcpFeedbackType>(value);
 }
 
-RTCRtcpFeedbackMessageType RTCRtcpFeedbackImpl::GetMessageType() {
+RTCRtcpFeedbackMessageType RTCRtcpFeedbackImpl::message_type() {
   return static_cast<RTCRtcpFeedbackMessageType>(rtcp_feedback_.message_type.value());
 }
 
-void RTCRtcpFeedbackImpl::GetMessageType(RTCRtcpFeedbackMessageType value) {
+void RTCRtcpFeedbackImpl::set_message_type(RTCRtcpFeedbackMessageType value) {
   rtcp_feedback_.message_type =  static_cast<webrtc::RtcpFeedbackMessageType>(value);
 }
 

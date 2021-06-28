@@ -14,7 +14,7 @@ class RTCDataChannelImpl : public RTCDataChannel, public webrtc::DataChannelObse
   RTCDataChannelImpl(
       rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel);
 
-  virtual void Send(const char* data, int length, bool binary = false) override;
+  virtual void Send(const string data, bool binary = false) override;
 
   virtual void Close() override;
 
@@ -22,7 +22,7 @@ class RTCDataChannelImpl : public RTCDataChannel, public webrtc::DataChannelObse
 
   virtual void UnregisterObserver() override;
 
-  virtual const char* label() const override;
+  virtual const string label() const override;
 
   virtual int id() const override;
 
@@ -42,7 +42,7 @@ class RTCDataChannelImpl : public RTCDataChannel, public webrtc::DataChannelObse
   RTCDataChannelObserver* observer_ = nullptr;
   std::unique_ptr<webrtc::Mutex> crit_sect_;
   RTCDataChannelState state_;
-  char label_[kMaxStringLength];
+  string label_;
 };
 
 } // namespace libwebrtc

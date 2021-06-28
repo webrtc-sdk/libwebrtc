@@ -2,9 +2,7 @@
 #define LIB_WEBRTC_RTC_RTP_TRANSCEIVER_HXX
 
 #include "base/refcount.h"
-#include "rtc_media_types.h"
 #include "rtc_rtp_parameters.h"
-#include "rtc_rtp_transceiver_direction.h"
 #include "rtc_types.h"
 #include "rtc_rtp_receiver.h"
 #include "rtc_rtp_sender.h"
@@ -15,66 +13,54 @@ class RTCRtpTransceiverInit : public RefCountInterface {
  public:
   LIB_WEBRTC_API static scoped_refptr<RTCRtpTransceiverInit> Create();
 
-  virtual RTCRtpTransceiverDirection GetDirection() = 0;
-  virtual void SetDirection(RTCRtpTransceiverDirection value) = 0;
+  virtual RTCRtpTransceiverDirection direction() = 0;
+  virtual void set_direction(RTCRtpTransceiverDirection value) = 0;
 
-  virtual void GetStreamIds(OnString on) = 0;
-  virtual void SetStreamIds(OnVectorString on) = 0;
+  virtual const vector<string> stream_ids() = 0;
+  virtual void set_stream_ids(const vector<string> ids) = 0;
 
-  virtual void GetSendEncodings(OnRTCRtpEncodingParameters on) = 0;
-  virtual void SetSendEncodings(OnVectorRTCRtpEncodingParameters on) = 0;
+  virtual const vector<scoped_refptr<RTCRtpEncodingParameters>>
+  send_encodings() = 0;
+  virtual void set_send_encodings(
+      const vector<scoped_refptr<RTCRtpEncodingParameters>> send_encodings) = 0;
 };
 
 class RTCRtpTransceiver : public RefCountInterface {
  public:
-  virtual RTCMediaType GetMediaType() const = 0;
+  virtual RTCMediaType media_type() const = 0;
 
-  virtual void GetMid(OnString on) const = 0;
+  virtual const string mid() const = 0;
 
-  virtual scoped_refptr<RTCRtpSender> Sender() const = 0;
+  virtual scoped_refptr<RTCRtpSender> sender() const = 0;
 
-  virtual scoped_refptr<RTCRtpReceiver> Receiver() const = 0;
+  virtual scoped_refptr<RTCRtpReceiver> receiver() const = 0;
 
   virtual bool Stopped() const = 0;
 
   virtual bool Stopping() const = 0;
 
-  virtual RTCRtpTransceiverDirection Direction() const = 0;
+  virtual RTCRtpTransceiverDirection direction() const = 0;
 
-  virtual void SetDirectionWithError(RTCRtpTransceiverDirection new_direction,
-                                     OnString on) = 0;
+  virtual const string SetDirectionWithError(RTCRtpTransceiverDirection new_direction) = 0;
 
-  virtual RTCRtpTransceiverDirection CurrentDirection() const = 0;
+  virtual RTCRtpTransceiverDirection current_direction() const = 0;
 
-  virtual RTCRtpTransceiverDirection FiredDirection() const = 0;
+  virtual RTCRtpTransceiverDirection fired_direction() const = 0;
 
-  virtual void StopStandard(OnString on) = 0;
+  virtual const string StopStandard() = 0;
 
   virtual void StopInternal() = 0;
 
-  // virtual String SetCodecPreferences(
-  //    rtc::ArrayView<RTCRtpCodecCapability> codecs);
+  //virtual string set_codec_preferences(vector<RTCRtpCodecCapability> codecs) = 0;
 
-  // virtual std::vector<RTCRtpCodecCapability> codec_preferences() const;
+  //virtual vector<RTCRtpCodecCapability> codec_preferences() const = 0;
 
-  // virtual std::vector<RtpHeaderExtensionCapability> HeaderExtensionsToOffer()
-  //    const;
+  //virtual vector<RTCRtpHeaderExtensionCapability> HeaderExtensionsToOffer() const = 0;
 
-  // virtual std::vector<RTCRtpHeaderExtensionCapability>
-  // HeaderExtensionsNegotiated()
-  //    const;
+  //virtual std::vector<RTCRtpHeaderExtensionCapability> HeaderExtensionsNegotiated() const = 0;
 
-  // virtual webrtc::RTCError SetOfferedRtpHeaderExtensions(
-  //    rtc::ArrayView<const RTCRtpHeaderExtensionCapability>
-  //        header_extensions_to_offer);
+  //virtual webrtc::RTCError SetOfferedRtpHeaderExtensions(vector<const RTCRtpHeaderExtensionCapability> header_extensions_to_offer);
 };
-
-typedef fixed_size_function<void(scoped_refptr<RTCRtpTransceiver> param)>
-    OnRTCRtpTransceiver;
-
-typedef fixed_size_function<void(OnRTCRtpTransceiver param)>
-    OnVectorRTCRtpTransceiver;
-
 
 }  // namespace libwebrtc
 

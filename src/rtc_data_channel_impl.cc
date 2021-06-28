@@ -7,18 +7,16 @@ RTCDataChannelImpl::RTCDataChannelImpl(
     : rtc_data_channel_(rtc_data_channel),
       crit_sect_(new webrtc::Mutex()) {
   rtc_data_channel_->RegisterObserver(this);
-  strncpy(label_, rtc_data_channel_->label().data(), sizeof(label_));
+  label_ = rtc_data_channel_->label().c_str();
 }
 
-void RTCDataChannelImpl::Send(const char* data,
-	int length,
-                              bool binary /*= false*/) {
+void RTCDataChannelImpl::Send(const string data, bool binary /*= false*/) {
   if (binary) {
-    rtc::CopyOnWriteBuffer binary(data);
+    rtc::CopyOnWriteBuffer binary(data.str());
     webrtc::DataBuffer buffer(binary, true);
     rtc_data_channel_->Send(buffer);
   } else {
-    webrtc::DataBuffer buffer(data);
+    webrtc::DataBuffer buffer(data.str());
     rtc_data_channel_->Send(buffer);
   }
 }
@@ -38,7 +36,7 @@ void RTCDataChannelImpl::UnregisterObserver() {
   observer_ = nullptr;
 }
 
-const char* RTCDataChannelImpl::label() const {
+const string RTCDataChannelImpl::label() const {
   return label_;
 }
 

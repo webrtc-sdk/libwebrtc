@@ -1,19 +1,20 @@
 #ifndef LIB_WEBRTC_RTP_RECEIVER_HXX
 #define LIB_WEBRTC_RTP_RECEIVER_HXX
 
-//#include <string.h>
-#include "rtc_types.h"
 #include "base/refcount.h"
 #include "base/scoped_ref_ptr.h"
-#include "rtc_dtls_transport.h"
-#include "rtc_media_stream.h"
-#include "rtc_media_types.h"
+
+#include "rtc_types.h"
 #include "rtc_rtp_parameters.h"
-#include "rtc_media_track.h"
+
 //#include "rtc_frame_decryptor.h"
 //#include "rtc_frame_encryptor.h"
 
 namespace libwebrtc {
+
+class RTCMediaTrack;
+class RTCMediaStream;
+class RTCDtlsTransport;
 
 class RTCRtpReceiverObserver {
  public:
@@ -25,20 +26,21 @@ class RTCRtpReceiverObserver {
 
 class RTCRtpReceiver : public RefCountInterface {
  public:
-  virtual scoped_refptr<RTCMediaTrack> Track() const = 0;
+  virtual scoped_refptr<RTCMediaTrack> track() const = 0;
 
-  virtual scoped_refptr<RTCDtlsTransport> DtlsTransport() const = 0;
+  virtual scoped_refptr<RTCDtlsTransport> dtls_transport() const = 0;
 
-  virtual void StreamIds(OnString on) const = 0;
-  virtual void Streams(OnRTCMediaStream on) const = 0;
+  virtual const vector<string> stream_ids() const = 0;
 
-  virtual RTCMediaType MediaType() const = 0;
+  virtual vector<scoped_refptr<RTCMediaStream>> streams() const = 0;
 
-  virtual void Id(OnString on) const = 0;
+  virtual RTCMediaType media_type() const = 0;
 
-  virtual scoped_refptr<RTCRtpParameters> GetParameters() const = 0;
+  virtual const string id() const = 0;
 
-  virtual bool SetParameters(scoped_refptr<RTCRtpParameters> parameters) = 0;
+  virtual scoped_refptr<RTCRtpParameters> parameters() const = 0;
+
+  virtual bool set_parameters(scoped_refptr<RTCRtpParameters> parameters) = 0;
 
   virtual void SetObserver(RTCRtpReceiverObserver* observer) = 0;
 
@@ -54,13 +56,6 @@ class RTCRtpReceiver : public RefCountInterface {
   // virtual void SetDepacketizerToDecoderFrameTransformer(
   //    scoped_refptr<FrameTransformerInterface> frame_transformer) = 0;
 };
-
-
-typedef fixed_size_function<void(scoped_refptr<RTCRtpReceiver> param)>
-    OnRTCRtpReceiver;
-
-typedef fixed_size_function<void(OnRTCRtpReceiver param)>
-    OnVectorRTCRtpReceiver;
 
 }  // namespace libwebrtc
 

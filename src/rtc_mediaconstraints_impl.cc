@@ -34,14 +34,14 @@ const char* RTCMediaConstraints::kScreencastMinBitrate = webrtc::MediaConstraint
 const char* RTCMediaConstraints::kCpuOveruseDetection = webrtc::MediaConstraints::kCpuOveruseDetection;
 const char* RTCMediaConstraints::kNumSimulcastLayers = webrtc::MediaConstraints::kNumSimulcastLayers;
 
-void RTCMediaConstraintsImpl::AddMandatoryConstraint(const char* key,
-                                                     const char* value) {
-  webrtc::MediaConstraints::Constraint constraint(key,value);
+void RTCMediaConstraintsImpl::AddMandatoryConstraint(const string key,
+                                                     const string value) {
+  webrtc::MediaConstraints::Constraint constraint(key.c_str(), value.c_str());
   mandatory_.push_back(constraint);
 }
-void RTCMediaConstraintsImpl::AddOptionalConstraint(const char* key,
-                                                    const char* value) {
-  webrtc::MediaConstraints::Constraint constraint(key, value);
+void RTCMediaConstraintsImpl::AddOptionalConstraint(const string key,
+                                                    const string value) {
+  webrtc::MediaConstraints::Constraint constraint(key.c_str(), value.c_str());
   optional_.push_back(constraint);
 }
 } // namespace libwebrtc

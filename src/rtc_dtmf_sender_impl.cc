@@ -12,37 +12,34 @@ RTCDtmfSenderImpl::dtmf_sender() {
 }
 
 
-bool RTCDtmfSenderImpl::InsertDtmf(const char* tones,
-                                   size_t size,
+bool RTCDtmfSenderImpl::InsertDtmf(const string tones,
                                    int duration,
                                    int inter_tone_gap) {
-  return dtmf_sender_->InsertDtmf(std::string(tones,size),duration,inter_tone_gap);
+  return dtmf_sender_->InsertDtmf(tones.c_str(), duration, inter_tone_gap);
 }
 
-bool RTCDtmfSenderImpl::InsertDtmf(const char* tones,
-                                   size_t size,
+bool RTCDtmfSenderImpl::InsertDtmf(const string tones,
                                    int duration,
                                    int inter_tone_gap,
                                    int comma_delay) {
-  return dtmf_sender_->InsertDtmf(std::string(tones, size), duration,
+  return dtmf_sender_->InsertDtmf(tones.c_str(), duration,
                                   inter_tone_gap,comma_delay);
 }
 
-void RTCDtmfSenderImpl::Tones(OnString on) const {
-  auto temp = dtmf_sender_->tones();
-  on((char*)temp.c_str(), temp.size());
+const string RTCDtmfSenderImpl::tones() const {
+  return dtmf_sender_->tones().c_str();
 }
 
 void RTCDtmfSenderImpl::OnToneChange(const std::string& tone,
                                      const std::string& tone_buffer) {
   if (observer_) {
-    observer_->OnToneChange((char*)tone.c_str(),tone.size(),(char*)tone_buffer.c_str(),tone_buffer.size());
+    observer_->OnToneChange(tone.c_str(), tone_buffer.c_str());
   }
 }
 
 void RTCDtmfSenderImpl::OnToneChange(const std::string& tone) {
   if (observer_) {
-    observer_->OnToneChange((char*)tone.c_str(), tone.size());
+    observer_->OnToneChange(tone.c_str());
   }
 }
 
@@ -61,17 +58,17 @@ bool RTCDtmfSenderImpl::CanInsertDtmf() {
 }
 
 
-int RTCDtmfSenderImpl::Duration() const {
+int RTCDtmfSenderImpl::duration() const {
   return dtmf_sender_->duration();
 }
 
 
-int RTCDtmfSenderImpl::InterToneGap() const {
+int RTCDtmfSenderImpl::inter_tone_gap() const {
   return dtmf_sender_->inter_tone_gap();
 }
 
 
-int RTCDtmfSenderImpl::CommaDelay() const {
+int RTCDtmfSenderImpl::comma_delay() const {
   return dtmf_sender_->comma_delay();
 }
 }  // namespace libwebrtc

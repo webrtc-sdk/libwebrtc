@@ -8,17 +8,16 @@ namespace libwebrtc {
 class RTCRtpReceiverImpl : public RTCRtpReceiver,
                            webrtc:: RtpReceiverObserverInterface {
  public:
-  RTCRtpReceiverImpl(
-      rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver);
+  RTCRtpReceiverImpl(rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver);
 
-  virtual scoped_refptr<RTCMediaTrack> Track() const override;
-  virtual scoped_refptr<RTCDtlsTransport> DtlsTransport() const override;
-  virtual void StreamIds(OnString on) const override;
-  virtual void Streams(OnRTCMediaStream on) const override;
-  virtual RTCMediaType MediaType() const override;
-  virtual void Id(OnString on) const override;
-  virtual scoped_refptr<RTCRtpParameters> GetParameters() const override;
-  virtual bool SetParameters(
+  virtual scoped_refptr<RTCMediaTrack> track() const override;
+  virtual scoped_refptr<RTCDtlsTransport> dtls_transport() const override;
+  virtual const vector<string> stream_ids() const override;
+  virtual vector<scoped_refptr<RTCMediaStream>> streams() const override;
+  virtual RTCMediaType media_type() const override;
+  virtual const string id() const override;
+  virtual scoped_refptr<RTCRtpParameters> parameters() const override;
+  virtual bool set_parameters(
       scoped_refptr<RTCRtpParameters> parameters) override;
   virtual void SetObserver(RTCRtpReceiverObserver* observer) override;
   virtual void SetJitterBufferMinimumDelay(double delay_seconds) override;

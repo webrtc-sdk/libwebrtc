@@ -18,16 +18,16 @@ RTCDtlsTransportInformation& RTCDtlsTransportInformationImpl::operator=(
 }
 
 RTCDtlsTransportInformation::RTCDtlsTransportState
-RTCDtlsTransportInformationImpl::GetState() const {
+RTCDtlsTransportInformationImpl::state() const {
   return static_cast<RTCDtlsTransportState>(
       dtls_transport_information_.state());
 }
 
-int RTCDtlsTransportInformationImpl::GetSslCipherSuite() const {
+int RTCDtlsTransportInformationImpl::ssl_cipher_suite() const {
   return dtls_transport_information_.ssl_cipher_suite().value();
 }
 
-int RTCDtlsTransportInformationImpl::GetSrtpCipherSuite() const {
+int RTCDtlsTransportInformationImpl::srtp_cipher_suite() const {
   return dtls_transport_information_.srtp_cipher_suite().value();
 }
 

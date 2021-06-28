@@ -60,9 +60,9 @@ class RTCMediaConstraints : public RefCountInterface {
  public:
   LIB_WEBRTC_API static scoped_refptr<RTCMediaConstraints> Create();
 
-  virtual void AddMandatoryConstraint(const char* key, const char* value) = 0;
+  virtual void AddMandatoryConstraint(const string key, const string value) = 0;
 
-  virtual void AddOptionalConstraint(const char* key, const char* value) = 0;
+  virtual void AddOptionalConstraint(const string key, const string value) = 0;
 
  protected:
   virtual ~RTCMediaConstraints() {}

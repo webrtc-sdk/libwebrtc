@@ -19,19 +19,17 @@ class RTCDtmfSenderImpl : public RTCDtmfSender,
   virtual void RegisterObserver(RTCDtmfSenderObserver* observer) override;
   virtual void UnregisterObserver() override;
   virtual bool CanInsertDtmf() override;
-  virtual int Duration() const override;
-  virtual int InterToneGap() const override;
-  virtual int CommaDelay() const override;
-  virtual bool InsertDtmf(const char* tones,
-                          size_t size,
+  virtual int duration() const override;
+  virtual int inter_tone_gap() const override;
+  virtual int comma_delay() const override;
+  virtual bool InsertDtmf(const string tones,
                           int duration,
                           int inter_tone_gap) override;
-  virtual bool InsertDtmf(const char* tones,
-                          size_t size,
+  virtual bool InsertDtmf(const string tones,
                           int duration,
                           int inter_tone_gap,
                           int comma_delay) override;
-  virtual void Tones(OnString on) const override;
+  virtual const string tones() const override;
 
   virtual void OnToneChange(const std::string& tone,
                             const std::string& tone_buffer) override;

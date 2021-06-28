@@ -9,12 +9,9 @@ namespace libwebrtc {
 
 class RTCDtmfSenderObserver {
  public:
-  virtual void OnToneChange(const char* tone,
-                            size_t tone_size,
-                            const char* tone_buffer,
-                            size_t b_size) = 0;
+  virtual void OnToneChange(const string tone, const string tone_buffer) = 0;
 
-  virtual void OnToneChange(const char* tone, size_t tone_size) = 0;
+  virtual void OnToneChange(const string tone) = 0;
 
  protected:
   virtual ~RTCDtmfSenderObserver() = default;
@@ -28,26 +25,24 @@ class RTCDtmfSender : public RefCountInterface {
 
   virtual void UnregisterObserver() = 0;
 
-  virtual bool CanInsertDtmf() = 0;
-
-  virtual bool InsertDtmf(const char* tones,
-                          size_t size,
+  virtual bool InsertDtmf(const string tones,
                           int duration,
                           int inter_tone_gap) = 0;
 
-  virtual bool InsertDtmf(const char* tones,
-                          size_t size,
+  virtual bool InsertDtmf(const string tones,
                           int duration,
                           int inter_tone_gap,
                           int comma_delay) = 0;
 
-  virtual void Tones(OnString on) const = 0;
+  virtual bool CanInsertDtmf() = 0;
 
-  virtual int Duration() const = 0;
+  virtual const string tones() const = 0;
 
-  virtual int InterToneGap() const = 0;
+  virtual int duration() const = 0;
 
-  virtual int CommaDelay() const = 0;
+  virtual int inter_tone_gap() const = 0;
+
+  virtual int comma_delay() const = 0;
 };
 
 }  // namespace libwebrtc

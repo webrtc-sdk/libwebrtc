@@ -33,22 +33,23 @@ class RTCPeerConnectionFactory : public RefCountInterface {
   virtual scoped_refptr<RTCVideoDevice> GetVideoDevice() = 0;
 
   virtual scoped_refptr<RTCAudioSource> CreateAudioSource(
-      const char* audio_source_label) = 0;
+      const string audio_source_label) = 0;
 
   virtual scoped_refptr<RTCVideoSource> CreateVideoSource(
       scoped_refptr<RTCVideoCapturer> capturer,
-      const char* video_source_label,
+      const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) = 0;
 
   virtual scoped_refptr<RTCAudioTrack> CreateAudioTrack(
       scoped_refptr<RTCAudioSource> source,
-      const char* track_id) = 0;
+      const string track_id) = 0;
 
   virtual scoped_refptr<RTCVideoTrack> CreateVideoTrack(
       scoped_refptr<RTCVideoSource> source,
-      const char* track_id) = 0;
+      const string track_id) = 0;
 
-  virtual scoped_refptr<RTCMediaStream> CreateStream(const char* stream_id) = 0;
+  virtual scoped_refptr<RTCMediaStream> CreateStream(
+      const string stream_id) = 0;
 };
 
 } // namespace libwebrtc

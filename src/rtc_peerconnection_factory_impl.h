@@ -37,23 +37,23 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<RTCVideoDevice> GetVideoDevice() override;
 
   virtual scoped_refptr<RTCAudioSource> CreateAudioSource(
-      const char* audio_source_label) override;
+      const string audio_source_label) override;
 
   virtual scoped_refptr<RTCVideoSource> CreateVideoSource(
       scoped_refptr<RTCVideoCapturer> capturer,
-      const char* video_source_label,
+      const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) override;
 
   virtual scoped_refptr<RTCAudioTrack> CreateAudioTrack(
       scoped_refptr<RTCAudioSource> source,
-      const char* track_id) override;
+      const string track_id) override;
 
   virtual scoped_refptr<RTCVideoTrack> CreateVideoTrack(
       scoped_refptr<RTCVideoSource> source,
-      const char* track_id) override;
+      const string track_id) override;
 
   virtual scoped_refptr<RTCMediaStream> CreateStream(
-      const char* stream_id) override;
+      const string stream_id) override;
 
   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
   peer_connection_factory() {

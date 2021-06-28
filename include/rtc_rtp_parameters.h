@@ -3,12 +3,18 @@
 
 #include "base/refcount.h"
 #include "base/scoped_ref_ptr.h"
-#include "rtc_media_types.h"
-#include "rtc_priority.h"
-#include "rtc_rtp_transceiver_direction.h"
+
 #include "rtc_types.h"
 
 namespace libwebrtc {
+
+enum class RTCRtpTransceiverDirection {
+  kSendRecv,
+  kSendOnly,
+  kRecvOnly,
+  kInactive,
+  kStopped,
+};
 
 enum class RTCFecMechanism {
   RED,
@@ -43,94 +49,81 @@ enum class RTCDegradationPreference {
 };
 
 class RTCRtcpFeedback : public RefCountInterface {
-  virtual RTCRtcpFeedbackType GetType() = 0;
-  virtual void GetType(RTCRtcpFeedbackType value) = 0;
+  virtual RTCRtcpFeedbackType type() = 0;
+  virtual void set_type(RTCRtcpFeedbackType value) = 0;
 
-  virtual RTCRtcpFeedbackMessageType GetMessageType() = 0;
-  virtual void GetMessageType(RTCRtcpFeedbackMessageType value) = 0;
+  virtual RTCRtcpFeedbackMessageType message_type() = 0;
+  virtual void set_message_type(RTCRtcpFeedbackMessageType value) = 0;
 
   virtual bool operator==(scoped_refptr<RTCRtcpFeedback> o) = 0;
   virtual bool operator!=(scoped_refptr<RTCRtcpFeedback> o) = 0;
 };
 
+/* class RTCRtpCodecCapability : public RefCountInterface {
+  virtual const string mine_type() const = 0;
 
-typedef fixed_size_function<void(scoped_refptr<RTCRtcpFeedback> val)>
-    OnRTCRtcpFeedback;
-typedef fixed_size_function<void(OnRTCRtcpFeedback on)>
-    OnVectorRTCRtcpFeedback;
+  virtual const string name() = 0;
 
+  virtual void set_name(const string name) = 0;
 
-class RTCRtpCodecCapability : public RefCountInterface {
-  virtual void GetMimeType(OnString on) const = 0;
+  virtual RTCMediaType kind() = 0;
+  virtual void set_kind(RTCMediaType value) = 0;
 
-  virtual void GetName(OnString on) = 0;
-  virtual void SetName(char* p,size_t size) = 0;
+  virtual int clock_rate() = 0;
+  virtual void set_clock_rate(int value) = 0;
 
-  virtual RTCMediaType GetKind() = 0;
-  virtual void SetKind(RTCMediaType value) = 0;
+  virtual int preferred_payload_type() = 0;
+  virtual void set_preferred_payload_type(int value) = 0;
 
-  virtual int GetClockRate() = 0;
-  virtual void SetClockRate(int value) = 0;
+  virtual int max_ptime() = 0;
+  virtual void set_max_ptime(int value) = 0;
 
-  virtual int GetPreferredPayloadType() = 0;
-  virtual void SetPreferredPayloadType(int value) = 0;
+  virtual int ptime() = 0;
+  virtual void set_ptime(int value) = 0;
 
-  virtual int GetMaxPtime() = 0;
-  virtual void SetMaxPtime(int value) = 0;
+  virtual int num_channels() = 0;
+  virtual void set_num_channels(int value) = 0;
 
-  virtual int GetPtime() = 0;
-  virtual void SetPtime(int value) = 0;
+  virtual vector<scoped_refptr<RTCRtcpFeedback>> rtcp_feedback() = 0;
+  virtual void set_rtcp_feedback(vector<scoped_refptr<RTCRtcpFeedback>> rtcp_feecbacks) = 0;
 
-  virtual int GetNumChannels() = 0;
-  virtual void SetNumChannels(int value) = 0;
+  virtual const map<string,string> parameters() = 0;
+  virtual void set_parameters(const map<string, string> parameters) = 0;
 
-  virtual void GetRtcpFeedback(OnRTCRtcpFeedback on) = 0;
-  virtual void SetRtcpFeedback(OnVectorRTCRtcpFeedback on) = 0;
+  virtual const map<string, string> ptions() = 0;
+  virtual void set_options(map<string, string> options) = 0;
 
-  virtual void GetParameters(OnStringAndString on) = 0;
-  virtual void SetParameters(OnMapStringAndString on) = 0;
+  virtual int max_temporal_layer_extensions() = 0;
+  virtual void set_max_temporal_layer_extensions(int value) = 0;
 
-  virtual void GetOptions(OnStringAndString on) = 0;
-  virtual void SetOptions(OnMapStringAndString on) = 0;
+  virtual int max_spatial_layer_extensions() = 0;
+  virtual void set_max_spatial_layer_extensions(int value) = 0;
 
-  virtual int GetMaxTemporalLayerExtensions() = 0;
-  virtual void SetMaxTemporalLayerExtensions(int value) = 0;
-
-  virtual int GetMaxSpatialLayerExtensions() = 0;
-  virtual void SetMaxSpatialLayerExtensions(int value) = 0;
-
-  virtual bool GetSvcMultiStreamSupport() = 0;
-  virtual void SetSvcMultiStreamSupport(bool value) = 0;
+  virtual bool svc_multi_stream_support() = 0;
+  virtual void set_svc_multi_stream_support(bool value) = 0;
 
   virtual bool operator==(scoped_refptr<RTCRtpCodecCapability> o) const = 0;
   virtual bool operator!=(scoped_refptr<RTCRtpCodecCapability> o) const = 0;
-};
+};*/
 
 class RTCRtpHeaderExtensionCapability : public RefCountInterface {
-  virtual void GetUri(OnString on) = 0;
-  virtual void SetUri(char* p, size_t size) = 0;
+  virtual const string uri() = 0;
+  virtual void set_uri(const string uri) = 0;
 
-  virtual int GetPreferredId() = 0;
-  virtual void SetPreferredId(int value) = 0;
+  virtual int preferred_id() = 0;
+  virtual void set_preferred_id(int value) = 0;
 
-  virtual bool GetPreferredEncrypt() = 0;
-  virtual void SetPreferredEncrypt(bool value) = 0;
+  virtual bool preferred_encrypt() = 0;
+  virtual void set_preferred_encrypt(bool value) = 0;
 
-  virtual RTCRtpTransceiverDirection GetDirection() = 0;
-  virtual void SetDirection(RTCRtpTransceiverDirection value) = 0;
+  virtual RTCRtpTransceiverDirection direction() = 0;
+  virtual void set_direction(RTCRtpTransceiverDirection value) = 0;
 
   virtual bool operator==(
       scoped_refptr<RTCRtpHeaderExtensionCapability> o) const = 0;
   virtual bool operator!=(
       scoped_refptr<RTCRtpHeaderExtensionCapability> o) const = 0;
 };
-
-class RTCRtpExtension;
-
-typedef fixed_size_function<void(scoped_refptr<RTCRtpExtension> val)>
-    OnRTCRtpExtension;
-typedef fixed_size_function<void(OnRTCRtpExtension on)> OnVectorRTCRtpExtension;
-
 
 class RTCRtpExtension : public RefCountInterface {
  public:
@@ -140,86 +133,33 @@ class RTCRtpExtension : public RefCountInterface {
     kRequireEncryptedExtension,
   };
 
-  static bool IsSupportedForAudio(char* uri, size_t size);
-  static bool IsSupportedForVideo(char* uri, size_t size);
-  static bool IsEncryptionSupported(char* uri, size_t size);
-
-  static const scoped_refptr<RTCRtpExtension> FindHeaderExtensionByUri(
-      OnVectorRTCRtpExtension extensions,
-      char* uri,
-      size_t size,
-      RTCFilter filter);
-
-  static const scoped_refptr<RTCRtpExtension> FindHeaderExtensionByUri(
-      OnVectorRTCRtpExtension extensions,
-      char* uri,
-      size_t size);
-
-  static const scoped_refptr<RTCRtpExtension>
-  FindHeaderExtensionByUriAndEncryption(OnVectorRTCRtpExtension extensions,
-      char* uri,
-      size_t size,
-      bool encrypt);
-
-  void
-  DeduplicateHeaderExtensions(OnVectorRTCRtpExtension extensions,
-                              OnRTCRtpExtension retuls,
-      RTCFilter filter);
-
-  static char GetkEncryptHeaderExtensionsUri();
-  static char GetkAudioLevelUri();
-  static char GetkTimestampOffsetUri();
-  static char GetkAbsSendTimeUri();
-  static char GetkAbsoluteCaptureTimeUri();
-  static char GetkVideoRotationUri();
-  static char GetkVideoContentTypeUri();
-  static char GetkVideoTimingUri();
-  static char GetkGenericFrameDescriptorUri00();
-  static char GetkDependencyDescriptorUri();
-  static char GetkVideoLayersAllocationUri();
-  static char GetkTransportSequenceNumberUri();
-  static char GetkTransportSequenceNumberV2Uri();
-  static char GetkPlayoutDelayUri();
-  static char GetkColorSpaceUri();
-  static char GetkMidUri();
-  static char GetkRidUri();
-  static char GetkRepairedRidUri();
-  static char GetkVideoFrameTrackingIdUri();
-  static char GetkCsrcAudioLevelsUri();
-
-  static int GetkMinId();
-  static int GetkMaxId();
-  static int GetkMaxValueSize();
-  static int GetkOneByteHeaderExtensionMaxId();
-  static int GetkOneByteHeaderExtensionMaxValueSize();
-
-  virtual void ToString(OnString on) const = 0;
+  virtual const string ToString() const = 0;
   virtual bool operator==(scoped_refptr<RTCRtpExtension> o) const = 0;
 
-  virtual void GetUri(OnString on) = 0;
-  virtual void SetUri(char* uri, size_t size) = 0;
+  virtual const string uri() = 0;
+  virtual void set_uri(const string uri) = 0;
 
-  virtual int GetId() = 0;
-  virtual void SetId(int value) = 0;
+  virtual int id() = 0;
+  virtual void set_id(int value) = 0;
 
-  virtual bool GetEncrypt() = 0;
-  virtual void SetEncrypt(bool value) = 0;
+  virtual bool encrypt() = 0;
+  virtual void set_encrypt(bool value) = 0;
 };
 
 class RtpFecParameters : public RefCountInterface {
-  virtual uint32_t GetSsrc() = 0;
-  virtual void SetSsrc(uint32_t value) = 0;
+  virtual uint32_t ssrc() = 0;
+  virtual void set_ssrc(uint32_t value) = 0;
 
-  virtual RTCFecMechanism GetMechanism() = 0;
-  virtual void SetMechanism(RTCFecMechanism value) = 0;
+  virtual RTCFecMechanism mechanism() = 0;
+  virtual void set_mechanism(RTCFecMechanism value) = 0;
 
   virtual bool operator==(const RtpFecParameters& o) const = 0;
   virtual bool operator!=(const RtpFecParameters& o) const = 0;
 };
 
 class RTCRtpRtxParameters : public RefCountInterface {
-  virtual uint32_t GetSsrc() = 0;
-  virtual void SetSsrc(uint32_t value) = 0;
+  virtual uint32_t ssrc() = 0;
+  virtual void set_ssrc(uint32_t value) = 0;
 
   virtual bool operator==(scoped_refptr<RTCRtpRtxParameters> o) const = 0;
 
@@ -228,173 +168,152 @@ class RTCRtpRtxParameters : public RefCountInterface {
 
 class RTCRtpCodecParameters : public RefCountInterface {
  public:
-  virtual void GetMimeType(OnString on) const = 0;
+  virtual const string mime_type() const = 0;
 
-  virtual void GetName(OnString on) = 0;
-  virtual void SetName(char* p, size_t size) = 0;
+  virtual const string name() = 0;
+  virtual void set_name(const string name) = 0;
 
-  virtual RTCMediaType GetKind() = 0;
-  virtual void SetKind(RTCMediaType value) = 0;
+  virtual RTCMediaType kind() = 0;
+  virtual void set_kind(RTCMediaType value) = 0;
 
-  virtual int GetPayloadType() = 0;
-  virtual void SetPayloadType(int value) = 0;
+  virtual int payload_type() = 0;
+  virtual void set_payload_type(int value) = 0;
 
-  virtual int GetClockRate() = 0;
-  virtual void SetClockRate(int value) = 0;
+  virtual int clock_rate() = 0;
+  virtual void set_clock_rate(int value) = 0;
 
-  virtual int GetNumChannels() = 0;
-  virtual void SetNumChannels(int value) = 0;
+  virtual int num_channels() = 0;
+  virtual void set_num_channels(int value) = 0;
 
-  virtual int GetMaxPtime() = 0;
-  virtual void GetMaxPtime(int value) = 0;
+  virtual int max_ptime() = 0;
+  virtual void set_max_ptime(int value) = 0;
 
-  virtual int GetPtime() = 0;
-  virtual void SetPtime(int value) = 0;
+  virtual int ptime() = 0;
+  virtual void set_ptime(int value) = 0;
 
-  virtual void GetRtcpFeedback(OnRTCRtcpFeedback on) = 0;
-  virtual void SetRtcpFeedback(OnVectorRTCRtcpFeedback on) = 0;
+  virtual const vector<scoped_refptr<RTCRtcpFeedback>> rtcp_feedback() = 0;
+  virtual void set_rtcp_feedback(
+      const vector<scoped_refptr<RTCRtcpFeedback>> feecbacks) = 0;
 
-  virtual void GetParameters(OnStringAndString on) = 0;
-  virtual void SetParameters(OnMapStringAndString on) = 0;
+  virtual const vector<std::pair<string, string>> parameters() = 0;
+  virtual void set_parameters(const map<string, string> parameters) = 0;
 
   virtual bool operator==(scoped_refptr<RTCRtpCodecParameters> o) = 0;
   virtual bool operator!=(scoped_refptr<RTCRtpCodecParameters> o) = 0;
 };
 
-typedef fixed_size_function<void(scoped_refptr<RTCRtpCodecCapability> val)>
-    OnRTCRtpCodecCapability;
-typedef fixed_size_function<void(OnRTCRtpCodecCapability on)>
-    OnVectorRTCRtpCodecCapability;
-
-typedef fixed_size_function<void(
-    scoped_refptr<RTCRtpHeaderExtensionCapability> val)>
-    OnRTCRtpHeaderExtensionCapability;
-typedef fixed_size_function<void(OnRTCRtpHeaderExtensionCapability on)>
-    OnVectorRTCRtpHeaderExtensionCapability;
-
-typedef fixed_size_function<void(scoped_refptr<RTCFecMechanism> val)>
-    OnRTCFecMechanism;
-typedef fixed_size_function<void(OnRTCFecMechanism on)>
-    OnVectorRTCFecMechanism;
-
+/*
 class RTCRtpCapabilities : public RefCountInterface {
-  virtual void GetCodecs(OnRTCRtpCodecCapability on) = 0;
-  virtual void SetCodecs(OnVectorRTCRtpCodecCapability on) = 0;
+  virtual const vector<scoped_refptr<RTCRtpCodecCapability>> codecs() = 0;
+  virtual void set_codecs(
+      const vector<scoped_refptr<RTCRtpCodecCapability>> codecs) = 0;
 
-  virtual void GetHeaderExtensions(OnRTCRtpHeaderExtensionCapability on) = 0;
-  virtual void SetHeaderExtensions(
-      OnVectorRTCRtpHeaderExtensionCapability on) = 0;
+  virtual const vector<scoped_refptr<RTCRtpHeaderExtensionCapability>>
+  header_extensions() = 0;
 
-  virtual void GetFec(OnRTCFecMechanism on) = 0;
-  virtual void SetFec(OnVectorRTCFecMechanism on) = 0;
+  virtual void set_header_extensions(
+      const vector<scoped_refptr<RTCRtpHeaderExtensionCapability>>
+          header_extensions) = 0;
+
+  virtual const vector<scoped_refptr<RTCFecMechanism>> fec() = 0;
+  virtual void set_fec(const vector<scoped_refptr<RTCFecMechanism>> fec) = 0;
 
   virtual bool operator==(scoped_refptr<RTCRtpCapabilities> o) = 0;
   virtual bool operator!=(scoped_refptr<RTCRtpCapabilities> o) = 0;
-};
+};*/
 
 class RTCRtcpParameters : public RefCountInterface {
  public:
-  virtual uint32_t GetSsrc() = 0;
-  virtual void SetSsrc(uint32_t value) = 0;
+  virtual uint32_t ssrc() = 0;
+  virtual void set_ssrc(uint32_t value) = 0;
 
-  virtual void GetCname(OnString on) = 0;
-  virtual void SetCname(char* p, size_t size) = 0;
+  virtual const string cname() = 0;
+  virtual void set_cname(const string) = 0;
 
-  virtual bool GetReducedSize() = 0;
-  virtual void SetReducedSize(bool value) = 0;
+  virtual bool reduced_size() = 0;
+  virtual void set_reduced_size(bool value) = 0;
 
-  virtual bool GetMux() = 0;
-  virtual void SetMux(bool value) = 0;
+  virtual bool mux() = 0;
+  virtual void set_mux(bool value) = 0;
 
   virtual bool operator==(scoped_refptr<RTCRtcpParameters> o) const = 0;
   virtual bool operator!=(scoped_refptr<RTCRtcpParameters> o) const = 0;
+};
+
+enum class RTCPriority {
+  kVeryLow,
+  kLow,
+  kMedium,
+  kHigh,
 };
 
 class RTCRtpEncodingParameters : public RefCountInterface {
  public:
   LIB_WEBRTC_API static scoped_refptr<RTCRtpEncodingParameters> Create();
 
-  virtual uint32_t GetSsrc() = 0;
-  virtual void SetSsrc(uint32_t value) = 0;
+  virtual uint32_t ssrc() = 0;
+  virtual void set_ssrc(uint32_t value) = 0;
 
-  virtual double GetBitratePriority() = 0;
-  virtual void SetBitratePriority(double value) = 0;
+  virtual double bitrate_priority() = 0;
+  virtual void set_bitrate_priority(double value) = 0;
 
-  virtual RTCPriority GetNetworkPriority() = 0;
-  virtual void SetNetworkPriority(RTCPriority value) = 0;
+  virtual RTCPriority network_priority() = 0;
+  virtual void set_network_priority(RTCPriority value) = 0;
 
-  virtual int GetMaxBitrateBps() = 0;
-  virtual void SetMaxBitrateBps(int value) = 0;
+  virtual int max_bitrate_bps() = 0;
+  virtual void set_max_bitrate_bps(int value) = 0;
 
-  virtual int GetMinBitrateBps() = 0;
-  virtual void SetMinBitrateBps(int value) = 0;
+  virtual int min_bitrate_bps() = 0;
+  virtual void set_min_bitrate_bps(int value) = 0;
 
-  virtual double GetMaxFramerate() = 0;
-  virtual void SetMaxFramerate(double value) = 0;
+  virtual double max_framerate() = 0;
+  virtual void set_max_framerate(double value) = 0;
 
-  virtual int GetNumTemporalLayers() = 0;
-  virtual void SetNumTemporalLayers(int value) = 0;
+  virtual int num_temporal_layers() = 0;
+  virtual void set_num_temporal_layers(int value) = 0;
 
-  virtual double GetScaleResolutionDownBy() = 0;
-  virtual void SetScaleResolutionDownBy(double value) = 0;
+  virtual double scale_resolution_down_by() = 0;
+  virtual void set_scale_resolution_down_by(double value) = 0;
 
-  virtual void GetScalabilityMode(OnString on) = 0;
-  virtual void SetScalabilityMode(char* p,size_t size) = 0;
+  virtual const string scalability_mode() = 0;
+  virtual void set_scalability_mode(const string mode) = 0;
 
-  virtual bool GetActive() = 0;
-  virtual void SetActive(bool value) = 0;
+  virtual bool active() = 0;
+  virtual void set_active(bool value) = 0;
 
-  virtual void GetRid(OnString on) = 0;
-  virtual void SetRid(char* p, size_t size) = 0;
+  virtual const string rid() = 0;
+  virtual void set_rid(const string rid) = 0;
 
-  virtual bool GetAdaptivePtime() = 0;
-  virtual void SetAdaptivePtime(bool value) = 0;
+  virtual bool adaptive_ptime() = 0;
+  virtual void set_adaptive_ptime(bool value) = 0;
 
   virtual bool operator==(scoped_refptr<RTCRtpEncodingParameters> o) const = 0;
   virtual bool operator!=(scoped_refptr<RTCRtpEncodingParameters> o) const = 0;
 };
 
-typedef fixed_size_function<void(scoped_refptr<RTCRtpEncodingParameters> param)>
-    OnRTCRtpEncodingParameters;
-
-typedef fixed_size_function<void(OnRTCRtpEncodingParameters param)>
-    OnVectorRTCRtpEncodingParameters;
-
-typedef fixed_size_function<void(scoped_refptr<RTCRtpCodecParameters> val)>
-    OnRTCRtpCodecParameters;
-typedef fixed_size_function<void(OnRTCRtpCodecParameters on)>
-    OnVectorRTCRtpCodecParameters;
-
-
-typedef fixed_size_function<void(scoped_refptr<RTCRtpEncodingParameters> val)>
-    OnRTCRtpEncodingParameters;
-typedef fixed_size_function<void(OnRTCRtpEncodingParameters on)>
-    OnVectorRTCRtpEncodingParameters;
-
-
 struct RTCRtpParameters : public RefCountInterface {
  public:
   // static scoped_refptr<RTCRtpParameters> Create();
-  virtual void GetTransactionId(OnString on) = 0;
-  virtual void SetTransactionId(char* p, size_t size) = 0;
+  virtual const string transaction_id() = 0;
+  virtual void set_transaction_id(const string id) = 0;
 
-  virtual void GetMid(OnString on) = 0;
-  virtual void SetMid(char* p, size_t size) = 0;
+  virtual const string mid() = 0;
+  virtual void set_mid(const string mid) = 0;
 
-  virtual void GetCodecs(
-      OnRTCRtpCodecParameters on) = 0;
-  virtual void SetCodecs(OnVectorRTCRtpCodecParameters on) = 0;
+  virtual const vector<scoped_refptr<RTCRtpCodecParameters>> codecs() = 0;
+  virtual void set_codecs(
+      const vector<scoped_refptr<RTCRtpCodecParameters>> codecs) = 0;
 
-  virtual void GetHeaderExtensions(
-      OnRTCRtpExtension on) = 0;
-  virtual void SetHeaderExtensions(OnVectorRTCRtpExtension on) = 0;
+  virtual const vector<scoped_refptr<RTCRtpExtension>> header_extensions() = 0;
+  virtual void set_header_extensions(const vector<scoped_refptr<RTCRtpExtension>> header_extensions) = 0;
 
-  virtual void GetEncodings(
-      OnRTCRtpEncodingParameters on) = 0;
-  virtual void SetEncodings(OnVectorRTCRtpEncodingParameters on) = 0;
+  virtual const vector<scoped_refptr<RTCRtpEncodingParameters>> encodings() = 0;
+  virtual void set_encodings(
+      const vector<scoped_refptr<RTCRtpEncodingParameters>> encodings) = 0;
 
-  virtual scoped_refptr<RTCRtcpParameters> GetRtcp() = 0;
-  virtual void SetRtcp(scoped_refptr<RTCRtcpParameters> value) = 0;
+  virtual scoped_refptr<RTCRtcpParameters> rtcp_parameters() = 0;
+  virtual void set_rtcp_parameters(
+      scoped_refptr<RTCRtcpParameters> rtcp_parameters) = 0;
 
   // virtual DegradationPreference GetDegradationPreference() = 0;
   // virtual void SetDegradationPreference(DegradationPreference value) = 0;

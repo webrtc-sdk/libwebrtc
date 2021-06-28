@@ -4,10 +4,6 @@
 #include <src/rtc_rtp_receive_imp.h>
 
 namespace libwebrtc {
-webrtc::RtpTransceiverInit
-libwebrtc::RTCRtpTransceiverInitImpl::rtp_transceiver_init() {
-  return rtp_transceiver_init_;
-}
 
 LIB_WEBRTC_API scoped_refptr<RTCRtpTransceiverInit>
 RTCRtpTransceiverInit::Create() {
@@ -16,50 +12,51 @@ RTCRtpTransceiverInit::Create() {
 
 RTCRtpTransceiverInitImpl::RTCRtpTransceiverInitImpl() {}
 
-RTCRtpTransceiverDirection RTCRtpTransceiverInitImpl::GetDirection() {
+RTCRtpTransceiverDirection RTCRtpTransceiverInitImpl::direction() {
   return static_cast<RTCRtpTransceiverDirection>(
       rtp_transceiver_init_.direction);
 }
 
-void RTCRtpTransceiverInitImpl::SetDirection(RTCRtpTransceiverDirection value) {
+void RTCRtpTransceiverInitImpl::set_direction(RTCRtpTransceiverDirection value) {
   rtp_transceiver_init_.direction =
       static_cast<webrtc::RtpTransceiverDirection>(value);
 }
 
-void RTCRtpTransceiverInitImpl::GetStreamIds(OnString on) {
+const vector<string> RTCRtpTransceiverInitImpl::stream_ids() {
+  vector<string> vec;
   for (std::string item : rtp_transceiver_init_.stream_ids) {
-    on((char*)item.c_str(), item.size());
+    vec.push_back(item.c_str());
   }
+  return vec;
 }
 
-void RTCRtpTransceiverInitImpl::SetStreamIds(OnVectorString on) {
+void RTCRtpTransceiverInitImpl::set_stream_ids(const vector<string> ids) {
   std::vector<std::string> list;
-  on([&](char* p, size_t size) {
-    std::string id(p, size);
-    list.push_back(id);
-  });
+  for (auto id : ids) {
+    list.push_back(id.str());
+  }
   rtp_transceiver_init_.stream_ids = list;
 }
 
-void
-RTCRtpTransceiverInitImpl::GetSendEncodings(OnRTCRtpEncodingParameters on) {
+
+ const vector<scoped_refptr<RTCRtpEncodingParameters>>
+     RTCRtpTransceiverInitImpl::send_encodings() {
+  vector<scoped_refptr<RTCRtpEncodingParameters>> vec;
   for (auto item : rtp_transceiver_init_.send_encodings) {
-    on(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
+    vec.push_back(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
   }
-}
+  return vec;
+ }
 
-void RTCRtpTransceiverInitImpl::SetSendEncodings(
-    OnVectorRTCRtpEncodingParameters on) {
-
-  std::vector<webrtc::RtpEncodingParameters> list;
-
-  on([&](scoped_refptr<RTCRtpEncodingParameters> param) {
-    auto impl = static_cast<RTCRtpEncodingParametersImpl*>(param.get());
-    list.push_back(impl->rtp_parameters());
-  });
-
-  rtp_transceiver_init_.send_encodings = list;
-}
+ void RTCRtpTransceiverInitImpl::set_send_encodings(
+     const vector<scoped_refptr<RTCRtpEncodingParameters>> send_encodings) {
+   std::vector<webrtc::RtpEncodingParameters> list;
+   for (auto param : send_encodings) {
+     auto impl = static_cast<RTCRtpEncodingParametersImpl*>(param.get());
+     list.push_back(impl->rtp_parameters());
+   }
+   rtp_transceiver_init_.send_encodings = list;
+ }
 
 RTCRtpTransceiverImpl::RTCRtpTransceiverImpl(
     rtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver)
@@ -70,14 +67,14 @@ libwebrtc::RTCRtpTransceiverImpl::rtp_transceiver() {
   return rtp_transceiver_;
 }
 
-scoped_refptr<RTCRtpSender> RTCRtpTransceiverImpl::Sender() const {
+scoped_refptr<RTCRtpSender> RTCRtpTransceiverImpl::sender() const {
   if (nullptr == rtp_transceiver_->sender().get()) {
     return scoped_refptr<RTCRtpSender>();
   }
   return new RefCountedObject<RTCRtpSenderImpl>(rtp_transceiver_->sender());
 }
 
-scoped_refptr<RTCRtpReceiver> RTCRtpTransceiverImpl::Receiver() const {
+scoped_refptr<RTCRtpReceiver> RTCRtpTransceiverImpl::receiver() const {
   if (nullptr == rtp_transceiver_->receiver().get()) {
     return scoped_refptr<RTCRtpReceiver>();
   }
@@ -92,24 +89,23 @@ bool RTCRtpTransceiverImpl::Stopping() const {
   return rtp_transceiver_->stopping();
 }
 
-RTCRtpTransceiverDirection RTCRtpTransceiverImpl::Direction() const {
+RTCRtpTransceiverDirection RTCRtpTransceiverImpl::direction() const {
   return static_cast<RTCRtpTransceiverDirection>(rtp_transceiver_->direction());
 }
 
-void RTCRtpTransceiverImpl::SetDirectionWithError(
-    RTCRtpTransceiverDirection new_direction,
-    OnString on) {
+const string RTCRtpTransceiverImpl::SetDirectionWithError(
+    RTCRtpTransceiverDirection new_direction) {
   auto error = rtp_transceiver_->SetDirectionWithError(
       static_cast<webrtc::RtpTransceiverDirection>(new_direction));
   if (error.ok()) {
-    on(nullptr, 0);
+    return "";
   } else {
     std::string val = error.message();
-    on((char*)val.c_str(), val.size());
+    return val.c_str();
   }
 }
 
-RTCRtpTransceiverDirection RTCRtpTransceiverImpl::CurrentDirection() const {
+RTCRtpTransceiverDirection RTCRtpTransceiverImpl::current_direction() const {
   auto temp = rtp_transceiver_->current_direction();
   if (temp.has_value()) {
     return static_cast<RTCRtpTransceiverDirection>(temp.value());
@@ -117,7 +113,7 @@ RTCRtpTransceiverDirection RTCRtpTransceiverImpl::CurrentDirection() const {
   return RTCRtpTransceiverDirection::kInactive;
 }
 
-RTCRtpTransceiverDirection RTCRtpTransceiverImpl::FiredDirection() const {
+RTCRtpTransceiverDirection RTCRtpTransceiverImpl::fired_direction() const {
   auto temp = rtp_transceiver_->fired_direction();
   if (temp.has_value()) {
     return static_cast<RTCRtpTransceiverDirection>(temp.value());
@@ -125,24 +121,24 @@ RTCRtpTransceiverDirection RTCRtpTransceiverImpl::FiredDirection() const {
   return RTCRtpTransceiverDirection::kInactive;
 }
 
-void RTCRtpTransceiverImpl::StopStandard(OnString on) {
+const string RTCRtpTransceiverImpl::StopStandard() {
   std::string val = rtp_transceiver_->StopStandard().message();
-  on((char*)val.c_str(), val.size());
+  return val.c_str();
 }
 
 void RTCRtpTransceiverImpl::StopInternal() {
   rtp_transceiver_->StopInternal();
 }
 
-void RTCRtpTransceiverImpl::GetMid(OnString on) const {
+const string RTCRtpTransceiverImpl::mid() const {
   auto temp = rtp_transceiver_->mid();
   if (temp.has_value()) {
-    std::string val = temp.value();
-    on((char*)val.c_str(), val.size());
+    return temp.value().c_str();
   }
+  return "";
 }
 
-RTCMediaType RTCRtpTransceiverImpl::GetMediaType() const {
+RTCMediaType RTCRtpTransceiverImpl::media_type() const {
   return static_cast<RTCMediaType>(rtp_transceiver_->media_type());
 }
 }  // namespace libwebrtc

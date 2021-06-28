@@ -10,14 +10,18 @@ class RTCRtpTransceiverInitImpl : public RTCRtpTransceiverInit {
  public:
   RTCRtpTransceiverInitImpl();
 
-  virtual RTCRtpTransceiverDirection GetDirection() override;
-  virtual void SetDirection(RTCRtpTransceiverDirection value) override;
-  virtual void GetStreamIds(OnString on) override;
-  virtual void SetStreamIds(OnVectorString on) override;
-  virtual void GetSendEncodings(OnRTCRtpEncodingParameters on) override;
-  virtual void SetSendEncodings(OnVectorRTCRtpEncodingParameters on) override;
+  virtual RTCRtpTransceiverDirection direction() override;
+  virtual void set_direction(RTCRtpTransceiverDirection value) override;
+  virtual const vector<string> stream_ids() override;
+  virtual void set_stream_ids(const vector<string> ids) override;
+  virtual const vector<scoped_refptr<RTCRtpEncodingParameters>>
+  send_encodings() override;
+  virtual void set_send_encodings(
+      const vector<scoped_refptr<RTCRtpEncodingParameters>> send_encodings) override;
 
-  webrtc::RtpTransceiverInit rtp_transceiver_init();
+  webrtc::RtpTransceiverInit rtp_transceiver_init() {
+    return rtp_transceiver_init_;
+  }
 
  private:
   webrtc::RtpTransceiverInit rtp_transceiver_init_;
@@ -28,18 +32,18 @@ class RTCRtpTransceiverImpl : public RTCRtpTransceiver {
   RTCRtpTransceiverImpl(
       rtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver);
 
-  virtual RTCMediaType GetMediaType() const override;
-  virtual void GetMid(OnString on) const override;
-  virtual scoped_refptr<RTCRtpSender> Sender() const override;
-  virtual scoped_refptr<RTCRtpReceiver> Receiver() const override;
+  virtual RTCMediaType media_type() const override;
+  virtual const string mid() const override;
+  virtual scoped_refptr<RTCRtpSender> sender() const override;
+  virtual scoped_refptr<RTCRtpReceiver> receiver() const override;
   virtual bool Stopped() const override;
   virtual bool Stopping() const override;
-  virtual RTCRtpTransceiverDirection Direction() const override;
-  virtual void SetDirectionWithError(RTCRtpTransceiverDirection new_direction,
-                                       OnString on) override;
-  virtual RTCRtpTransceiverDirection CurrentDirection() const override;
-  virtual RTCRtpTransceiverDirection FiredDirection() const override;
-  virtual void StopStandard(OnString on) override;
+  virtual RTCRtpTransceiverDirection direction() const override;
+  virtual const string SetDirectionWithError(
+      RTCRtpTransceiverDirection new_direction) override;
+  virtual RTCRtpTransceiverDirection current_direction() const override;
+  virtual RTCRtpTransceiverDirection fired_direction() const override;
+  virtual const string StopStandard() override;
   virtual void StopInternal() override;
 
   rtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver();

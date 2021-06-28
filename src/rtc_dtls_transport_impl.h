@@ -16,9 +16,12 @@ class RTCDtlsTransportInformationImpl : public  RTCDtlsTransportInformation {
 
   virtual RTCDtlsTransportInformation& operator=(
       scoped_refptr<RTCDtlsTransportInformation> c) override;
-  virtual RTCDtlsTransportState GetState() const override;
-  virtual int GetSslCipherSuite() const override;
-  virtual int GetSrtpCipherSuite() const override;
+
+  virtual RTCDtlsTransportState state() const override;
+
+  virtual int ssl_cipher_suite() const override;
+
+  virtual int srtp_cipher_suite() const override;
 
   webrtc::DtlsTransportInformation& dtls_transport_information();
 

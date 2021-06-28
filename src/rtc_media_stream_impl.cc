@@ -24,8 +24,8 @@ MediaStreamImpl::MediaStreamImpl(
         new RefCountedObject<VideoTrackImpl>(track));
     video_tracks_.push_back(video_track);
   }
-
-  strncpy(label_, rtc_media_stream_->id().c_str(), sizeof(label_));
+  id_ = rtc_media_stream_->id().c_str();
+  label_ = rtc_media_stream_->id().c_str();
 }
 
 MediaStreamImpl::~MediaStreamImpl() {
@@ -75,22 +75,29 @@ bool MediaStreamImpl::RemoveTrack(scoped_refptr<RTCVideoTrack> track) {
   return false;
 }
 
-void MediaStreamImpl::GetAudioTracks(OnRTCAudioTrack on) {
-  for (auto item : audio_tracks_) {
-    on(item);
-  }
+vector<scoped_refptr<RTCAudioTrack>> MediaStreamImpl::audio_tracks() {
+  return audio_tracks_;
 }
 
-void MediaStreamImpl::GetVideoTracks(OnRTCVideoTrack on) {
-  for (auto item : video_tracks_) {
-    on(item);
+vector<scoped_refptr<RTCVideoTrack>> MediaStreamImpl::video_tracks() {
+  return video_tracks_;
+}
+
+vector<scoped_refptr<RTCMediaTrack>> MediaStreamImpl::tracks() {
+  vector<scoped_refptr<RTCMediaTrack>> tracks;
+  for (auto track : audio_tracks_) {
+    tracks.push_back(track);
   }
+  for (auto track : video_tracks_) {
+    tracks.push_back(track);
+  }
+  return tracks;
 }
 
 scoped_refptr<RTCAudioTrack> MediaStreamImpl::FindAudioTrack(
-    const char* track_id) {
+    const string track_id) {
   for (auto track : audio_tracks_) {
-    if (strcmp(track->id(), track_id) == 0)
+    if (track->id() ==  track_id)
       return track;
   }
 
@@ -98,18 +105,13 @@ scoped_refptr<RTCAudioTrack> MediaStreamImpl::FindAudioTrack(
 }
 
 scoped_refptr<RTCVideoTrack> MediaStreamImpl::FindVideoTrack(
-    const char* track_id) {
+    const string track_id) {
   for (auto track : video_tracks_) {
-    if (strcmp(track->id(), track_id) == 0)
+    if (track->id() == track_id)
       return track;
   }
 
   return scoped_refptr<RTCVideoTrack>();
-}
-
-void MediaStreamImpl::GetId(OnString on) {
-   std::string id= rtc_media_stream_->id();
-  on((char*)id.c_str(), id.size());
 }
 
 void MediaStreamImpl::OnChanged() {
@@ -129,7 +131,6 @@ void MediaStreamImpl::OnChanged() {
     video_tracks.push_back(video_track);
   }
 
-  /*对比流，回调OnAddTrack 或 OnRemoveTrack*/
   std::vector<scoped_refptr<RTCVideoTrack>> removed_video_tracks;
 
   for (auto track : video_tracks_) {
