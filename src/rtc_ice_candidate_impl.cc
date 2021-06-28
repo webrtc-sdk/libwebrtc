@@ -2,10 +2,10 @@
 
 namespace libwebrtc {
 
-scoped_refptr<RTCIceCandidate> CreateRTCIceCandidate(const string sdp,
-                                                     const string sdp_mid,
-                                                     int sdp_mline_index,
-                                                     SdpParseError* error) {
+scoped_refptr<RTCIceCandidate> RTCIceCandidate::Create(const string sdp,
+                                                       const string sdp_mid,
+                                                       int sdp_mline_index,
+                                                       SdpParseError* error) {
   webrtc::SdpParseError sdp_error;
   std::unique_ptr<webrtc::IceCandidateInterface> rtc_candidate(
       webrtc::CreateIceCandidate(sdp_mid.c_str(), sdp_mline_index, sdp.c_str(),

@@ -323,8 +323,8 @@ void RTCPeerConnectionImpl::OnIceCandidate(
   if (observer_ && candidate->ToString(&cand_sdp)) {
     SdpParseError error;
     scoped_refptr<RTCIceCandidate> cand =
-        CreateRTCIceCandidate(cand_sdp.c_str(), candidate->sdp_mid().c_str(),
-                              candidate->sdp_mline_index(), &error);
+        RTCIceCandidate::Create(cand_sdp.c_str(), candidate->sdp_mid().c_str(),
+                                candidate->sdp_mline_index(), &error);
     observer_->OnIceCandidate(cand);
   }
 
