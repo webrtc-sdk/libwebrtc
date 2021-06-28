@@ -48,8 +48,7 @@ class CapturerTrackSource : public webrtc::VideoTrackSource {
   static rtc::scoped_refptr<CapturerTrackSource> Create();
 
  public:
-  explicit CapturerTrackSource(
-      std::unique_ptr<VideoCapturer> capturer)
+  explicit CapturerTrackSource(std::unique_ptr<VideoCapturer> capturer)
       : VideoTrackSource(/*remote=*/false), capturer_(std::move(capturer)) {}
 
  private:

@@ -6,8 +6,10 @@
 #include "rtc_peerconnection_factory.h"
 #include "rtc_video_device_impl.h"
 
+#include <memory>
 #include "api/media_stream_interface.h"
 #include "api/peer_connection_interface.h"
+#include "api/task_queue/task_queue_factory.h"
 #include "rtc_base/thread.h"
 
 namespace libwebrtc {
@@ -35,23 +37,23 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<RTCVideoDevice> GetVideoDevice() override;
 
   virtual scoped_refptr<RTCAudioSource> CreateAudioSource(
-      const char* audio_source_label) override;
+      const string audio_source_label) override;
 
   virtual scoped_refptr<RTCVideoSource> CreateVideoSource(
       scoped_refptr<RTCVideoCapturer> capturer,
-      const char* video_source_label,
+      const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) override;
 
   virtual scoped_refptr<RTCAudioTrack> CreateAudioTrack(
       scoped_refptr<RTCAudioSource> source,
-      const char* track_id) override;
+      const string track_id) override;
 
   virtual scoped_refptr<RTCVideoTrack> CreateVideoTrack(
       scoped_refptr<RTCVideoSource> source,
-      const char* track_id) override;
+      const string track_id) override;
 
   virtual scoped_refptr<RTCMediaStream> CreateStream(
-      const char* stream_id) override;
+      const string stream_id) override;
 
   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
   peer_connection_factory() {
@@ -78,8 +80,9 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<AudioDeviceImpl> audio_device_impl_;
   scoped_refptr<RTCVideoDeviceImpl> video_device_impl_;
   std::list<scoped_refptr<RTCPeerConnection>> peerconnections_;
+  std::unique_ptr<webrtc::TaskQueueFactory> task_queue_factory_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_MEDIA_SESSION_FACTORY_IMPL_HXX

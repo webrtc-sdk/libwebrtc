@@ -1,28 +1,25 @@
 #ifndef LIB_WEBRTC_MEDIA_SESSION_IMPL_HXX
 #define LIB_WEBRTC_MEDIA_SESSION_IMPL_HXX
 
+#include <deque>
+#include <map>
+#include <set>
+#include <string>
+
+#include "api/data_channel_interface.h"
+#include "api/media_stream_interface.h"
+#include "api/peer_connection_interface.h"
+#include "api/scoped_refptr.h"
+#include "modules/video_capture/video_capture.h"
 #include "rtc_audio_track_impl.h"
+#include "rtc_base/synchronization/mutex.h"
 #include "rtc_peerconnection.h"
 #include "rtc_peerconnection_factory.h"
 #include "rtc_video_sink_adapter.h"
 #include "rtc_video_source.h"
 #include "rtc_video_source_impl.h"
 #include "rtc_video_track_impl.h"
-
-#include "api/data_channel_interface.h"
-#include "api/media_stream_interface.h"
-#include "api/peer_connection_interface.h"
-#include "api/peer_connection_proxy.h"
-
 #include "src/internal/video_capturer.h"
-#include "modules/video_capture/video_capture.h"
-#include "rtc_base/critical_section.h"
-#include "api/scoped_refptr.h"
-
-#include <deque>
-#include <map>
-#include <set>
-#include <string>
 
 namespace webrtc {
 class VideoCaptureModule;
@@ -49,19 +46,25 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
       OnSdpCreateFailure failure,
       scoped_refptr<RTCMediaConstraints> constraints) override;
 
-  virtual void SetLocalDescription(const char* sdp,
-                                   const char* type,
+  virtual void SetLocalDescription(const string sdp,
+                                   const string type,
                                    OnSetSdpSuccess success,
                                    OnSetSdpFailure failure) override;
 
-  virtual void SetRemoteDescription(const char* sdp,
-                                    const char* type,
+  virtual void SetRemoteDescription(const string sdp,
+                                    const string type,
                                     OnSetSdpSuccess success,
                                     OnSetSdpFailure failure) override;
 
-  virtual void AddCandidate(const char* mid,
+  virtual void GetLocalDescription(OnGetSdpSuccess success,
+                                   OnGetSdpFailure failure) override;
+
+  virtual void GetRemoteDescription(OnGetSdpSuccess success,
+                                    OnGetSdpFailure failure) override;
+
+  virtual void AddCandidate(const string mid,
                             int midx,
-                            const char* candiate) override;
+                            const string candiate) override;
 
   virtual void Close() override;
 
@@ -70,18 +73,41 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
 
   virtual void DeRegisterRTCPeerConnectionObserver() override;
 
+  virtual scoped_refptr<RTCRtpTransceiver> AddTransceiver(
+      scoped_refptr<RTCMediaTrack> track,
+      scoped_refptr<RTCRtpTransceiverInit> init) override;
+
+  virtual scoped_refptr<RTCRtpTransceiver> AddTransceiver(
+      scoped_refptr<RTCMediaTrack> track) override;
+
+  virtual scoped_refptr<RTCRtpSender> AddTrack(
+      scoped_refptr<RTCMediaTrack> track,
+      vector<string> streamIds) override;
+
+  virtual bool RemoveTrack(scoped_refptr<RTCRtpSender> render) override;
+
+  virtual vector<scoped_refptr<RTCRtpSender>> senders() override;
+
+  virtual vector<scoped_refptr<RTCRtpTransceiver>> transceivers() override;
+
+  virtual vector<scoped_refptr<RTCRtpReceiver>> receivers() override;
+
  public:
   virtual int AddStream(scoped_refptr<RTCMediaStream> stream) override;
 
   virtual int RemoveStream(scoped_refptr<RTCMediaStream> stream) override;
 
-  virtual MediaStreamVector local_streams() override;
+  virtual vector<scoped_refptr<RTCMediaStream>> local_streams() override {
+    return local_streams_;
+  }
 
-  virtual MediaStreamVector remote_streams() override;
+  virtual vector<scoped_refptr<RTCMediaStream>> remote_streams() override {
+    return remote_streams_;
+  }
 
   virtual scoped_refptr<RTCDataChannel> CreateDataChannel(
-      const char* label,
-      const RTCDataChannelInit *dataChannelDict) override;
+      const string label,
+      const RTCDataChannelInit* dataChannelDict) override;
 
   virtual bool GetStats(const RTCAudioTrack* track,
                         scoped_refptr<TrackStatsObserver> observer) override;
@@ -99,6 +125,17 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
  protected:
   ~RTCPeerConnectionImpl();
 
+  virtual void OnAddTrack(
+      rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
+      const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>&
+          streams) override;
+
+  virtual void OnTrack(
+      rtc::scoped_refptr<webrtc::RtpTransceiverInterface> transceiver) override;
+
+  virtual void OnRemoveTrack(
+      rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) override;
+
   virtual void OnAddStream(
       rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 
@@ -108,10 +145,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   virtual void OnDataChannel(
       rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel) override;
 
-  virtual void OnRenegotiationNeeded() override {
-    if (observer_)
-      observer_->OnRenegotiationNeeded();
-  }
+  virtual void OnRenegotiationNeeded() override;
 
   virtual void OnIceCandidate(
       const webrtc::IceCandidateInterface* candidate) override;
@@ -133,13 +167,13 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   scoped_refptr<RTCMediaConstraints> constraints_;
   webrtc::PeerConnectionInterface::RTCOfferAnswerOptions offer_answer_options_;
   RTCPeerConnectionObserver* observer_ = nullptr;
-  std::unique_ptr<rtc::CriticalSection> callback_crt_sec_;
+  std::unique_ptr<webrtc::Mutex> callback_crt_sec_;
   bool initialize_offer_sent = false;
-  MediaStreamVector local_streams_;
-  MediaStreamVector remote_streams_;
+  std::vector<scoped_refptr<RTCMediaStream>> local_streams_;
+  std::vector<scoped_refptr<RTCMediaStream>> remote_streams_;
   scoped_refptr<RTCDataChannel> data_channel_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_MEDIA_SESSION_IMPL_HXX

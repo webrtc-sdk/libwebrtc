@@ -35,12 +35,12 @@ int32_t RTCVideoDeviceImpl::GetDeviceName(
 }
 
 scoped_refptr<RTCVideoCapturer> RTCVideoDeviceImpl::Create(const char* name,
-                                                   uint32_t index) {
+                                                           uint32_t index) {
   scoped_refptr<RTCVideoCapturerImpl> video_capturer =
       scoped_refptr<RTCVideoCapturerImpl>(
-          new RefCountedObject<RTCVideoCapturerImpl>(
-              absl::WrapUnique(webrtc::internal::VcmCapturer::Create(640,480,30, index))));
+          new RefCountedObject<RTCVideoCapturerImpl>(absl::WrapUnique(
+              webrtc::internal::VcmCapturer::Create(640, 480, 30, index))));
   return video_capturer;
 }
 
-} // namespace libwebrtc
+}  // namespace libwebrtc

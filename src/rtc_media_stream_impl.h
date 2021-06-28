@@ -52,19 +52,21 @@ class MediaStreamImpl : public RTCMediaStream,
 
   virtual bool RemoveTrack(scoped_refptr<RTCVideoTrack> track) override;
 
-  virtual AudioTrackVector GetAudioTracks() override;
+  virtual vector<scoped_refptr<RTCAudioTrack>> audio_tracks() override;
 
-  virtual VideoTrackVector GetVideoTracks() override;
+  virtual vector<scoped_refptr<RTCVideoTrack>> video_tracks() override;
+
+  virtual vector<scoped_refptr<RTCMediaTrack>> tracks() override;
 
   virtual scoped_refptr<RTCAudioTrack> FindAudioTrack(
-      const char* track_id) override;
+      const string track_id) override;
 
   virtual scoped_refptr<RTCVideoTrack> FindVideoTrack(
-      const char* track_id) override;
+      const string track_id) override;
 
-  virtual const char* label() override {
-    return label_;
-  }
+  virtual const string label() override { return label_; }
+
+  virtual const string id() override { return id_; }
 
   virtual void OnChanged() override;
 
@@ -80,11 +82,11 @@ class MediaStreamImpl : public RTCMediaStream,
  private:
   rtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_media_stream_;
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> rtc_peerconnection_;
-  AudioTrackVector audio_tracks_;
-  VideoTrackVector video_tracks_;
+  vector<scoped_refptr<RTCAudioTrack>> audio_tracks_;
+  vector<scoped_refptr<RTCVideoTrack>> video_tracks_;
   RTCPeerConnectionObserver* observer_ = nullptr;
-  char label_[kMaxStringLength];
+  string label_, id_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 #endif  //! LIB_WEBRTC_MEDIA_STREAM_IMPL_HXX

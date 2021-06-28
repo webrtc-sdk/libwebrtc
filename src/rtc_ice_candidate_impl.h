@@ -1,9 +1,9 @@
 #ifndef LIB_WEBRTC_RTC_ICE_CANDIDATE_IMPL_HXX
 #define LIB_WEBRTC_RTC_ICE_CANDIDATE_IMPL_HXX
 
-#include "rtc_types.h"
-#include "rtc_ice_candidate.h"
 #include "api/jsep.h"
+#include "rtc_ice_candidate.h"
+#include "rtc_types.h"
 
 namespace libwebrtc {
 
@@ -11,13 +11,13 @@ class RTCIceCandidateImpl : public RTCIceCandidate {
  public:
   RTCIceCandidateImpl(std::unique_ptr<webrtc::IceCandidateInterface> candidate);
 
-  virtual const char* candidate() const override;
+  virtual const string candidate() const override;
 
-  virtual const char* sdp_mid() const override;
+  virtual const string sdp_mid() const override;
 
   virtual int sdp_mline_index() const override;
 
-  virtual bool ToString(char* out, int length) override;
+  virtual bool ToString(string& out) override;
 
   webrtc::IceCandidateInterface* candidate() { return candidate_.get(); }
 
@@ -30,6 +30,6 @@ class RTCIceCandidateImpl : public RTCIceCandidate {
   std::string sdp_mid_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_ICE_CANDIDATE_IMPL_HXX

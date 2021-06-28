@@ -16,15 +16,15 @@ class RTCMediaConstraintsImpl : public RTCMediaConstraints,
   const Constraints& GetMandatory() const { return mandatory_; }
   const Constraints& GetOptional() const { return optional_; }
 
-  void AddMandatoryConstraint(const char* key, const char* value) override;
+  void AddMandatoryConstraint(const string key, const string value) override;
 
-  void AddOptionalConstraint(const char* key, const char* value) override;
+  void AddOptionalConstraint(const string key, const string value) override;
 
  private:
   webrtc::MediaConstraints::Constraints mandatory_;
   webrtc::MediaConstraints::Constraints optional_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_MEDIA_CONSTRAINTS_IMPL_HXX

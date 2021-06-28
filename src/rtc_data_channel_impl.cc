@@ -4,21 +4,18 @@ namespace libwebrtc {
 
 RTCDataChannelImpl::RTCDataChannelImpl(
     rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel)
-    : rtc_data_channel_(rtc_data_channel),
-      crit_sect_(new rtc::CriticalSection()) {
+    : rtc_data_channel_(rtc_data_channel), crit_sect_(new webrtc::Mutex()) {
   rtc_data_channel_->RegisterObserver(this);
-  strncpy(label_, rtc_data_channel_->label().data(), sizeof(label_));
+  label_ = rtc_data_channel_->label().c_str();
 }
 
-void RTCDataChannelImpl::Send(const char* data,
-	int length,
-                              bool binary /*= false*/) {
+void RTCDataChannelImpl::Send(const string data, bool binary /*= false*/) {
   if (binary) {
-    rtc::CopyOnWriteBuffer binary(data);
+    rtc::CopyOnWriteBuffer binary(data.str());
     webrtc::DataBuffer buffer(binary, true);
     rtc_data_channel_->Send(buffer);
   } else {
-    webrtc::DataBuffer buffer(data);
+    webrtc::DataBuffer buffer(data.str());
     rtc_data_channel_->Send(buffer);
   }
 }
@@ -29,16 +26,16 @@ void RTCDataChannelImpl::Close() {
 }
 
 void RTCDataChannelImpl::RegisterObserver(RTCDataChannelObserver* observer) {
-  rtc::CritScope(crit_sect_.get());
+  webrtc::MutexLock(crit_sect_.get());
   observer_ = observer;
 }
 
 void RTCDataChannelImpl::UnregisterObserver() {
-  rtc::CritScope(crit_sect_.get());
+  webrtc::MutexLock(crit_sect_.get());
   observer_ = nullptr;
 }
 
-const char* RTCDataChannelImpl::label() const {
+const string RTCDataChannelImpl::label() const {
   return label_;
 }
 
@@ -64,7 +61,7 @@ void RTCDataChannelImpl::OnStateChange() {
     default:
       break;
   }
-  rtc::CritScope(crit_sect_.get());
+  webrtc::MutexLock(crit_sect_.get());
   if (observer_)
     observer_->OnStateChange(state_);
 }
@@ -75,7 +72,8 @@ RTCDataChannelState RTCDataChannelImpl::state() {
 
 void RTCDataChannelImpl::OnMessage(const webrtc::DataBuffer& buffer) {
   if (observer_)
-    observer_->OnMessage(buffer.data.data<char>(), buffer.data.size(), buffer.binary);
- }
+    observer_->OnMessage(buffer.data.data<char>(), buffer.data.size(),
+                         buffer.binary);
+}
 
-} // namespace libwebrtc
+}  // namespace libwebrtc

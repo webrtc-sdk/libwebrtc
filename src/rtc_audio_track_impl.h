@@ -5,14 +5,13 @@
 
 #include "api/media_stream_interface.h"
 #include "api/peer_connection_interface.h"
-#include "api/peer_connection_proxy.h"
 #include "common_audio/resampler/include/push_resampler.h"
 #include "common_audio/vad/include/webrtc_vad.h"
 #include "media/engine/webrtc_video_engine.h"
 #include "media/engine/webrtc_voice_engine.h"
 #include "pc/media_session.h"
-#include "rtc_base/critical_section.h"
 #include "rtc_base/logging.h"
+#include "rtc_base/synchronization/mutex.h"
 
 namespace libwebrtc {
 
@@ -22,9 +21,9 @@ class AudioTrackImpl : public RTCAudioTrack {
 
   virtual ~AudioTrackImpl();
 
-  virtual const char* kind() const override { return kind_; }
+  virtual const string kind() const override { return kind_; }
 
-  virtual const char* id() const override { return id_; }
+  virtual const string id() const override { return id_; }
 
   virtual bool enabled() const override { return rtc_track_->enabled(); }
 
@@ -36,11 +35,15 @@ class AudioTrackImpl : public RTCAudioTrack {
     return rtc_track_;
   }
 
+  virtual RTCTrackState state() const override {
+    return static_cast<RTCTrackState>(rtc_track_->state());
+  }
+
  private:
   rtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track_;
-  char id_[kMaxStringLength], kind_[kShortStringLength];
+  string id_, kind_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_AUDIO_TRACK_IMPL_HXX

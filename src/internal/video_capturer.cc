@@ -57,9 +57,8 @@ rtc::VideoSinkWants VideoCapturer::GetSinkWants() {
   return broadcaster_.wants();
 }
 
-void VideoCapturer::AddOrUpdateSink(
-    rtc::VideoSinkInterface<VideoFrame>* sink,
-    const rtc::VideoSinkWants& wants) {
+void VideoCapturer::AddOrUpdateSink(rtc::VideoSinkInterface<VideoFrame>* sink,
+                                    const rtc::VideoSinkWants& wants) {
   broadcaster_.AddOrUpdateSink(sink, wants);
   UpdateVideoAdapter();
 }
@@ -71,8 +70,13 @@ void VideoCapturer::RemoveSink(rtc::VideoSinkInterface<VideoFrame>* sink) {
 
 void VideoCapturer::UpdateVideoAdapter() {
   rtc::VideoSinkWants wants = broadcaster_.wants();
-  video_adapter_.OnResolutionFramerateRequest(
-      wants.target_pixel_count, wants.max_pixel_count, wants.max_framerate_fps);
+
+  if (0 < wants.resolutions.size()) {
+    auto size = wants.resolutions.at(0);
+    std::pair<int, int> target_aspect_ratiot(size.width, size.height);
+    video_adapter_.OnOutputFormatRequest(
+        target_aspect_ratiot, wants.max_pixel_count, wants.max_framerate_fps);
+  }
 }
 
 }  // namespace internal

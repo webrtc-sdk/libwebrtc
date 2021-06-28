@@ -2,19 +2,19 @@
 
 namespace libwebrtc {
 
-scoped_refptr<RTCSessionDescription> CreateRTCSessionDescription(
-    const char* type,
-    const char* sdp,
+scoped_refptr<RTCSessionDescription> RTCSessionDescription::Create(
+    const string type,
+    const string sdp,
     SdpParseError* error) {
   webrtc::SdpParseError sdp_error;
   std::unique_ptr<webrtc::SessionDescriptionInterface> rtc_description(
-      webrtc::CreateSessionDescription(type, sdp, &sdp_error));
-  strncpy(error->description, sdp_error.description.c_str(),
-          sdp_error.description.size());
-  strncpy(error->line, sdp_error.line.c_str(), sdp_error.line.size());
+      webrtc::CreateSessionDescription(type.c_str(), sdp.c_str(), &sdp_error));
+  error->description = sdp_error.description.c_str();
+  error->line = sdp_error.line.c_str();
   scoped_refptr<RTCSessionDescriptionImpl> session_description =
       scoped_refptr<RTCSessionDescriptionImpl>(
-          new RefCountedObject<RTCSessionDescriptionImpl>(std::move(rtc_description)));
+          new RefCountedObject<RTCSessionDescriptionImpl>(
+              std::move(rtc_description)));
   return session_description;
 }
 
@@ -22,7 +22,7 @@ RTCSessionDescriptionImpl::RTCSessionDescriptionImpl(
     std::unique_ptr<webrtc::SessionDescriptionInterface> description)
     : description_(std::move(description)) {}
 
-const char* RTCSessionDescriptionImpl::sdp() const {
+const string RTCSessionDescriptionImpl::sdp() const {
   description_->ToString((std::string*)&sdp_);
   return sdp_.c_str();
 }
@@ -31,18 +31,18 @@ RTCSessionDescription::SdpType RTCSessionDescriptionImpl::GetType() {
   return (RTCSessionDescription::SdpType)description_->GetType();
 }
 
-const char* RTCSessionDescriptionImpl::type(){
+const string RTCSessionDescriptionImpl::type() {
   type_ = description_->type();
   return type_.c_str();
 }
 
-bool RTCSessionDescriptionImpl::ToString(char* out, int length) {
+bool RTCSessionDescriptionImpl::ToString(string& out) {
   std::string tmp;
   if (description_->ToString(&tmp)) {
-    strncpy(out, tmp.c_str(), length);
+    out = tmp.c_str();
     return true;
   }
   return false;
 }
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
