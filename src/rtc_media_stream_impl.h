@@ -88,5 +88,5 @@ class MediaStreamImpl : public RTCMediaStream,
   string label_, id_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 #endif  //! LIB_WEBRTC_MEDIA_STREAM_IMPL_HXX

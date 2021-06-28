@@ -35,4 +35,4 @@ int32_t AudioDeviceImpl::SetRecordingDevice(uint16_t index) {
   return audio_device_module_->SetRecordingDevice(index);
 }
 
-} // namespace libwebrtc
+}  // namespace libwebrtc

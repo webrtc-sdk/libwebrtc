@@ -1,9 +1,9 @@
 #ifndef LIB_WEBRTC_AUDIO_DEVICE_IMPL_HXX
 #define LIB_WEBRTC_AUDIO_DEVICE_IMPL_HXX
 
-#include "rtc_audio_device.h"
-#include "modules/audio_device/include/audio_device.h"
 #include "modules/audio_device/audio_device_impl.h"
+#include "modules/audio_device/include/audio_device.h"
+#include "rtc_audio_device.h"
 #include "rtc_base/ref_count.h"
 
 namespace libwebrtc {
@@ -36,6 +36,6 @@ class AudioDeviceImpl : public RTCAudioDevice {
   rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
-#endif //LIB_WEBRTC_AUDIO_DEVICE_IMPL_HXX
+#endif  // LIB_WEBRTC_AUDIO_DEVICE_IMPL_HXX

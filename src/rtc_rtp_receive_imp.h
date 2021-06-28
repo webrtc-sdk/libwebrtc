@@ -6,9 +6,10 @@
 
 namespace libwebrtc {
 class RTCRtpReceiverImpl : public RTCRtpReceiver,
-                           webrtc:: RtpReceiverObserverInterface {
+                           webrtc::RtpReceiverObserverInterface {
  public:
-  RTCRtpReceiverImpl(rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver);
+  RTCRtpReceiverImpl(
+      rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver);
 
   virtual scoped_refptr<RTCMediaTrack> track() const override;
   virtual scoped_refptr<RTCDtlsTransport> dtls_transport() const override;
@@ -27,7 +28,7 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver_;
   RTCRtpReceiverObserver* observer_;
 
-virtual void OnFirstPacketReceived(cricket::MediaType media_type) override;
+  virtual void OnFirstPacketReceived(cricket::MediaType media_type) override;
 
 };  // namespace libwebrtc
 

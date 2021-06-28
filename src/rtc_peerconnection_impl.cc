@@ -656,11 +656,11 @@ scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
         impl->rtc_track(), initImpl->rtp_transceiver_init());
   }
 
-    if (errorOr.ok()) {
-      return new RefCountedObject<RTCRtpTransceiverImpl>(errorOr.value());
-    }
+  if (errorOr.ok()) {
+    return new RefCountedObject<RTCRtpTransceiverImpl>(errorOr.value());
+  }
 
-    return scoped_refptr<RTCRtpTransceiver>();
+  return scoped_refptr<RTCRtpTransceiver>();
 }
 
 scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(

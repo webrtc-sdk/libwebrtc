@@ -3,9 +3,9 @@
 
 #include "rtc_video_device.h"
 
-#include "src/internal/video_capturer.h"
-#include "src/internal/vcm_capturer.h"
 #include "modules/video_capture/video_capture.h"
+#include "src/internal/vcm_capturer.h"
+#include "src/internal/video_capturer.h"
 
 #include <memory>
 
@@ -13,9 +13,13 @@ namespace libwebrtc {
 
 class RTCVideoCapturerImpl : public RTCVideoCapturer {
  public:
-  RTCVideoCapturerImpl(std::unique_ptr<webrtc::internal::VideoCapturer> video_capturer)
+  RTCVideoCapturerImpl(
+      std::unique_ptr<webrtc::internal::VideoCapturer> video_capturer)
       : video_capturer_(std::move(video_capturer)) {}
-  std::unique_ptr<webrtc::internal::VideoCapturer> video_capturer() { return std::move(video_capturer_); }
+  std::unique_ptr<webrtc::internal::VideoCapturer> video_capturer() {
+    return std::move(video_capturer_);
+  }
+
  private:
   std::unique_ptr<webrtc::internal::VideoCapturer> video_capturer_;
 };
@@ -42,6 +46,6 @@ class RTCVideoDeviceImpl : public RTCVideoDevice {
   std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> device_info_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_VIDEO_DEVICE_IMPL_HXX

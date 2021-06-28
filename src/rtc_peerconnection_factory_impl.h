@@ -6,11 +6,11 @@
 #include "rtc_peerconnection_factory.h"
 #include "rtc_video_device_impl.h"
 
+#include <memory>
 #include "api/media_stream_interface.h"
 #include "api/peer_connection_interface.h"
-#include "rtc_base/thread.h"
 #include "api/task_queue/task_queue_factory.h"
-#include <memory>
+#include "rtc_base/thread.h"
 
 namespace libwebrtc {
 
@@ -83,6 +83,6 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   std::unique_ptr<webrtc::TaskQueueFactory> task_queue_factory_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_MEDIA_SESSION_FACTORY_IMPL_HXX

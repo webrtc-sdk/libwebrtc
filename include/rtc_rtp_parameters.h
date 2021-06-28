@@ -85,7 +85,8 @@ class RTCRtcpFeedback : public RefCountInterface {
   virtual void set_num_channels(int value) = 0;
 
   virtual vector<scoped_refptr<RTCRtcpFeedback>> rtcp_feedback() = 0;
-  virtual void set_rtcp_feedback(vector<scoped_refptr<RTCRtcpFeedback>> rtcp_feecbacks) = 0;
+  virtual void set_rtcp_feedback(vector<scoped_refptr<RTCRtcpFeedback>>
+rtcp_feecbacks) = 0;
 
   virtual const map<string,string> parameters() = 0;
   virtual void set_parameters(const map<string, string> parameters) = 0;
@@ -305,7 +306,8 @@ struct RTCRtpParameters : public RefCountInterface {
       const vector<scoped_refptr<RTCRtpCodecParameters>> codecs) = 0;
 
   virtual const vector<scoped_refptr<RTCRtpExtension>> header_extensions() = 0;
-  virtual void set_header_extensions(const vector<scoped_refptr<RTCRtpExtension>> header_extensions) = 0;
+  virtual void set_header_extensions(
+      const vector<scoped_refptr<RTCRtpExtension>> header_extensions) = 0;
 
   virtual const vector<scoped_refptr<RTCRtpEncodingParameters>> encodings() = 0;
   virtual void set_encodings(

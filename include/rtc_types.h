@@ -11,9 +11,9 @@
 #define LIB_WEBRTC_API
 #endif
 
+#include "base/fixed_map.h"
 #include "base/fixed_size_function.h"
 #include "base/fixed_string.h"
-#include "base/fixed_map.h"
 #include "base/inlined_vector.h"
 #include "base/refcount.h"
 #include "base/scoped_ref_ptr.h"
@@ -22,13 +22,13 @@ namespace libwebrtc {
 
 enum { kMaxFixedLength = 1024, kMaxIceServerSize = 8 };
 
-using string =  bsp::fixed_string<kMaxFixedLength * 64>;
+using string = bsp::fixed_string<kMaxFixedLength * 64>;
 
-template<typename T>
+template <typename T>
 using vector = bsp::inlined_vector<T, kMaxFixedLength, true>;
 
 template <typename Key, typename T>
-using map =  bsp::fixed_map<Key, T, kMaxFixedLength>;
+using map = bsp::fixed_map<Key, T, kMaxFixedLength>;
 
 enum MediaSecurityType { kSRTP_None = 0, kSDES_SRTP, kDTLS_SRTP };
 

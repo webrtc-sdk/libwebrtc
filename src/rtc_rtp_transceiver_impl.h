@@ -14,10 +14,11 @@ class RTCRtpTransceiverInitImpl : public RTCRtpTransceiverInit {
   virtual void set_direction(RTCRtpTransceiverDirection value) override;
   virtual const vector<string> stream_ids() override;
   virtual void set_stream_ids(const vector<string> ids) override;
-  virtual const vector<scoped_refptr<RTCRtpEncodingParameters>>
-  send_encodings() override;
+  virtual const vector<scoped_refptr<RTCRtpEncodingParameters>> send_encodings()
+      override;
   virtual void set_send_encodings(
-      const vector<scoped_refptr<RTCRtpEncodingParameters>> send_encodings) override;
+      const vector<scoped_refptr<RTCRtpEncodingParameters>> send_encodings)
+      override;
 
   webrtc::RtpTransceiverInit rtp_transceiver_init() {
     return rtp_transceiver_init_;

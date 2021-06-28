@@ -29,6 +29,6 @@ class RTCMediaTrack : public RefCountInterface {
   ~RTCMediaTrack() {}
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
-#endif //LIB_WEBRTC_RTC_MEDIA_TRACK_HXX
+#endif  // LIB_WEBRTC_RTC_MEDIA_TRACK_HXX

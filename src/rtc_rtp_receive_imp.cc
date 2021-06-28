@@ -60,7 +60,7 @@ vector<scoped_refptr<RTCMediaStream>> RTCRtpReceiverImpl::streams() const {
   for (auto item : rtp_receiver_->streams()) {
     streams.push_back(new RefCountedObject<MediaStreamImpl>(item));
   }
- return streams;
+  return streams;
 }
 
 RTCMediaType RTCRtpReceiverImpl::media_type() const {

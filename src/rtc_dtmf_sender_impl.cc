@@ -11,7 +11,6 @@ RTCDtmfSenderImpl::dtmf_sender() {
   return dtmf_sender_;
 }
 
-
 bool RTCDtmfSenderImpl::InsertDtmf(const string tones,
                                    int duration,
                                    int inter_tone_gap) {
@@ -22,8 +21,8 @@ bool RTCDtmfSenderImpl::InsertDtmf(const string tones,
                                    int duration,
                                    int inter_tone_gap,
                                    int comma_delay) {
-  return dtmf_sender_->InsertDtmf(tones.c_str(), duration,
-                                  inter_tone_gap,comma_delay);
+  return dtmf_sender_->InsertDtmf(tones.c_str(), duration, inter_tone_gap,
+                                  comma_delay);
 }
 
 const string RTCDtmfSenderImpl::tones() const {
@@ -57,16 +56,13 @@ bool RTCDtmfSenderImpl::CanInsertDtmf() {
   return dtmf_sender_->CanInsertDtmf();
 }
 
-
 int RTCDtmfSenderImpl::duration() const {
   return dtmf_sender_->duration();
 }
 
-
 int RTCDtmfSenderImpl::inter_tone_gap() const {
   return dtmf_sender_->inter_tone_gap();
 }
-
 
 int RTCDtmfSenderImpl::comma_delay() const {
   return dtmf_sender_->comma_delay();

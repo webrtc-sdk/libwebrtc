@@ -3,9 +3,9 @@
 
 #include "base/refcount.h"
 #include "rtc_rtp_parameters.h"
-#include "rtc_types.h"
 #include "rtc_rtp_receiver.h"
 #include "rtc_rtp_sender.h"
+#include "rtc_types.h"
 
 namespace libwebrtc {
 
@@ -41,7 +41,8 @@ class RTCRtpTransceiver : public RefCountInterface {
 
   virtual RTCRtpTransceiverDirection direction() const = 0;
 
-  virtual const string SetDirectionWithError(RTCRtpTransceiverDirection new_direction) = 0;
+  virtual const string SetDirectionWithError(
+      RTCRtpTransceiverDirection new_direction) = 0;
 
   virtual RTCRtpTransceiverDirection current_direction() const = 0;
 
@@ -51,15 +52,19 @@ class RTCRtpTransceiver : public RefCountInterface {
 
   virtual void StopInternal() = 0;
 
-  //virtual string set_codec_preferences(vector<RTCRtpCodecCapability> codecs) = 0;
+  // virtual string set_codec_preferences(vector<RTCRtpCodecCapability> codecs)
+  // = 0;
 
-  //virtual vector<RTCRtpCodecCapability> codec_preferences() const = 0;
+  // virtual vector<RTCRtpCodecCapability> codec_preferences() const = 0;
 
-  //virtual vector<RTCRtpHeaderExtensionCapability> HeaderExtensionsToOffer() const = 0;
+  // virtual vector<RTCRtpHeaderExtensionCapability> HeaderExtensionsToOffer()
+  // const = 0;
 
-  //virtual std::vector<RTCRtpHeaderExtensionCapability> HeaderExtensionsNegotiated() const = 0;
+  // virtual std::vector<RTCRtpHeaderExtensionCapability>
+  // HeaderExtensionsNegotiated() const = 0;
 
-  //virtual webrtc::RTCError SetOfferedRtpHeaderExtensions(vector<const RTCRtpHeaderExtensionCapability> header_extensions_to_offer);
+  // virtual webrtc::RTCError SetOfferedRtpHeaderExtensions(vector<const
+  // RTCRtpHeaderExtensionCapability> header_extensions_to_offer);
 };
 
 }  // namespace libwebrtc

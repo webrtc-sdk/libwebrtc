@@ -9,7 +9,8 @@
 
 namespace libwebrtc {
 
-class RTCDataChannelImpl : public RTCDataChannel, public webrtc::DataChannelObserver {
+class RTCDataChannelImpl : public RTCDataChannel,
+                           public webrtc::DataChannelObserver {
  public:
   RTCDataChannelImpl(
       rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel);
@@ -45,6 +46,6 @@ class RTCDataChannelImpl : public RTCDataChannel, public webrtc::DataChannelObse
   string label_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // !LIB_WEBRTC_RTC_DATA_CHANNEL_IMPL_HXX

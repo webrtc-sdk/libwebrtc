@@ -10,8 +10,8 @@
 #include "media/engine/webrtc_video_engine.h"
 #include "media/engine/webrtc_voice_engine.h"
 #include "pc/media_session.h"
-#include "rtc_base/synchronization/mutex.h"
 #include "rtc_base/logging.h"
+#include "rtc_base/synchronization/mutex.h"
 
 namespace libwebrtc {
 
@@ -30,6 +30,6 @@ class RTCAudioSourceImpl : public RTCAudioSource {
   rtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_AUDIO_SOURCE_IMPL_HXX

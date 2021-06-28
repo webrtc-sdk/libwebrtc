@@ -29,6 +29,7 @@ class RTCRtpSenderImpl : public RTCRtpSender {
   rtc::scoped_refptr<webrtc::RtpSenderInterface> rtc_rtp_sender() {
     return rtp_sender_;
   }
+
  private:
   rtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender_;
 };

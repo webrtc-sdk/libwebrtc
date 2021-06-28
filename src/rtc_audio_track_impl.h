@@ -10,8 +10,8 @@
 #include "media/engine/webrtc_video_engine.h"
 #include "media/engine/webrtc_voice_engine.h"
 #include "pc/media_session.h"
-#include "rtc_base/synchronization/mutex.h"
 #include "rtc_base/logging.h"
+#include "rtc_base/synchronization/mutex.h"
 
 namespace libwebrtc {
 
@@ -44,6 +44,6 @@ class AudioTrackImpl : public RTCAudioTrack {
   string id_, kind_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_AUDIO_TRACK_IMPL_HXX

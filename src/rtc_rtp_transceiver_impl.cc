@@ -1,7 +1,7 @@
 #include "rtc_rtp_transceiver_impl.h"
 #include <src/rtc_rtp_parameters_impl.h>
-#include <src/rtc_rtp_sender_impl.h>
 #include <src/rtc_rtp_receive_imp.h>
+#include <src/rtc_rtp_sender_impl.h>
 
 namespace libwebrtc {
 
@@ -17,7 +17,8 @@ RTCRtpTransceiverDirection RTCRtpTransceiverInitImpl::direction() {
       rtp_transceiver_init_.direction);
 }
 
-void RTCRtpTransceiverInitImpl::set_direction(RTCRtpTransceiverDirection value) {
+void RTCRtpTransceiverInitImpl::set_direction(
+    RTCRtpTransceiverDirection value) {
   rtp_transceiver_init_.direction =
       static_cast<webrtc::RtpTransceiverDirection>(value);
 }
@@ -38,25 +39,24 @@ void RTCRtpTransceiverInitImpl::set_stream_ids(const vector<string> ids) {
   rtp_transceiver_init_.stream_ids = list;
 }
 
-
- const vector<scoped_refptr<RTCRtpEncodingParameters>>
-     RTCRtpTransceiverInitImpl::send_encodings() {
+const vector<scoped_refptr<RTCRtpEncodingParameters>>
+RTCRtpTransceiverInitImpl::send_encodings() {
   vector<scoped_refptr<RTCRtpEncodingParameters>> vec;
   for (auto item : rtp_transceiver_init_.send_encodings) {
     vec.push_back(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
   }
   return vec;
- }
+}
 
- void RTCRtpTransceiverInitImpl::set_send_encodings(
-     const vector<scoped_refptr<RTCRtpEncodingParameters>> send_encodings) {
-   std::vector<webrtc::RtpEncodingParameters> list;
-   for (auto param : send_encodings) {
-     auto impl = static_cast<RTCRtpEncodingParametersImpl*>(param.get());
-     list.push_back(impl->rtp_parameters());
-   }
-   rtp_transceiver_init_.send_encodings = list;
- }
+void RTCRtpTransceiverInitImpl::set_send_encodings(
+    const vector<scoped_refptr<RTCRtpEncodingParameters>> send_encodings) {
+  std::vector<webrtc::RtpEncodingParameters> list;
+  for (auto param : send_encodings) {
+    auto impl = static_cast<RTCRtpEncodingParametersImpl*>(param.get());
+    list.push_back(impl->rtp_parameters());
+  }
+  rtp_transceiver_init_.send_encodings = list;
+}
 
 RTCRtpTransceiverImpl::RTCRtpTransceiverImpl(
     rtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver)

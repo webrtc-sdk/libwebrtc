@@ -20,11 +20,9 @@
 #include "api/scoped_refptr.h"
 #include "rtc_base/ref_count.h"
 
-
 namespace libwebrtc {
 class IceTransport : public rtc::RefCountInterface {
  public:
-
   virtual IceTransport* internal() = 0;
 };
 
@@ -63,7 +61,6 @@ class IceTransportInit final {
   void set_event_log(RtcEventLog* event_log) { event_log_ = event_log; }
 };
 
-
 class IceTransportFactory {
  public:
   virtual ~IceTransportFactory() = default;
@@ -74,5 +71,5 @@ class IceTransportFactory {
       IceTransportInit init) = 0;
 };
 
-}  // namespace webrtc
+}  // namespace libwebrtc
 #endif  // API_ICE_TRANSPORT_INTERFACE_H_

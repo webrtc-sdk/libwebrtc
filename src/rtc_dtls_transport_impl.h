@@ -2,14 +2,13 @@
 #ifndef LIB_WEBRTC_DTLS_TRANSPORT_INTERFACE_IMPL_H_
 #define LIB_WEBRTC_DTLS_TRANSPORT_INTERFACE_IMPL_H_
 
-#include "rtc_dtls_transport.h"
 #include "api/dtls_transport_interface.h"
 #include "api/scoped_refptr.h"
+#include "rtc_dtls_transport.h"
 
 namespace libwebrtc {
 
-
-class RTCDtlsTransportInformationImpl : public  RTCDtlsTransportInformation {
+class RTCDtlsTransportInformationImpl : public RTCDtlsTransportInformation {
  public:
   RTCDtlsTransportInformationImpl(
       webrtc::DtlsTransportInformation dtls_transport_information);
@@ -29,13 +28,11 @@ class RTCDtlsTransportInformationImpl : public  RTCDtlsTransportInformation {
   webrtc::DtlsTransportInformation dtls_transport_information_;
 };
 
-
-class RTCDtlsTransportImpl : public RTCDtlsTransport
-    ,public webrtc::DtlsTransportObserverInterface {
+class RTCDtlsTransportImpl : public RTCDtlsTransport,
+                             public webrtc::DtlsTransportObserverInterface {
  public:
   RTCDtlsTransportImpl(
       rtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport);
-
 
   virtual scoped_refptr<RTCDtlsTransportInformation> GetInformation() override;
 
@@ -48,7 +45,6 @@ class RTCDtlsTransportImpl : public RTCDtlsTransport
 
   virtual void OnError(webrtc::RTCError error) override;
 
-
   rtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport();
 
  private:
@@ -56,6 +52,6 @@ class RTCDtlsTransportImpl : public RTCDtlsTransport
   RTCDtlsTransportObserver* observer_;
 };
 
-}  // namespace webrtc
+}  // namespace libwebrtc
 
 #endif  // API_DTLS_TRANSPORT_INTERFACE_H_

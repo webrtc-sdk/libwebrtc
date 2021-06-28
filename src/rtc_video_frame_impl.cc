@@ -1,10 +1,10 @@
 #include "rtc_video_frame_impl.h"
 
-#include "rtc_base/checks.h"
-#include "rtc_base/logging.h"
 #include "api/video/i420_buffer.h"
 #include "libyuv/convert_argb.h"
 #include "libyuv/convert_from.h"
+#include "rtc_base/checks.h"
+#include "rtc_base/logging.h"
 
 namespace libwebrtc {
 
@@ -16,8 +16,7 @@ VideoFrameBufferImpl::VideoFrameBufferImpl(
     rtc::scoped_refptr<webrtc::I420Buffer> frame_buffer)
     : buffer_(frame_buffer) {}
 
-VideoFrameBufferImpl::~VideoFrameBufferImpl() {
-}
+VideoFrameBufferImpl::~VideoFrameBufferImpl() {}
 
 scoped_refptr<RTCVideoFrame> VideoFrameBufferImpl::Copy() {
   scoped_refptr<VideoFrameBufferImpl> frame =
@@ -123,15 +122,15 @@ libwebrtc::RTCVideoFrame::VideoRotation VideoFrameBufferImpl::rotation() {
 }
 
 scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width,
-                                           int height,
-                                           const uint8_t* buffer,
-                                           int length) {
+                                                   int height,
+                                                   const uint8_t* buffer,
+                                                   int length) {
   int stride_y = width;
   int stride_uv = (width + 1) / 2;
 
   int size_y = stride_y * height;
   int size_u = stride_uv * height / 2;
-  //int size_v = size_u;
+  // int size_v = size_u;
 
   RTC_DCHECK(length == (width * height * 3) / 2);
 
@@ -149,13 +148,13 @@ scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width,
 }
 
 scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width,
-                                           int height,
-                                           const uint8_t* data_y,
-                                           int stride_y,
-                                           const uint8_t* data_u,
-                                           int stride_u,
-                                           const uint8_t* data_v,
-                                           int stride_v) {
+                                                   int height,
+                                                   const uint8_t* data_y,
+                                                   int stride_y,
+                                                   const uint8_t* data_u,
+                                                   int stride_u,
+                                                   const uint8_t* data_v,
+                                                   int stride_v) {
   rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Copy(
       width, height, data_y, stride_y, data_u, stride_u, data_v, stride_v);
 
@@ -165,4 +164,4 @@ scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width,
   return frame;
 }
 
-} // namespace libwebrtc
+}  // namespace libwebrtc

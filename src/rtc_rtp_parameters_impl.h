@@ -21,7 +21,6 @@ class RTCRtcpFeedbackImpl : public RTCRtcpFeedback {
 
  private:
   webrtc::RtcpFeedback rtcp_feedback_;
-
 };
 
 class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
@@ -69,9 +68,9 @@ class RTCRtpExtensionImpl : public RTCRtpExtension {
   virtual void set_encrypt(bool value) override;
 
   webrtc::RtpExtension rtp_extension();
+
  private:
   webrtc::RtpExtension rtp_extension_;
-
 };
 
 class RTCRtcpParametersImpl : public RTCRtcpParameters {
@@ -106,11 +105,10 @@ class RTCRtpParametersImpl : public RTCRtpParameters {
   virtual const vector<scoped_refptr<RTCRtpCodecParameters>> codecs() override;
   virtual void set_codecs(
       const vector<scoped_refptr<RTCRtpCodecParameters>> codecs) override;
-  virtual const vector<scoped_refptr<RTCRtpExtension>>
-  header_extensions() override;
+  virtual const vector<scoped_refptr<RTCRtpExtension>> header_extensions()
+      override;
   virtual void set_header_extensions(
-      const vector<scoped_refptr<RTCRtpExtension>>
-          header_extensions) override;
+      const vector<scoped_refptr<RTCRtpExtension>> header_extensions) override;
   virtual const vector<scoped_refptr<RTCRtpEncodingParameters>> encodings()
       override;
   virtual void set_encodings(

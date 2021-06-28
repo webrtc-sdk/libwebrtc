@@ -10,7 +10,8 @@
 
 namespace libwebrtc {
 
-class VideoSinkAdapter : public rtc::VideoSinkInterface<webrtc::VideoFrame>, public RefCountInterface {
+class VideoSinkAdapter : public rtc::VideoSinkInterface<webrtc::VideoFrame>,
+                         public RefCountInterface {
  public:
   VideoSinkAdapter(rtc::scoped_refptr<webrtc::VideoTrackInterface> track);
   ~VideoSinkAdapter() override;

@@ -4,8 +4,8 @@
 #include "base/refcount.h"
 #include "base/scoped_ref_ptr.h"
 
-#include "rtc_types.h"
 #include "rtc_rtp_parameters.h"
+#include "rtc_types.h"
 
 namespace libwebrtc {
 
@@ -31,8 +31,8 @@ class RTCRtpSender : public RefCountInterface {
 
   virtual void set_stream_ids(const vector<string> stream_ids) const = 0;
 
-  virtual const vector<scoped_refptr<RTCRtpEncodingParameters>> init_send_encodings()
-      const = 0;
+  virtual const vector<scoped_refptr<RTCRtpEncodingParameters>>
+  init_send_encodings() const = 0;
 
   virtual scoped_refptr<RTCRtpParameters> parameters() const = 0;
 
@@ -41,7 +41,6 @@ class RTCRtpSender : public RefCountInterface {
 
   virtual scoped_refptr<RTCDtmfSender> dtmf_sender() const = 0;
 };
-
 
 }  // namespace libwebrtc
 

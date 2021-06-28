@@ -1,9 +1,9 @@
 #ifndef LIB_WEBRTC_RTC_ICE_CANDIDATE_IMPL_HXX
 #define LIB_WEBRTC_RTC_ICE_CANDIDATE_IMPL_HXX
 
-#include "rtc_types.h"
-#include "rtc_ice_candidate.h"
 #include "api/jsep.h"
+#include "rtc_ice_candidate.h"
+#include "rtc_types.h"
 
 namespace libwebrtc {
 
@@ -30,6 +30,6 @@ class RTCIceCandidateImpl : public RTCIceCandidate {
   std::string sdp_mid_;
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_ICE_CANDIDATE_IMPL_HXX

@@ -97,7 +97,7 @@ vector<scoped_refptr<RTCMediaTrack>> MediaStreamImpl::tracks() {
 scoped_refptr<RTCAudioTrack> MediaStreamImpl::FindAudioTrack(
     const string track_id) {
   for (auto track : audio_tracks_) {
-    if (track->id() ==  track_id)
+    if (track->id() == track_id)
       return track;
   }
 
@@ -141,9 +141,9 @@ void MediaStreamImpl::OnChanged() {
   }
 
   for (auto track : removed_video_tracks) {
-  /*  if (observer_) {
-      observer_->OnRemoveTrack([&](OnRTCMediaStream on) { on(this); }, track);
-    }*/
+    /*  if (observer_) {
+        observer_->OnRemoveTrack([&](OnRTCMediaStream on) { on(this); }, track);
+      }*/
   }
 
   std::vector<scoped_refptr<RTCVideoTrack>> new_video_tracks;
@@ -154,7 +154,7 @@ void MediaStreamImpl::OnChanged() {
     }
   }
 
-  //for (auto track : new_video_tracks) {
+  // for (auto track : new_video_tracks) {
   //  if (observer_)
   //    observer_->OnAddTrack([&](OnRTCMediaStream on) { on(this); }, track);
   //}

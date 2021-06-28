@@ -40,10 +40,8 @@ RTCDtlsTransportImpl::RTCDtlsTransportImpl(
     rtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport)
     : dtls_transport_(dtls_transport), observer_(nullptr) {}
 
-
 scoped_refptr<RTCDtlsTransportInformation>
 RTCDtlsTransportImpl::GetInformation() {
-
   return new RefCountedObject<RTCDtlsTransportInformationImpl>(
       dtls_transport_->Information());
 }

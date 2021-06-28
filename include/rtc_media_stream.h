@@ -1,8 +1,8 @@
 ﻿#ifndef LIB_WEBRTC_RTC_MEDIA_STREAM_HXX
 #define LIB_WEBRTC_RTC_MEDIA_STREAM_HXX
 
-#include "rtc_types.h"
 #include "rtc_audio_track.h"
+#include "rtc_types.h"
 #include "rtc_video_track.h"
 
 namespace libwebrtc {
@@ -37,6 +37,6 @@ class RTCMediaStream : public RefCountInterface {
   ~RTCMediaStream() {}
 };
 
-} // namespace libwebrtc
+}  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_MEDIA_STREAM_HXX

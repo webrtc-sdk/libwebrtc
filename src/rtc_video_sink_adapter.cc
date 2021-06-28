@@ -20,7 +20,6 @@ VideoSinkAdapter::~VideoSinkAdapter() {
 
 // VideoSinkInterface implementation
 void VideoSinkAdapter::OnFrame(const webrtc::VideoFrame& video_frame) {
-
   scoped_refptr<VideoFrameBufferImpl> frame_buffer =
       scoped_refptr<VideoFrameBufferImpl>(
           new RefCountedObject<VideoFrameBufferImpl>(
@@ -38,14 +37,14 @@ void VideoSinkAdapter::OnFrame(const webrtc::VideoFrame& video_frame) {
 void VideoSinkAdapter::AddRenderer(
     RTCVideoRenderer<scoped_refptr<RTCVideoFrame>>* renderer) {
   RTC_LOG(INFO) << __FUNCTION__ << ": AddRenderer " << (void*)renderer;
-  webrtc::MutexLock  cs(crt_sec_.get());
+  webrtc::MutexLock cs(crt_sec_.get());
   renderers_.push_back(renderer);
 }
 
 void VideoSinkAdapter::RemoveRenderer(
     RTCVideoRenderer<scoped_refptr<RTCVideoFrame>>* renderer) {
   RTC_LOG(INFO) << __FUNCTION__ << ": RemoveRenderer " << (void*)renderer;
-  webrtc::MutexLock  cs(crt_sec_.get());
+  webrtc::MutexLock cs(crt_sec_.get());
   renderers_.erase(
       std::remove_if(
           renderers_.begin(), renderers_.end(),
@@ -65,4 +64,4 @@ void VideoSinkAdapter::RemoveRenderer(
   rtc_track_->RemoveSink(renderer);
 }
 
-} // namespace libwebrtc
+}  // namespace libwebrtc

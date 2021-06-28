@@ -150,7 +150,8 @@ void RTCRtpParametersImpl::set_mid(const string mid) {
   rtp_parameters_.mid = mid.str();
 }
 
-const vector<scoped_refptr<RTCRtpCodecParameters>> RTCRtpParametersImpl::codecs() {
+const vector<scoped_refptr<RTCRtpCodecParameters>>
+RTCRtpParametersImpl::codecs() {
   vector<scoped_refptr<RTCRtpCodecParameters>> vec;
   for (auto item : rtp_parameters_.codecs) {
     vec.push_back(new RefCountedObject<RTCRtpCodecParametersImpl>(item));
@@ -158,7 +159,8 @@ const vector<scoped_refptr<RTCRtpCodecParameters>> RTCRtpParametersImpl::codecs(
   return vec;
 }
 
-void RTCRtpParametersImpl::set_codecs( const vector<scoped_refptr<RTCRtpCodecParameters>> codecs) {
+void RTCRtpParametersImpl::set_codecs(
+    const vector<scoped_refptr<RTCRtpCodecParameters>> codecs) {
   std::vector<webrtc::RtpCodecParameters> list;
   for (auto item : codecs) {
     auto impl = static_cast<RTCRtpCodecParametersImpl*>(item.get());
@@ -167,7 +169,8 @@ void RTCRtpParametersImpl::set_codecs( const vector<scoped_refptr<RTCRtpCodecPar
   rtp_parameters_.codecs = list;
 }
 
-const vector<scoped_refptr<RTCRtpExtension>> RTCRtpParametersImpl::header_extensions() {
+const vector<scoped_refptr<RTCRtpExtension>>
+RTCRtpParametersImpl::header_extensions() {
   vector<scoped_refptr<RTCRtpExtension>> vec;
   for (auto item : rtp_parameters_.header_extensions) {
     vec.push_back(new RefCountedObject<RTCRtpExtensionImpl>(item));
@@ -232,7 +235,7 @@ uint32_t RTCRtcpParametersImpl::ssrc() {
 }
 
 void RTCRtcpParametersImpl::set_ssrc(uint32_t value) {
-   rtcp_parameters_.ssrc = value;
+  rtcp_parameters_.ssrc = value;
 }
 
 const string RTCRtcpParametersImpl::cname() {
@@ -269,11 +272,11 @@ webrtc::RtcpParameters RTCRtcpParametersImpl::rtcp_parameters() {
 }
 
 RTCRtpExtensionImpl::RTCRtpExtensionImpl(webrtc::RtpExtension rtp_extension)
-    : rtp_extension_(rtp_extension) {
-}
+    : rtp_extension_(rtp_extension) {}
 
 bool RTCRtpExtensionImpl::operator==(scoped_refptr<RTCRtpExtension> o) const {
-  return rtp_extension_ == static_cast<RTCRtpExtensionImpl*>(o.get())->rtp_extension();
+  return rtp_extension_ ==
+         static_cast<RTCRtpExtensionImpl*>(o.get())->rtp_extension();
 }
 
 const string RTCRtpExtensionImpl::uri() {
@@ -305,14 +308,13 @@ webrtc::RtpExtension RTCRtpExtensionImpl::rtp_extension() {
 }
 
 const string RTCRtpExtensionImpl::ToString() const {
-  auto temp =  rtp_extension_.ToString();
+  auto temp = rtp_extension_.ToString();
   return temp;
 }
 
 RTCRtpCodecParametersImpl::RTCRtpCodecParametersImpl(
     webrtc::RtpCodecParameters rtp_codec_parameters)
     : rtp_codec_parameters_(rtp_codec_parameters) {}
-
 
 const string RTCRtpCodecParametersImpl::mime_type() const {
   return rtp_codec_parameters_.mime_type();
@@ -367,7 +369,7 @@ void RTCRtpCodecParametersImpl::set_max_ptime(int value) {
 }
 
 int RTCRtpCodecParametersImpl::ptime() {
- return rtp_codec_parameters_.ptime.value();
+  return rtp_codec_parameters_.ptime.value();
 }
 
 void RTCRtpCodecParametersImpl::set_ptime(int value) {
@@ -378,7 +380,7 @@ const vector<scoped_refptr<RTCRtcpFeedback>>
 RTCRtpCodecParametersImpl::rtcp_feedback() {
   vector<scoped_refptr<RTCRtcpFeedback>> vec;
   for (auto item : rtp_codec_parameters_.rtcp_feedback) {
-   vec.push_back(new RefCountedObject<RTCRtcpFeedbackImpl>(item));
+    vec.push_back(new RefCountedObject<RTCRtcpFeedbackImpl>(item));
   }
   return vec;
 }
@@ -403,8 +405,7 @@ RTCRtpCodecParametersImpl::parameters() {
   return els;
 }
 
-void RTCRtpCodecParametersImpl::set_parameters(
-    const map<string, string> map) {
+void RTCRtpCodecParametersImpl::set_parameters(const map<string, string> map) {
   std::map<std::string, std::string> parameters;
   for (auto item : map) {
     parameters[item.key.str()] = item.value.str();
@@ -446,11 +447,13 @@ void RTCRtcpFeedbackImpl::set_type(RTCRtcpFeedbackType value) {
 }
 
 RTCRtcpFeedbackMessageType RTCRtcpFeedbackImpl::message_type() {
-  return static_cast<RTCRtcpFeedbackMessageType>(rtcp_feedback_.message_type.value());
+  return static_cast<RTCRtcpFeedbackMessageType>(
+      rtcp_feedback_.message_type.value());
 }
 
 void RTCRtcpFeedbackImpl::set_message_type(RTCRtcpFeedbackMessageType value) {
-  rtcp_feedback_.message_type =  static_cast<webrtc::RtcpFeedbackMessageType>(value);
+  rtcp_feedback_.message_type =
+      static_cast<webrtc::RtcpFeedbackMessageType>(value);
 }
 
 bool RTCRtcpFeedbackImpl::operator==(scoped_refptr<RTCRtcpFeedback> o) {
@@ -459,7 +462,8 @@ bool RTCRtcpFeedbackImpl::operator==(scoped_refptr<RTCRtcpFeedback> o) {
 }
 
 bool RTCRtcpFeedbackImpl::operator!=(scoped_refptr<RTCRtcpFeedback> o) {
-  return rtcp_feedback_ != static_cast<RTCRtcpFeedbackImpl*>(o.get())->rtcp_feedback();
+  return rtcp_feedback_ !=
+         static_cast<RTCRtcpFeedbackImpl*>(o.get())->rtcp_feedback();
 }
 
 }  // namespace libwebrtc
