@@ -125,17 +125,14 @@ class RTCPeerConnectionObserver {
 
   virtual void OnRemoveStream(scoped_refptr<RTCMediaStream> stream) = 0;
 
-  virtual void OnAddTrack(vector<scoped_refptr<RTCMediaStream>> streams,
-                          scoped_refptr<RTCRtpReceiver> receiver) = 0;
-
-  //virtual void OnRemoveTrack(vector<scoped_refptr<RTCMediaStream>> streams,
-  //                           scoped_refptr<RTCMediaTrack> track) = 0;
-
   virtual void OnDataChannel(scoped_refptr<RTCDataChannel> data_channel) = 0;
 
   virtual void OnRenegotiationNeeded() = 0;
 
   virtual void OnTrack(scoped_refptr<RTCRtpTransceiver> transceiver) = 0;
+
+  virtual void OnAddTrack(vector<scoped_refptr<RTCMediaStream>> streams,
+                          scoped_refptr<RTCRtpReceiver> receiver) = 0;
 
   virtual void OnRemoveTrack(scoped_refptr<RTCRtpReceiver> receiver) = 0;
 

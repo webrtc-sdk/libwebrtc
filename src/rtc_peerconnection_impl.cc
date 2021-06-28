@@ -231,16 +231,6 @@ void RTCPeerConnectionImpl::OnAddStream(
 
   if (observer_) {
     observer_->OnAddStream(remote_stream);
-
-    /*   remote_stream->GetAudioTracks([&](scoped_refptr<RTCMediaTrack> track) {
-         observer_->OnAddTrack([&](OnRTCMediaStream on) { on(remote_stream); },
-                               track);
-       });
-
-       remote_stream->GetVideoTracks([&](scoped_refptr<RTCMediaTrack> track) {
-         observer_->OnAddTrack([&](OnRTCMediaStream on) { on(remote_stream); },
-                               track);
-       });*/
   }
 }
 
@@ -261,16 +251,6 @@ void RTCPeerConnectionImpl::OnRemoveStream(
     if (observer_) {
       observer_->OnRemoveStream(recv_stream);
     }
-
-    /*   recv_stream->GetVideoTracks([&](scoped_refptr<RTCMediaTrack> track) {
-         observer_->OnRemoveTrack([&](OnRTCMediaStream on) { on(recv_stream); },
-                                  track);
-       });
-
-       recv_stream->GetAudioTracks([&](scoped_refptr<RTCMediaTrack> track) {
-         observer_->OnRemoveTrack([&](OnRTCMediaStream on) { on(recv_stream); },
-                                  track);
-       });*/
 
     remote_streams_.erase(
         std::find(remote_streams_.begin(), remote_streams_.end(), recv_stream));
