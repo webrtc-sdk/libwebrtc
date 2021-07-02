@@ -84,7 +84,7 @@ const string RTCRtpEncodingParametersImpl::scalability_mode() {
 }
 
 void RTCRtpEncodingParametersImpl::set_scalability_mode(const string mode) {
-  rtp_encoding_parameters_.scalability_mode = mode.str();
+  rtp_encoding_parameters_.scalability_mode = to_std_string(mode);
 }
 
 bool RTCRtpEncodingParametersImpl::active() {
@@ -101,7 +101,7 @@ const string RTCRtpEncodingParametersImpl::rid() {
 }
 
 void RTCRtpEncodingParametersImpl::set_rid(const string rid) {
-  rtp_encoding_parameters_.rid = rid.str();
+  rtp_encoding_parameters_.rid = to_std_string(rid);
 }
 
 bool RTCRtpEncodingParametersImpl::adaptive_ptime() {
@@ -139,7 +139,7 @@ const string RTCRtpParametersImpl::transaction_id() {
 }
 
 void RTCRtpParametersImpl::set_transaction_id(const string id) {
-  rtp_parameters_.transaction_id = id.str();
+  rtp_parameters_.transaction_id = to_std_string(id);
 }
 
 const string RTCRtpParametersImpl::mid() {
@@ -147,7 +147,7 @@ const string RTCRtpParametersImpl::mid() {
   return temp.c_str();
 }
 void RTCRtpParametersImpl::set_mid(const string mid) {
-  rtp_parameters_.mid = mid.str();
+  rtp_parameters_.mid = to_std_string(mid);
 }
 
 const vector<scoped_refptr<RTCRtpCodecParameters>>
@@ -242,7 +242,7 @@ const string RTCRtcpParametersImpl::cname() {
   return rtcp_parameters_.cname.c_str();
 }
 void RTCRtcpParametersImpl::set_cname(const string cname) {
-  rtcp_parameters_.cname = cname.str();
+  rtcp_parameters_.cname = to_std_string(cname);
 }
 
 bool RTCRtcpParametersImpl::reduced_size() {
@@ -284,7 +284,7 @@ const string RTCRtpExtensionImpl::uri() {
 }
 
 void RTCRtpExtensionImpl::set_uri(const string uri) {
-  rtp_extension_.uri = uri.c_str();
+  rtp_extension_.uri = to_std_string(uri);
 }
 
 int RTCRtpExtensionImpl::id() {
@@ -309,7 +309,7 @@ webrtc::RtpExtension RTCRtpExtensionImpl::rtp_extension() {
 
 const string RTCRtpExtensionImpl::ToString() const {
   auto temp = rtp_extension_.ToString();
-  return temp;
+  return temp.c_str();
 }
 
 RTCRtpCodecParametersImpl::RTCRtpCodecParametersImpl(
@@ -317,15 +317,15 @@ RTCRtpCodecParametersImpl::RTCRtpCodecParametersImpl(
     : rtp_codec_parameters_(rtp_codec_parameters) {}
 
 const string RTCRtpCodecParametersImpl::mime_type() const {
-  return rtp_codec_parameters_.mime_type();
+  return rtp_codec_parameters_.mime_type().c_str();
 }
 
 const string RTCRtpCodecParametersImpl::name() {
-  return rtp_codec_parameters_.name;
+  return rtp_codec_parameters_.name.c_str();
 }
 
 void RTCRtpCodecParametersImpl::set_name(const string name) {
-  rtp_codec_parameters_.name = name.str();
+  rtp_codec_parameters_.name = to_std_string(name);
 }
 
 RTCMediaType RTCRtpCodecParametersImpl::kind() {
@@ -408,7 +408,7 @@ RTCRtpCodecParametersImpl::parameters() {
 void RTCRtpCodecParametersImpl::set_parameters(const map<string, string> map) {
   std::map<std::string, std::string> parameters;
   for (auto item : map) {
-    parameters[item.key.str()] = item.value.str();
+    parameters[to_std_string(item.first)] = to_std_string(item.second);
   }
   rtp_codec_parameters_.parameters = parameters;
 }

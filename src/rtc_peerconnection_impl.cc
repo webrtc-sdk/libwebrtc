@@ -295,7 +295,7 @@ void RTCPeerConnectionImpl::AddCandidate(const string mid,
                                          const string candiate) {
   webrtc::SdpParseError error;
   webrtc::IceCandidateInterface* candidate = webrtc::CreateIceCandidate(
-      mid.c_str(), mid_mline_index, candiate.c_str(), &error);
+      to_std_string(mid), mid_mline_index, to_std_string(candiate), &error);
   if (!candidate)
     rtc_peerconnection_->AddIceCandidate(candidate);
 }
@@ -361,9 +361,9 @@ bool RTCPeerConnectionImpl::Initialize() {
     IceServer ice_server = configuration_.ice_servers[i];
     if (ice_server.uri.size() > 0) {
       webrtc::PeerConnectionInterface::IceServer server;
-      server.uri = ice_server.uri.str();
-      server.username = ice_server.username.str();
-      server.password = ice_server.password.str();
+      server.uri = to_std_string(ice_server.uri);
+      server.username = to_std_string(ice_server.username);
+      server.password = to_std_string(ice_server.password);
       config.servers.push_back(server);
     }
   }
@@ -414,11 +414,11 @@ scoped_refptr<RTCDataChannel> RTCPeerConnectionImpl::CreateDataChannel(
   init.maxRetransmitTime = dataChannelDict->maxRetransmitTime;
   init.negotiated = dataChannelDict->negotiated;
   init.ordered = dataChannelDict->ordered;
-  init.protocol = dataChannelDict->protocol.c_str();
+  init.protocol = to_std_string(dataChannelDict->protocol);
   init.reliable = dataChannelDict->reliable;
 
   rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel =
-      rtc_peerconnection_->CreateDataChannel(label.c_str(), &init);
+      rtc_peerconnection_->CreateDataChannel(to_std_string(label), &init);
 
   data_channel_ = scoped_refptr<RTCDataChannelImpl>(
       new RefCountedObject<RTCDataChannelImpl>(rtc_data_channel));
@@ -432,7 +432,7 @@ void RTCPeerConnectionImpl::SetLocalDescription(const string sdp,
                                                 OnSetSdpFailure failure) {
   webrtc::SdpParseError error;
   webrtc::SessionDescriptionInterface* session_description(
-      webrtc::CreateSessionDescription(type.c_str(), sdp.c_str(), &error));
+      webrtc::CreateSessionDescription(to_std_string(type), to_std_string(sdp), &error));
 
   if (!session_description) {
     std::string error = "Can't parse received session description message.";
@@ -450,10 +450,10 @@ void RTCPeerConnectionImpl::SetRemoteDescription(const string sdp,
                                                  const string type,
                                                  OnSetSdpSuccess success,
                                                  OnSetSdpFailure failure) {
-  RTC_LOG(INFO) << " Received session description :" << sdp;
+  RTC_LOG(INFO) << " Received session description :" << to_std_string(sdp);
   webrtc::SdpParseError error;
   webrtc::SessionDescriptionInterface* session_description(
-      webrtc::CreateSessionDescription(type.c_str(), sdp.c_str(), &error));
+      webrtc::CreateSessionDescription(to_std_string(type), to_std_string(sdp), &error));
 
   if (!session_description) {
     std::string error = "Can't parse received session description message.";
@@ -645,7 +645,7 @@ scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
 
   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpTransceiverInterface>>
       errorOr;
-  std::string kind = track->kind().c_str();
+  std::string kind = to_std_string(track->kind());
   if (0 == kind.compare(webrtc::MediaStreamTrackInterface::kVideoKind)) {
     VideoTrackImpl* impl = static_cast<VideoTrackImpl*>(track.get());
     errorOr = rtc_peerconnection_->AddTransceiver(
@@ -667,7 +667,7 @@ scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
     scoped_refptr<RTCMediaTrack> track) {
   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpTransceiverInterface>>
       errorOr;
-  std::string kind = track->kind().c_str();
+  std::string kind = to_std_string(track->kind());
   if (0 == kind.compare(webrtc::MediaStreamTrackInterface::kVideoKind)) {
     VideoTrackImpl* impl = static_cast<VideoTrackImpl*>(track.get());
     errorOr = rtc_peerconnection_->AddTransceiver(impl->rtc_track());
@@ -690,9 +690,9 @@ scoped_refptr<RTCRtpSender> RTCPeerConnectionImpl::AddTrack(
 
   std::vector<std::string> stream_ids;
   for (auto id : streamIds) {
-    stream_ids.push_back(id.str());
+    stream_ids.push_back(to_std_string(id));
   }
-  std::string kind = track->kind().c_str();
+  std::string kind = to_std_string(track->kind());
   if (0 == kind.compare(webrtc::MediaStreamTrackInterface::kVideoKind)) {
     VideoTrackImpl* impl = static_cast<VideoTrackImpl*>(track.get());
     errorOr = rtc_peerconnection_->AddTrack(impl->rtc_track(), stream_ids);

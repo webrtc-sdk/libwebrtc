@@ -8,7 +8,7 @@ scoped_refptr<RTCSessionDescription> RTCSessionDescription::Create(
     SdpParseError* error) {
   webrtc::SdpParseError sdp_error;
   std::unique_ptr<webrtc::SessionDescriptionInterface> rtc_description(
-      webrtc::CreateSessionDescription(type.c_str(), sdp.c_str(), &sdp_error));
+      webrtc::CreateSessionDescription(to_std_string(type), to_std_string(sdp), &sdp_error));
   error->description = sdp_error.description.c_str();
   error->line = sdp_error.line.c_str();
   scoped_refptr<RTCSessionDescriptionImpl> session_description =

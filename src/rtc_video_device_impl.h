@@ -6,6 +6,7 @@
 #include "modules/video_capture/video_capture.h"
 #include "src/internal/vcm_capturer.h"
 #include "src/internal/video_capturer.h"
+#include "rtc_base/thread.h"
 
 #include <memory>
 
@@ -26,7 +27,7 @@ class RTCVideoCapturerImpl : public RTCVideoCapturer {
 
 class RTCVideoDeviceImpl : public RTCVideoDevice {
  public:
-  RTCVideoDeviceImpl();
+  RTCVideoDeviceImpl(rtc::Thread* signaling_thread);
 
  public:
   uint32_t NumberOfDevices() override;
@@ -44,6 +45,7 @@ class RTCVideoDeviceImpl : public RTCVideoDevice {
 
  private:
   std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> device_info_;
+  rtc::Thread* signaling_thread_ = nullptr;
 };
 
 }  // namespace libwebrtc

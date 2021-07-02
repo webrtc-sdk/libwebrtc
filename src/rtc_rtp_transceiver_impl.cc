@@ -41,7 +41,7 @@ const vector<string> RTCRtpTransceiverInitImpl::stream_ids() {
 void RTCRtpTransceiverInitImpl::set_stream_ids(const vector<string> ids) {
   std::vector<std::string> list;
   for (auto id : ids) {
-    list.push_back(id.str());
+    list.push_back(to_std_string(id));
   }
   rtp_transceiver_init_.stream_ids = list;
 }

@@ -14,14 +14,14 @@ RTCDtmfSenderImpl::dtmf_sender() {
 bool RTCDtmfSenderImpl::InsertDtmf(const string tones,
                                    int duration,
                                    int inter_tone_gap) {
-  return dtmf_sender_->InsertDtmf(tones.c_str(), duration, inter_tone_gap);
+  return dtmf_sender_->InsertDtmf(to_std_string(tones), duration, inter_tone_gap);
 }
 
 bool RTCDtmfSenderImpl::InsertDtmf(const string tones,
                                    int duration,
                                    int inter_tone_gap,
                                    int comma_delay) {
-  return dtmf_sender_->InsertDtmf(tones.c_str(), duration, inter_tone_gap,
+  return dtmf_sender_->InsertDtmf(to_std_string(tones), duration, inter_tone_gap,
                                   comma_delay);
 }
 

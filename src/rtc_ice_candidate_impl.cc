@@ -8,7 +8,7 @@ scoped_refptr<RTCIceCandidate> RTCIceCandidate::Create(const string sdp,
                                                        SdpParseError* error) {
   webrtc::SdpParseError sdp_error;
   std::unique_ptr<webrtc::IceCandidateInterface> rtc_candidate(
-      webrtc::CreateIceCandidate(sdp_mid.c_str(), sdp_mline_index, sdp.c_str(),
+      webrtc::CreateIceCandidate(to_std_string(sdp_mid), sdp_mline_index, to_std_string(sdp),
                                  &sdp_error));
   error->description = sdp_error.description.c_str();
   error->line = sdp_error.line.c_str();

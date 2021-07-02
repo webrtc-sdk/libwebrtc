@@ -60,12 +60,12 @@ const char* RTCMediaConstraints::kNumSimulcastLayers =
 
 void RTCMediaConstraintsImpl::AddMandatoryConstraint(const string key,
                                                      const string value) {
-  webrtc::MediaConstraints::Constraint constraint(key.c_str(), value.c_str());
+  webrtc::MediaConstraints::Constraint constraint(to_std_string(key), to_std_string(value));
   mandatory_.push_back(constraint);
 }
 void RTCMediaConstraintsImpl::AddOptionalConstraint(const string key,
                                                     const string value) {
-  webrtc::MediaConstraints::Constraint constraint(key.c_str(), value.c_str());
+  webrtc::MediaConstraints::Constraint constraint(to_std_string(key), to_std_string(value));
   optional_.push_back(constraint);
 }
 }  // namespace libwebrtc

@@ -72,7 +72,7 @@ const vector<string> RTCRtpSenderImpl::stream_ids() const {
 void RTCRtpSenderImpl::set_stream_ids(const vector<string> stream_ids) const {
   std::vector<std::string> list;
   for (auto id : stream_ids) {
-    list.push_back(id.c_str());
+    list.push_back(to_std_string(id));
   }
   rtp_sender_->SetStreams(list);
 }

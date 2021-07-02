@@ -117,7 +117,7 @@ scoped_refptr<RTCAudioDevice> RTCPeerConnectionFactoryImpl::GetAudioDevice() {
 scoped_refptr<RTCVideoDevice> RTCPeerConnectionFactoryImpl::GetVideoDevice() {
   if (!video_device_impl_)
     video_device_impl_ = scoped_refptr<RTCVideoDeviceImpl>(
-        new RefCountedObject<RTCVideoDeviceImpl>());
+        new RefCountedObject<RTCVideoDeviceImpl>(signaling_thread_));
 
   return video_device_impl_;
 }
@@ -140,13 +140,13 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource(
     scoped_refptr<RTCVideoSource> source =
         signaling_thread_->Invoke<scoped_refptr<RTCVideoSource>>(
             RTC_FROM_HERE, [this, capturer, video_source_label, constraints] {
-              return CreateVideoSource_s(capturer, video_source_label.c_str(),
+              return CreateVideoSource_s(capturer, to_std_string(video_source_label).c_str(),
                                          constraints);
             });
     return source;
   }
 
-  return CreateVideoSource_s(capturer, video_source_label.c_str(), constraints);
+  return CreateVideoSource_s(capturer, to_std_string(video_source_label).c_str(), constraints);
 }
 
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
@@ -168,7 +168,7 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
 scoped_refptr<RTCMediaStream> RTCPeerConnectionFactoryImpl::CreateStream(
     const string stream_id) {
   rtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_stream =
-      rtc_peerconnection_factory_->CreateLocalMediaStream(stream_id.c_str());
+      rtc_peerconnection_factory_->CreateLocalMediaStream(to_std_string(stream_id));
 
   scoped_refptr<MediaStreamImpl> stream = scoped_refptr<MediaStreamImpl>(
       new RefCountedObject<MediaStreamImpl>(rtc_stream));
@@ -184,7 +184,7 @@ scoped_refptr<RTCVideoTrack> RTCPeerConnectionFactoryImpl::CreateVideoTrack(
 
   rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_video_track =
       rtc_peerconnection_factory_->CreateVideoTrack(
-          track_id.c_str(), source_adapter->rtc_source_track());
+          to_std_string(track_id), source_adapter->rtc_source_track());
 
   scoped_refptr<VideoTrackImpl> video_track = scoped_refptr<VideoTrackImpl>(
       new RefCountedObject<VideoTrackImpl>(rtc_video_track));
@@ -209,7 +209,7 @@ scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
 
   rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track(
       rtc_peerconnection_factory_->CreateAudioTrack(
-          track_id.c_str(), source_impl->rtc_audio_source()));
+          to_std_string(track_id), source_impl->rtc_audio_source()));
 
   scoped_refptr<AudioTrackImpl> track = scoped_refptr<AudioTrackImpl>(
       new RefCountedObject<AudioTrackImpl>(audio_track));
