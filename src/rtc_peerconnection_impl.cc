@@ -21,9 +21,9 @@ using rtc::Thread;
 static std::map<libwebrtc::RtcpMuxPolicy,
                 webrtc::PeerConnectionInterface::RtcpMuxPolicy>
     rtcp_mux_policy_map = {
-        {libwebrtc::kRtcpMuxPolicyNegotiate,
+        {libwebrtc::RtcpMuxPolicy::kRtcpMuxPolicyNegotiate,
          webrtc::PeerConnectionInterface::kRtcpMuxPolicyNegotiate},
-        {libwebrtc::kRtcpMuxPolicyRequire,
+        {libwebrtc::RtcpMuxPolicy::kRtcpMuxPolicyRequire,
          webrtc::PeerConnectionInterface::kRtcpMuxPolicyRequire}};
 
 static std::map<libwebrtc::SdpSemantics, webrtc::SdpSemantics>
@@ -368,7 +368,8 @@ bool RTCPeerConnectionImpl::Initialize() {
     }
   }
 
-  config.enable_dtls_srtp = configuration_.srtp_type == kDTLS_SRTP;
+  config.enable_dtls_srtp =
+      configuration_.srtp_type == MediaSecurityType::kDTLS_SRTP;
 
   config.sdp_semantics = sdp_semantics_map[configuration_.sdp_semantics];
   config.candidate_network_policy =
@@ -390,7 +391,8 @@ bool RTCPeerConnectionImpl::Initialize() {
   CopyConstraintsIntoRtcConfiguration(media_constraints, &config);
 
   webrtc::PeerConnectionFactoryInterface::Options options;
-  options.disable_encryption = (configuration_.srtp_type == kSRTP_None);
+  options.disable_encryption =
+      (configuration_.srtp_type == MediaSecurityType::kSRTP_None);
   // options.network_ignore_mask |= ADAPTER_TYPE_CELLULAR;
   rtc_peerconnection_factory_->SetOptions(options);
 
