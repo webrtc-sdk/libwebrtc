@@ -2,6 +2,7 @@
 #define LIB_WEBRTC_MEDIA_SESSION_FACTORY_IMPL_HXX
 
 #include "rtc_audio_device_impl.h"
+#include "rtc_desktop_device_impl.h"
 #include "rtc_peerconnection.h"
 #include "rtc_peerconnection_factory.h"
 #include "rtc_video_device_impl.h"
@@ -44,6 +45,8 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
       const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) override;
 
+  virtual scoped_refptr<RTCDesktopDevice> GetDesktopDevice() override;
+
   virtual scoped_refptr<RTCAudioTrack> CreateAudioTrack(
       scoped_refptr<RTCAudioSource> source,
       const string track_id) override;
@@ -79,6 +82,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
   scoped_refptr<AudioDeviceImpl> audio_device_impl_;
   scoped_refptr<RTCVideoDeviceImpl> video_device_impl_;
+  scoped_refptr<DesktopDeviceImpl> desktop_device_impl_;
   std::list<scoped_refptr<RTCPeerConnection>> peerconnections_;
   std::unique_ptr<webrtc::TaskQueueFactory> task_queue_factory_;
 };
