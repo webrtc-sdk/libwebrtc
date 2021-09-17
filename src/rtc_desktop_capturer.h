@@ -45,9 +45,6 @@ class RTCDesktopCapturer : public webrtc::internal::VideoCapturer,
       std::unique_ptr<webrtc::DesktopFrame> frame) override;
   virtual void OnMessage(rtc::Message* msg) override;
 
- protected:
-  virtual bool GetPreferredFourccs(std::vector<uint32_t>* fourccs);
-
  private:
   std::unique_ptr<webrtc::DesktopCapturer> capturer;
   rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer_;

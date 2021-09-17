@@ -2,7 +2,7 @@
 
 namespace libwebrtc {
 
-    enum { kCaptureDelay = 33 };
+    enum { kCaptureDelay = 33, kCaptureMessageId = 1000 };
 
 RTCDesktopCapturer::RTCDesktopCapturer(
     std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer)
@@ -13,7 +13,6 @@ RTCDesktopCapturer ::~RTCDesktopCapturer() {}
 
 CaptureState RTCDesktopCapturer::Start(
     const cricket::VideoFormat& capture_format) {
-
   capture_state_ = CS_RUNNING;
   capturer->Start(this);
   CaptureFrame();
@@ -28,22 +27,14 @@ bool RTCDesktopCapturer::IsRunning() {
   return capture_state_ == CS_RUNNING;
 }
 
-bool RTCDesktopCapturer::GetPreferredFourccs(std::vector<uint32_t>* fourccs) {
-  fourccs->push_back(cricket::FOURCC_I420);
-  fourccs->push_back(cricket::FOURCC_MJPG);
-  return true;
-}
-
 void RTCDesktopCapturer::OnCaptureResult(
     webrtc::DesktopCapturer::Result result,
     std::unique_ptr<webrtc::DesktopFrame> frame) {
   if (result != webrtc::DesktopCapturer::Result::SUCCESS) {
     return;
   }
-
   int width = frame->size().width();
   int height = frame->size().height();
-
   if (!i420_buffer_ || !i420_buffer_.get() ||
       i420_buffer_->width() * i420_buffer_->height() < width * height) {
     i420_buffer_ = webrtc::I420Buffer::Create(width, height);
@@ -58,13 +49,16 @@ void RTCDesktopCapturer::OnCaptureResult(
 }
 
 void RTCDesktopCapturer::OnMessage(rtc::Message* msg) {
-  if (msg->message_id == 0) {
+  if (msg->message_id == kCaptureMessageId) {
     CaptureFrame();
   }
 }
 
 void RTCDesktopCapturer::CaptureFrame() {
-  capturer->CaptureFrame();
-  rtc::Thread::Current()->PostDelayed(RTC_FROM_HERE, kCaptureDelay, this, 0);
+  if (capture_state_ == CS_RUNNING) {
+    capturer->CaptureFrame();
+    rtc::Thread::Current()->PostDelayed(RTC_FROM_HERE, kCaptureDelay, this,
+                                        kCaptureMessageId);
+  }
 }
 }  // namespace libwebrtc
