@@ -80,7 +80,7 @@ void RTCRtpEncodingParametersImpl::set_scale_resolution_down_by(double value) {
 
 const string RTCRtpEncodingParametersImpl::scalability_mode() {
   auto temp = rtp_encoding_parameters_.scalability_mode.value();
-  return temp.c_str();
+  return temp;
 }
 
 void RTCRtpEncodingParametersImpl::set_scalability_mode(const string mode) {
@@ -97,7 +97,7 @@ void RTCRtpEncodingParametersImpl::set_active(bool value) {
 
 const string RTCRtpEncodingParametersImpl::rid() {
   auto temp = rtp_encoding_parameters_.rid;
-  return temp.c_str();
+  return temp;
 }
 
 void RTCRtpEncodingParametersImpl::set_rid(const string rid) {
@@ -135,7 +135,7 @@ webrtc::RtpParameters RTCRtpParametersImpl::rtp_parameters() {
 
 const string RTCRtpParametersImpl::transaction_id() {
   auto temp = rtp_parameters_.transaction_id;
-  return temp.c_str();
+  return temp;
 }
 
 void RTCRtpParametersImpl::set_transaction_id(const string id) {
@@ -144,7 +144,7 @@ void RTCRtpParametersImpl::set_transaction_id(const string id) {
 
 const string RTCRtpParametersImpl::mid() {
   auto temp = rtp_parameters_.mid;
-  return temp.c_str();
+  return temp;
 }
 void RTCRtpParametersImpl::set_mid(const string mid) {
   rtp_parameters_.mid = to_std_string(mid);
@@ -152,7 +152,7 @@ void RTCRtpParametersImpl::set_mid(const string mid) {
 
 const vector<scoped_refptr<RTCRtpCodecParameters>>
 RTCRtpParametersImpl::codecs() {
-  vector<scoped_refptr<RTCRtpCodecParameters>> vec;
+  std::vector<scoped_refptr<RTCRtpCodecParameters>> vec;
   for (auto item : rtp_parameters_.codecs) {
     vec.push_back(new RefCountedObject<RTCRtpCodecParametersImpl>(item));
   }
@@ -162,7 +162,7 @@ RTCRtpParametersImpl::codecs() {
 void RTCRtpParametersImpl::set_codecs(
     const vector<scoped_refptr<RTCRtpCodecParameters>> codecs) {
   std::vector<webrtc::RtpCodecParameters> list;
-  for (auto item : codecs) {
+  for (auto item : codecs.std_vector()) {
     auto impl = static_cast<RTCRtpCodecParametersImpl*>(item.get());
     list.push_back(impl->rtp_codec_parameters());
   }
@@ -171,7 +171,7 @@ void RTCRtpParametersImpl::set_codecs(
 
 const vector<scoped_refptr<RTCRtpExtension>>
 RTCRtpParametersImpl::header_extensions() {
-  vector<scoped_refptr<RTCRtpExtension>> vec;
+  std::vector<scoped_refptr<RTCRtpExtension>> vec;
   for (auto item : rtp_parameters_.header_extensions) {
     vec.push_back(new RefCountedObject<RTCRtpExtensionImpl>(item));
   }
@@ -181,7 +181,7 @@ RTCRtpParametersImpl::header_extensions() {
 void RTCRtpParametersImpl::set_header_extensions(
     vector<scoped_refptr<RTCRtpExtension>> header_extensions) {
   std::vector<webrtc::RtpExtension> list;
-  for (auto item : header_extensions) {
+  for (auto item : header_extensions.std_vector()) {
     auto impl = static_cast<RTCRtpExtensionImpl*>(item.get());
     list.push_back(impl->rtp_extension());
   }
@@ -190,7 +190,7 @@ void RTCRtpParametersImpl::set_header_extensions(
 
 const vector<scoped_refptr<RTCRtpEncodingParameters>>
 RTCRtpParametersImpl::encodings() {
-  vector<scoped_refptr<RTCRtpEncodingParameters>> vec;
+  std::vector<scoped_refptr<RTCRtpEncodingParameters>> vec;
   for (auto item : rtp_parameters_.encodings) {
     vec.push_back(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
   }
@@ -200,7 +200,7 @@ RTCRtpParametersImpl::encodings() {
 void RTCRtpParametersImpl::set_encodings(
     vector<scoped_refptr<RTCRtpEncodingParameters>> encodings) {
   std::vector<webrtc::RtpEncodingParameters> list;
-  for (auto item : encodings) {
+  for (auto item : encodings.std_vector()) {
     auto impl = static_cast<RTCRtpEncodingParametersImpl*>(item.get());
     list.push_back(impl->rtp_parameters());
   }
@@ -239,7 +239,7 @@ void RTCRtcpParametersImpl::set_ssrc(uint32_t value) {
 }
 
 const string RTCRtcpParametersImpl::cname() {
-  return rtcp_parameters_.cname.c_str();
+  return rtcp_parameters_.cname;
 }
 void RTCRtcpParametersImpl::set_cname(const string cname) {
   rtcp_parameters_.cname = to_std_string(cname);
@@ -280,7 +280,7 @@ bool RTCRtpExtensionImpl::operator==(scoped_refptr<RTCRtpExtension> o) const {
 }
 
 const string RTCRtpExtensionImpl::uri() {
-  return rtp_extension_.uri.c_str();
+  return rtp_extension_.uri;
 }
 
 void RTCRtpExtensionImpl::set_uri(const string uri) {
@@ -309,7 +309,7 @@ webrtc::RtpExtension RTCRtpExtensionImpl::rtp_extension() {
 
 const string RTCRtpExtensionImpl::ToString() const {
   auto temp = rtp_extension_.ToString();
-  return temp.c_str();
+  return temp;
 }
 
 RTCRtpCodecParametersImpl::RTCRtpCodecParametersImpl(
@@ -317,11 +317,11 @@ RTCRtpCodecParametersImpl::RTCRtpCodecParametersImpl(
     : rtp_codec_parameters_(rtp_codec_parameters) {}
 
 const string RTCRtpCodecParametersImpl::mime_type() const {
-  return rtp_codec_parameters_.mime_type().c_str();
+  return rtp_codec_parameters_.mime_type();
 }
 
 const string RTCRtpCodecParametersImpl::name() {
-  return rtp_codec_parameters_.name.c_str();
+  return rtp_codec_parameters_.name;
 }
 
 void RTCRtpCodecParametersImpl::set_name(const string name) {
@@ -378,7 +378,7 @@ void RTCRtpCodecParametersImpl::set_ptime(int value) {
 
 const vector<scoped_refptr<RTCRtcpFeedback>>
 RTCRtpCodecParametersImpl::rtcp_feedback() {
-  vector<scoped_refptr<RTCRtcpFeedback>> vec;
+  std::vector<scoped_refptr<RTCRtcpFeedback>> vec;
   for (auto item : rtp_codec_parameters_.rtcp_feedback) {
     vec.push_back(new RefCountedObject<RTCRtcpFeedbackImpl>(item));
   }
@@ -388,7 +388,7 @@ RTCRtpCodecParametersImpl::rtcp_feedback() {
 void RTCRtpCodecParametersImpl::set_rtcp_feedback(
     const vector<scoped_refptr<RTCRtcpFeedback>> rtcp_feedbacks) {
   std::vector<webrtc::RtcpFeedback> rtcp_feedback;
-  for (scoped_refptr<RTCRtcpFeedback> item : rtcp_feedbacks) {
+  for (scoped_refptr<RTCRtcpFeedback> item : rtcp_feedbacks.std_vector()) {
     auto impl = static_cast<RTCRtcpFeedbackImpl*>(item.get());
     rtcp_feedback.push_back(impl->rtcp_feedback());
   }
@@ -397,7 +397,7 @@ void RTCRtpCodecParametersImpl::set_rtcp_feedback(
 
 const vector<std::pair<string, string>>
 RTCRtpCodecParametersImpl::parameters() {
-  vector<std::pair<string, string>> els{};
+  std::vector<std::pair<string, string>> els{};
   for (auto item : rtp_codec_parameters_.parameters) {
     els.push_back(
         std::pair<string, string>{item.first.c_str(), item.second.c_str()});
@@ -405,9 +405,10 @@ RTCRtpCodecParametersImpl::parameters() {
   return els;
 }
 
-void RTCRtpCodecParametersImpl::set_parameters(const map<string, string> map) {
+void RTCRtpCodecParametersImpl::set_parameters(
+    const map<string, string> parameters_in) {
   std::map<std::string, std::string> parameters;
-  for (auto item : map) {
+  for (auto item : parameters_in) {
     parameters[to_std_string(item.first)] = to_std_string(item.second);
   }
   rtp_codec_parameters_.parameters = parameters;

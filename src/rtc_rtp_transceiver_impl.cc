@@ -31,7 +31,7 @@ void RTCRtpTransceiverInitImpl::set_direction(
 }
 
 const vector<string> RTCRtpTransceiverInitImpl::stream_ids() {
-  vector<string> vec;
+  std::vector<string> vec;
   for (std::string item : rtp_transceiver_init_.stream_ids) {
     vec.push_back(item.c_str());
   }
@@ -40,7 +40,7 @@ const vector<string> RTCRtpTransceiverInitImpl::stream_ids() {
 
 void RTCRtpTransceiverInitImpl::set_stream_ids(const vector<string> ids) {
   std::vector<std::string> list;
-  for (auto id : ids) {
+  for (auto id : ids.std_vector()) {
     list.push_back(to_std_string(id));
   }
   rtp_transceiver_init_.stream_ids = list;
@@ -48,7 +48,7 @@ void RTCRtpTransceiverInitImpl::set_stream_ids(const vector<string> ids) {
 
 const vector<scoped_refptr<RTCRtpEncodingParameters>>
 RTCRtpTransceiverInitImpl::send_encodings() {
-  vector<scoped_refptr<RTCRtpEncodingParameters>> vec;
+  std::vector<scoped_refptr<RTCRtpEncodingParameters>> vec;
   for (auto item : rtp_transceiver_init_.send_encodings) {
     vec.push_back(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
   }
@@ -58,7 +58,7 @@ RTCRtpTransceiverInitImpl::send_encodings() {
 void RTCRtpTransceiverInitImpl::set_send_encodings(
     const vector<scoped_refptr<RTCRtpEncodingParameters>> send_encodings) {
   std::vector<webrtc::RtpEncodingParameters> list;
-  for (auto param : send_encodings) {
+  for (auto param : send_encodings.std_vector()) {
     auto impl = static_cast<RTCRtpEncodingParametersImpl*>(param.get());
     list.push_back(impl->rtp_parameters());
   }
@@ -108,7 +108,7 @@ const string RTCRtpTransceiverImpl::SetDirectionWithError(
     return "";
   } else {
     std::string val = error.message();
-    return val.c_str();
+    return val;
   }
 }
 
@@ -130,7 +130,7 @@ RTCRtpTransceiverDirection RTCRtpTransceiverImpl::fired_direction() const {
 
 const string RTCRtpTransceiverImpl::StopStandard() {
   std::string val = rtp_transceiver_->StopStandard().message();
-  return val.c_str();
+  return val;
 }
 
 void RTCRtpTransceiverImpl::StopInternal() {
@@ -140,7 +140,7 @@ void RTCRtpTransceiverImpl::StopInternal() {
 const string RTCRtpTransceiverImpl::mid() const {
   auto temp = rtp_transceiver_->mid();
   if (temp.has_value()) {
-    return temp.value().c_str();
+    return temp.value();
   }
   return "";
 }

@@ -12,20 +12,16 @@
 #endif
 
 #include "base/fixed_size_function.h"
-#include "base/string.h"
-#include "base/inlined_vector.h"
+#include "base/portable.h"
 #include "base/refcount.h"
 #include "base/scoped_ref_ptr.h"
-
-#include <vector>
-#include <map>
 
 namespace libwebrtc {
 
 enum { kMaxIceServerSize = 8 };
 
-template <typename T>
-using vector = bsp::inlined_vector<T, 16, true>;
+//template <typename T>
+//using vector = bsp::inlined_vector<T, 16, true>;
 
 template <typename Key, typename T>
 using map = std::map<Key, T>;
@@ -33,6 +29,14 @@ using map = std::map<Key, T>;
 enum class MediaSecurityType { kSRTP_None = 0, kSDES_SRTP, kDTLS_SRTP };
 
 enum class RTCMediaType { ANY, AUDIO, VIDEO, DATA };
+
+using string = portable::string;
+
+//template <typename Key, typename T>
+//using map = portable::map<Key, T>;
+
+template <typename T>
+using vector = portable::vector<T>;
 
 struct IceServer {
   string uri;

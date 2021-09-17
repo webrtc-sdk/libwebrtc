@@ -191,7 +191,7 @@ void RTCPeerConnectionImpl::OnAddTrack(
     const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>&
         streams) {
   if (nullptr != observer_) {
-    vector<scoped_refptr<RTCMediaStream>> out_streams;
+    std::vector<scoped_refptr<RTCMediaStream>> out_streams;
     for (auto item : streams) {
       out_streams.push_back(new RefCountedObject<MediaStreamImpl>(item));
     }
@@ -691,7 +691,7 @@ scoped_refptr<RTCRtpSender> RTCPeerConnectionImpl::AddTrack(
   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpSenderInterface>> errorOr;
 
   std::vector<std::string> stream_ids;
-  for (auto id : streamIds) {
+  for (auto id : streamIds.std_vector()) {
     stream_ids.push_back(to_std_string(id));
   }
   std::string kind = to_std_string(track->kind());
@@ -717,7 +717,7 @@ bool RTCPeerConnectionImpl::RemoveTrack(scoped_refptr<RTCRtpSender> render) {
 }
 
 vector<scoped_refptr<RTCRtpSender>> RTCPeerConnectionImpl::senders() {
-  vector<scoped_refptr<RTCRtpSender>> vec;
+  std::vector<scoped_refptr<RTCRtpSender>> vec;
   for (auto item : rtc_peerconnection_->GetSenders()) {
     vec.push_back(new RefCountedObject<RTCRtpSenderImpl>(item));
   }
@@ -725,7 +725,7 @@ vector<scoped_refptr<RTCRtpSender>> RTCPeerConnectionImpl::senders() {
 }
 
 vector<scoped_refptr<RTCRtpTransceiver>> RTCPeerConnectionImpl::transceivers() {
-  vector<scoped_refptr<RTCRtpTransceiver>> vec;
+  std::vector<scoped_refptr<RTCRtpTransceiver>> vec;
   for (auto item : rtc_peerconnection_->GetTransceivers()) {
     vec.push_back(new RefCountedObject<RTCRtpTransceiverImpl>(item));
   }
@@ -733,7 +733,7 @@ vector<scoped_refptr<RTCRtpTransceiver>> RTCPeerConnectionImpl::transceivers() {
 }
 
 vector<scoped_refptr<RTCRtpReceiver>> RTCPeerConnectionImpl::receivers() {
-  vector<scoped_refptr<RTCRtpReceiver>> vec;
+  std::vector<scoped_refptr<RTCRtpReceiver>> vec;
   for (auto item : rtc_peerconnection_->GetReceivers()) {
     vec.push_back(new RefCountedObject<RTCRtpReceiverImpl>(item));
   }
@@ -798,15 +798,15 @@ void WebRTCStatsObserver::OnComplete(const webrtc::StatsReports& reports) {
 
     kv = report->FindValue(webrtc::StatsReport::kStatsValueNameTrackId);
     if (kv) {
-      stats.msid = kv->static_string_val();
+      stats.msid = string(kv->static_string_val());
     }
 
     kv = report->FindValue(webrtc::StatsReport::kStatsValueNameMediaType);
     if (kv) {
-      stats.kind = kv->static_string_val();
+      stats.kind = string(kv->static_string_val());
     }
 
-    stats.direction = direction_.c_str();
+    stats.direction = direction_;
   }
 
   if (observer_)

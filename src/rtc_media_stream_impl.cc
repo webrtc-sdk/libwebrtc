@@ -24,8 +24,8 @@ MediaStreamImpl::MediaStreamImpl(
         new RefCountedObject<VideoTrackImpl>(track));
     video_tracks_.push_back(video_track);
   }
-  id_ = rtc_media_stream_->id().c_str();
-  label_ = rtc_media_stream_->id().c_str();
+  id_ = rtc_media_stream_->id();
+  label_ = rtc_media_stream_->id();
 }
 
 MediaStreamImpl::~MediaStreamImpl() {
@@ -67,9 +67,11 @@ bool MediaStreamImpl::RemoveTrack(scoped_refptr<RTCAudioTrack> track) {
 bool MediaStreamImpl::RemoveTrack(scoped_refptr<RTCVideoTrack> track) {
   VideoTrackImpl* track_impl = static_cast<VideoTrackImpl*>(track.get());
   if (rtc_media_stream_->RemoveTrack(track_impl->rtc_track())) {
+
     auto it = std::find(video_tracks_.begin(), video_tracks_.end(), track);
     if (it != video_tracks_.end())
       video_tracks_.erase(it);
+
     return true;
   }
   return false;
@@ -84,7 +86,7 @@ vector<scoped_refptr<RTCVideoTrack>> MediaStreamImpl::video_tracks() {
 }
 
 vector<scoped_refptr<RTCMediaTrack>> MediaStreamImpl::tracks() {
-  vector<scoped_refptr<RTCMediaTrack>> tracks;
+  std::vector<scoped_refptr<RTCMediaTrack>> tracks;
   for (auto track : audio_tracks_) {
     tracks.push_back(track);
   }
@@ -97,7 +99,7 @@ vector<scoped_refptr<RTCMediaTrack>> MediaStreamImpl::tracks() {
 scoped_refptr<RTCAudioTrack> MediaStreamImpl::FindAudioTrack(
     const string track_id) {
   for (auto track : audio_tracks_) {
-    if (track->id() == track_id)
+    if (track->id().std_string() == track_id.std_string())
       return track;
   }
 
@@ -107,7 +109,7 @@ scoped_refptr<RTCAudioTrack> MediaStreamImpl::FindAudioTrack(
 scoped_refptr<RTCVideoTrack> MediaStreamImpl::FindVideoTrack(
     const string track_id) {
   for (auto track : video_tracks_) {
-    if (track->id() == track_id)
+    if (track->id().std_string() == track_id.std_string())
       return track;
   }
 

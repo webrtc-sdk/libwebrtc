@@ -26,7 +26,7 @@ bool RTCDtmfSenderImpl::InsertDtmf(const string tones,
 }
 
 const string RTCDtmfSenderImpl::tones() const {
-  return dtmf_sender_->tones().c_str();
+  return dtmf_sender_->tones();
 }
 
 void RTCDtmfSenderImpl::OnToneChange(const std::string& tone,

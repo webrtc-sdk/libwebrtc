@@ -10,8 +10,8 @@ scoped_refptr<RTCIceCandidate> RTCIceCandidate::Create(const string sdp,
   std::unique_ptr<webrtc::IceCandidateInterface> rtc_candidate(
       webrtc::CreateIceCandidate(to_std_string(sdp_mid), sdp_mline_index, to_std_string(sdp),
                                  &sdp_error));
-  error->description = sdp_error.description.c_str();
-  error->line = sdp_error.line.c_str();
+  error->description = sdp_error.description;
+  error->line = sdp_error.line;
   scoped_refptr<RTCIceCandidate> candidate = scoped_refptr<RTCIceCandidateImpl>(
       new RefCountedObject<RTCIceCandidateImpl>(std::move(rtc_candidate)));
 
@@ -26,11 +26,11 @@ RTCIceCandidateImpl::RTCIceCandidateImpl(
 
 const string RTCIceCandidateImpl::candidate() const {
   candidate_->ToString((std::string*)&sdp_);
-  return sdp_.c_str();
+  return sdp_;
 }
 
 const string RTCIceCandidateImpl::sdp_mid() const {
-  return sdp_mid_.c_str();
+  return sdp_mid_;
 }
 
 int RTCIceCandidateImpl::sdp_mline_index() const {
@@ -40,7 +40,7 @@ int RTCIceCandidateImpl::sdp_mline_index() const {
 bool RTCIceCandidateImpl::ToString(string& out) {
   std::string tmp;
   if (candidate_->ToString(&tmp)) {
-    out = tmp.c_str();
+    out = tmp;
     return true;
   }
   return false;

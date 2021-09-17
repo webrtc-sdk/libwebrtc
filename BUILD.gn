@@ -47,14 +47,13 @@ rtc_shared_library("libwebrtc"){
 
     "include/base/atomicops.h",
     "include/base/fixed_size_function.h",
-    "include/base/inlined_vector.h",
     "include/base/refcount.h",
     "include/base/refcountedobject.h",
     "include/base/scoped_ref_ptr.h",
-    "include/base/string.h",
+    "include/base/portable.h",
 
-    "src/base/string.cc",
     "src/libwebrtc.cc",
+    "src/base/portable.cc",
     "src/rtc_audio_device_impl.h",
     "src/rtc_audio_device_impl.cc",
     "src/rtc_audio_source_impl.h",

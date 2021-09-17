@@ -82,8 +82,8 @@ class MediaStreamImpl : public RTCMediaStream,
  private:
   rtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_media_stream_;
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> rtc_peerconnection_;
-  vector<scoped_refptr<RTCAudioTrack>> audio_tracks_;
-  vector<scoped_refptr<RTCVideoTrack>> video_tracks_;
+  std::vector<scoped_refptr<RTCAudioTrack>> audio_tracks_;
+  std::vector<scoped_refptr<RTCVideoTrack>> video_tracks_;
   RTCPeerConnectionObserver* observer_ = nullptr;
   string label_, id_;
 };

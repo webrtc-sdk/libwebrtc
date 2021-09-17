@@ -9,8 +9,8 @@ scoped_refptr<RTCSessionDescription> RTCSessionDescription::Create(
   webrtc::SdpParseError sdp_error;
   std::unique_ptr<webrtc::SessionDescriptionInterface> rtc_description(
       webrtc::CreateSessionDescription(to_std_string(type), to_std_string(sdp), &sdp_error));
-  error->description = sdp_error.description.c_str();
-  error->line = sdp_error.line.c_str();
+  error->description = sdp_error.description;
+  error->line = sdp_error.line;
   scoped_refptr<RTCSessionDescriptionImpl> session_description =
       scoped_refptr<RTCSessionDescriptionImpl>(
           new RefCountedObject<RTCSessionDescriptionImpl>(
@@ -24,7 +24,7 @@ RTCSessionDescriptionImpl::RTCSessionDescriptionImpl(
 
 const string RTCSessionDescriptionImpl::sdp() const {
   description_->ToString((std::string*)&sdp_);
-  return sdp_.c_str();
+  return sdp_;
 }
 
 RTCSessionDescription::SdpType RTCSessionDescriptionImpl::GetType() {
@@ -33,13 +33,13 @@ RTCSessionDescription::SdpType RTCSessionDescriptionImpl::GetType() {
 
 const string RTCSessionDescriptionImpl::type() {
   type_ = description_->type();
-  return type_.c_str();
+  return type_;
 }
 
 bool RTCSessionDescriptionImpl::ToString(string& out) {
   std::string tmp;
   if (description_->ToString(&tmp)) {
-    out = tmp.c_str();
+    out = tmp;
     return true;
   }
   return false;

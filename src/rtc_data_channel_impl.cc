@@ -6,7 +6,7 @@ RTCDataChannelImpl::RTCDataChannelImpl(
     rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel)
     : rtc_data_channel_(rtc_data_channel), crit_sect_(new webrtc::Mutex()) {
   rtc_data_channel_->RegisterObserver(this);
-  label_ = rtc_data_channel_->label().c_str();
+  label_ = rtc_data_channel_->label();
 }
 
 void RTCDataChannelImpl::Send(const string data, bool binary /*= false*/) {

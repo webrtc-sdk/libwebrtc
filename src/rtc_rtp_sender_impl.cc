@@ -12,11 +12,11 @@ RTCRtpSenderImpl::RTCRtpSenderImpl(
     : rtp_sender_(rtp_sender) {}
 
 bool RTCRtpSenderImpl::set_track(scoped_refptr<RTCMediaTrack> track) {
-  if (track->kind() == string(webrtc::MediaStreamTrackInterface::kVideoKind)) {
+  if (std::string(webrtc::MediaStreamTrackInterface::kVideoKind) == track->kind().std_string()) {
     VideoTrackImpl* impl = static_cast<VideoTrackImpl*>(track.get());
     return rtp_sender_->SetTrack(impl->rtc_track());
-  } else if (track->kind() ==
-             string(webrtc::MediaStreamTrackInterface::kAudioKind)) {
+  } else if (std::string(webrtc::MediaStreamTrackInterface::kAudioKind) ==
+             track->kind().std_string()) {
     AudioTrackImpl* impl = static_cast<AudioTrackImpl*>(track.get());
     return rtp_sender_->SetTrack(impl->rtc_track());
   }
@@ -58,11 +58,11 @@ RTCMediaType RTCRtpSenderImpl::media_type() const {
 }
 
 const string RTCRtpSenderImpl::id() const {
-  return rtp_sender_->id().c_str();
+  return rtp_sender_->id();
 }
 
 const vector<string> RTCRtpSenderImpl::stream_ids() const {
-  vector<string> vec;
+  std::vector<string> vec;
   for (std::string item : rtp_sender_->stream_ids()) {
     vec.push_back(item.c_str());
   }
@@ -71,7 +71,7 @@ const vector<string> RTCRtpSenderImpl::stream_ids() const {
 
 void RTCRtpSenderImpl::set_stream_ids(const vector<string> stream_ids) const {
   std::vector<std::string> list;
-  for (auto id : stream_ids) {
+  for (auto id : stream_ids.std_vector()) {
     list.push_back(to_std_string(id));
   }
   rtp_sender_->SetStreams(list);
@@ -79,7 +79,7 @@ void RTCRtpSenderImpl::set_stream_ids(const vector<string> stream_ids) const {
 
 const vector<scoped_refptr<RTCRtpEncodingParameters>>
 RTCRtpSenderImpl::init_send_encodings() const {
-  vector<scoped_refptr<RTCRtpEncodingParameters>> vec;
+  std::vector<scoped_refptr<RTCRtpEncodingParameters>> vec;
   for (webrtc::RtpEncodingParameters item :
        rtp_sender_->init_send_encodings()) {
     vec.push_back(new RefCountedObject<RTCRtpEncodingParametersImpl>(item));
