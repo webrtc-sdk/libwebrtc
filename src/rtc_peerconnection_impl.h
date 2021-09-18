@@ -80,6 +80,13 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   virtual scoped_refptr<RTCRtpTransceiver> AddTransceiver(
       scoped_refptr<RTCMediaTrack> track) override;
 
+  virtual scoped_refptr<RTCRtpTransceiver> AddTransceiver(
+      RTCMediaType media_type) override;
+
+  virtual scoped_refptr<RTCRtpTransceiver> AddTransceiver(
+      RTCMediaType media_type,
+      scoped_refptr<RTCRtpTransceiverInit> init) override;
+
   virtual scoped_refptr<RTCRtpSender> AddTrack(
       scoped_refptr<RTCMediaTrack> track,
       vector<string> streamIds) override;
@@ -107,7 +114,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
 
   virtual scoped_refptr<RTCDataChannel> CreateDataChannel(
       const string label,
-      const RTCDataChannelInit* dataChannelDict) override;
+      RTCDataChannelInit* dataChannelDict) override;
 
   virtual bool GetStats(const RTCAudioTrack* track,
                         scoped_refptr<TrackStatsObserver> observer) override;

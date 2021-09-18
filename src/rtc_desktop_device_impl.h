@@ -14,13 +14,11 @@ class DesktopDeviceImpl : public RTCDesktopDevice {
  public:
   DesktopDeviceImpl();
 
-  scoped_refptr<RTCVideoCapturer> CreateScreenCapturer(
-      const DesktopCaptureOptions& options) override;
+  scoped_refptr<RTCVideoCapturer> CreateScreenCapturer() override;
 
-  scoped_refptr<RTCVideoCapturer> CreateWindowCapturer(
-      const DesktopCaptureOptions& options) override;
+  scoped_refptr<RTCVideoCapturer> CreateWindowCapturer() override;
 
-  DesktopCaptureOptions CreateOptions() override;
+  webrtc::DesktopCaptureOptions CreateOptions();
 };
 
 }  // namespace libwebrtc

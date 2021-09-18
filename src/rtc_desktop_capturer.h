@@ -33,18 +33,15 @@ class RTCDesktopCapturer : public webrtc::internal::VideoCapturer,
  public:
   RTCDesktopCapturer(std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer);
   ~RTCDesktopCapturer();
-
   void CaptureFrame();
   virtual CaptureState Start(
       const cricket::VideoFormat& capture_format);
   virtual void Stop();
   virtual bool IsRunning();
-  virtual bool IsScreencast() const { return true; }
   virtual void OnCaptureResult(
       webrtc::DesktopCapturer::Result result,
       std::unique_ptr<webrtc::DesktopFrame> frame) override;
   virtual void OnMessage(rtc::Message* msg) override;
-
  private:
   std::unique_ptr<webrtc::DesktopCapturer> capturer;
   rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer_;
