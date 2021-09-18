@@ -41,7 +41,10 @@ class RTCVideoDeviceImpl : public RTCVideoDevice {
                         uint32_t productUniqueIdUTF8Length = 0) override;
 
   scoped_refptr<RTCVideoCapturer> Create(const char* name,
-                                         uint32_t index) override;
+                                         uint32_t index,
+                                         size_t width,
+                                         size_t height,
+                                         size_t target_fps) override;
 
  private:
   std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> device_info_;

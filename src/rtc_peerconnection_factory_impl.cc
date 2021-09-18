@@ -132,6 +132,15 @@ scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
   return source;
 }
 
+scoped_refptr<RTCDesktopDevice>
+RTCPeerConnectionFactoryImpl::GetDesktopDevice() {
+  if (!desktop_device_impl_) {
+    desktop_device_impl_ = scoped_refptr<DesktopDeviceImpl>(
+        new RefCountedObject<DesktopDeviceImpl>());
+  }
+  return desktop_device_impl_;
+}
+
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource(
     scoped_refptr<RTCVideoCapturer> capturer,
     const string video_source_label,
@@ -140,13 +149,15 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource(
     scoped_refptr<RTCVideoSource> source =
         signaling_thread_->Invoke<scoped_refptr<RTCVideoSource>>(
             RTC_FROM_HERE, [this, capturer, video_source_label, constraints] {
-              return CreateVideoSource_s(capturer, to_std_string(video_source_label).c_str(),
-                                         constraints);
+              return CreateVideoSource_s(
+                  capturer, to_std_string(video_source_label).c_str(),
+                  constraints);
             });
     return source;
   }
 
-  return CreateVideoSource_s(capturer, to_std_string(video_source_label).c_str(), constraints);
+  return CreateVideoSource_s(
+      capturer, to_std_string(video_source_label).c_str(), constraints);
 }
 
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
@@ -168,7 +179,8 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
 scoped_refptr<RTCMediaStream> RTCPeerConnectionFactoryImpl::CreateStream(
     const string stream_id) {
   rtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_stream =
-      rtc_peerconnection_factory_->CreateLocalMediaStream(to_std_string(stream_id));
+      rtc_peerconnection_factory_->CreateLocalMediaStream(
+          to_std_string(stream_id));
 
   scoped_refptr<MediaStreamImpl> stream = scoped_refptr<MediaStreamImpl>(
       new RefCountedObject<MediaStreamImpl>(rtc_stream));

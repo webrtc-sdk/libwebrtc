@@ -409,7 +409,7 @@ bool RTCPeerConnectionImpl::Initialize() {
 
 scoped_refptr<RTCDataChannel> RTCPeerConnectionImpl::CreateDataChannel(
     const string label,
-    const RTCDataChannelInit* dataChannelDict) {
+    RTCDataChannelInit* dataChannelDict) {
   webrtc::DataChannelInit init;
   init.id = dataChannelDict->id;
   init.maxRetransmits = dataChannelDict->maxRetransmits;
@@ -425,6 +425,7 @@ scoped_refptr<RTCDataChannel> RTCPeerConnectionImpl::CreateDataChannel(
   data_channel_ = scoped_refptr<RTCDataChannelImpl>(
       new RefCountedObject<RTCDataChannelImpl>(rtc_data_channel));
 
+  dataChannelDict->id = init.id;
   return data_channel_;
 }
 
@@ -665,6 +666,7 @@ scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
   return scoped_refptr<RTCRtpTransceiver>();
 }
 
+
 scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
     scoped_refptr<RTCMediaTrack> track) {
   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpTransceiverInterface>>
@@ -684,6 +686,46 @@ scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
   // onAdd(scoped_refptr<RTCRtpTransceiver>(), errorOr.error().message());
   return scoped_refptr<RTCRtpTransceiver>();
 }
+
+ scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
+    RTCMediaType media_type) {
+  webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpTransceiverInterface>>
+       errorOr;
+  if (media_type == RTCMediaType::AUDIO) {
+    errorOr = rtc_peerconnection_->AddTransceiver(cricket::MediaType::MEDIA_TYPE_AUDIO);
+  } else if(media_type == RTCMediaType::VIDEO) {
+    errorOr = rtc_peerconnection_->AddTransceiver(
+        cricket::MediaType::MEDIA_TYPE_VIDEO);
+   }
+   if (errorOr.ok()) {
+     return new RefCountedObject<RTCRtpTransceiverImpl>(errorOr.value());
+   }
+   // onAdd(scoped_refptr<RTCRtpTransceiver>(), errorOr.error().message());
+   return scoped_refptr<RTCRtpTransceiver>();
+ }
+
+scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
+     RTCMediaType media_type,
+     scoped_refptr<RTCRtpTransceiverInit> init) {
+   RTCRtpTransceiverInitImpl* initImpl =
+       static_cast<RTCRtpTransceiverInitImpl*>(init.get());
+   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpTransceiverInterface>>
+       errorOr;
+   if (media_type == RTCMediaType::AUDIO) {
+     errorOr = rtc_peerconnection_->AddTransceiver(
+         cricket::MediaType::MEDIA_TYPE_AUDIO,
+         initImpl->rtp_transceiver_init());
+   } else if (media_type == RTCMediaType::VIDEO) {
+     errorOr = rtc_peerconnection_->AddTransceiver(
+         cricket::MediaType::MEDIA_TYPE_VIDEO,
+         initImpl->rtp_transceiver_init());
+   }
+   if (errorOr.ok()) {
+     return new RefCountedObject<RTCRtpTransceiverImpl>(errorOr.value());
+   }
+   // onAdd(scoped_refptr<RTCRtpTransceiver>(), errorOr.error().message());
+   return scoped_refptr<RTCRtpTransceiver>();
+ }
 
 scoped_refptr<RTCRtpSender> RTCPeerConnectionImpl::AddTrack(
     scoped_refptr<RTCMediaTrack> track,
