@@ -1,10 +1,12 @@
 # libwebrtc
 
-WebRTC dynamic library wrapper for flutter desktop plugin.
+WebRTC C++ wrapper, which can be used in flutter desktop or packaged into other languages.
+
+Used to generate C++ dynamic link library, suitable for package re-release, such as C#, Dart FFI, Rust
 
 ## Note
 
-Use the WebRTC branch M74 to compile.
+Use the WebRTC branch M92 to compile.
 
 ## Usage
 
