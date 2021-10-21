@@ -10,7 +10,9 @@ DesktopDeviceImpl::DesktopDeviceImpl() {}
 webrtc::DesktopCaptureOptions DesktopDeviceImpl::CreateOptions() {
   webrtc::DesktopCaptureOptions options =
       webrtc::DesktopCaptureOptions::CreateDefault();
+#ifdef _MSC_VER
   options.set_allow_directx_capturer(false);
+#endif
   return options;
 }
 

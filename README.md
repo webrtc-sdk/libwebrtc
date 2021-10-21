@@ -10,10 +10,10 @@ Use the WebRTC branch M92 to compile.
 
 ## Usage
 
-- Download webrtc source into webrtc_src_m74, Please refer to https://webrtc.github.io/webrtc-org/native-code/development/.
+- Download webrtc source into webrtc_src_m92, Please refer to https://webrtc.github.io/webrtc-org/native-code/development/.
 
 ```
-cd webrtc_src_m74/src
+cd webrtc_src_m92/src
 git clone https://github.com/cloudwebrtc/libwebrtc.git
 ```
 
@@ -21,17 +21,18 @@ git clone https://github.com/cloudwebrtc/libwebrtc.git
 
 ```patch
 diff --git a/BUILD.gn b/BUILD.gn
-index bfe6d02ab9..2c0eaaa631 100644
+index e60d7dd0bd..b9b6acab8b 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -30,6 +30,7 @@ if (!build_with_chromium) {
+@@ -29,7 +29,7 @@ if (!build_with_chromium) {
+   # 'ninja default' and then 'ninja all', the second build should do no work.
+   group("default") {
      testonly = true
-     deps = [
-       ":webrtc",
-+      "//libwebrtc:libwebrtc",
-     ]
+-    deps = [ ":webrtc" ]
++    deps = [ ":webrtc","//libwebrtc:libwebrtc", ]
      if (rtc_build_examples) {
        deps += [ "examples" ]
+     }
 ```
 
 - Compile

@@ -396,14 +396,17 @@ bool RTCPeerConnectionImpl::Initialize() {
   // options.network_ignore_mask |= ADAPTER_TYPE_CELLULAR;
   rtc_peerconnection_factory_->SetOptions(options);
 
-  rtc_peerconnection_ = rtc_peerconnection_factory_->CreatePeerConnection(
-      config, nullptr, nullptr, this);
+  webrtc::PeerConnectionDependencies dependencies(this);
+  auto result =
+      rtc_peerconnection_factory_->CreatePeerConnectionOrError(config, std::move(dependencies));
 
-  if (rtc_peerconnection_.get() == nullptr) {
+  if (!result.ok()) {
     RTC_LOG(WARNING) << "CreatePeerConnection failed";
     Close();
     return false;
   }
+
+  rtc_peerconnection_ = result.MoveValue();
   return true;
 }
 
