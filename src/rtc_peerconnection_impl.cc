@@ -292,11 +292,11 @@ void RTCPeerConnectionImpl::OnSignalingChange(
 
 void RTCPeerConnectionImpl::AddCandidate(const string mid,
                                          int mid_mline_index,
-                                         const string candiate) {
+                                         const string cand_sdp) {
   webrtc::SdpParseError error;
   webrtc::IceCandidateInterface* candidate = webrtc::CreateIceCandidate(
-      to_std_string(mid), mid_mline_index, to_std_string(candiate), &error);
-  if (!candidate)
+      to_std_string(mid), mid_mline_index, to_std_string(cand_sdp), &error);
+  if (candidate != nullptr)
     rtc_peerconnection_->AddIceCandidate(candidate);
 }
 

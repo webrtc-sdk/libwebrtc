@@ -134,8 +134,7 @@ webrtc::RtpParameters RTCRtpParametersImpl::rtp_parameters() {
 }
 
 const string RTCRtpParametersImpl::transaction_id() {
-  auto temp = rtp_parameters_.transaction_id;
-  return temp;
+  return rtp_parameters_.transaction_id;
 }
 
 void RTCRtpParametersImpl::set_transaction_id(const string id) {
@@ -143,8 +142,7 @@ void RTCRtpParametersImpl::set_transaction_id(const string id) {
 }
 
 const string RTCRtpParametersImpl::mid() {
-  auto temp = rtp_parameters_.mid;
-  return temp;
+  return rtp_parameters_.mid;
 }
 void RTCRtpParametersImpl::set_mid(const string mid) {
   rtp_parameters_.mid = to_std_string(mid);
@@ -308,8 +306,7 @@ webrtc::RtpExtension RTCRtpExtensionImpl::rtp_extension() {
 }
 
 const string RTCRtpExtensionImpl::ToString() const {
-  auto temp = rtp_extension_.ToString();
-  return temp;
+  return rtp_extension_.ToString();
 }
 
 RTCRtpCodecParametersImpl::RTCRtpCodecParametersImpl(
