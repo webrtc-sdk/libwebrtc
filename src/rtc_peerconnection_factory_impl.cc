@@ -136,7 +136,7 @@ scoped_refptr<RTCDesktopDevice>
 RTCPeerConnectionFactoryImpl::GetDesktopDevice() {
   if (!desktop_device_impl_) {
     desktop_device_impl_ = scoped_refptr<DesktopDeviceImpl>(
-        new RefCountedObject<DesktopDeviceImpl>());
+        new RefCountedObject<DesktopDeviceImpl>(signaling_thread_));
   }
   return desktop_device_impl_;
 }

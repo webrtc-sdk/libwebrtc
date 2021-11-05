@@ -31,7 +31,9 @@ class RTCDesktopCapturer : public webrtc::internal::VideoCapturer,
                            public rtc::MessageHandler,
                            public webrtc::DesktopCapturer::Callback {
  public:
-  RTCDesktopCapturer(std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer);
+  RTCDesktopCapturer(
+      rtc::Thread* signaling_thread,std::unique_ptr<webrtc::DesktopCapturer>
+          desktopcapturer);
   ~RTCDesktopCapturer();
   void CaptureFrame();
   virtual CaptureState Start(
@@ -46,6 +48,7 @@ class RTCDesktopCapturer : public webrtc::internal::VideoCapturer,
   std::unique_ptr<webrtc::DesktopCapturer> capturer;
   rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer_;
   CaptureState capture_state_ = CS_STOPPED;
+  rtc::Thread* signaling_thread_ = nullptr;
 };
 
 }  // namespace libwebrtc
