@@ -5,8 +5,8 @@
 
 namespace libwebrtc {
 
-DesktopDeviceImpl::DesktopDeviceImpl(rtc::Thread* signaling_thread)
-    : signaling_thread_(signaling_thread) {}
+DesktopDeviceImpl::DesktopDeviceImpl(rtc::Thread* worker_thread)
+    : worker_thread_(worker_thread) {}
 
 webrtc::DesktopCaptureOptions DesktopDeviceImpl::CreateOptions() {
   webrtc::DesktopCaptureOptions options =
@@ -18,9 +18,9 @@ webrtc::DesktopCaptureOptions DesktopDeviceImpl::CreateOptions() {
 }
 
 scoped_refptr<RTCVideoCapturer> DesktopDeviceImpl::CreateScreenCapturer() {
-  webrtc::DesktopCaptureOptions options;
+  webrtc::DesktopCaptureOptions options = CreateOptions();
   RTCDesktopCapturer* desktopCapturer = new RTCDesktopCapturer(
-      signaling_thread_,
+      worker_thread_,
       webrtc::DesktopCapturer::CreateScreenCapturer(options));
   RefCountedObject<RTCVideoCapturerImpl>* vci =
       new RefCountedObject<RTCVideoCapturerImpl>(
@@ -34,7 +34,7 @@ scoped_refptr<RTCVideoCapturer> DesktopDeviceImpl::CreateScreenCapturer() {
 scoped_refptr<RTCVideoCapturer> DesktopDeviceImpl::CreateWindowCapturer() {
   webrtc::DesktopCaptureOptions options;
   RTCDesktopCapturer* desktopCapturer = new RTCDesktopCapturer(
-      signaling_thread_,
+      worker_thread_,
       webrtc::DesktopCapturer::CreateWindowCapturer(options));
   scoped_refptr<RTCVideoCapturerImpl> video_capturer =
       scoped_refptr<RTCVideoCapturerImpl>(

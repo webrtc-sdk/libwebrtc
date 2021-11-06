@@ -12,7 +12,7 @@
 namespace libwebrtc {
 class DesktopDeviceImpl : public RTCDesktopDevice {
  public:
-  DesktopDeviceImpl(rtc::Thread* signaling_thread);
+  DesktopDeviceImpl(rtc::Thread* worker_thread);
 
   scoped_refptr<RTCVideoCapturer> CreateScreenCapturer() override;
 
@@ -21,7 +21,7 @@ class DesktopDeviceImpl : public RTCDesktopDevice {
   webrtc::DesktopCaptureOptions CreateOptions();
 
  private:
-  rtc::Thread* signaling_thread_ = nullptr;
+  rtc::Thread* worker_thread_ = nullptr;
 };
 
 }  // namespace libwebrtc

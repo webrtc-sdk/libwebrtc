@@ -5,10 +5,10 @@ namespace libwebrtc {
     enum { kCaptureDelay = 33, kCaptureMessageId = 1000 };
 
 RTCDesktopCapturer::RTCDesktopCapturer(
-        rtc::Thread* signaling_thread,
+        rtc::Thread* worker_thread,
     std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer)
         : capturer(std::move(desktopcapturer)),
-          signaling_thread_(signaling_thread) {}
+          worker_thread_(worker_thread) {}
 
 RTCDesktopCapturer ::~RTCDesktopCapturer() {}
 
@@ -60,7 +60,7 @@ void RTCDesktopCapturer::CaptureFrame() {
     capturer->CaptureFrame();
     //rtc::Thread::Current()->PostDelayed(RTC_FROM_HERE, kCaptureDelay, this,
     //                                    kCaptureMessageId);
-    signaling_thread_->PostDelayed(RTC_FROM_HERE, kCaptureDelay, this,
+    worker_thread_->PostDelayed(RTC_FROM_HERE, kCaptureDelay, this,
                                    kCaptureMessageId);
   }
 }
