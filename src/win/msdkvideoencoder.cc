@@ -522,7 +522,7 @@ retry:
   //webrtc::EncodedImage encodedFrame(encoded_data, encoded_data_size,
   //                                  encoded_data_size);
 
-    webrtc::EncodedImage encodedFrame;
+  webrtc::EncodedImage encodedFrame;
   encodedFrame._encodedHeight = input_image.height();
   encodedFrame._encodedWidth = input_image.width();
   encodedFrame.capture_time_ms_ = input_image.render_time_ms();
@@ -531,6 +531,9 @@ retry:
   encodedFrame._frameType = is_keyframe_required
                                 ? webrtc::VideoFrameType::kVideoFrameKey
                                 : webrtc::VideoFrameType::kVideoFrameDelta;
+  encodedFrame.SetEncodedData(
+      webrtc::EncodedImageBuffer::Create(encoded_data, encoded_data_size));
+
 
   webrtc::CodecSpecificInfo info;
   memset(&info, 0, sizeof(info));
