@@ -130,6 +130,12 @@ rtc_shared_library("libwebrtc"){
     "src/win/base_allocator.cc",
     "src/win/sysmem_allocator.h",
     "src/win/sysmem_allocator.cc",
+    "src/win/msdkvideoencoderfactory.h",
+    "src/win/msdkvideoencoderfactory.cc",
+    "src/win/mediacapabilities.h",
+    "src/win/mediacapabilities.cc",
+    "src/win/codecutils.h",
+    "src/win/codecutils.cc",
   ]
 
   include_dirs = [

@@ -13,7 +13,7 @@
 #include "api/video_codecs/builtin_video_decoder_factory.h"
 #include "api/video_codecs/builtin_video_encoder_factory.h"
 #include "modules/audio_device/audio_device_impl.h"
-
+#include "src/win/msdkvideoencoderfactory.h"
 #if defined(WEBRTC_IOS)
 #include "engine/sdk/objc/Framework/Classes/videotoolboxvideocodecfactory.h"
 #endif
@@ -30,7 +30,9 @@ RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl(
       network_thread_(network_thread) {}
 
 RTCPeerConnectionFactoryImpl::~RTCPeerConnectionFactoryImpl() {}
-
+std::unique_ptr<webrtc::VideoEncoderFactory> CreateFakeVideoEncoderFactory() {
+  return std::make_unique<owt::base::MSDKVideoEncoderFactory>();
+}
 bool RTCPeerConnectionFactoryImpl::Initialize() {
   if (!audio_device_module_) {
     task_queue_factory_ = webrtc::CreateDefaultTaskQueueFactory();
@@ -43,7 +45,8 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
         network_thread_, worker_thread_, signaling_thread_,
         audio_device_module_.get(), webrtc::CreateBuiltinAudioEncoderFactory(),
         webrtc::CreateBuiltinAudioDecoderFactory(),
-        webrtc::CreateBuiltinVideoEncoderFactory(),
+        CreateFakeVideoEncoderFactory(),
+        //webrtc::CreateBuiltinVideoEncoderFactory(),
         webrtc::CreateBuiltinVideoDecoderFactory(), nullptr, nullptr);
   }
 
