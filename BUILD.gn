@@ -136,6 +136,14 @@ rtc_shared_library("libwebrtc"){
     "src/win/mediacapabilities.cc",
     "src/win/codecutils.h",
     "src/win/codecutils.cc",
+    "src/win/msdkvideodecoder.h",
+    "src/win/msdkvideodecoder.cc",
+    "src/win/msdkvideodecoderfactory.h",
+    "src/win/msdkvideodecoderfactory.cc",
+    "src/win/d3dnativeframe.h",
+    "src/win/d3d11_manager.h",
+    "src/win/videorendererinterface.h",
+    "src/win/nativehandlebuffer.h",
   ]
 
   include_dirs = [
