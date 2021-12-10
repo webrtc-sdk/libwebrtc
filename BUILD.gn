@@ -105,56 +105,59 @@ rtc_shared_library("libwebrtc"){
     "src/rtc_dtls_transport_impl.h",
     "src/rtc_dtmf_sender_impl.cc",
     "src/rtc_dtmf_sender_impl.h",
-    #"talk/owt/sdk/base/codecutils.h",
-    #"talk/owt/sdk/base/codecutils.cc",
-    #"talk/owt/sdk/base/win/mediacapabilities.h",
-    #"talk/owt/sdk/base/win/mediacapabilities.cc",
-    #"talk/owt/sdk/base/win/msdkcommon.h",
-    #"talk/owt/sdk/base/win/msdkvideobase.h",
-    #"talk/owt/sdk/base/win/msdkvideobase.cc",
-    #"talk/owt/sdk/base/win/msdkvideoencoder.h",
-    #"talk/owt/sdk/base/win/msdkvideoencoder.cc",
-    "src/win/commontypes.h",
-    "src/win/msdkcommon.h",
-    "src/win/mediautils.h",
-    "src/win/mediautils.cc",
-    "src/win/d3d_allocator.h",
-    "src/win/d3d_allocator.cc",
-    "src/win/d3d11_allocator.h",
-    "src/win/d3d11_allocator.cc",
-    "src/win/msdkvideobase.h",
-    "src/win/msdkvideobase.cc",
-    "src/win/msdkvideoencoder.h",
-    "src/win/msdkvideoencoder.cc",
-    "src/win/base_allocator.h",
-    "src/win/base_allocator.cc",
-    "src/win/sysmem_allocator.h",
-    "src/win/sysmem_allocator.cc",
-    "src/win/msdkvideoencoderfactory.h",
-    "src/win/msdkvideoencoderfactory.cc",
-    "src/win/mediacapabilities.h",
-    "src/win/mediacapabilities.cc",
-    "src/win/codecutils.h",
-    "src/win/codecutils.cc",
-    "src/win/msdkvideodecoder.h",
-    "src/win/msdkvideodecoder.cc",
-    "src/win/msdkvideodecoderfactory.h",
-    "src/win/msdkvideodecoderfactory.cc",
-    "src/win/d3dnativeframe.h",
-    "src/win/d3d11_manager.h",
-    "src/win/videorendererinterface.h",
-    "src/win/nativehandlebuffer.h",
   ]
+
+  if(is_win) {
+    sources += [
+      "src/win/commontypes.h",
+      "src/win/msdkcommon.h",
+      "src/win/mediautils.h",
+      "src/win/mediautils.cc",
+      "src/win/d3d_allocator.h",
+      "src/win/d3d_allocator.cc",
+      "src/win/d3d11_allocator.h",
+      "src/win/d3d11_allocator.cc",
+      "src/win/msdkvideobase.h",
+      "src/win/msdkvideobase.cc",
+      "src/win/msdkvideoencoder.h",
+      "src/win/msdkvideoencoder.cc",
+      "src/win/base_allocator.h",
+      "src/win/base_allocator.cc",
+      "src/win/sysmem_allocator.h",
+      "src/win/sysmem_allocator.cc",
+      "src/win/msdkvideoencoderfactory.h",
+      "src/win/msdkvideoencoderfactory.cc",
+      "src/win/mediacapabilities.h",
+      "src/win/mediacapabilities.cc",
+      "src/win/codecutils.h",
+      "src/win/codecutils.cc",
+      "src/win/msdkvideodecoder.h",
+      "src/win/msdkvideodecoder.cc",
+      "src/win/msdkvideodecoderfactory.h",
+      "src/win/msdkvideodecoderfactory.cc",
+      "src/win/d3dnativeframe.h",
+      "src/win/d3d11_manager.h",
+      "src/win/videorendererinterface.h",
+      "src/win/nativehandlebuffer.h",
+    ]
+  }
 
   include_dirs = [
     ".",
     "include",
-    "src/win/include",
+    
   ]
+
   defines = [ 
     "USE_LIBYUV",
     "WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE",
+    "USE_INTEL_MEDIA_SDK",
   ]
+
+  if(is_win) {
+    include_dirs += [ "src/win/include" ]
+    defines += [ "USE_INTEL_MEDIA_SDK" ]
+  }
   
   public_configs = [ ":external_config" ]
   
@@ -198,12 +201,14 @@ rtc_shared_library("libwebrtc"){
       "//third_party/libyuv",
   ]
   libs = []
-  libs += [ "libmfx_vs2015.lib" ]
-  lib_dirs = [ "src\win\lib\x64" ]
-      
-  ldflags = [
-    "/ignore:4098",
-    "/ignore:4099",
-  ]  
+
+  if(is_win) {
+    libs += [ "libmfx_vs2015.lib" ]
+    lib_dirs = [ "src\win\lib\x64" ]
+    ldflags = [
+      "/ignore:4098",
+      "/ignore:4099",
+    ]  
+  }
 }
 
