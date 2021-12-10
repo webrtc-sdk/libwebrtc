@@ -137,7 +137,6 @@ rtc_shared_library("libwebrtc"){
       "src/win/msdkvideodecoderfactory.cc",
       "src/win/d3dnativeframe.h",
       "src/win/d3d11_manager.h",
-      "src/win/videorendererinterface.h",
       "src/win/nativehandlebuffer.h",
     ]
   }

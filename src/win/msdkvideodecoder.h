@@ -26,8 +26,14 @@
 #include "src/win/d3dnativeframe.h"
 #include "src/win/msdkvideobase.h"
 #include "src/win/d3d11_allocator.h"
-#include "src/win/videorendererinterface.h"
 
+#if defined(WEBRTC_WIN)
+struct D3D11ImageHandle {
+  ID3D11Device* d3d11_device;
+  ID3D11Texture2D* texture;     // The DX texture or texture array.
+  int texture_array_index;      // When >=0, indicate the index within texture array 
+};
+#endif
 
 namespace owt {
 namespace base {

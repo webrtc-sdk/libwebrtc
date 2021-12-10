@@ -7,7 +7,6 @@
 #include "src/win/nativehandlebuffer.h"
 #include "src/win/d3d11_allocator.h"
 #include "src/win/msdkvideodecoder.h"
-#include "src/win/videorendererinterface.h"
 #include "api/scoped_refptr.h"
 
 using namespace rtc;
