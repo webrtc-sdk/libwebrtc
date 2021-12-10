@@ -13,13 +13,24 @@
 #include "api/video_codecs/builtin_video_decoder_factory.h"
 #include "api/video_codecs/builtin_video_encoder_factory.h"
 #include "modules/audio_device/audio_device_impl.h"
-
+#include "src/win/msdkvideodecoderfactory.h"
+#include "src/win/msdkvideoencoderfactory.h"
 #if defined(WEBRTC_IOS)
 #include "engine/sdk/objc/Framework/Classes/videotoolboxvideocodecfactory.h"
 #endif
 #include <api/task_queue/default_task_queue_factory.h>
 
 namespace libwebrtc {
+
+#if defined(USE_INTEL_MEDIA_SDK)
+std::unique_ptr<webrtc::VideoEncoderFactory> CreateIntelVideoEncoderFactory() {
+  return std::make_unique<owt::base::MSDKVideoEncoderFactory>();
+}
+
+std::unique_ptr<webrtc::VideoDecoderFactory> CreateIntelVideoDecoderFactory() {
+  return std::make_unique<owt::base::MSDKVideoDecoderFactory>();
+}
+#endif
 
 RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl(
     rtc::Thread* worker_thread,
@@ -43,8 +54,13 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
         network_thread_, worker_thread_, signaling_thread_,
         audio_device_module_.get(), webrtc::CreateBuiltinAudioEncoderFactory(),
         webrtc::CreateBuiltinAudioDecoderFactory(),
+#if defined(USE_INTEL_MEDIA_SDK)
+        CreateIntelVideoEncoderFactory(), CreateIntelVideoDecoderFactory(),
+#else
         webrtc::CreateBuiltinVideoEncoderFactory(),
-        webrtc::CreateBuiltinVideoDecoderFactory(), nullptr, nullptr);
+        webrtc::CreateBuiltinVideoDecoderFactory(),
+#endif
+        nullptr, nullptr);
   }
 
   if (!rtc_peerconnection_factory_.get()) {
