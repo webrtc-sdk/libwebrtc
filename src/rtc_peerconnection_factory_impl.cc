@@ -13,8 +13,11 @@
 #include "api/video_codecs/builtin_video_decoder_factory.h"
 #include "api/video_codecs/builtin_video_encoder_factory.h"
 #include "modules/audio_device/audio_device_impl.h"
+#if defined(USE_INTEL_MEDIA_SDK)
+#include "src/win/mediacapabilities.h"
 #include "src/win/msdkvideodecoderfactory.h"
 #include "src/win/msdkvideoencoderfactory.h"
+#endif
 #if defined(WEBRTC_IOS)
 #include "engine/sdk/objc/Framework/Classes/videotoolboxvideocodecfactory.h"
 #endif
@@ -24,10 +27,16 @@ namespace libwebrtc {
 
 #if defined(USE_INTEL_MEDIA_SDK)
 std::unique_ptr<webrtc::VideoEncoderFactory> CreateIntelVideoEncoderFactory() {
+  if (!owt::base::MediaCapabilities::Get()) {
+    return webrtc::CreateBuiltinVideoEncoderFactory();
+  }
   return std::make_unique<owt::base::MSDKVideoEncoderFactory>();
 }
 
 std::unique_ptr<webrtc::VideoDecoderFactory> CreateIntelVideoDecoderFactory() {
+  if (!owt::base::MediaCapabilities::Get()) {
+    return webrtc::CreateBuiltinVideoDecoderFactory();
+  }
   return std::make_unique<owt::base::MSDKVideoDecoderFactory>();
 }
 #endif
