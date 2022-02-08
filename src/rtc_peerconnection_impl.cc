@@ -562,6 +562,13 @@ void RTCPeerConnectionImpl::CreateAnswer(
       offer_answer_options);
 }
 
+void RTCPeerConnectionImpl::RestartIce() {
+  RTC_LOG(INFO) << __FUNCTION__;
+  if (rtc_peerconnection_.get()) {
+    rtc_peerconnection_->RestartIce();
+  }
+}
+
 void RTCPeerConnectionImpl::Close() {
   RTC_LOG(INFO) << __FUNCTION__;
   if (rtc_peerconnection_.get()) {

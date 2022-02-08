@@ -66,6 +66,8 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
                             int midx,
                             const string candiate) override;
 
+  virtual void RestartIce() override;
+
   virtual void Close() override;
 
   virtual void RegisterRTCPeerConnectionObserver(
