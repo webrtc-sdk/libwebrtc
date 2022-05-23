@@ -44,6 +44,11 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
       scoped_refptr<RTCVideoCapturer> capturer,
       const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) override;
+    
+  virtual scoped_refptr<RTCVideoSource> CreateDesktopSource(
+      scoped_refptr<RTCDesktopCapturer> capturer,
+      const string video_source_label,
+      scoped_refptr<RTCMediaConstraints> constraints) override;
 
   virtual scoped_refptr<RTCDesktopDevice> GetDesktopDevice() override;
 
@@ -73,6 +78,11 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
       const char* video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints);
 
+  scoped_refptr<RTCVideoSource> CreateVideoSource_d(
+      scoped_refptr<RTCDesktopCapturer> capturer,
+      const char* video_source_label,
+      scoped_refptr<RTCMediaConstraints> constraints);    
+
  private:
   rtc::Thread* worker_thread_ = nullptr;
   rtc::Thread* signaling_thread_ = nullptr;
@@ -82,7 +92,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
   scoped_refptr<AudioDeviceImpl> audio_device_impl_;
   scoped_refptr<RTCVideoDeviceImpl> video_device_impl_;
-  scoped_refptr<DesktopDeviceImpl> desktop_device_impl_;
+  scoped_refptr<RTCDesktopDeviceImpl> desktop_device_impl_;
   std::list<scoped_refptr<RTCPeerConnection>> peerconnections_;
   std::unique_ptr<webrtc::TaskQueueFactory> task_queue_factory_;
 };
