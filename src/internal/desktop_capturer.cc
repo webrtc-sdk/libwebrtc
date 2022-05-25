@@ -10,6 +10,11 @@ DesktopCapturer::DesktopCapturer(
     : capturer_(std::move(desktopcapturer)) {
 }
 
+DesktopCapturer::DesktopCapturer(std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer, int window_id) 
+    : capturer_(std::move(desktopcapturer)) {
+      windows_id_ = window_id;
+}
+
 DesktopCapturer ::~DesktopCapturer() {
   RTC_LOG(INFO) << __FUNCTION__ << ": dtor ";
   Stop();
@@ -43,6 +48,10 @@ bool DesktopCapturer::IsRunning() {
   return capture_state_ == CS_RUNNING;
 }
 
+int filterException(int code, PEXCEPTION_POINTERS ex) {
+  return EXCEPTION_EXECUTE_HANDLER;
+}
+
 void DesktopCapturer::OnCaptureResult(
     webrtc::DesktopCapturer::Result result,
     std::unique_ptr<webrtc::DesktopFrame> frame) {
@@ -54,17 +63,25 @@ void DesktopCapturer::OnCaptureResult(
   int width = frame->size().width();
   int height = frame->size().height();
 
-  if (!i420_buffer_.get() || i420_buffer_->width() * i420_buffer_->height() < width * height) {
-    i420_buffer_ = webrtc::I420Buffer::Create(width, height);
+  webrtc::DesktopRect rect_ = webrtc::DesktopRect::MakeWH(width, height);
+
+  if (windows_id_ > 0) {
+    webrtc::GetWindowRect(reinterpret_cast<HWND>(windows_id_), &rect_);
+    // RTC_LOG(INFO) << "GetWindowRect(): " << rect_.size().width() << " " <<  rect_.size().height();
   }
 
-  libyuv::ConvertToI420(frame->data(), 0, i420_buffer_->MutableDataY(),
+  __try {
+    i420_buffer_ = webrtc::I420Buffer::Create(width, height);
+
+    libyuv::ConvertToI420(frame->data(), 0, i420_buffer_->MutableDataY(),
                         i420_buffer_->StrideY(), i420_buffer_->MutableDataU(),
                         i420_buffer_->StrideU(), i420_buffer_->MutableDataV(),
-                        i420_buffer_->StrideV(), 0, 0, width, height, width,
-                        height, libyuv::kRotate0, libyuv::FOURCC_ARGB);
+                        i420_buffer_->StrideV(), 0, 0, rect_.width(), rect_.height(), 
+                        width, height, libyuv::kRotate0, libyuv::FOURCC_ARGB);
   
-  OnFrame(webrtc::VideoFrame(i420_buffer_, 0, 0, webrtc::kVideoRotation_0));
+    OnFrame(webrtc::VideoFrame(i420_buffer_, 0, 0, webrtc::kVideoRotation_0));
+  } 
+  __except (filterException(GetExceptionCode(), GetExceptionInformation())) { }
 }
 
 void DesktopCapturer::OnMessage(rtc::Message* msg) {
@@ -79,20 +96,6 @@ void DesktopCapturer::CaptureFrame() {
     rtc::Thread::Current()->PostDelayed(RTC_FROM_HERE, kCaptureDelay, this, kCaptureMessageId);
   }
 }
-
- bool DesktopCapturer::GetSourceList(std::vector<libwebrtc::Source>& sources) {
-  RTC_LOG(INFO) << __FUNCTION__ << " before: " << sources.size();
-  webrtc::DesktopCapturer::SourceList screens;
-  capturer_->GetSourceList(&screens);
-  RTC_LOG(INFO) << __FUNCTION__ << " " << screens.capacity();
-  for (const auto& screen : screens) {
-    const libwebrtc::Source source {screen.title, screen.title, libwebrtc::SourceType::kEntireScreen};
-	  sources.push_back(source);
-    RTC_LOG(INFO) << " id:" << screen.id << " title:" << screen.title;
-	}
-  RTC_LOG(INFO) << __FUNCTION__ << " after: " << sources.size();
-  return true;
- }
 
 }  // namespace internal
 }  // namespace webrtc

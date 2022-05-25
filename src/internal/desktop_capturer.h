@@ -5,6 +5,7 @@
 #include "modules/desktop_capture/desktop_capturer.h"
 #include "modules/desktop_capture/desktop_frame.h"
 #include "modules/desktop_capture/desktop_and_cursor_composer.h"
+#include "modules/desktop_capture/win/window_capture_utils.h"
 #include "modules/video_capture/video_capture.h"
 #include "modules/video_capture/video_capture_factory.h"
 
@@ -36,6 +37,7 @@ class DesktopCapturer : public webrtc::internal::VideoCapturer,
                         public webrtc::DesktopCapturer::Callback {
  public:
   DesktopCapturer(std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer);
+  DesktopCapturer(std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer, int window_id);
   ~DesktopCapturer();
   void CaptureFrame();
   virtual CaptureState Start(
@@ -46,16 +48,13 @@ class DesktopCapturer : public webrtc::internal::VideoCapturer,
       webrtc::DesktopCapturer::Result result,
       std::unique_ptr<webrtc::DesktopFrame> frame) override;
   virtual void OnMessage(rtc::Message* msg) override;
-
-  bool GetSourceList(std::vector<libwebrtc::Source>& sources);
-  // bool GetWindowList(SourceList* sources...
-  // bool GetScreenList(SourceList* sources...
  
  private:
   std::unique_ptr<webrtc::DesktopCapturer> capturer_;
   rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer_;
   CaptureState capture_state_ = CS_STOPPED;
   std::unique_ptr<rtc::Thread> capture_thread_;
+  int windows_id_= -1;
 };
 
 class ScreenCapturerTrackSource : public webrtc::VideoTrackSource {

@@ -31,15 +31,19 @@ class RTCDesktopDeviceImpl : public RTCDesktopDevice {
   RTCDesktopDeviceImpl(rtc::Thread* signaling_thread);
   ~RTCDesktopDeviceImpl();
 
-  virtual scoped_refptr<RTCDesktopCapturer> CreateScreenCapturer() override;
+  virtual scoped_refptr<RTCDesktopCapturer> CreateScreenCapturer(uint64_t screen_id) override;
 
-  virtual scoped_refptr<RTCVideoCapturer> CreateWindowCapturer() override;
+  virtual scoped_refptr<RTCDesktopCapturer> CreateWindowCapturer(uint64_t window_id) override;
 
   webrtc::DesktopCaptureOptions CreateOptions();
 
   virtual bool GetScreenList(SourceList& sources) override;
 
   virtual bool GetWindowList(SourceList& sources) override;
+
+  virtual SourceList EnumerateWindows() override;
+
+  virtual SourceList EnumerateScreens() override;
 
 private:
   std::unique_ptr<rtc::Thread> _capture_thread;
