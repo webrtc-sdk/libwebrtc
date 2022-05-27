@@ -55,7 +55,7 @@ SourceList RTCDesktopDeviceImpl::EnumerateScreens() {
   webrtc::GetScreenList(&screen_list);
   for (const auto& screen : screen_list) {
     RTC_LOG(INFO) << " id:" << screen.id << " title:" << screen.title;
-    sources_.push_back({static_cast<uint64_t>(screen.id), screen.title, kEntireScreen}); 
+    sources_.push_back({std::to_string(screen.id), screen.title, kEntireScreen}); 
   }
 
   return sources_;
@@ -73,7 +73,7 @@ SourceList RTCDesktopDeviceImpl::EnumerateWindows() {
   webrtc::GetWindowList(webrtc::GetWindowListFlags::kIgnoreUntitled | webrtc::GetWindowListFlags::kIgnoreUnresponsive, &window_list);
   for (const auto& window : window_list) {
     RTC_LOG(INFO) << " id:" << window.id << " title:" << window.title;
-    sources_.push_back({static_cast<uint64_t>(window.id), window.title, kWindow}); 
+    sources_.push_back({std::to_string(window.id), window.title, kWindow}); 
   }
 
   return sources_;
