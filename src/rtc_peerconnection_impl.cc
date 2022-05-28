@@ -650,6 +650,18 @@ bool RTCPeerConnectionImpl::GetStats(
       webrtc::PeerConnectionInterface::kStatsOutputLevelDebug);
 }
 
+void RTCPeerConnectionImpl::GetStats(OnStatsCollectorSuccess success,
+                                     OnStatsCollectorFailure failure) {
+  rtc::scoped_refptr<WebRTCStatsCollectorCallback> rtc_callback =
+      WebRTCStatsCollectorCallback::Create(success, failure);
+  if (!rtc_peerconnection_.get() || !rtc_peerconnection_factory_.get()) {
+    webrtc::MutexLock cs(callback_crt_sec_.get());
+    failure("Failed to initialize PeerConnection");
+    return;
+  }
+  rtc_peerconnection_->GetStats(rtc_callback);
+}
+
 scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
     scoped_refptr<RTCMediaTrack> track,
     scoped_refptr<RTCRtpTransceiverInit> init) {
@@ -792,6 +804,17 @@ vector<scoped_refptr<RTCRtpReceiver>> RTCPeerConnectionImpl::receivers() {
   return vec;
 }
 
+void WebRTCStatsCollectorCallback::OnStatsDelivered(
+    const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report) {
+  webrtc::RTCStatsReport::ConstIterator iter = report->begin();
+  std::vector<scoped_refptr<MediaRTCStats>> reports;
+  while (iter != report->end()) {
+    reports.push_back(new RefCountedObject<MediaRTCStatsImpl>(iter->copy()));
+    iter++;
+  }
+  success_(reports);
+}
+
 void WebRTCStatsObserver::OnComplete(const webrtc::StatsReports& reports) {
   MediaTrackStatistics stats;
 
@@ -867,6 +890,25 @@ void WebRTCStatsObserver::OnComplete(const webrtc::StatsReports& reports) {
   observer_ = nullptr;
 
   this->Release();
+}
+
+MediaRTCStatsImpl::MediaRTCStatsImpl(std::unique_ptr<webrtc::RTCStats> stats)
+    : stats_(std::move(stats)) {}
+
+const string MediaRTCStatsImpl::id() {
+  return stats_->id();
+}
+
+const string MediaRTCStatsImpl::type() {
+  return stats_->type();
+}
+
+int64_t MediaRTCStatsImpl::timestamp_us() {
+  return stats_->timestamp_us();
+}
+
+const string MediaRTCStatsImpl::ToJson() {
+  return stats_->ToJson();
 }
 
 }  // namespace libwebrtc

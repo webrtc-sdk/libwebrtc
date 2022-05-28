@@ -124,6 +124,8 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   virtual bool GetStats(const RTCVideoTrack* track,
                         scoped_refptr<TrackStatsObserver> observer) override;
 
+  virtual void GetStats(OnStatsCollectorSuccess success, OnStatsCollectorFailure failure) override;
+
  public:
   RTCPeerConnectionImpl(
       const RTCConfiguration& configuration,

@@ -97,6 +97,22 @@ class TrackStatsObserver : public RefCountInterface {
   ~TrackStatsObserver() {}
 };
 
+class MediaRTCStats : public RefCountInterface {
+public:
+  virtual const string id() = 0;
+
+  virtual const string type() = 0;
+
+  virtual int64_t timestamp_us() = 0;
+
+  virtual const string ToJson() = 0;
+};
+
+typedef fixed_size_function<void(const vector<scoped_refptr<MediaRTCStats>> reports)>
+    OnStatsCollectorSuccess;
+
+typedef fixed_size_function<void(const char* error)> OnStatsCollectorFailure;
+
 typedef fixed_size_function<void(const string sdp, const string type)>
     OnSdpCreateSuccess;
 
@@ -196,6 +212,9 @@ class RTCPeerConnection : public RefCountInterface {
 
   virtual bool GetStats(const RTCVideoTrack* track,
                         scoped_refptr<TrackStatsObserver> observer) = 0;
+
+  virtual void GetStats(OnStatsCollectorSuccess success,
+                        OnStatsCollectorFailure failure) = 0;
 
   virtual scoped_refptr<RTCRtpTransceiver> AddTransceiver(
       scoped_refptr<RTCMediaTrack> track,
