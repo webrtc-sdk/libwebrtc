@@ -422,11 +422,18 @@ scoped_refptr<RTCDataChannel> RTCPeerConnectionImpl::CreateDataChannel(
   init.protocol = to_std_string(dataChannelDict->protocol);
   init.reliable = dataChannelDict->reliable;
 
-  rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel =
-      rtc_peerconnection_->CreateDataChannel(to_std_string(label), &init);
+  webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::DataChannelInterface>> result =
+      rtc_peerconnection_->CreateDataChannelOrError(to_std_string(label), &init);
+
+  if (!result.ok()) {
+    RTC_LOG(LS_ERROR) << "CreateDataChannel failed: "
+                      << ToString(result.error().type()) << " "
+                      << result.error().message();
+    return nullptr;
+  }
 
   data_channel_ = scoped_refptr<RTCDataChannelImpl>(
-      new RefCountedObject<RTCDataChannelImpl>(rtc_data_channel));
+      new RefCountedObject<RTCDataChannelImpl>(result.MoveValue()));
 
   dataChannelDict->id = init.id;
   return data_channel_;

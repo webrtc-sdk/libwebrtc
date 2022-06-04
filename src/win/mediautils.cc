@@ -149,7 +149,7 @@ absl::optional<AV1Profile> StringToAV1Profile(const std::string& str) {
     case 2:
       return AV1Profile::kProfessional;
     default:
-      return absl::nullopt;
+      break;
   }
   return absl::nullopt;
 }
