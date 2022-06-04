@@ -36,6 +36,46 @@ class WebRTCStatsObserver : public webrtc::StatsObserver {
   std::string direction_;
 };
 
+class WebRTCStatsCollectorCallback : public webrtc::RTCStatsCollectorCallback {
+ public:
+  WebRTCStatsCollectorCallback(OnStatsCollectorSuccess success,
+                               OnStatsCollectorFailure failure)
+      : success_(success), failure_(failure) {}
+  ~WebRTCStatsCollectorCallback() {}
+
+  static rtc::scoped_refptr<WebRTCStatsCollectorCallback> Create(
+      OnStatsCollectorSuccess success,OnStatsCollectorFailure failure) {
+    rtc::scoped_refptr<WebRTCStatsCollectorCallback> rtc_stats_observer =
+        rtc::scoped_refptr<WebRTCStatsCollectorCallback>(
+            new rtc::RefCountedObject<WebRTCStatsCollectorCallback>(success, failure));
+    rtc_stats_observer->AddRef();
+    return rtc_stats_observer;
+  }
+
+  virtual void OnStatsDelivered(
+      const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report) override;
+
+ private:
+  OnStatsCollectorSuccess success_;
+  OnStatsCollectorFailure failure_;
+};
+
+class MediaRTCStatsImpl : public MediaRTCStats {
+ public:
+  MediaRTCStatsImpl(std::unique_ptr<webrtc::RTCStats> stats);
+
+  virtual const string id() override;
+
+  virtual const string type() override;
+
+  virtual int64_t timestamp_us() override;
+
+  virtual const string ToJson() override;
+
+private:
+  std::unique_ptr<webrtc::RTCStats> stats_;
+};
+
 class MediaStreamImpl : public RTCMediaStream,
                         public webrtc::ObserverInterface {
  public:
