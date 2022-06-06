@@ -105,16 +105,12 @@ libwebrtc::RTCVideoFrame::VideoRotation VideoFrameBufferImpl::rotation() {
   switch (rotation_) {
     case webrtc::kVideoRotation_0:
       return RTCVideoFrame::kVideoRotation_0;
-      break;
     case webrtc::kVideoRotation_90:
       return RTCVideoFrame::kVideoRotation_90;
-      break;
     case webrtc::kVideoRotation_180:
       return RTCVideoFrame::kVideoRotation_180;
-      break;
     case webrtc::kVideoRotation_270:
       return RTCVideoFrame::kVideoRotation_270;
-      break;
     default:
       break;
   }

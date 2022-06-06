@@ -148,25 +148,21 @@ bool MSDKVideoDecoder::CreateD3D11Device() {
   return true;
 }
 
-int32_t MSDKVideoDecoder::InitDecode(const webrtc::VideoCodec* codecSettings, int32_t numberOfCores) {
+bool MSDKVideoDecoder::Configure(const Settings& settings) {
 
   RTC_LOG(LS_INFO) << "InitDecode enter";
-  if (!codecSettings){
-    RTC_LOG(LS_ERROR) << "Invalid codec settings passed to decoder";
-    return WEBRTC_VIDEO_CODEC_ERROR;
-  }
-  codec_type_  = codecSettings->codecType;
+
+  codec_type_  = settings.codec_type();
   timestamps_.clear();
   ntp_time_ms_.clear();
 
-  if (&codec_ != codecSettings)
-    codec_ = *codecSettings;
+  settings_ = settings;
 
   //return decoder_thread_->Invoke<int32_t>(RTC_FROM_HERE,
   //    Bind(&MSDKVideoDecoder::InitDecodeOnCodecThread, this));
-  return decoder_thread_->Invoke<int32_t>(
+  return decoder_thread_->Invoke<bool>(
       RTC_FROM_HERE, [this] {
-    return InitDecodeOnCodecThread();
+    return InitDecodeOnCodecThread() == WEBRTC_VIDEO_CODEC_OK;
       });
 }
 
@@ -186,8 +182,8 @@ int32_t MSDKVideoDecoder::InitDecodeOnCodecThread() {
   m_video_param_extracted = false;
 
   mfxStatus sts;
-  width_ = codec_.width;
-  height_ = codec_.height;
+  width_ = settings_.max_render_resolution().Width();
+  height_ = settings_.max_render_resolution().Height();
   uint32_t codec_id = MFX_CODEC_AVC;
 
   if (inited_) {
@@ -204,11 +200,11 @@ int32_t MSDKVideoDecoder::InitDecodeOnCodecThread() {
     if (!m_mfx_session_) {
       return WEBRTC_VIDEO_CODEC_ERROR;
     }
-    if (codec_.codecType == webrtc::kVideoCodecVP8) {
+    if (settings_.codec_type() == webrtc::kVideoCodecVP8) {
       codec_id = MFX_CODEC_VP8;
-    } else if (codec_.codecType == webrtc::kVideoCodecVP9) {
+    } else if (settings_.codec_type() == webrtc::kVideoCodecVP9) {
       codec_id = MFX_CODEC_VP9;
-    } else if (codec_.codecType == webrtc::kVideoCodecAV1) {
+    } else if (settings_.codec_type() == webrtc::kVideoCodecAV1) {
       codec_id = MFX_CODEC_AV1;
     }
 
