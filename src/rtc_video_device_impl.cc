@@ -4,9 +4,11 @@
 
 namespace libwebrtc {
 
-RTCVideoDeviceImpl::RTCVideoDeviceImpl(rtc::Thread* signaling_thread)
+RTCVideoDeviceImpl::RTCVideoDeviceImpl(rtc::Thread* signaling_thread,
+                                       rtc::Thread* worker_thread)
     : device_info_(webrtc::VideoCaptureFactory::CreateDeviceInfo()),
-    signaling_thread_(signaling_thread) {}
+      signaling_thread_(signaling_thread),
+      worker_thread_(worker_thread) {}
 
 uint32_t RTCVideoDeviceImpl::NumberOfDevices() {
   if (!device_info_) {
@@ -40,16 +42,17 @@ scoped_refptr<RTCVideoCapturer> RTCVideoDeviceImpl::Create(const char* name,
                                                            size_t width,
                                                            size_t height,
                                                            size_t target_fps) {
-  
-    auto vcm = webrtc::internal::VcmCapturer::Create(width, height, target_fps, index);
-    if (vcm == nullptr) {
-        return nullptr;
-    }
+  auto vcm = webrtc::internal::VcmCapturer::Create(worker_thread_, width,
+                                                   height, target_fps, index);
 
-    return signaling_thread_->Invoke<scoped_refptr<RTCVideoCapturerImpl>>(
-      RTC_FROM_HERE,[vcm] {
-      return scoped_refptr<RTCVideoCapturerImpl>(
-          new RefCountedObject<RTCVideoCapturerImpl>(absl::WrapUnique(vcm)));
+  if (vcm == nullptr) {
+    return nullptr;
+  }
+
+  return signaling_thread_->Invoke<scoped_refptr<RTCVideoCapturerImpl>>(
+      RTC_FROM_HERE, [vcm] {
+        return scoped_refptr<RTCVideoCapturerImpl>(
+            new RefCountedObject<RTCVideoCapturerImpl>(absl::WrapUnique(vcm)));
       });
 }
 
