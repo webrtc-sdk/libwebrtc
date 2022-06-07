@@ -114,6 +114,16 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
     return remote_streams_;
   }
 
+  virtual RTCSignalingState signaling_state() override;
+
+  virtual RTCIceConnectionState ice_connection_state() override;
+
+  virtual RTCIceConnectionState standardized_ice_connection_state() override;
+
+  virtual RTCPeerConnectionState peer_connection_state() override;
+
+  virtual RTCIceGatheringState ice_gathering_state() override;
+
   virtual scoped_refptr<RTCDataChannel> CreateDataChannel(
       const string label,
       RTCDataChannelInit* dataChannelDict) override;
@@ -124,7 +134,8 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   virtual bool GetStats(const RTCVideoTrack* track,
                         scoped_refptr<TrackStatsObserver> observer) override;
 
-  virtual void GetStats(OnStatsCollectorSuccess success, OnStatsCollectorFailure failure) override;
+  virtual void GetStats(OnStatsCollectorSuccess success,
+                        OnStatsCollectorFailure failure) override;
 
  public:
   RTCPeerConnectionImpl(
@@ -157,6 +168,9 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
       rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel) override;
 
   virtual void OnRenegotiationNeeded() override;
+
+  virtual void OnConnectionChange(
+      webrtc::PeerConnectionInterface::PeerConnectionState new_state) override;
 
   virtual void OnIceCandidate(
       const webrtc::IceCandidateInterface* candidate) override;
