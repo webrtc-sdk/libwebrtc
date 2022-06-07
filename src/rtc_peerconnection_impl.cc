@@ -70,11 +70,11 @@ static std::map<webrtc::PeerConnectionInterface::PeerConnectionState,
          libwebrtc::RTCPeerConnectionState::RTCPeerConnectionStateConnected},
         {webrtc::PeerConnectionInterface::PeerConnectionState::kDisconnected,
          libwebrtc::RTCPeerConnectionState::
-             RTCPeerConnectionStatekDisconnected},
+             RTCPeerConnectionStateDisconnected},
         {webrtc::PeerConnectionInterface::PeerConnectionState::kClosed,
-         libwebrtc::RTCPeerConnectionState::RTCPeerConnectionStatekClosed},
+         libwebrtc::RTCPeerConnectionState::RTCPeerConnectionStateClosed},
         {webrtc::PeerConnectionInterface::PeerConnectionState::kFailed,
-         libwebrtc::RTCPeerConnectionState::RTCPeerConnectionStatekFailed}};
+         libwebrtc::RTCPeerConnectionState::RTCPeerConnectionStateFailed}};
 
 static std::map<webrtc::PeerConnectionInterface::IceGatheringState,
                 libwebrtc::RTCIceGatheringState>

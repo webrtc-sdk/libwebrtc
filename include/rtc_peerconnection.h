@@ -24,9 +24,9 @@ enum RTCPeerConnectionState {
   RTCPeerConnectionStateNew,
   RTCPeerConnectionStateConnecting,
   RTCPeerConnectionStateConnected,
-  RTCPeerConnectionStatekDisconnected,
-  RTCPeerConnectionStatekFailed,
-  RTCPeerConnectionStatekClosed,
+  RTCPeerConnectionStateDisconnected,
+  RTCPeerConnectionStateFailed,
+  RTCPeerConnectionStateClosed,
 };
 
 enum RTCSignalingState {
