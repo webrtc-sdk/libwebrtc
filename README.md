@@ -10,11 +10,17 @@ Use the https://github.com/webrtc-sdk/webrtc.git branch m97_release to compile.
 
 ## Usage
 
+### Create checkout dir
+
 ```
 mkdir webrtc_src_m97
 cd webrtc_src_m97
+```
 
-echo "solutions = [
+### Create .gclient
+
+```
+solutions = [
   {
     "name"        : 'src',
     "url"         : 'https://github.com/webrtc-sdk/webrtc.git@m97_release',
@@ -25,15 +31,23 @@ echo "solutions = [
     "custom_vars": {},
   },
 ]
-target_os  = ['win']" > .gclient
-
-gclient sync
-
-cd src
-git clone https://github.com/cloudwebrtc/libwebrtc.git
+target_os  = ['win']
 ```
 
-- Modify webrtc's src/BUILD.gn file and add libwebrtc to group("default").
+### Synchronize source code
+
+```
+gclient sync
+```
+
+### Compile steps for libwebrtc
+Confirm that it is currently in the `src`.
+
+```
+git clone https://github.com/webrtc-sdk/libwebrtc
+```
+
+### Modify webrtc's src/BUILD.gn file and add libwebrtc to group("default").
 
 ```patch
 diff --git a/BUILD.gn b/BUILD.gn
@@ -51,7 +65,7 @@ index e60d7dd0bd..b9b6acab8b 100644
      }
 ```
 
-- GN
+### GN
 
 ```
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
@@ -62,7 +76,7 @@ cd src
 gn gen out-debug/Windows-x64 --args="target_os=\"win\" target_cpu=\"x64\" is_component_build=false is_clang=true is_debug=true rtc_use_h264=true rtc_include_tests=false" --ide=vs2019
 ```
 
-- Compile
+### Compile
 
 ```
 ninja -C out-debug/Windows-x64 libwebrtc
