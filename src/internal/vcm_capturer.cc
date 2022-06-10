@@ -20,7 +20,8 @@
 namespace webrtc {
 namespace internal {
 
-VcmCapturer::VcmCapturer() : vcm_(nullptr) {}
+VcmCapturer::VcmCapturer(rtc::Thread* worker_thread)
+    : vcm_(nullptr), worker_thread_(worker_thread) {}
 
 bool VcmCapturer::Init(size_t width,
                        size_t height,
@@ -38,10 +39,14 @@ bool VcmCapturer::Init(size_t width,
     return false;
   }
 
-  vcm_ = webrtc::VideoCaptureFactory::Create(unique_name);
+  vcm_ = worker_thread_->Invoke<rtc::scoped_refptr<VideoCaptureModule>>(
+      RTC_FROM_HERE,
+      [&] { return webrtc::VideoCaptureFactory::Create(unique_name); });
+
   if (!vcm_) {
     return false;
   }
+
   vcm_->RegisterCaptureDataCallback(this);
 
   device_info->GetCapability(vcm_->CurrentDeviceName(), 0, capability_);
@@ -51,21 +56,27 @@ bool VcmCapturer::Init(size_t width,
   capability_.maxFPS = static_cast<int32_t>(target_fps);
   capability_.videoType = VideoType::kI420;
 
-  if (vcm_->StartCapture(capability_) != 0) {
+  int32_t result = worker_thread_->Invoke<bool>(
+      RTC_FROM_HERE, [&] { return vcm_->StartCapture(capability_); });
+
+
+  if (result != 0) {
     Destroy();
     return false;
   }
 
-  RTC_CHECK(vcm_->CaptureStarted());
+  RTC_CHECK(worker_thread_->Invoke<bool>(
+      RTC_FROM_HERE, [&] { return vcm_->CaptureStarted(); }));
 
   return true;
 }
 
-VcmCapturer* VcmCapturer::Create(size_t width,
+VcmCapturer* VcmCapturer::Create(rtc::Thread* worker_thread,
+                                 size_t width,
                                  size_t height,
                                  size_t target_fps,
                                  size_t capture_device_index) {
-  std::unique_ptr<VcmCapturer> vcm_capturer(new VcmCapturer());
+  std::unique_ptr<VcmCapturer> vcm_capturer(new VcmCapturer(worker_thread));
   if (!vcm_capturer->Init(width, height, target_fps, capture_device_index)) {
     RTC_LOG(LS_WARNING) << "Failed to create VcmCapturer(w = " << width
                         << ", h = " << height << ", fps = " << target_fps
@@ -79,10 +90,13 @@ void VcmCapturer::Destroy() {
   if (!vcm_)
     return;
 
-  vcm_->StopCapture();
   vcm_->DeRegisterCaptureDataCallback();
-  // Release reference to VCM.
-  vcm_ = nullptr;
+
+  worker_thread_->Invoke<void>(RTC_FROM_HERE, [&] {
+    vcm_->StopCapture();
+    // Release reference to VCM.
+    vcm_ = nullptr;
+  });
 }
 
 VcmCapturer::~VcmCapturer() {
@@ -93,7 +107,7 @@ void VcmCapturer::OnFrame(const VideoFrame& frame) {
   VideoCapturer::OnFrame(frame);
 }
 
-rtc::scoped_refptr<CapturerTrackSource> CapturerTrackSource::Create() {
+rtc::scoped_refptr<CapturerTrackSource> CapturerTrackSource::Create(rtc::Thread* worker_thread) {
   const size_t kWidth = 640;
   const size_t kHeight = 480;
   const size_t kFps = 30;
@@ -105,7 +119,7 @@ rtc::scoped_refptr<CapturerTrackSource> CapturerTrackSource::Create() {
   }
   int num_devices = info->NumberOfDevices();
   for (int i = 0; i < num_devices; ++i) {
-    capturer = absl::WrapUnique(VcmCapturer::Create(kWidth, kHeight, kFps, i));
+    capturer = absl::WrapUnique(VcmCapturer::Create(worker_thread, kWidth, kHeight, kFps, i));
     if (capturer) {
       return new rtc::RefCountedObject<CapturerTrackSource>(
           std::move(capturer));

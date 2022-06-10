@@ -142,7 +142,8 @@ scoped_refptr<RTCAudioDevice> RTCPeerConnectionFactoryImpl::GetAudioDevice() {
 scoped_refptr<RTCVideoDevice> RTCPeerConnectionFactoryImpl::GetVideoDevice() {
   if (!video_device_impl_)
     video_device_impl_ = scoped_refptr<RTCVideoDeviceImpl>(
-        new RefCountedObject<RTCVideoDeviceImpl>(signaling_thread_));
+        new RefCountedObject<RTCVideoDeviceImpl>(signaling_thread_,
+                                                 worker_thread_));
 
   return video_device_impl_;
 }
