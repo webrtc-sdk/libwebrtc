@@ -142,7 +142,8 @@ scoped_refptr<RTCAudioDevice> RTCPeerConnectionFactoryImpl::GetAudioDevice() {
 scoped_refptr<RTCVideoDevice> RTCPeerConnectionFactoryImpl::GetVideoDevice() {
   if (!video_device_impl_)
     video_device_impl_ = scoped_refptr<RTCVideoDeviceImpl>(
-        new RefCountedObject<RTCVideoDeviceImpl>(signaling_thread_));
+        new RefCountedObject<RTCVideoDeviceImpl>(signaling_thread_,
+                                                 worker_thread_));
 
   return video_device_impl_;
 }
@@ -224,14 +225,14 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_d(
     scoped_refptr<RTCDesktopCapturer> capturer,
     const char* video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
-  
+
   RTCDesktopCapturerImpl* capturer_impl =
-      static_cast<RTCDesktopCapturerImpl*>(capturer.get());  
-  
+      static_cast<RTCDesktopCapturerImpl*>(capturer.get());
+
   // /*RTCMediaConstraintsImpl* media_constraints =
   //         static_cast<RTCMediaConstraintsImpl*>(constraints.get());*/
- 
-  rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =      
+
+  rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
       new rtc::RefCountedObject<webrtc::internal::ScreenCapturerTrackSource>(
           capturer_impl->video_capturer());
 

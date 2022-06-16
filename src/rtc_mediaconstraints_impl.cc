@@ -41,8 +41,6 @@ const char* RTCMediaConstraints::kValueTrue =
     webrtc::MediaConstraints::kValueTrue;
 const char* RTCMediaConstraints::kValueFalse =
     webrtc::MediaConstraints::kValueFalse;
-const char* RTCMediaConstraints::kEnableDtlsSrtp =
-    webrtc::MediaConstraints::kEnableDtlsSrtp;
 const char* RTCMediaConstraints::kEnableDscp =
     webrtc::MediaConstraints::kEnableDscp;
 const char* RTCMediaConstraints::kEnableIPv6 =

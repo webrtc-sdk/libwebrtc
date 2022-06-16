@@ -55,8 +55,7 @@ public:
 
     static std::unique_ptr<MSDKVideoDecoder> Create(cricket::VideoCodec format);
 
-    int32_t InitDecode(const webrtc::VideoCodec* codecSettings, int32_t numberOfCores)
-        override;
+    bool Configure(const Settings& settings) override;
 
     int32_t Decode(
         const webrtc::EncodedImage& inputImage, bool missingFrames,
@@ -109,7 +108,7 @@ private:
     int height_;
     std::unique_ptr<rtc::Thread> decoder_thread_;  // Thread on which the decoder will be working on.
 
-    webrtc::VideoCodec codec_;
+    webrtc::VideoDecoder::Settings settings_;
     webrtc::DecodedImageCallback* callback_;
     webrtc::Mutex timestampCS_;
     std::vector<int64_t> ntp_time_ms_;
