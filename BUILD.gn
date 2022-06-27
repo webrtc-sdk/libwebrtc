@@ -67,6 +67,10 @@ rtc_shared_library("libwebrtc"){
     "src/rtc_desktop_device_impl.cc",
     "src/rtc_desktop_capturer.h",
     "src/rtc_desktop_capturer.cc",
+    "src/rtc_desktop_capturer_impl.h",
+    "src/rtc_desktop_capturer_impl.cc",
+    "src/rtc_desktop_media_list_impl.h",
+    "src/rtc_desktop_media_list_impl.cc",
     "src/rtc_ice_candidate_impl.h",
     "src/rtc_ice_candidate_impl.cc",
     "src/rtc_peerconnection_impl.h",
@@ -198,6 +202,7 @@ rtc_shared_library("libwebrtc"){
       "../rtc_base:rtc_base",
       "//third_party/abseil-cpp/absl/memory",
       "//third_party/libyuv",
+      "//third_party:jpeg",
   ]
   libs = []
 
