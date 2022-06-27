@@ -86,6 +86,7 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
   int height = frame->size().height();
   int real_width = width;
 
+#if defined(TARGET_OS_OSX)
   if(type_ == kWindow) {
     int multiple = 0;
 #if defined(WEBRTC_ARCH_X86_FAMILY)
@@ -99,6 +100,7 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
       width = (width / multiple + 1) * multiple;
     }
   }
+ #endif
  
   if (!i420_buffer_ || !i420_buffer_.get() ||
       i420_buffer_->width() * i420_buffer_->height() != real_width * height) {

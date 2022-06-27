@@ -177,6 +177,7 @@ void RTCDesktopMediaListImpl::MediaSource::SaveCaptureResult(webrtc::DesktopCapt
   int height = frame->size().height();
   int real_width = width;
 
+#if defined(TARGET_OS_OSX)
   if(type_ == kWindow) {
     int multiple = 0;
 #if defined(WEBRTC_ARCH_X86_FAMILY)
@@ -190,6 +191,7 @@ void RTCDesktopMediaListImpl::MediaSource::SaveCaptureResult(webrtc::DesktopCapt
       width = (width / multiple + 1) * multiple;
     }
   }
+#endif
 
   cinfo.image_width = real_width;
   cinfo.image_height = height;
