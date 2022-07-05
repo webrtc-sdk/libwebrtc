@@ -161,8 +161,8 @@ scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
 scoped_refptr<RTCDesktopDevice>
 RTCPeerConnectionFactoryImpl::GetDesktopDevice() {
   if (!desktop_device_impl_) {
-    desktop_device_impl_ = scoped_refptr<DesktopDeviceImpl>(
-        new RefCountedObject<DesktopDeviceImpl>());
+    desktop_device_impl_ = scoped_refptr<RTCDesktopDeviceImpl>(
+        new RefCountedObject<RTCDesktopDeviceImpl>(signaling_thread_));
   }
   return desktop_device_impl_;
 }
@@ -199,6 +199,46 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
           capturer_impl->video_capturer());
   scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(
       new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
+  return source;
+}
+
+scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource(
+    scoped_refptr<RTCDesktopCapturer> capturer,
+    const string video_source_label,
+    scoped_refptr<RTCMediaConstraints> constraints) {
+  if (rtc::Thread::Current() != signaling_thread_) {
+    scoped_refptr<RTCVideoSource> source =
+        signaling_thread_->Invoke<scoped_refptr<RTCVideoSource>>(
+            RTC_FROM_HERE, [this, capturer, video_source_label, constraints] {
+              return CreateVideoSource_d(
+                  capturer, to_std_string(video_source_label).c_str(),
+                  constraints);
+            });
+    return source;
+  }
+
+  return CreateVideoSource_d(
+      capturer, to_std_string(video_source_label).c_str(), constraints);
+}
+
+scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_d(
+    scoped_refptr<RTCDesktopCapturer> capturer,
+    const char* video_source_label,
+    scoped_refptr<RTCMediaConstraints> constraints) {
+
+  RTCDesktopCapturerImpl* capturer_impl =
+      static_cast<RTCDesktopCapturerImpl*>(capturer.get());
+
+  // /*RTCMediaConstraintsImpl* media_constraints =
+  //         static_cast<RTCMediaConstraintsImpl*>(constraints.get());*/
+
+  rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
+      new rtc::RefCountedObject<webrtc::internal::ScreenCapturerTrackSource>(
+          capturer_impl->video_capturer());
+
+  scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(
+      new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
+
   return source;
 }
 
