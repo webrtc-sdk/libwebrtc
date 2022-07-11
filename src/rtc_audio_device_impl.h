@@ -5,13 +5,14 @@
 #include "modules/audio_device/include/audio_device.h"
 #include "rtc_audio_device.h"
 #include "rtc_base/ref_count.h"
+#include "rtc_base/thread.h"
 
 namespace libwebrtc {
 class AudioDeviceImpl : public RTCAudioDevice {
  public:
   AudioDeviceImpl(
-      rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module)
-      : audio_device_module_(audio_device_module) {}
+      rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module,
+      rtc::Thread* worker_thread);
 
   virtual ~AudioDeviceImpl();
 
@@ -34,6 +35,7 @@ class AudioDeviceImpl : public RTCAudioDevice {
 
  private:
   rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
+  rtc::Thread* worker_thread_ = nullptr;
 };
 
 }  // namespace libwebrtc
