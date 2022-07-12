@@ -81,8 +81,10 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
 }
 
 bool RTCPeerConnectionFactoryImpl::Terminate() {
-  audio_device_impl_ = nullptr;
-  video_device_impl_ = nullptr;
+  worker_thread_->Invoke<void>(RTC_FROM_HERE, [&] {
+    audio_device_impl_ = nullptr;
+    video_device_impl_ = nullptr;
+  });
   rtc_peerconnection_factory_ = NULL;
   if (audio_device_module_) {
     worker_thread_->Invoke<void>(RTC_FROM_HERE,
@@ -134,7 +136,7 @@ scoped_refptr<RTCAudioDevice> RTCPeerConnectionFactoryImpl::GetAudioDevice() {
 
   if (!audio_device_impl_)
     audio_device_impl_ = scoped_refptr<AudioDeviceImpl>(
-        new RefCountedObject<AudioDeviceImpl>(audio_device_module_));
+        new RefCountedObject<AudioDeviceImpl>(audio_device_module_,worker_thread_));
 
   return audio_device_impl_;
 }
