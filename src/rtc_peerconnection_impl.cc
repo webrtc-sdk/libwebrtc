@@ -411,7 +411,8 @@ bool RTCPeerConnectionImpl::Initialize() {
 
   RTCMediaConstraintsImpl* media_constraints =
       static_cast<RTCMediaConstraintsImpl*>(constraints_.get());
-  CopyConstraintsIntoRtcConfiguration(media_constraints, &config);
+  webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),media_constraints->GetOptional());   
+  CopyConstraintsIntoRtcConfiguration(&rtc_constraints, &config);
 
   webrtc::PeerConnectionFactoryInterface::Options options;
   options.disable_encryption =
@@ -565,7 +566,8 @@ void RTCPeerConnectionImpl::CreateOffer(
   RTCMediaConstraintsImpl* media_constraints =
       static_cast<RTCMediaConstraintsImpl*>(constraints.get());
   webrtc::PeerConnectionInterface::RTCOfferAnswerOptions offer_answer_options;
-  if (CopyConstraintsIntoOfferAnswerOptions(media_constraints,
+  webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),media_constraints->GetOptional());
+  if (CopyConstraintsIntoOfferAnswerOptions(&rtc_constraints,
                                             &offer_answer_options) == false) {
     offer_answer_options = offer_answer_options_;
   }
@@ -587,7 +589,8 @@ void RTCPeerConnectionImpl::CreateAnswer(
   RTCMediaConstraintsImpl* media_constraints =
       static_cast<RTCMediaConstraintsImpl*>(constraints.get());
   webrtc::PeerConnectionInterface::RTCOfferAnswerOptions offer_answer_options;
-  if (CopyConstraintsIntoOfferAnswerOptions(media_constraints,
+  webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),media_constraints->GetOptional());
+  if (CopyConstraintsIntoOfferAnswerOptions(&rtc_constraints,
                                             &offer_answer_options) == false) {
     offer_answer_options = offer_answer_options_;
   }

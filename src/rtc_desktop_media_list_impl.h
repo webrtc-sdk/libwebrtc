@@ -57,6 +57,8 @@ public:
         // Returns the thumbnail of the source, jpeg format.
         std::vector<unsigned char> thumbnail() const { return thumbnail_; }
 
+        DesktopType type() const { return type_; }
+
         void SaveCaptureResult(webrtc::DesktopCapturer::Result result,
                                         std::unique_ptr<webrtc::DesktopFrame> frame);
     private:

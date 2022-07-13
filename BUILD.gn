@@ -25,7 +25,6 @@ rtc_shared_library("libwebrtc"){
     "include/rtc_audio_track.h",
     "include/rtc_audio_source.h",
     "include/rtc_data_channel.h",
-    "include/rtc_desktop_device.h",
     "include/rtc_ice_candidate.h",
     "include/rtc_media_stream.h",
     "include/rtc_media_track.h",
@@ -63,10 +62,6 @@ rtc_shared_library("libwebrtc"){
     "src/rtc_audio_track_impl.cc",
     "src/rtc_data_channel_impl.h",
     "src/rtc_data_channel_impl.cc",
-    "src/rtc_desktop_device_impl.h",
-    "src/rtc_desktop_device_impl.cc",
-    "src/rtc_desktop_capturer.h",
-    "src/rtc_desktop_capturer.cc",
     "src/rtc_desktop_capturer_impl.h",
     "src/rtc_desktop_capturer_impl.cc",
     "src/rtc_desktop_media_list_impl.h",
@@ -97,6 +92,7 @@ rtc_shared_library("libwebrtc"){
     "src/internal/video_capturer.cc",
     "src/internal/vcm_capturer.h",
     "src/internal/vcm_capturer.cc",
+
     "src/rtc_rtp_sender_impl.cc",
     "src/rtc_rtp_sender_impl.h",
     "src/rtc_rtp_transceiver_impl.cc",
@@ -154,7 +150,6 @@ rtc_shared_library("libwebrtc"){
   defines = [ 
     "USE_LIBYUV",
     "WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE",
-    "USE_INTEL_MEDIA_SDK",
   ]
 
   if(is_win) {
@@ -194,7 +189,6 @@ rtc_shared_library("libwebrtc"){
       "../media:rtc_media",
       "../media:rtc_media_base",
       "../modules/audio_device:audio_device",
-      "../modules/desktop_capture",
       "../modules/audio_processing:api",
       "../modules/audio_processing:audio_processing",
       "../modules/video_capture:video_capture_module",
@@ -202,10 +196,22 @@ rtc_shared_library("libwebrtc"){
       "../rtc_base:rtc_base",
       "//third_party/abseil-cpp/absl/memory",
       "//third_party/libyuv",
-      "//third_party:jpeg",
+      "//third_party/libjpeg_turbo:libjpeg",
   ]
   libs = []
 
+
+  if(is_win) {
+    defines += [ "RTC_DESKTOP_DEVICE"]
+    sources += [
+      "include/rtc_desktop_device.h",
+      "src/rtc_desktop_device_impl.h",
+      "src/rtc_desktop_device_impl.cc",    
+      "src/interanl/desktop_capturer.h",
+      "src/internal/desktop_capturer.cc",      
+    ]
+     deps += ["../modules/desktop_capture"]
+  }
   if(is_win) {
     libs += [ "libmfx_vs2015.lib" ]
     lib_dirs = [ "src\win\lib\x64" ]

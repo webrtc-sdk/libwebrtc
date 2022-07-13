@@ -11,6 +11,10 @@
 #define LIB_WEBRTC_API
 #endif
 
+#if !defined(RTC_DESKTOP_DEVICE) && defined(WIN32)
+#define RTC_DESKTOP_DEVICE
+#endif
+
 #include "base/fixed_size_function.h"
 #include "base/portable.h"
 #include "base/refcount.h"
@@ -98,6 +102,21 @@ struct SdpParseError {
   // Explains the error.
   string description;
 };
+
+enum SourceType {
+     kWindow,
+     kEntireScreen,
+};
+
+struct Source {
+  public:
+    string id;
+    string title;
+    SourceType type;
+};
+
+// typedef portable::vector<Source> SourceList;
+using SourceList = portable::vector<Source>;
 
 }  // namespace libwebrtc
 

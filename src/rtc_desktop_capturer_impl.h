@@ -38,7 +38,7 @@ class RTCDesktopCapturerImpl : public webrtc::DesktopCapturer::Callback,
 
  public:
   RTCDesktopCapturerImpl(DesktopType type, webrtc::DesktopCapturer::SourceId source_id);
-  virtual ~RTCDesktopCapturerImpl();
+  ~RTCDesktopCapturerImpl();
 
   virtual CaptureState Start(uint32_t fps);
 
