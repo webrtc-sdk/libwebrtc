@@ -19,6 +19,7 @@
 
 #include "api/video/i420_buffer.h"
 #include "api/video/video_frame.h"
+#include "modules/desktop_capture/desktop_and_cursor_composer.h"
 #include "modules/desktop_capture/desktop_capture_options.h"
 #include "modules/desktop_capture/desktop_capturer.h"
 #include "modules/desktop_capture/desktop_frame.h"
@@ -28,16 +29,29 @@
 
 namespace libwebrtc {
 
+enum DesktopType { kScreen, kWindow };
+
+class RTCDesktopCapturerImpl;
+
+class DesktopCapturerObserver {
+public:
+  virtual void OnStart(RTCDesktopCapturerImpl *capturer) = 0;
+  virtual void OnPaused(RTCDesktopCapturerImpl *capturer) = 0;
+  virtual void OnStop(RTCDesktopCapturerImpl *capturer) = 0;
+  virtual void OnError(RTCDesktopCapturerImpl *capturer) = 0;
+
+protected:
+   ~DesktopCapturerObserver() {}
+};
+
 class RTCDesktopCapturerImpl : public webrtc::DesktopCapturer::Callback,
                                public rtc::MessageHandler,
                                public webrtc::internal::VideoCapturer {
  public:
   enum CaptureState { CS_RUNNING, CS_STOPPED, CS_FAILED};
 
-  enum DesktopType { kScreen, kWindow };
-
  public:
-  RTCDesktopCapturerImpl(DesktopType type, webrtc::DesktopCapturer::SourceId source_id);
+  RTCDesktopCapturerImpl(DesktopType type, webrtc::DesktopCapturer::SourceId source_id, DesktopCapturerObserver *observer);
   ~RTCDesktopCapturerImpl();
 
   virtual CaptureState Start(uint32_t fps);
@@ -60,7 +74,9 @@ class RTCDesktopCapturerImpl : public webrtc::DesktopCapturer::Callback,
   CaptureState capture_state_ = CS_STOPPED;
   DesktopType type_;
   webrtc::DesktopCapturer::SourceId source_id_;
+  DesktopCapturerObserver *observer_;
   uint32_t capture_delay_ = 1000; // 1s
+  webrtc::DesktopCapturer::Result result_ = webrtc::DesktopCapturer::Result::SUCCESS;
 };
 
 }  // namespace webrtc

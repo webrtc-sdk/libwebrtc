@@ -23,15 +23,15 @@ namespace libwebrtc {
 enum { kCaptureDelay = 33, kCaptureMessageId = 1000 };
 
 RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
-    DesktopType type,webrtc::DesktopCapturer::SourceId source_id)
-    : thread_(rtc::Thread::Create()), source_id_(source_id) {
+    DesktopType type,webrtc::DesktopCapturer::SourceId source_id, DesktopCapturerObserver *observer)
+    : thread_(rtc::Thread::Create()), source_id_(source_id),observer_(observer) {
+  RTC_DCHECK(observer_);
   options_ = webrtc::DesktopCaptureOptions::CreateDefault();
   options_.set_detect_updated_region(true);
-
   if (type == kScreen) {
-    capturer_ = webrtc::DesktopCapturer::CreateScreenCapturer(options_);
+    capturer_ = std::make_unique<webrtc::DesktopAndCursorComposer>(webrtc::DesktopCapturer::CreateScreenCapturer(options_), options_);
   }
-  else { capturer_ = webrtc::DesktopCapturer::CreateWindowCapturer(options_); }
+  else { capturer_ = std::make_unique<webrtc::DesktopAndCursorComposer>(webrtc::DesktopCapturer::CreateWindowCapturer(options_), options_); }
   type_ = type;
   thread_->Start();
 }
@@ -42,8 +42,7 @@ RTCDesktopCapturerImpl::~RTCDesktopCapturerImpl() {
 
 RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
     uint32_t fps) {
-
-  if(fps == 0) {
+if(fps == 0) {
       capture_state_ = CS_FAILED;
       return capture_state_;
   }
@@ -55,19 +54,27 @@ RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
   }
 
   if(source_id_ != -1) {
-    if(!capturer_->SelectSource(source_id_) && (type_ == kWindow && !capturer_->FocusOnSelectedSource())) {
+    if(!capturer_->SelectSource(source_id_)) {
         capture_state_ = CS_FAILED;
         return capture_state_;
+    }
+    if(type_ == kWindow) {
+      if(!capturer_->FocusOnSelectedSource()) {
+        capture_state_ = CS_FAILED;
+        return capture_state_;
+      }
     }
   }
 
   capturer_->Start(this);
   capture_state_ = CS_RUNNING;
   CaptureFrame();
+  observer_->OnStart(this);
   return capture_state_;
 }
 
 void RTCDesktopCapturerImpl::Stop() {
+  observer_->OnStop(this);
   capture_state_ = CS_STOPPED;
 }
 
@@ -78,8 +85,27 @@ bool RTCDesktopCapturerImpl::IsRunning() {
 void RTCDesktopCapturerImpl::OnCaptureResult(
     webrtc::DesktopCapturer::Result result,
                                         std::unique_ptr<webrtc::DesktopFrame> frame) {
-  if (result != webrtc::DesktopCapturer::Result::SUCCESS) {
-    return;
+  if (result != result_) {
+    if (result == webrtc::DesktopCapturer::Result::ERROR_PERMANENT) {
+      observer_->OnError(this);
+      capture_state_ = CS_FAILED;
+      return;
+    }
+
+    if (result == webrtc::DesktopCapturer::Result::ERROR_TEMPORARY) {
+      result_ = result;
+      observer_->OnPaused(this);
+      return;
+    }
+
+    if (result == webrtc::DesktopCapturer::Result::SUCCESS) {
+      result_ = result;
+      observer_->OnStart(this);
+    }
+  }
+
+  if (result == webrtc::DesktopCapturer::Result::ERROR_TEMPORARY) {
+      return;
   }
   
   int width = frame->size().width();
