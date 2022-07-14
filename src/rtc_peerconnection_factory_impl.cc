@@ -22,7 +22,6 @@
 #include "engine/sdk/objc/Framework/Classes/videotoolboxvideocodecfactory.h"
 #endif
 #include <api/task_queue/default_task_queue_factory.h>
-#include "src/internal/desktop_capturer.h"
 
 namespace libwebrtc {
 
@@ -161,6 +160,7 @@ scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
   return source;
 }
 
+#ifdef RTC_DESKTOP_DEVICE
 scoped_refptr<RTCDesktopDevice>
 RTCPeerConnectionFactoryImpl::GetDesktopDevice() {
   if (!desktop_device_impl_) {
@@ -169,6 +169,7 @@ RTCPeerConnectionFactoryImpl::GetDesktopDevice() {
   }
   return desktop_device_impl_;
 }
+#endif
 
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource(
     scoped_refptr<RTCVideoCapturer> capturer,
@@ -205,6 +206,7 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
   return source;
 }
 
+#ifdef RTC_DESKTOP_DEVICE
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource(
     scoped_refptr<RTCDesktopCapturer> capturer,
     const string video_source_label,
@@ -213,18 +215,18 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource(
     scoped_refptr<RTCVideoSource> source =
         signaling_thread_->Invoke<scoped_refptr<RTCVideoSource>>(
             RTC_FROM_HERE, [this, capturer, video_source_label, constraints] {
-              return CreateVideoSource_d(
+              return CreateDesktopSource_d(
                   capturer, to_std_string(video_source_label).c_str(),
                   constraints);
             });
     return source;
   }
 
-  return CreateVideoSource_d(
+  return CreateDesktopSource_d(
       capturer, to_std_string(video_source_label).c_str(), constraints);
 }
 
-scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_d(
+scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource_d(
     scoped_refptr<RTCDesktopCapturer> capturer,
     const char* video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
@@ -238,6 +240,7 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_d(
 
   return source;
 }
+#endif
 
 scoped_refptr<RTCMediaStream> RTCPeerConnectionFactoryImpl::CreateStream(
     const string stream_id) {
