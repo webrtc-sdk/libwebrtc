@@ -40,8 +40,7 @@ class MediaSourceImpl : public MediaSource {
   webrtc::DesktopCapturer::Source source;
 
   virtual string id() const override { 
-      // TODO:
-      return string("");
+      return string(std::to_string(source.id));
   }
 
   // source id
