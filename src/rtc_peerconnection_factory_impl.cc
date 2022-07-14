@@ -22,6 +22,7 @@
 #include "engine/sdk/objc/Framework/Classes/videotoolboxvideocodecfactory.h"
 #endif
 #include <api/task_queue/default_task_queue_factory.h>
+#include "src/internal/desktop_capturer.h"
 
 namespace libwebrtc {
 
@@ -159,7 +160,7 @@ scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
       new RefCountedObject<RTCAudioSourceImpl>(rtc_source_track));
   return source;
 }
-#ifdef RTC_DESKTOP_DEVICE   
+
 scoped_refptr<RTCDesktopDevice>
 RTCPeerConnectionFactoryImpl::GetDesktopDevice() {
   if (!desktop_device_impl_) {
@@ -168,7 +169,7 @@ RTCPeerConnectionFactoryImpl::GetDesktopDevice() {
   }
   return desktop_device_impl_;
 }
-#endif
+
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource(
     scoped_refptr<RTCVideoCapturer> capturer,
     const string video_source_label,
@@ -204,7 +205,6 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
   return source;
 }
 
-#ifdef RTC_DESKTOP_DEVICE   
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource(
     scoped_refptr<RTCDesktopCapturer> capturer,
     const string video_source_label,
@@ -229,22 +229,15 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_d(
     const char* video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
   
-  RTCDesktopCapturerImpl* capturer_impl =
-      static_cast<RTCDesktopCapturerImpl*>(capturer.get());
-
-  // /*RTCMediaConstraintsImpl* media_constraints =
-  //         static_cast<RTCMediaConstraintsImpl*>(constraints.get());*/
-
   rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
-      new rtc::RefCountedObject<webrtc::internal::ScreenCapturerTrackSource>(
-          capturer_impl->video_capturer());
+      new rtc::RefCountedObject<ScreenCapturerTrackSource>(
+          capturer);
 
   scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(
       new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
 
   return source;
 }
-#endif
 
 scoped_refptr<RTCMediaStream> RTCPeerConnectionFactoryImpl::CreateStream(
     const string stream_id) {

@@ -17,6 +17,9 @@
 #ifndef LIBWEBRTC_RTC_DESKTOP_CAPTURER_IMPL_HXX
 #define LIBWEBRTC_RTC_DESKTOP_CAPTURER_IMPL_HXX
 
+#include "include/rtc_types.h"
+#include "include/rtc_desktop_capturer.h"
+
 #include "api/video/i420_buffer.h"
 #include "api/video/video_frame.h"
 #include "modules/desktop_capture/desktop_and_cursor_composer.h"
@@ -29,36 +32,35 @@
 
 namespace libwebrtc {
 
-enum DesktopType { kScreen, kWindow };
-
-class RTCDesktopCapturerImpl;
-
-class DesktopCapturerObserver {
-public:
-  virtual void OnStart(RTCDesktopCapturerImpl *capturer) = 0;
-  virtual void OnPaused(RTCDesktopCapturerImpl *capturer) = 0;
-  virtual void OnStop(RTCDesktopCapturerImpl *capturer) = 0;
-  virtual void OnError(RTCDesktopCapturerImpl *capturer) = 0;
-
-protected:
-   ~DesktopCapturerObserver() {}
-};
-
-class RTCDesktopCapturerImpl : public webrtc::DesktopCapturer::Callback,
+class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
+                               public webrtc::DesktopCapturer::Callback,
                                public rtc::MessageHandler,
                                public webrtc::internal::VideoCapturer {
  public:
-  enum CaptureState { CS_RUNNING, CS_STOPPED, CS_FAILED};
-
- public:
-  RTCDesktopCapturerImpl(DesktopType type, webrtc::DesktopCapturer::SourceId source_id, DesktopCapturerObserver *observer);
+  RTCDesktopCapturerImpl(DesktopType type,
+                         webrtc::DesktopCapturer::SourceId source_id,
+                         rtc::Thread* signaling_thread,
+                         scoped_refptr<MediaSource> source);
   ~RTCDesktopCapturerImpl();
 
-  virtual CaptureState Start(uint32_t fps);
+  void RegisterDesktopCapturerObserver(
+      DesktopCapturerObserver* observer) override {
+    observer_ = observer;
+  }
 
-  virtual void Stop();
+  void DeRegisterDesktopCapturerObserver() override  {
+    observer_ = nullptr;
+  }
 
-  virtual bool IsRunning();
+  CaptureState Start(uint32_t fps) override;
+
+  void Stop() override;
+
+  bool IsRunning() override;
+
+  scoped_refptr<MediaSource> source() override {
+      return source_;
+  }
 
  protected:
   virtual void OnCaptureResult(webrtc::DesktopCapturer::Result result,
@@ -74,9 +76,11 @@ class RTCDesktopCapturerImpl : public webrtc::DesktopCapturer::Callback,
   CaptureState capture_state_ = CS_STOPPED;
   DesktopType type_;
   webrtc::DesktopCapturer::SourceId source_id_;
-  DesktopCapturerObserver *observer_;
+  DesktopCapturerObserver *observer_ = nullptr;
   uint32_t capture_delay_ = 1000; // 1s
   webrtc::DesktopCapturer::Result result_ = webrtc::DesktopCapturer::Result::SUCCESS;
+  rtc::Thread* signaling_thread_ = nullptr;
+  scoped_refptr<MediaSource> source_;
 };
 
 }  // namespace webrtc

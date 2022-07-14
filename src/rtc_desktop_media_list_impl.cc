@@ -33,12 +33,13 @@ extern "C" {
 
 namespace libwebrtc {
 
-RTCDesktopMediaListImpl::RTCDesktopMediaListImpl(DesktopType type, MediaListObserver* observer)
-    :thread_(rtc::Thread::Create()),observer_(observer),type_(type) {
-  RTC_DCHECK(observer_);
+RTCDesktopMediaListImpl::RTCDesktopMediaListImpl(DesktopType type, rtc::Thread* signaling_thread)
+    :thread_(rtc::Thread::Create()),type_(type),signaling_thread_(signaling_thread) {
   options_ = webrtc::DesktopCaptureOptions::CreateDefault();
   options_.set_detect_updated_region(true);
-  //options_.set_allow_iosurface(true);
+#ifdef _MSC_VER
+  options_.set_allow_directx_capturer(false);
+#endif
   if (type == kScreen) {
     capturer_ = webrtc::DesktopCapturer::CreateScreenCapturer(options_);
   } else { 
@@ -57,7 +58,13 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload, bool get_th
 
   if(force_reload) {
     for( auto source : sources_) {
-        observer_->OnMediaSourceRemoved(source.get());
+      if(observer_) {
+        auto source_ptr = source.get();
+        signaling_thread_->Invoke<void>(
+          RTC_FROM_HERE,[&, source_ptr]() {
+            observer_->OnMediaSourceRemoved(source_ptr);
+          });
+      }
     }
     sources_.clear();
   }
@@ -75,8 +82,14 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload, bool get_th
   }
   // Iterate through the old sources to find the removed sources.
   for (size_t i = 0; i < sources_.size(); ++i) {
-    if (new_source_set.find(sources_[i]->id()) == new_source_set.end()) {
-      observer_->OnMediaSourceRemoved((*(sources_.begin() + i)).get());
+    if (new_source_set.find(sources_[i]->source_id()) == new_source_set.end()) {
+      if(observer_) {
+        auto source = (*(sources_.begin() + i)).get();
+        signaling_thread_->Invoke<void>(
+          RTC_FROM_HERE,[&, source]() {
+            observer_->OnMediaSourceRemoved(source);
+          });
+      }
       sources_.erase(sources_.begin() + i);
       --i;
     }
@@ -85,13 +98,19 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload, bool get_th
   if (new_sources.size() > sources_.size()) {
     SourceSet old_source_set;
     for (size_t i = 0; i < sources_.size(); ++i) {
-      old_source_set.insert(sources_[i]->id());
+      old_source_set.insert(sources_[i]->source_id());
     }
     for (size_t i = 0; i < new_sources.size(); ++i) {
       if (old_source_set.find(new_sources[i].id) == old_source_set.end()) {
-        MediaSource* source = new MediaSource(this, new_sources[i],type_);
-        sources_.insert(sources_.begin() + i, std::shared_ptr<MediaSource>(source));
-        observer_->OnMediaSourceAdded(source);
+        auto source =
+            new RefCountedObject<MediaSourceImpl>(this, new_sources[i], type_);
+        sources_.insert(sources_.begin() + i, source);
+        if(observer_) {
+          signaling_thread_->Invoke<void>(
+            RTC_FROM_HERE,[&, source]() {
+              observer_->OnMediaSourceAdded(source);
+            });
+        }
       }
     }
   }
@@ -101,26 +120,32 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload, bool get_th
   // Find the moved/changed sources.
   size_t pos = 0;
   while (pos < sources_.size()) {
-    if (!(sources_[pos]->id() == new_sources[pos].id)) {
+    if (!(sources_[pos]->source_id() == new_sources[pos].id)) {
       // Find the source that should be moved to |pos|, starting from |pos + 1|
       // of |sources_|, because entries before |pos| should have been sorted.
       size_t old_pos = pos + 1;
       for (; old_pos < sources_.size(); ++old_pos) {
-        if (sources_[old_pos]->id() == new_sources[pos].id)
+        if (sources_[old_pos]->source_id() == new_sources[pos].id)
           break;
       }
-      RTC_DCHECK(sources_[old_pos]->id() == new_sources[pos].id);
+      RTC_DCHECK(sources_[old_pos]->source_id() == new_sources[pos].id);
 
       // Move the source from |old_pos| to |pos|.
       auto temp = sources_[old_pos];
       sources_.erase(sources_.begin() + old_pos);
       sources_.insert(sources_.begin() + pos, temp);
-      //observer_->OnMediaSourceMoved:old_pos newIndex:pos];
+      //if(observer_) observer_->OnMediaSourceMoved:old_pos newIndex:pos];
     }
 
     if (sources_[pos]->source.title != new_sources[pos].title) {
       sources_[pos]->source.title = new_sources[pos].title;
-      observer_->OnMediaSourceNameChanged(sources_[pos].get());
+      if(observer_) {
+        auto source = sources_[pos].get();
+        signaling_thread_->Invoke<void>(
+          RTC_FROM_HERE,[&, source]() {
+            observer_->OnMediaSourceNameChanged(source);
+          });
+      }
     }
     ++pos;
   }
@@ -133,16 +158,22 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload, bool get_th
   return sources_.size();
 }
 
-bool RTCDesktopMediaListImpl::GetThumbnail(MediaSource *source) {
+bool RTCDesktopMediaListImpl::GetThumbnail(scoped_refptr<MediaSource> source) {
+  MediaSourceImpl* source_impl = static_cast<MediaSourceImpl*>(source.get());
   callback_->SetCallback([&](webrtc::DesktopCapturer::Result result,
                              std::unique_ptr<webrtc::DesktopFrame> frame) {
-    auto old_thumbnail = source->thumbnail();
-    source->SaveCaptureResult(result, std::move(frame));
-    if(old_thumbnail.size() != source->thumbnail().size()) {
-      observer_->OnMediaSourceThumbnailChanged(source);
+    auto old_thumbnail = source_impl->thumbnail();
+    source_impl->SaveCaptureResult(result, std::move(frame));
+    if (old_thumbnail.size() != source_impl->thumbnail().size()) {
+      if(observer_) {
+        signaling_thread_->Invoke<void>(
+            RTC_FROM_HERE, [&, source]() {
+            observer_->OnMediaSourceThumbnailChanged(source);
+          });
+      }
     }
   });
-  if(capturer_->SelectSource(source->id())){
+  if (capturer_->SelectSource(source_impl->source_id())) {
     capturer_->CaptureFrame();
     return true;
   }
@@ -153,15 +184,15 @@ int RTCDesktopMediaListImpl::GetSourceCount() const {
     return sources_.size();
 }
   
-MediaSource *RTCDesktopMediaListImpl::GetSource(int index) {
-    return sources_[index].get();
+scoped_refptr<MediaSource> RTCDesktopMediaListImpl::GetSource(int index) {
+    return sources_[index];
 }
 
-bool MediaSource::UpdateThumbnail() {
+bool MediaSourceImpl::UpdateThumbnail() {
   return mediaList_->GetThumbnail(this);
 }
 
-void MediaSource::SaveCaptureResult(webrtc::DesktopCapturer::Result result,
+void MediaSourceImpl::SaveCaptureResult(webrtc::DesktopCapturer::Result result,
                                         std::unique_ptr<webrtc::DesktopFrame> frame) {
   if (result != webrtc::DesktopCapturer::Result::SUCCESS) {
     return;
@@ -183,6 +214,7 @@ void MediaSource::SaveCaptureResult(webrtc::DesktopCapturer::Result result,
   int height = frame->size().height();
   int real_width = width;
 
+#if defined(TARGET_OS_OSX)
   if(type_ == kWindow) {
     int multiple = 0;
 #if defined(WEBRTC_ARCH_X86_FAMILY)
@@ -196,6 +228,7 @@ void MediaSource::SaveCaptureResult(webrtc::DesktopCapturer::Result result,
       width = (width / multiple + 1) * multiple;
     }
   }
+#endif
 
   cinfo.image_width = real_width;
   cinfo.image_height = height;

@@ -205,6 +205,8 @@ rtc_shared_library("libwebrtc"){
     defines += [ "RTC_DESKTOP_DEVICE"]
     sources += [
       "include/rtc_desktop_device.h",
+      "include/rtc_desktop_capturer.h",
+      "include/rtc_desktop_media_list.h",
       "src/rtc_desktop_device_impl.h",
       "src/rtc_desktop_device_impl.cc",    
       "src/interanl/desktop_capturer.h",
