@@ -17,7 +17,7 @@
 #include "rtc_desktop_media_list_impl.h"
 #include "rtc_base/checks.h"
 #include "third_party/libyuv/include/libyuv.h"
-
+#include "modules/desktop_capture/win/window_capture_utils.h"
 
 extern "C" {
 #if defined(USE_SYSTEM_LIBJPEG)
@@ -105,6 +105,7 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload, bool get_th
         auto source =
             new RefCountedObject<MediaSourceImpl>(this, new_sources[i], type_);
         sources_.insert(sources_.begin() + i, source);
+        GetThumbnail(source, false);
         if(observer_) {
           signaling_thread_->Invoke<void>(
             RTC_FROM_HERE,[&, source]() {
@@ -152,20 +153,20 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload, bool get_th
 
   if(get_thumbnail) {
     for( auto source : sources_) {
-       GetThumbnail(source.get());
+       GetThumbnail(source.get(), true);
     }
   }
   return sources_.size();
 }
 
-bool RTCDesktopMediaListImpl::GetThumbnail(scoped_refptr<MediaSource> source) {
+bool RTCDesktopMediaListImpl::GetThumbnail(scoped_refptr<MediaSource> source, bool notify) {
   MediaSourceImpl* source_impl = static_cast<MediaSourceImpl*>(source.get());
   callback_->SetCallback([&](webrtc::DesktopCapturer::Result result,
                              std::unique_ptr<webrtc::DesktopFrame> frame) {
     auto old_thumbnail = source_impl->thumbnail();
     source_impl->SaveCaptureResult(result, std::move(frame));
     if (old_thumbnail.size() != source_impl->thumbnail().size()) {
-      if(observer_) {
+      if(observer_ && notify) {
         signaling_thread_->Invoke<void>(
             RTC_FROM_HERE, [&, source]() {
             observer_->OnMediaSourceThumbnailChanged(source);
@@ -192,68 +193,92 @@ bool MediaSourceImpl::UpdateThumbnail() {
   return mediaList_->GetThumbnail(this);
 }
 
-void MediaSourceImpl::SaveCaptureResult(webrtc::DesktopCapturer::Result result,
+extern int filterException(int code, PEXCEPTION_POINTERS ex);
+
+void MediaSourceImpl::SaveCaptureResult(
+    webrtc::DesktopCapturer::Result result,
                                         std::unique_ptr<webrtc::DesktopFrame> frame) {
   if (result != webrtc::DesktopCapturer::Result::SUCCESS) {
     return;
   }
-  int quality = 80;
-  const int kColorPlanes = 4;  // alpha, R, G and B.
-  unsigned char* out_buffer = NULL;
-  unsigned long out_size = 0;
-  // Invoking LIBJPEG
-  struct jpeg_compress_struct cinfo;
-  struct jpeg_error_mgr jerr;
-  JSAMPROW row_pointer[1];
-  cinfo.err = jpeg_std_error(&jerr);
-  jpeg_create_compress(&cinfo);
-
-  jpeg_mem_dest(&cinfo, &out_buffer, &out_size);
 
   int width = frame->size().width();
   int height = frame->size().height();
-  int real_width = width;
 
-#if defined(TARGET_OS_OSX)
-  if(type_ == kWindow) {
-    int multiple = 0;
-#if defined(WEBRTC_ARCH_X86_FAMILY)
-    multiple = 16;
-#elif defined(WEBRTC_ARCH_ARM64)
-    multiple = 32;
-#endif
-    // A multiple of $multiple must be used as the width of the src frame,
-    // and the right black border needs to be cropped during conversion.
-    if( multiple != 0 && (width % multiple) != 0 ) {
-      width = (width / multiple + 1) * multiple;
+  webrtc::DesktopRect rect_ = webrtc::DesktopRect::MakeWH(width, height);
+
+  if (type_ != kScreen) {
+    webrtc::GetWindowRect(reinterpret_cast<HWND>(source_id()), &rect_);
+  }
+
+  __try {
+    if (!i420_buffer_ || !i420_buffer_.get() ||
+        i420_buffer_->width() * i420_buffer_->height() != width * height) {
+      i420_buffer_ = webrtc::I420Buffer::Create(width, height);
     }
+
+    libyuv::ConvertToI420(frame->data(), 0, i420_buffer_->MutableDataY(),
+                          i420_buffer_->StrideY(), i420_buffer_->MutableDataU(),
+                          i420_buffer_->StrideU(), i420_buffer_->MutableDataV(),
+                          i420_buffer_->StrideV(), 0, 0, rect_.width(),
+                          rect_.height(), width, height, libyuv::kRotate0,
+                          libyuv::FOURCC_ARGB);
+
+      webrtc::VideoFrame input_frame(i420_buffer_, 0, 0,
+                                   webrtc::kVideoRotation_0);
+
+
+     const int kColorPlanes = 3;  // R, G and B.
+      size_t rgb_len = input_frame.height() * input_frame.width() * kColorPlanes;
+      std::unique_ptr<uint8_t[]> rgb_buf(new uint8_t[rgb_len]);
+
+      // kRGB24 actually corresponds to FourCC 24BG which is 24-bit BGR.
+      if (ConvertFromI420(input_frame, webrtc::VideoType::kRGB24, 0, rgb_buf.get()) < 0) {
+        RTC_LOG(LS_ERROR) << "Could not convert input frame to RGB.";
+        return;
+      }
+
+      int quality = 80;
+      unsigned char* out_buffer = NULL;
+      unsigned long out_size = 0;
+      // Invoking LIBJPEG
+      struct jpeg_compress_struct cinfo;
+      struct jpeg_error_mgr jerr;
+      JSAMPROW row_pointer[1];
+      cinfo.err = jpeg_std_error(&jerr);
+      jpeg_create_compress(&cinfo);
+
+      jpeg_mem_dest(&cinfo, &out_buffer, &out_size);
+
+      int width = input_frame.width();
+      int height = input_frame.height();
+
+      cinfo.image_width = width;
+      cinfo.image_height = height;
+      cinfo.input_components = kColorPlanes;
+      cinfo.in_color_space = JCS_EXT_BGR;
+      jpeg_set_defaults(&cinfo);
+      jpeg_set_quality(&cinfo, quality, TRUE);
+
+      jpeg_start_compress(&cinfo, TRUE);
+      int row_stride = width * kColorPlanes;
+      while (cinfo.next_scanline < cinfo.image_height) {
+        row_pointer[0] = &rgb_buf.get()[cinfo.next_scanline * row_stride];
+        jpeg_write_scanlines(&cinfo, row_pointer, 1);
+      }
+
+      jpeg_finish_compress(&cinfo);
+      jpeg_destroy_compress(&cinfo);
+
+      thumbnail_.resize(out_size);
+
+      std::copy(out_buffer
+            , out_buffer + out_size
+            , thumbnail_.begin());
+
+      free(out_buffer);
+  } __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
   }
-#endif
-
-  cinfo.image_width = real_width;
-  cinfo.image_height = height;
-  cinfo.input_components = kColorPlanes;
-  cinfo.in_color_space = JCS_EXT_BGRA;
-  jpeg_set_defaults(&cinfo);
-  jpeg_set_quality(&cinfo, quality, TRUE);
-
-  jpeg_start_compress(&cinfo, TRUE);
-  int row_stride = width * kColorPlanes;
-  while (cinfo.next_scanline < cinfo.image_height) {
-    row_pointer[0] = &frame->data()[cinfo.next_scanline * row_stride];
-    jpeg_write_scanlines(&cinfo, row_pointer, 1);
-  }
-
-  jpeg_finish_compress(&cinfo);
-  jpeg_destroy_compress(&cinfo);
-
-  thumbnail_.resize(out_size);
-
-  std::copy(out_buffer
-        , out_buffer + out_size
-        , thumbnail_.begin());
-
-  free(out_buffer);
 }
 
 void RTCDesktopMediaListImpl::OnMessage(rtc::Message* msg) {

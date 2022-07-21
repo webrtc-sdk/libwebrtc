@@ -18,6 +18,8 @@
 
 #include "third_party/libyuv/include/libyuv.h"
 
+#include "modules/desktop_capture/win/window_capture_utils.h"
+
 namespace libwebrtc {
 
 enum { kCaptureDelay = 33, kCaptureMessageId = 1000 };
@@ -84,17 +86,23 @@ RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
 }
 
 void RTCDesktopCapturerImpl::Stop() {
-    if(observer_) {
-    signaling_thread_->Invoke<void>(
-      RTC_FROM_HERE,[&, this]() {
+  if(observer_) {
+    if (!signaling_thread_->IsCurrent()) {
+        signaling_thread_->Invoke<void>(
+            RTC_FROM_HERE, [&, this]() { observer_->OnStop(this); });
+    } else {
         observer_->OnStop(this);
-      });
+    }
   }
   capture_state_ = CS_STOPPED;
 }
 
 bool RTCDesktopCapturerImpl::IsRunning() {
   return capture_state_ == CS_RUNNING;
+}
+
+int filterException(int code, PEXCEPTION_POINTERS ex) {
+  return EXCEPTION_EXECUTE_HANDLER;
 }
 
 void RTCDesktopCapturerImpl::OnCaptureResult(
@@ -140,47 +148,29 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
   
   int width = frame->size().width();
   int height = frame->size().height();
-  int real_width = width;
 
-#if defined(TARGET_OS_OSX)
-  if(type_ == kWindow) {
-    int multiple = 0;
-#if defined(WEBRTC_ARCH_X86_FAMILY)
-    multiple = 16;
-#elif defined(WEBRTC_ARCH_ARM64)
-    multiple = 32;
-#endif
-    // A multiple of $multiple must be used as the width of the src frame,
-    // and the right black border needs to be cropped during conversion.
-    if( multiple != 0 && (width % multiple) != 0 ) {
-      width = (width / multiple + 1) * multiple;
+  webrtc::DesktopRect rect_ = webrtc::DesktopRect::MakeWH(width, height);
+
+  if (type_ != kScreen) {
+    webrtc::GetWindowRect(reinterpret_cast<HWND>(source_id_), &rect_);
+  }
+
+  __try {
+    if (!i420_buffer_ || !i420_buffer_.get() ||
+        i420_buffer_->width() * i420_buffer_->height() != width * height) {
+      i420_buffer_ = webrtc::I420Buffer::Create(width, height);
     }
-  }
- #endif
- 
-  if (!i420_buffer_ || !i420_buffer_.get() ||
-      i420_buffer_->width() * i420_buffer_->height() != real_width * height) {
-    i420_buffer_ = webrtc::I420Buffer::Create(real_width, height);
-  }
 
-  libyuv::ConvertToI420(frame->data(),
-                        0,
-                        i420_buffer_->MutableDataY(),
-                        i420_buffer_->StrideY(),
-                        i420_buffer_->MutableDataU(),
-                        i420_buffer_->StrideU(),
-                        i420_buffer_->MutableDataV(),
-                        i420_buffer_->StrideV(),
-                        0,
-                        0,
-                        width,
-                        height,
-                        real_width,
-                        height,
-                        libyuv::kRotate0,
-                        libyuv::FOURCC_ARGB);
+    libyuv::ConvertToI420(frame->data(), 0, i420_buffer_->MutableDataY(),
+                          i420_buffer_->StrideY(), i420_buffer_->MutableDataU(),
+                          i420_buffer_->StrideU(), i420_buffer_->MutableDataV(),
+                          i420_buffer_->StrideV(), 0, 0, rect_.width(),
+                          rect_.height(), width, height, libyuv::kRotate0,
+                          libyuv::FOURCC_ARGB);
 
-  OnFrame(webrtc::VideoFrame(i420_buffer_, 0, 0, webrtc::kVideoRotation_0));
+    OnFrame(webrtc::VideoFrame(i420_buffer_, 0, 0, webrtc::kVideoRotation_0));
+  } __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
+  }
 }
 
 void RTCDesktopCapturerImpl::OnMessage(rtc::Message* msg) {

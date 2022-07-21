@@ -63,6 +63,7 @@ class MediaSourceImpl : public MediaSource {
 
  private:
   std::vector<unsigned char> thumbnail_;
+  rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer_;
   RTCDesktopMediaListImpl *mediaList_;
   DesktopType type_;
 };
@@ -94,7 +95,7 @@ public:
   
   scoped_refptr<MediaSource> GetSource(int index) override;
 
-  bool GetThumbnail(scoped_refptr<MediaSource> source) override;
+  bool GetThumbnail(scoped_refptr<MediaSource> source, bool notify = false) override;
 
  protected:
   virtual void OnMessage(rtc::Message* msg) override;

@@ -40,7 +40,9 @@ class ScreenCapturerTrackSource : public webrtc::VideoTrackSource {
  public:
   explicit ScreenCapturerTrackSource(scoped_refptr<RTCDesktopCapturer> capturer)
       : VideoTrackSource(/*remote=*/false), capturer_(std::move(capturer)) {}
-
+  virtual ~ScreenCapturerTrackSource() { 
+      capturer_->Stop();
+  }
  private:
   rtc::VideoSourceInterface<webrtc::VideoFrame>* source() override {
     return static_cast<RTCDesktopCapturerImpl*>(capturer_.get());
