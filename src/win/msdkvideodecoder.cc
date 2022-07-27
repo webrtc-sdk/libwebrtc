@@ -8,7 +8,8 @@
 #include "src/win/d3d11_allocator.h"
 #include "src/win/msdkvideodecoder.h"
 #include "api/scoped_refptr.h"
-
+#include "api/video/i420_buffer.h"
+#include "libyuv/convert.h"
 using namespace rtc;
 
 #define MSDK_BS_INIT_SIZE (1024*1024)
@@ -365,27 +366,27 @@ retry:
     if (sts == MFX_ERR_NONE && syncp != nullptr) {
       sts = m_mfx_session_->SyncOperation(syncp, MSDK_DEC_WAIT_INTERVAL);
       if (sts >= MFX_ERR_NONE) {
+        mfxFrameData* pData = &pOutputSurface->Data;
         mfxMemId dxMemId = pOutputSurface->Data.MemId;
         mfxFrameInfo frame_info = pOutputSurface->Info;
         mfxHDLPair pair = {nullptr};
         // Maybe we should also send the allocator as part of the frame
         // handle for locking/unlocking purpose.
         m_pmfx_allocator_->GetFrameHDL(dxMemId, (mfxHDL*)&pair);
-
+        m_pmfx_allocator_->LockFrame(dxMemId, pData);
+        rtc::scoped_refptr<I420Buffer> i420_buffer =
+            I420Buffer::Create(frame_info.Width, frame_info.Height);
+        libyuv::NV12ToI420(pData->Y, pData->Pitch, pData->UV, pData->Pitch/2,
+                           i420_buffer->MutableDataY(), i420_buffer->StrideY(),
+                           i420_buffer->MutableDataU(), i420_buffer->StrideU(),
+                           i420_buffer->MutableDataV(), i420_buffer->StrideV(),
+                           frame_info.Width, frame_info.Height);
+        m_pmfx_allocator_->UnlockFrame(dxMemId, pData);
+        if (callback_) {
+          webrtc::VideoFrame decoded_frame(i420_buffer, inputImage.Timestamp(), 0, webrtc::kVideoRotation_0);
+          callback_->Decoded(decoded_frame);
+        }
 #if 0
-         rtc::scoped_refptr<webrtc::VideoFrameBuffer> cropped_buffer =
-            WrapI420Buffer(frame_info.Width, frame_info.Height,
-                           av_frame_->data[kYPlaneIndex],
-                           av_frame_->linesize[kYPlaneIndex],
-                           av_frame_->data[kUPlaneIndex],
-
-                           av_frame_->linesize[kUPlaneIndex],
-                           av_frame_->data[kVPlaneIndex],
-                           av_frame_->linesize[kVPlaneIndex],
-                           // To keep reference alive.
-                           [frame_buffer] {});
-
-#endif
         if (callback_) {
           surface_handle_->d3d11_device = d3d11_device_.p;
           surface_handle_->texture =
@@ -408,6 +409,7 @@ retry:
           decoded_frame.set_timestamp(inputImage.Timestamp());
           callback_->Decoded(decoded_frame);
         }
+#endif
       }
     } else if (MFX_ERR_MORE_DATA == sts) {
       return WEBRTC_VIDEO_CODEC_OK;
