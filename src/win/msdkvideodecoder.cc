@@ -384,6 +384,8 @@ retry:
         m_pmfx_allocator_->UnlockFrame(dxMemId, pData);
         if (callback_) {
           webrtc::VideoFrame decoded_frame(i420_buffer, inputImage.Timestamp(), 0, webrtc::kVideoRotation_0);
+          decoded_frame.set_ntp_time_ms(inputImage.ntp_time_ms_);
+          decoded_frame.set_timestamp(inputImage.Timestamp());
           callback_->Decoded(decoded_frame);
         }
 #if 0
