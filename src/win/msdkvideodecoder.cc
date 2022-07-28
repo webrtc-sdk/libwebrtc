@@ -21,6 +21,10 @@ namespace base {
 
 int32_t MSDKVideoDecoder::Release() {
     WipeMfxBitstream(&m_mfx_bs_);
+    if (m_pmfx_dec_ != nullptr) {
+        m_pmfx_dec_->Close();
+        m_pmfx_dec_.reset();
+    }
     if (m_mfx_session_) {
       MSDKFactory* factory = MSDKFactory::Get();
       if (factory) {
@@ -28,6 +32,8 @@ int32_t MSDKVideoDecoder::Release() {
         factory->DestroySession(m_mfx_session_);
       }
     }
+    if (m_pmfx_allocator_)
+      m_pmfx_allocator_->Close();
     m_pmfx_allocator_.reset();
     MSDK_SAFE_DELETE_ARRAY(m_pinput_surfaces_);
     inited_ = false;
