@@ -5,7 +5,9 @@
 
 #include "rtc_audio_source.h"
 #include "rtc_audio_track.h"
+#ifdef RTC_DESKTOP_DEVICE
 #include "rtc_desktop_device.h"
+#endif
 #include "rtc_media_stream.h"
 #include "rtc_mediaconstraints.h"
 #include "rtc_video_device.h"
