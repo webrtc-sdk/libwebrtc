@@ -16,7 +16,7 @@ DesktopCapturer::DesktopCapturer(std::unique_ptr<webrtc::DesktopCapturer> deskto
 }
 
 DesktopCapturer ::~DesktopCapturer() {
-  RTC_LOG(INFO) << __FUNCTION__ << ": dtor ";
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
   Stop();
 }
 
@@ -67,7 +67,7 @@ void DesktopCapturer::OnCaptureResult(
 
   if (windows_id_ > 0) {
     webrtc::GetWindowRect(reinterpret_cast<HWND>(windows_id_), &rect_);
-    // RTC_LOG(INFO) << "GetWindowRect(): " << rect_.size().width() << " " <<  rect_.size().height();
+    // RTC_LOG(LS_INFO) << "GetWindowRect(): " << rect_.size().width() << " " <<  rect_.size().height();
   }
 
   __try {

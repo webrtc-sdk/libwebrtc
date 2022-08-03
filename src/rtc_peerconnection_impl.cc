@@ -28,7 +28,7 @@ static std::map<libwebrtc::RtcpMuxPolicy,
 
 static std::map<libwebrtc::SdpSemantics, webrtc::SdpSemantics>
     sdp_semantics_map = {
-        {libwebrtc::SdpSemantics::kPlanB, webrtc::SdpSemantics::kPlanB},
+        {libwebrtc::SdpSemantics::kPlanB, webrtc::SdpSemantics::kPlanB_DEPRECATED},
         {libwebrtc::SdpSemantics::kUnifiedPlan,
          webrtc::SdpSemantics::kUnifiedPlan}};
 
@@ -133,11 +133,11 @@ class SetSessionDescriptionObserverProxy
         success_callback, failure_callback);
   }
   virtual void OnSuccess() {
-    RTC_LOG(INFO) << __FUNCTION__;
+    RTC_LOG(LS_INFO) << __FUNCTION__;
     success_callback_();
   }
   virtual void OnFailure(webrtc::RTCError error) {
-    RTC_LOG(INFO) << __FUNCTION__ << " " << error.message();
+    RTC_LOG(LS_INFO) << __FUNCTION__ << " " << error.message();
     failure_callback_(error.message());
   }
 
@@ -194,13 +194,13 @@ RTCPeerConnectionImpl::RTCPeerConnectionImpl(
       configuration_(configuration),
       constraints_(constraints),
       callback_crt_sec_(new webrtc::Mutex()) {
-  RTC_LOG(INFO) << __FUNCTION__ << ": ctor";
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor";
   Initialize();
 }
 
 RTCPeerConnectionImpl::~RTCPeerConnectionImpl() {
   Close();
-  RTC_LOG(INFO) << __FUNCTION__ << ": dtor";
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor";
 }
 
 void RTCPeerConnectionImpl::OnAddTrack(
@@ -237,7 +237,7 @@ void RTCPeerConnectionImpl::OnRemoveTrack(
 // Called when a remote stream is added
 void RTCPeerConnectionImpl::OnAddStream(
     rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
-  RTC_LOG(INFO) << __FUNCTION__ << " " << stream->id();
+  RTC_LOG(LS_INFO) << __FUNCTION__ << " " << stream->id();
 
   scoped_refptr<MediaStreamImpl> remote_stream = scoped_refptr<MediaStreamImpl>(
       new RefCountedObject<MediaStreamImpl>(stream));
@@ -253,7 +253,7 @@ void RTCPeerConnectionImpl::OnAddStream(
 
 void RTCPeerConnectionImpl::OnRemoveStream(
     rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
-  RTC_LOG(INFO) << __FUNCTION__ << " " << stream->id();
+  RTC_LOG(LS_INFO) << __FUNCTION__ << " " << stream->id();
 
   MediaStreamImpl* recv_stream = nullptr;
 
@@ -336,7 +336,7 @@ void RTCPeerConnectionImpl::OnIceCandidate(
   // For loopback test. To save some connecting delay.
   if (type_ == kLoopBack) {
     if (!rtc_peerconnection_->AddIceCandidate(candidate)) {
-      RTC_LOG(WARNING) << "Failed to apply the received candidate";
+      RTC_LOG(LS_WARNING) << "Failed to apply the received candidate";
     }
     return;
   }
@@ -351,7 +351,7 @@ void RTCPeerConnectionImpl::OnIceCandidate(
     observer_->OnIceCandidate(cand);
   }
 
-  RTC_LOG(INFO) << __FUNCTION__ << ", mid " << candidate->sdp_mid()
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ", mid " << candidate->sdp_mid()
                 << ", mline " << candidate->sdp_mline_index() << ", sdp"
                 << cand_sdp;
 }
@@ -391,9 +391,6 @@ bool RTCPeerConnectionImpl::Initialize() {
     }
   }
 
-  config.enable_dtls_srtp =
-      configuration_.srtp_type == MediaSecurityType::kDTLS_SRTP;
-
   config.sdp_semantics = sdp_semantics_map[configuration_.sdp_semantics];
   config.candidate_network_policy =
       candidate_network_policy_map[configuration_.candidate_network_policy];
@@ -425,7 +422,7 @@ bool RTCPeerConnectionImpl::Initialize() {
       config, std::move(dependencies));
 
   if (!result.ok()) {
-    RTC_LOG(WARNING) << "CreatePeerConnection failed";
+    RTC_LOG(LS_WARNING) << "CreatePeerConnection failed";
     Close();
     return false;
   }
@@ -475,7 +472,7 @@ void RTCPeerConnectionImpl::SetLocalDescription(const string sdp,
 
   if (!session_description) {
     std::string error = "Can't parse received session description message.";
-    RTC_LOG(WARNING) << error;
+    RTC_LOG(LS_WARNING) << error;
     failure(error.c_str());
     return;
   }
@@ -489,7 +486,7 @@ void RTCPeerConnectionImpl::SetRemoteDescription(const string sdp,
                                                  const string type,
                                                  OnSetSdpSuccess success,
                                                  OnSetSdpFailure failure) {
-  RTC_LOG(INFO) << " Received session description :" << to_std_string(sdp);
+  RTC_LOG(LS_INFO) << " Received session description :" << to_std_string(sdp);
   webrtc::SdpParseError error;
   webrtc::SessionDescriptionInterface* session_description(
       webrtc::CreateSessionDescription(to_std_string(type), to_std_string(sdp),
@@ -497,7 +494,7 @@ void RTCPeerConnectionImpl::SetRemoteDescription(const string sdp,
 
   if (!session_description) {
     std::string error = "Can't parse received session description message.";
-    RTC_LOG(WARNING) << error;
+    RTC_LOG(LS_WARNING) << error;
     failure(error.c_str());
     return;
   }
@@ -600,14 +597,14 @@ void RTCPeerConnectionImpl::CreateAnswer(
 }
 
 void RTCPeerConnectionImpl::RestartIce() {
-  RTC_LOG(INFO) << __FUNCTION__;
+  RTC_LOG(LS_INFO) << __FUNCTION__;
   if (rtc_peerconnection_.get()) {
     rtc_peerconnection_->RestartIce();
   }
 }
 
 void RTCPeerConnectionImpl::Close() {
-  RTC_LOG(INFO) << __FUNCTION__;
+  RTC_LOG(LS_INFO) << __FUNCTION__;
   if (rtc_peerconnection_.get()) {
     rtc_peerconnection_ = nullptr;
     data_channel_ = nullptr;
@@ -640,7 +637,7 @@ int RTCPeerConnectionImpl::AddStream(scoped_refptr<RTCMediaStream> stream) {
       local_streams_.end())
     return -1;  // Already added.
 
-  if (!rtc_peerconnection_->AddStream(rtc_media_stream)) {
+  if (!rtc_peerconnection_->AddStream(rtc_media_stream.get())) {
     RTC_LOG(LS_ERROR) << "Adding stream to PeerConnection failed";
   }
 
@@ -658,7 +655,7 @@ int RTCPeerConnectionImpl::RemoveStream(scoped_refptr<RTCMediaStream> stream) {
       local_streams_.end())
     return -1;  // Not found.
 
-  rtc_peerconnection_->RemoveStream(rtc_media_stream);
+  rtc_peerconnection_->RemoveStream(rtc_media_stream.get());
 
   local_streams_.erase(
       std::find(local_streams_.begin(), local_streams_.end(), stream));
@@ -671,9 +668,10 @@ bool RTCPeerConnectionImpl::GetStats(
   AudioTrackImpl* impl = static_cast<AudioTrackImpl*>((RTCAudioTrack*)track);
   rtc::scoped_refptr<WebRTCStatsObserver> rtc_observer =
       WebRTCStatsObserver::Create(observer, "stats");
-  return rtc_peerconnection_->GetStats(
-      rtc_observer.get(), impl->rtc_track(),
+  rtc_peerconnection_->GetStats(
+      rtc_observer.get(), impl->rtc_track().get(),
       webrtc::PeerConnectionInterface::kStatsOutputLevelDebug);
+  return true;
 }
 
 bool RTCPeerConnectionImpl::GetStats(
@@ -682,9 +680,10 @@ bool RTCPeerConnectionImpl::GetStats(
   VideoTrackImpl* impl = static_cast<VideoTrackImpl*>((RTCVideoTrack*)track);
   rtc::scoped_refptr<WebRTCStatsObserver> rtc_observer =
       WebRTCStatsObserver::Create(observer, "recv");
-  return rtc_peerconnection_->GetStats(
-      rtc_observer.get(), impl->rtc_track(),
+  rtc_peerconnection_->GetStats(
+      rtc_observer.get(), impl->rtc_track().get(),
       webrtc::PeerConnectionInterface::kStatsOutputLevelDebug);
+  return true;
 }
 
 void RTCPeerConnectionImpl::GetStats(OnStatsCollectorSuccess success,
@@ -696,7 +695,7 @@ void RTCPeerConnectionImpl::GetStats(OnStatsCollectorSuccess success,
     failure("Failed to initialize PeerConnection");
     return;
   }
-  rtc_peerconnection_->GetStats(rtc_callback);
+  rtc_peerconnection_->GetStats(rtc_callback.get());
 }
 
 scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
@@ -812,7 +811,11 @@ scoped_refptr<RTCRtpSender> RTCPeerConnectionImpl::AddTrack(
 
 bool RTCPeerConnectionImpl::RemoveTrack(scoped_refptr<RTCRtpSender> render) {
   RTCRtpSenderImpl* impl = static_cast<RTCRtpSenderImpl*>(render.get());
-  return rtc_peerconnection_->RemoveTrack(impl->rtc_rtp_sender());
+  webrtc::RTCError err = rtc_peerconnection_->RemoveTrackOrError(impl->rtc_rtp_sender());
+  if(err.ok()) {
+    return true;
+  }
+  return false;
 }
 
 vector<scoped_refptr<RTCRtpSender>> RTCPeerConnectionImpl::senders() {

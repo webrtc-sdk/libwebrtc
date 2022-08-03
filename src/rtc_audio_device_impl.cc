@@ -8,7 +8,7 @@ AudioDeviceImpl::AudioDeviceImpl(
       : audio_device_module_(audio_device_module),worker_thread_(worker_thread) {}
 
 AudioDeviceImpl::~AudioDeviceImpl() {
-  RTC_LOG(INFO) << __FUNCTION__ << ": dtor ";
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
 }
 
 int16_t AudioDeviceImpl::PlayoutDevices() {

@@ -14,11 +14,11 @@ RTCRtpSenderImpl::RTCRtpSenderImpl(
 bool RTCRtpSenderImpl::set_track(scoped_refptr<RTCMediaTrack> track) {
   if (std::string(webrtc::MediaStreamTrackInterface::kVideoKind) == track->kind().std_string()) {
     VideoTrackImpl* impl = static_cast<VideoTrackImpl*>(track.get());
-    return rtp_sender_->SetTrack(impl->rtc_track());
+    return rtp_sender_->SetTrack(impl->rtc_track().get());
   } else if (std::string(webrtc::MediaStreamTrackInterface::kAudioKind) ==
              track->kind().std_string()) {
     AudioTrackImpl* impl = static_cast<AudioTrackImpl*>(track.get());
-    return rtp_sender_->SetTrack(impl->rtc_track());
+    return rtp_sender_->SetTrack(impl->rtc_track().get());
   }
   return false;
 }
@@ -32,11 +32,11 @@ scoped_refptr<RTCMediaTrack> RTCRtpSenderImpl::track() const {
   }
 
   if (track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
-    return new RefCountedObject<VideoTrackImpl>(
-        static_cast<webrtc::VideoTrackInterface*>(track.get()));
+    return scoped_refptr<RTCMediaTrack>(new RefCountedObject<VideoTrackImpl>(
+        rtc::scoped_refptr<webrtc::VideoTrackInterface>(static_cast<webrtc::VideoTrackInterface*>(track.get()))));
   } else if (track->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
-    return new RefCountedObject<AudioTrackImpl>(
-        static_cast<webrtc::AudioTrackInterface*>(track.get()));
+    return scoped_refptr<RTCMediaTrack>(new RefCountedObject<AudioTrackImpl>(rtc::scoped_refptr<webrtc::AudioTrackInterface>(
+        rtc::scoped_refptr<webrtc::AudioTrackInterface>(static_cast<webrtc::AudioTrackInterface*>(track.get())))));
   }
   return scoped_refptr<RTCMediaTrack>();
 }

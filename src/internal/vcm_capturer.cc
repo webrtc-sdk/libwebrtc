@@ -121,8 +121,8 @@ rtc::scoped_refptr<CapturerTrackSource> CapturerTrackSource::Create(rtc::Thread*
   for (int i = 0; i < num_devices; ++i) {
     capturer = absl::WrapUnique(VcmCapturer::Create(worker_thread, kWidth, kHeight, kFps, i));
     if (capturer) {
-      return new rtc::RefCountedObject<CapturerTrackSource>(
-          std::move(capturer));
+      return rtc::scoped_refptr<CapturerTrackSource>(new rtc::RefCountedObject<CapturerTrackSource>(
+          std::move(capturer)));
     }
   }
 

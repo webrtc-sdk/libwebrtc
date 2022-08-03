@@ -29,7 +29,7 @@ MediaStreamImpl::MediaStreamImpl(
 }
 
 MediaStreamImpl::~MediaStreamImpl() {
-  RTC_LOG(INFO) << __FUNCTION__ << ": dtor ";
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
   rtc_media_stream_->UnregisterObserver(this);
   audio_tracks_.clear();
   video_tracks_.clear();

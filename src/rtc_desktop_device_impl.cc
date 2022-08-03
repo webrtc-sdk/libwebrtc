@@ -12,7 +12,7 @@ RTCDesktopDeviceImpl::RTCDesktopDeviceImpl(rtc::Thread* signaling_thread)
      {}
 
 RTCDesktopDeviceImpl::~RTCDesktopDeviceImpl() {
-  RTC_LOG(INFO) << __FUNCTION__ << ": dtor ";
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
 }
 
 webrtc::DesktopCaptureOptions RTCDesktopDeviceImpl::CreateOptions() {
@@ -54,7 +54,7 @@ SourceList RTCDesktopDeviceImpl::EnumerateScreens() {
   webrtc::DesktopCapturer::SourceList screen_list;
   webrtc::GetScreenList(&screen_list);
   for (const auto& screen : screen_list) {
-    RTC_LOG(INFO) << " id:" << screen.id << " title:" << screen.title;
+    RTC_LOG(LS_INFO) << " id:" << screen.id << " title:" << screen.title;
     sources_.push_back({std::to_string(screen.id), screen.title, kEntireScreen}); 
   }
 
@@ -72,7 +72,7 @@ SourceList RTCDesktopDeviceImpl::EnumerateWindows() {
   webrtc::DesktopCapturer::SourceList window_list;
   webrtc::GetWindowList(webrtc::GetWindowListFlags::kIgnoreUntitled | webrtc::GetWindowListFlags::kIgnoreUnresponsive, &window_list);
   for (const auto& window : window_list) {
-    RTC_LOG(INFO) << " id:" << window.id << " title:" << window.title;
+    RTC_LOG(LS_INFO) << " id:" << window.id << " title:" << window.title;
     sources_.push_back({std::to_string(window.id), window.title, kWindow}); 
   }
 

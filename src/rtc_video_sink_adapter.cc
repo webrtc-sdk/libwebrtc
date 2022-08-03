@@ -10,12 +10,12 @@ VideoSinkAdapter::VideoSinkAdapter(
     rtc::scoped_refptr<webrtc::VideoTrackInterface> track)
     : rtc_track_(track), crt_sec_(new webrtc::Mutex()) {
   rtc_track_->AddOrUpdateSink(this, rtc::VideoSinkWants());
-  RTC_LOG(INFO) << __FUNCTION__ << ": ctor " << (void*)this;
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor " << (void*)this;
 }
 
 VideoSinkAdapter::~VideoSinkAdapter() {
   rtc_track_->RemoveSink(this);
-  RTC_LOG(INFO) << __FUNCTION__ << ": dtor ";
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
 }
 
 // VideoSinkInterface implementation
@@ -36,14 +36,14 @@ void VideoSinkAdapter::OnFrame(const webrtc::VideoFrame& video_frame) {
 
 void VideoSinkAdapter::AddRenderer(
     RTCVideoRenderer<scoped_refptr<RTCVideoFrame>>* renderer) {
-  RTC_LOG(INFO) << __FUNCTION__ << ": AddRenderer " << (void*)renderer;
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": AddRenderer " << (void*)renderer;
   webrtc::MutexLock cs(crt_sec_.get());
   renderers_.push_back(renderer);
 }
 
 void VideoSinkAdapter::RemoveRenderer(
     RTCVideoRenderer<scoped_refptr<RTCVideoFrame>>* renderer) {
-  RTC_LOG(INFO) << __FUNCTION__ << ": RemoveRenderer " << (void*)renderer;
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": RemoveRenderer " << (void*)renderer;
   webrtc::MutexLock cs(crt_sec_.get());
   renderers_.erase(
       std::remove_if(

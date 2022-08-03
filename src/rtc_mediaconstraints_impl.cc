@@ -13,16 +13,10 @@ const char* RTCMediaConstraints::kGoogEchoCancellation =
     webrtc::MediaConstraints::kGoogEchoCancellation;
 const char* RTCMediaConstraints::kAutoGainControl =
     webrtc::MediaConstraints::kAutoGainControl;
-const char* RTCMediaConstraints::kExperimentalAutoGainControl =
-    webrtc::MediaConstraints::kExperimentalAutoGainControl;
 const char* RTCMediaConstraints::kNoiseSuppression =
     webrtc::MediaConstraints::kNoiseSuppression;
-const char* RTCMediaConstraints::kExperimentalNoiseSuppression =
-    webrtc::MediaConstraints::kExperimentalNoiseSuppression;
 const char* RTCMediaConstraints::kHighpassFilter =
     webrtc::MediaConstraints::kHighpassFilter;
-const char* RTCMediaConstraints::kTypingNoiseDetection =
-    webrtc::MediaConstraints::kTypingNoiseDetection;
 const char* RTCMediaConstraints::kAudioMirroring =
     webrtc::MediaConstraints::kAudioMirroring;
 const char* RTCMediaConstraints::kAudioNetworkAdaptorConfig =
