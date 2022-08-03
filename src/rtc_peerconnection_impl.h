@@ -106,6 +106,8 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
 
   virtual int RemoveStream(scoped_refptr<RTCMediaStream> stream) override;
 
+  virtual scoped_refptr<RTCMediaStream> CreateLocalMediaStream(const string stream_id) override;
+
   virtual vector<scoped_refptr<RTCMediaStream>> local_streams() override {
     return local_streams_;
   }

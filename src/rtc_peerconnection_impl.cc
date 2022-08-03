@@ -662,6 +662,16 @@ int RTCPeerConnectionImpl::RemoveStream(scoped_refptr<RTCMediaStream> stream) {
   return 0;
 }
 
+scoped_refptr<RTCMediaStream> RTCPeerConnectionImpl::CreateLocalMediaStream(const string stream_id) {
+  if (!rtc_peerconnection_factory_.get()) {
+    return nullptr;
+  }
+  auto stream = rtc_peerconnection_factory_->CreateLocalMediaStream(stream_id.c_string());
+  auto rtc_stream = new RefCountedObject<MediaStreamImpl>(stream);
+  local_streams_.push_back(rtc_stream);
+  return rtc_stream;
+}
+
 bool RTCPeerConnectionImpl::GetStats(
     const RTCAudioTrack* track,
     scoped_refptr<TrackStatsObserver> observer) {
