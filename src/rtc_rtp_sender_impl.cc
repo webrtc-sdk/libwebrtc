@@ -12,6 +12,9 @@ RTCRtpSenderImpl::RTCRtpSenderImpl(
     : rtp_sender_(rtp_sender) {}
 
 bool RTCRtpSenderImpl::set_track(scoped_refptr<RTCMediaTrack> track) {
+  if (track == nullptr) {
+    return rtp_sender_->SetTrack(nullptr);
+  }
   if (std::string(webrtc::MediaStreamTrackInterface::kVideoKind) == track->kind().std_string()) {
     VideoTrackImpl* impl = static_cast<VideoTrackImpl*>(track.get());
     return rtp_sender_->SetTrack(impl->rtc_track().get());
