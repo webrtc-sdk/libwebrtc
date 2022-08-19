@@ -5,7 +5,9 @@ namespace libwebrtc {
 
 AudioDeviceImpl::AudioDeviceImpl(
       rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module,rtc::Thread* worker_thread)
-      : audio_device_module_(audio_device_module),worker_thread_(worker_thread) {}
+      : audio_device_module_(audio_device_module),worker_thread_(worker_thread) {
+  audio_device_module_->SetAudioDeviceSink(this);
+}
 
 AudioDeviceImpl::~AudioDeviceImpl() {
   RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
@@ -49,6 +51,15 @@ int32_t AudioDeviceImpl::SetRecordingDevice(uint16_t index) {
     RTC_DCHECK_RUN_ON(worker_thread_);
     return audio_device_module_->SetRecordingDevice(index);
   });
+}
+
+int32_t AudioDeviceImpl::OnDeviceChange(OnDeviceChangeCallback listener) {
+  listener_= listener;
+  return 0;
+}
+
+void AudioDeviceImpl::OnDevicesUpdated() {
+  if(listener_) listener_();
 }
 
 }  // namespace libwebrtc

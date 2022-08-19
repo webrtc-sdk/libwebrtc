@@ -8,7 +8,7 @@
 #include "rtc_base/thread.h"
 
 namespace libwebrtc {
-class AudioDeviceImpl : public RTCAudioDevice {
+class AudioDeviceImpl : public RTCAudioDevice, public webrtc::AudioDeviceSink {
  public:
   AudioDeviceImpl(
       rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module,
@@ -33,9 +33,15 @@ class AudioDeviceImpl : public RTCAudioDevice {
 
   int32_t SetRecordingDevice(uint16_t index) override;
 
+  int32_t OnDeviceChange(OnDeviceChangeCallback listener) override;
+
+protected:
+  void OnDevicesUpdated() override;
+
  private:
   rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
   rtc::Thread* worker_thread_ = nullptr;
+  OnDeviceChangeCallback listener_ = nullptr;
 };
 
 }  // namespace libwebrtc

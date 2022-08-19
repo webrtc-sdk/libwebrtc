@@ -36,19 +36,22 @@ namespace libwebrtc {
 
 RTCDesktopMediaListImpl::RTCDesktopMediaListImpl(DesktopType type, rtc::Thread* signaling_thread)
     :thread_(rtc::Thread::Create()),type_(type),signaling_thread_(signaling_thread) {
+  RTC_DCHECK(thread_);
+  thread_->Start();
   options_ = webrtc::DesktopCaptureOptions::CreateDefault();
   options_.set_detect_updated_region(true);
 #ifdef _MSC_VER
   options_.set_allow_directx_capturer(false);
 #endif
-  if (type == kScreen) {
-    capturer_ = webrtc::DesktopCapturer::CreateScreenCapturer(options_);
-  } else { 
-    capturer_ = webrtc::DesktopCapturer::CreateWindowCapturer(options_); 
-  }
   callback_ = std::make_unique<CallbackProxy>();
-  thread_->Start();
-  capturer_->Start(callback_.get());
+  thread_->Invoke<void>(RTC_FROM_HERE, [this, type] {
+    if (type == kScreen) {
+      capturer_ = webrtc::DesktopCapturer::CreateScreenCapturer(options_);
+    } else { 
+      capturer_ = webrtc::DesktopCapturer::CreateWindowCapturer(options_); 
+    }
+    capturer_->Start(callback_.get());
+  });
 }
 
 RTCDesktopMediaListImpl::~RTCDesktopMediaListImpl() {
@@ -71,7 +74,9 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload, bool get_th
   }
 
   webrtc::DesktopCapturer::SourceList new_sources;
-  capturer_->GetSourceList(&new_sources);
+  thread_->Invoke<void>(RTC_FROM_HERE, [this,&new_sources] {
+    capturer_->GetSourceList(&new_sources);
+  });
 
   typedef std::set<webrtc::DesktopCapturer::SourceId> SourceSet;
   SourceSet new_source_set;
@@ -106,7 +111,7 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload, bool get_th
         auto source =
             new RefCountedObject<MediaSourceImpl>(this, new_sources[i], type_);
         sources_.insert(sources_.begin() + i, source);
-        GetThumbnail(source, false);
+        GetThumbnail(source, true);
         if(observer_) {
           signaling_thread_->Invoke<void>(
             RTC_FROM_HERE,[&, source]() {
@@ -161,25 +166,24 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload, bool get_th
 }
 
 bool RTCDesktopMediaListImpl::GetThumbnail(scoped_refptr<MediaSource> source, bool notify) {
-  MediaSourceImpl* source_impl = static_cast<MediaSourceImpl*>(source.get());
-  callback_->SetCallback([&](webrtc::DesktopCapturer::Result result,
+    thread_->PostTask([this, source, notify] {
+      MediaSourceImpl* source_impl = static_cast<MediaSourceImpl*>(source.get());
+      if(capturer_->SelectSource(source_impl->source_id())){
+        callback_->SetCallback([&](webrtc::DesktopCapturer::Result result,
                              std::unique_ptr<webrtc::DesktopFrame> frame) {
-    auto old_thumbnail = source_impl->thumbnail();
-    source_impl->SaveCaptureResult(result, std::move(frame));
-    if (old_thumbnail.size() != source_impl->thumbnail().size()) {
-      if(observer_ && notify) {
-        signaling_thread_->Invoke<void>(
-            RTC_FROM_HERE, [&, source]() {
-            observer_->OnMediaSourceThumbnailChanged(source);
-          });
+          auto old_thumbnail = source_impl->thumbnail();
+          source_impl->SaveCaptureResult(result, std::move(frame));
+         if(observer_ && notify) {
+          signaling_thread_->Invoke<void>(
+              RTC_FROM_HERE, [&, source_impl]() {
+              observer_->OnMediaSourceThumbnailChanged(source_impl);
+            });
+          }
+        });
+        capturer_->CaptureFrame();
       }
-    }
   });
-  if (capturer_->SelectSource(source_impl->source_id())) {
-    capturer_->CaptureFrame();
-    return true;
-  }
-  return false;
+  return true;
 }
 
 int RTCDesktopMediaListImpl::GetSourceCount() const {

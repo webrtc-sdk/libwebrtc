@@ -31,17 +31,21 @@ RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
     rtc::Thread* signaling_thread,
     scoped_refptr<MediaSource> source)
     : thread_(rtc::Thread::Create()), source_id_(source_id),signaling_thread_(signaling_thread),source_(source) {
+  RTC_DCHECK(thread_);
+  type_ = type;
+  thread_->Start();
   options_ = webrtc::DesktopCaptureOptions::CreateDefault();
   options_.set_detect_updated_region(true);
 #ifdef _MSC_VER
   options_.set_allow_directx_capturer(false);
 #endif
-  if (type == kScreen) {
-    capturer_ = std::make_unique<webrtc::DesktopAndCursorComposer>(webrtc::DesktopCapturer::CreateScreenCapturer(options_), options_);
-  }
-  else { capturer_ = std::make_unique<webrtc::DesktopAndCursorComposer>(webrtc::DesktopCapturer::CreateWindowCapturer(options_), options_); }
-  type_ = type;
-  thread_->Start();
+  thread_->Invoke<void>(RTC_FROM_HERE, [this, type] {
+    if (type == kScreen) {
+      capturer_ = std::make_unique<webrtc::DesktopAndCursorComposer>(webrtc::DesktopCapturer::CreateScreenCapturer(options_), options_);
+    } else { 
+      capturer_ = std::make_unique<webrtc::DesktopAndCursorComposer>(webrtc::DesktopCapturer::CreateWindowCapturer(options_), options_);
+    }
+  });
 }
 
 RTCDesktopCapturerImpl::~RTCDesktopCapturerImpl() {
@@ -74,9 +78,13 @@ RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
     }
   }
 
-  capturer_->Start(this);
+  thread_->Invoke<void>(RTC_FROM_HERE, [this] {
+    capturer_->Start(this);
+  });
   capture_state_ = CS_RUNNING;
-  CaptureFrame();
+  thread_->PostTask([this]{
+      CaptureFrame();
+  });
   if(observer_) {
     signaling_thread_->Invoke<void>(
       RTC_FROM_HERE,[&, this]() {
