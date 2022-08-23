@@ -1,5 +1,10 @@
 import("../webrtc.gni")
 
+declare_args() {
+  libwebrtc_intel_media_sdk = false
+  libwebrtc_desktop_capture = true
+}
+
 if (is_android) {
   import("//build/config/android/config.gni")
   import("//build/config/android/rules.gni")
@@ -19,6 +24,24 @@ config("external_config") {
 }
 
 rtc_shared_library("libwebrtc"){
+  libs = []
+  include_dirs = [
+    ".",
+    "include",
+    
+  ]
+
+  defines = [ 
+    "USE_LIBYUV",
+    "WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE",
+  ]
+
+  if(is_win){
+      defines += [ "LIB_WEBRTC_API_EXPORTS", "WEBRTC_WIN", ]
+  }
+
+  public_configs = [ ":external_config" ]
+
   sources = [
     "include/libwebrtc.h",
     "include/rtc_audio_device.h",
@@ -103,7 +126,8 @@ rtc_shared_library("libwebrtc"){
     "src/rtc_dtmf_sender_impl.h",
   ]
 
-  if(is_win) {
+  # intel media sdk
+  if(is_win && libwebrtc_intel_media_sdk) {
     sources += [
       "src/win/commontypes.h",
       "src/win/msdkcommon.h",
@@ -135,25 +159,16 @@ rtc_shared_library("libwebrtc"){
       "src/win/d3d11_manager.h",
       "src/win/nativehandlebuffer.h",
     ]
-  }
-
-  include_dirs = [
-    ".",
-    "include",
-    
-  ]
-
-  defines = [ 
-    "USE_LIBYUV",
-    "WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE",
-  ]
-
-  if(is_win) {
     include_dirs += [ "src/win/include" ]
-    defines += [ "USE_INTEL_MEDIA_SDK" ]
+    defines += [ "USE_INTEL_MEDIA_SDK", ]
+    configs += [ "//build/config/win:windowed" ]
+    libs += [ "libmfx_vs2015.lib", "dxgi.lib", "d3d11.lib", ]
+    lib_dirs = [ "src\win\lib\x64" ]
+    ldflags = [
+      "/ignore:4098",
+      "/ignore:4099",
+    ]  
   }
-  
-  public_configs = [ ":external_config" ]
   
   if (is_win && is_clang) {
     cflags = [
@@ -164,11 +179,6 @@ rtc_shared_library("libwebrtc"){
   if (is_clang) {
     # Suppress warnings from the Chromium Clang plugin (bugs.webrtc.org/163).
     #suppressed_configs += [ "//build/config/clang:find_bad_constructs" ]
-  }
-
-  if(is_win){
-    configs += [ "//build/config/win:windowed" ]
-    defines += [ "WEBRTC_WIN", "LIB_WEBRTC_API_EXPORTS", ]
   }
 
   deps = [
@@ -193,27 +203,27 @@ rtc_shared_library("libwebrtc"){
       "//third_party/abseil-cpp/absl/memory",
       "//third_party/libyuv",
   ]
-  libs = []
-
-
-  if(is_win) {
+  
+  # screen capture device
+  if(libwebrtc_desktop_capture) {
     defines += [ "RTC_DESKTOP_DEVICE"]
     sources += [
       "include/rtc_desktop_device.h",
+      "include/rtc_desktop_capturer.h",
+      "include/rtc_desktop_media_list.h",
       "src/rtc_desktop_device_impl.h",
-      "src/rtc_desktop_device_impl.cc",    
+      "src/rtc_desktop_device_impl.cc",
+      "src/rtc_desktop_capturer_impl.h",
+      "src/rtc_desktop_capturer_impl.cc",
+      "src/rtc_desktop_media_list_impl.h",
+      "src/rtc_desktop_media_list_impl.cc",  
       "src/interanl/desktop_capturer.h",
-      "src/internal/desktop_capturer.cc",      
+      "src/internal/desktop_capturer.cc", 
     ]
-     deps += ["../modules/desktop_capture"]
-  }
-  if(is_win) {
-    libs += [ "libmfx_vs2015.lib" ]
-    lib_dirs = [ "src\win\lib\x64" ]
-    ldflags = [
-      "/ignore:4098",
-      "/ignore:4099",
-    ]  
+    deps += [
+      "../modules/desktop_capture",
+      "//third_party/libjpeg_turbo:libjpeg",
+    ]
   }
 }
 

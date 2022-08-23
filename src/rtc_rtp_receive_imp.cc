@@ -30,11 +30,11 @@ scoped_refptr<RTCMediaTrack> RTCRtpReceiverImpl::track() const {
     return scoped_refptr<RTCMediaTrack>();
   }
   if (track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
-    return new RefCountedObject<VideoTrackImpl>(
-        static_cast<webrtc::VideoTrackInterface*>(track.get()));
+    return scoped_refptr<RTCMediaTrack>(new RefCountedObject<VideoTrackImpl>(
+        rtc::scoped_refptr<webrtc::VideoTrackInterface>(static_cast<webrtc::VideoTrackInterface*>(track.get()))));
   } else if (track->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
-    return new RefCountedObject<AudioTrackImpl>(
-        static_cast<webrtc::AudioTrackInterface*>(track.get()));
+    return scoped_refptr<RTCMediaTrack>(new RefCountedObject<AudioTrackImpl>(
+        rtc::scoped_refptr<webrtc::AudioTrackInterface>(static_cast<webrtc::AudioTrackInterface*>(track.get()))));
   }
   return scoped_refptr<RTCMediaTrack>();
 }

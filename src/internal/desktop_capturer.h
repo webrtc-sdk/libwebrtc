@@ -5,7 +5,9 @@
 #include "modules/desktop_capture/desktop_capturer.h"
 #include "modules/desktop_capture/desktop_frame.h"
 #include "modules/desktop_capture/desktop_and_cursor_composer.h"
+#ifdef WEBRTC_WIN
 #include "modules/desktop_capture/win/window_capture_utils.h"
+#endif
 #include "modules/video_capture/video_capture.h"
 #include "modules/video_capture/video_capture_factory.h"
 
@@ -22,62 +24,34 @@
 #include "src/internal/video_capturer.h"
 #include "third_party/libyuv/include/libyuv.h"
 
+#include "src/rtc_desktop_capturer_impl.h"
 #include "rtc_types.h"
+#include "include/base/refcount.h"
 
-// std::unique_ptr<cricket::VideoCapturer> video_device =
-// std::unique_ptr<cricket::VideoCapturer>(new DesktopCapturerDeviceImpl());
-
-namespace webrtc {
-namespace internal {
-
-enum CaptureState { CS_RUNNING, CS_STOPPED };
-
-class DesktopCapturer : public webrtc::internal::VideoCapturer,
-                        public rtc::MessageHandler,
-                        public webrtc::DesktopCapturer::Callback {
- public:
-  DesktopCapturer(std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer);
-  DesktopCapturer(std::unique_ptr<webrtc::DesktopCapturer> desktopcapturer, int window_id);
-  ~DesktopCapturer();
-  void CaptureFrame();
-  virtual CaptureState Start(
-      const cricket::VideoFormat& capture_format);
-  virtual void Stop();
-  virtual bool IsRunning();
-  virtual void OnCaptureResult(
-      webrtc::DesktopCapturer::Result result,
-      std::unique_ptr<webrtc::DesktopFrame> frame) override;
-  virtual void OnMessage(rtc::Message* msg) override;
- 
- private:
-  std::unique_ptr<webrtc::DesktopCapturer> capturer_;
-  rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer_;
-  CaptureState capture_state_ = CS_STOPPED;
-  std::unique_ptr<rtc::Thread> capture_thread_;
-  int windows_id_= -1;
-};
+namespace libwebrtc {
 
 class ScreenCapturerTrackSource : public webrtc::VideoTrackSource {
  public:
-   static rtc::scoped_refptr<ScreenCapturerTrackSource> Create(std::unique_ptr<DesktopCapturer> capturer) {
+   static rtc::scoped_refptr<ScreenCapturerTrackSource> Create(scoped_refptr<RTCDesktopCapturer> capturer) {
     if (capturer) {
-        return new rtc::RefCountedObject<ScreenCapturerTrackSource>(std::move(capturer));
+        return rtc::make_ref_counted<ScreenCapturerTrackSource>(capturer);
       }
     return nullptr;
   }
 
  public:
-  explicit ScreenCapturerTrackSource(std::unique_ptr<DesktopCapturer> capturer)
+  explicit ScreenCapturerTrackSource(scoped_refptr<RTCDesktopCapturer> capturer)
       : VideoTrackSource(/*remote=*/false), capturer_(std::move(capturer)) {}
-
+  virtual ~ScreenCapturerTrackSource() { 
+      capturer_->Stop();
+  }
  private:
   rtc::VideoSourceInterface<webrtc::VideoFrame>* source() override {
-    return capturer_.get();
+    return static_cast<RTCDesktopCapturerImpl*>(capturer_.get());
   }
 
-  std::unique_ptr<DesktopCapturer> capturer_;
+  scoped_refptr<RTCDesktopCapturer> capturer_;
 };
 
-}  // namespace internal
-}  // namespace webrtc
+}  // namespace libwebrtc
 #endif

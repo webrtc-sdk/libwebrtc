@@ -5,49 +5,28 @@
 #include "modules/desktop_capture/desktop_capturer.h"
 #include "modules/desktop_capture/desktop_and_cursor_composer.h"
 #include "modules/desktop_capture/desktop_frame.h"
-#include "modules/desktop_capture/win/screen_capture_utils.h"
+#ifdef WEBRTC_WIN
 #include "modules/desktop_capture/win/window_capture_utils.h"
-#include "internal/desktop_capturer.h"
+#endif
 #include "rtc_desktop_device.h"
+#include "rtc_base/thread.h"
 
-// std::unique_ptr<cricket::VideoCapturer> video_device =
-// std::unique_ptr<cricket::VideoCapturer>(new DesktopCapturerDeviceImpl());
+#include "rtc_desktop_media_list_impl.h"
+
 namespace libwebrtc {
-
-class RTCDesktopCapturerImpl : public RTCDesktopCapturer {
- public:
-  RTCDesktopCapturerImpl(std::unique_ptr<webrtc::internal::DesktopCapturer> video_capturer);
-      
-  std::unique_ptr<webrtc::internal::DesktopCapturer> video_capturer() {
-      return std::unique_ptr<webrtc::internal::DesktopCapturer>(std::move(video_capturer_));
-  }
-
- private:
-  std::unique_ptr<webrtc::internal::DesktopCapturer> video_capturer_;
-};
 
 class RTCDesktopDeviceImpl : public RTCDesktopDevice {
  public:
   RTCDesktopDeviceImpl(rtc::Thread* signaling_thread);
   ~RTCDesktopDeviceImpl();
 
-  virtual scoped_refptr<RTCDesktopCapturer> CreateScreenCapturer(uint64_t screen_id) override;
+  scoped_refptr<RTCDesktopCapturer> CreateDesktopCapturer(scoped_refptr<MediaSource> source) override;
 
-  virtual scoped_refptr<RTCDesktopCapturer> CreateWindowCapturer(uint64_t window_id) override;
-
-  webrtc::DesktopCaptureOptions CreateOptions();
-
-  virtual bool GetScreenList(SourceList& sources) override;
-
-  virtual bool GetWindowList(SourceList& sources) override;
-
-  virtual SourceList EnumerateWindows() override;
-
-  virtual SourceList EnumerateScreens() override;
+  scoped_refptr<RTCDesktopMediaList> GetDesktopMediaList(DesktopType type) override;
 
 private:
-  std::unique_ptr<rtc::Thread> _capture_thread;
   rtc::Thread* signaling_thread_ = nullptr;
+  std::map<DesktopType, scoped_refptr<RTCDesktopMediaListImpl>> desktop_media_lists_;
 };
 
 }  // namespace libwebrtc
