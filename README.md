@@ -1,20 +1,19 @@
 # libwebrtc.{dll,so}
 
-WebRTC C++ wrapper, which can be used in flutter desktop or packaged into other languages.
-
-Used to generate C++ dynamic link library, suitable for package re-release, such as C#, Dart FFI, Rust
+WebRTC C++ wrapper
+A C++ binary wrapper for webrtc, mainly used for flutter-webrtc desktop (windows, linux, embedded) version release.
 
 ## Note
 
-Use the https://github.com/webrtc-sdk/webrtc.git branch m97_release to compile.
+Use the https://github.com/webrtc-sdk/webrtc.git branch m104_release to compile.
 
 ## Usage
 
 ### Create checkout dir
 
 ```bash
-mkdir webrtc_src_m97
-cd webrtc_src_m97
+mkdir webrtc_src_m104
+cd webrtc_src_m104
 ```
 
 ### Create .gclient
@@ -23,7 +22,7 @@ cd webrtc_src_m97
 solutions = [
   {
     "name"        : 'src',
-    "url"         : 'https://github.com/webrtc-sdk/webrtc.git@m97_release',
+    "url"         : 'https://github.com/webrtc-sdk/webrtc.git@m104_release',
     "deps_file"   : 'DEPS',
     "managed"     : False,
     "custom_deps" : {
