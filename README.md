@@ -1,4 +1,4 @@
-# libwebrtc
+# libwebrtc.{dll,so}
 
 WebRTC C++ wrapper, which can be used in flutter desktop or packaged into other languages.
 
