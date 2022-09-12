@@ -34,6 +34,126 @@ class WebRTCStatsCollectorCallback : public webrtc::RTCStatsCollectorCallback {
   OnStatsCollectorFailure failure_;
 };
 
+class RTCStatsMemberImpl : public RTCStatsMember {
+public:
+  RTCStatsMemberImpl(const webrtc::RTCStatsMemberInterface* member):member_(member) {}
+  ~RTCStatsMemberImpl() {}
+
+  string GetName() const override { return string(member_->name());
+  }
+
+  Type GetType() const override {
+    switch (member_->type()) {
+    case webrtc::RTCStatsMemberInterface::kBool:
+      return Type::kBool;
+    case webrtc::RTCStatsMemberInterface::kInt32:
+      return Type::kInt32;
+    case webrtc::RTCStatsMemberInterface::kUint32:
+      return Type::kUint32;
+    case webrtc::RTCStatsMemberInterface::kInt64:
+      return Type::kInt64;
+    case webrtc::RTCStatsMemberInterface::kUint64:
+      return Type::kUint64;
+    case webrtc::RTCStatsMemberInterface::kDouble:
+      return Type::kDouble;
+    case webrtc::RTCStatsMemberInterface::kString:
+      return Type::kString;
+    case webrtc::RTCStatsMemberInterface::kSequenceBool:
+      return Type::kSequenceBool;
+    case webrtc::RTCStatsMemberInterface::kSequenceInt32:
+      return Type::kSequenceInt32;
+    case webrtc::RTCStatsMemberInterface::kSequenceUint32:
+      return Type::kSequenceUint32;
+    case webrtc::RTCStatsMemberInterface::kSequenceInt64:
+      return Type::kSequenceInt64;
+    case webrtc::RTCStatsMemberInterface::kSequenceUint64:
+      return Type::kSequenceUint64;
+    case webrtc::RTCStatsMemberInterface::kSequenceDouble:
+      return Type::kSequenceDouble;
+    case webrtc::RTCStatsMemberInterface::kSequenceString:
+      return Type::kSequenceString;
+    default:
+      return Type::kString;
+    }
+  }
+  
+  bool IsDefined() const override {
+    return member_->is_defined();
+  }
+
+  bool ValueBool() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<bool>>();
+  }
+
+  int32_t ValueInt32() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<int32_t>>();
+  }
+
+  uint32_t ValueUint32() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<uint32_t>>();
+  }
+
+  int64_t ValueInt64() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<int64_t>>();
+  }
+
+  uint64_t ValueUint64() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<uint64_t>>();
+  }
+
+  double ValueDouble() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<double>>();
+  }
+
+  string ValueString() const override { 
+      return member_->ValueToString();
+  }
+
+  vector<bool> ValueSequenceBool() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<std::vector<bool>>>();
+  }
+
+  vector<int32_t> ValueSequenceInt32() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<std::vector<int32_t>>>();
+  }
+
+  vector<uint32_t> ValueSequenceUint32() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<std::vector<uint32_t>>>();
+  }
+
+  vector<int64_t> ValueSequenceInt64() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<std::vector<int64_t>>>();
+  }
+
+  vector<uint64_t> ValueSequenceUint64() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<std::vector<uint64_t>>>();
+  }
+
+  vector<double> ValueSequenceDouble() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<std::vector<double>>>();
+  }
+
+  vector<string> ValueSequenceString() const override {
+    return *member_->cast_to<webrtc::RTCStatsMember<std::vector<std::string>>>();
+  }
+
+  map<string, uint64_t> ValueMapStringUint64() const override {
+    //const std::map<std::string, uint64_t>& mapout = *member_->cast_to<
+    //    webrtc::RTCStatsMember<std::map<std::string, uint64_t>>>();
+    return map<string, uint64_t>();
+  }
+
+  map<string, double> ValueMapStringDouble() const override {
+    //const std::map<std::string, double>& mapout =
+    //    *member_
+    //         ->cast_to<webrtc::RTCStatsMember<std::map<std::string, double>>>();
+    return map<string, double>();
+  }
+
+private:
+  const webrtc::RTCStatsMemberInterface * member_;
+};
+
 class MediaRTCStatsImpl : public MediaRTCStats {
  public:
   MediaRTCStatsImpl(std::unique_ptr<webrtc::RTCStats> stats);
@@ -46,8 +166,17 @@ class MediaRTCStatsImpl : public MediaRTCStats {
 
   virtual const string ToJson() override;
 
+  virtual const vector<scoped_refptr<RTCStatsMember>> Members() override {
+    members_.clear();
+    for (const webrtc::RTCStatsMemberInterface* member : stats_->Members()) {
+      members_.push_back(new RefCountedObject<RTCStatsMemberImpl>(member));
+    }
+    return members_;
+  }
+
 private:
   std::unique_ptr<webrtc::RTCStats> stats_;
+  std::vector<scoped_refptr<RTCStatsMember>> members_;
 };
 
 class MediaStreamImpl : public RTCMediaStream,
