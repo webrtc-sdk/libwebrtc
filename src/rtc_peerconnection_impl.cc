@@ -27,10 +27,10 @@ static std::map<libwebrtc::RtcpMuxPolicy,
          webrtc::PeerConnectionInterface::kRtcpMuxPolicyRequire}};
 
 static std::map<libwebrtc::SdpSemantics, webrtc::SdpSemantics>
-    sdp_semantics_map = {
-        {libwebrtc::SdpSemantics::kPlanB, webrtc::SdpSemantics::kPlanB_DEPRECATED},
-        {libwebrtc::SdpSemantics::kUnifiedPlan,
-         webrtc::SdpSemantics::kUnifiedPlan}};
+    sdp_semantics_map = {{libwebrtc::SdpSemantics::kPlanB,
+                          webrtc::SdpSemantics::kPlanB_DEPRECATED},
+                         {libwebrtc::SdpSemantics::kUnifiedPlan,
+                          webrtc::SdpSemantics::kUnifiedPlan}};
 
 static std::map<libwebrtc::CandidateNetworkPolicy,
                 webrtc::PeerConnectionInterface::CandidateNetworkPolicy>
@@ -69,8 +69,7 @@ static std::map<webrtc::PeerConnectionInterface::PeerConnectionState,
         {webrtc::PeerConnectionInterface::PeerConnectionState::kConnected,
          libwebrtc::RTCPeerConnectionState::RTCPeerConnectionStateConnected},
         {webrtc::PeerConnectionInterface::PeerConnectionState::kDisconnected,
-         libwebrtc::RTCPeerConnectionState::
-             RTCPeerConnectionStateDisconnected},
+         libwebrtc::RTCPeerConnectionState::RTCPeerConnectionStateDisconnected},
         {webrtc::PeerConnectionInterface::PeerConnectionState::kClosed,
          libwebrtc::RTCPeerConnectionState::RTCPeerConnectionStateClosed},
         {webrtc::PeerConnectionInterface::PeerConnectionState::kFailed,
@@ -352,8 +351,8 @@ void RTCPeerConnectionImpl::OnIceCandidate(
   }
 
   RTC_LOG(LS_INFO) << __FUNCTION__ << ", mid " << candidate->sdp_mid()
-                << ", mline " << candidate->sdp_mline_index() << ", sdp"
-                << cand_sdp;
+                   << ", mline " << candidate->sdp_mline_index() << ", sdp"
+                   << cand_sdp;
 }
 
 void RTCPeerConnectionImpl::RegisterRTCPeerConnectionObserver(
@@ -408,7 +407,8 @@ bool RTCPeerConnectionImpl::Initialize() {
 
   RTCMediaConstraintsImpl* media_constraints =
       static_cast<RTCMediaConstraintsImpl*>(constraints_.get());
-  webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),media_constraints->GetOptional());   
+  webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),
+                                           media_constraints->GetOptional());
   CopyConstraintsIntoRtcConfiguration(&rtc_constraints, &config);
 
   webrtc::PeerConnectionFactoryInterface::Options options;
@@ -563,7 +563,8 @@ void RTCPeerConnectionImpl::CreateOffer(
   RTCMediaConstraintsImpl* media_constraints =
       static_cast<RTCMediaConstraintsImpl*>(constraints.get());
   webrtc::PeerConnectionInterface::RTCOfferAnswerOptions offer_answer_options;
-  webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),media_constraints->GetOptional());
+  webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),
+                                           media_constraints->GetOptional());
   if (CopyConstraintsIntoOfferAnswerOptions(&rtc_constraints,
                                             &offer_answer_options) == false) {
     offer_answer_options = offer_answer_options_;
@@ -586,7 +587,8 @@ void RTCPeerConnectionImpl::CreateAnswer(
   RTCMediaConstraintsImpl* media_constraints =
       static_cast<RTCMediaConstraintsImpl*>(constraints.get());
   webrtc::PeerConnectionInterface::RTCOfferAnswerOptions offer_answer_options;
-  webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),media_constraints->GetOptional());
+  webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),
+                                           media_constraints->GetOptional());
   if (CopyConstraintsIntoOfferAnswerOptions(&rtc_constraints,
                                             &offer_answer_options) == false) {
     offer_answer_options = offer_answer_options_;
@@ -662,37 +664,45 @@ int RTCPeerConnectionImpl::RemoveStream(scoped_refptr<RTCMediaStream> stream) {
   return 0;
 }
 
-scoped_refptr<RTCMediaStream> RTCPeerConnectionImpl::CreateLocalMediaStream(const string stream_id) {
+scoped_refptr<RTCMediaStream> RTCPeerConnectionImpl::CreateLocalMediaStream(
+    const string stream_id) {
   if (!rtc_peerconnection_factory_.get()) {
     return nullptr;
   }
-  auto stream = rtc_peerconnection_factory_->CreateLocalMediaStream(stream_id.c_string());
+  auto stream =
+      rtc_peerconnection_factory_->CreateLocalMediaStream(stream_id.c_string());
   auto rtc_stream = new RefCountedObject<MediaStreamImpl>(stream);
   local_streams_.push_back(rtc_stream);
   return rtc_stream;
 }
 
-bool RTCPeerConnectionImpl::GetStats(
-    const RTCAudioTrack* track,
-    scoped_refptr<TrackStatsObserver> observer) {
-  AudioTrackImpl* impl = static_cast<AudioTrackImpl*>((RTCAudioTrack*)track);
-  rtc::scoped_refptr<WebRTCStatsObserver> rtc_observer =
-      WebRTCStatsObserver::Create(observer, "stats");
-  rtc_peerconnection_->GetStats(
-      rtc_observer.get(), impl->rtc_track().get(),
-      webrtc::PeerConnectionInterface::kStatsOutputLevelDebug);
+bool RTCPeerConnectionImpl::GetStats(scoped_refptr<RTCRtpSender> sender,
+                                     OnStatsCollectorSuccess success,
+                                     OnStatsCollectorFailure failure) {
+  rtc::scoped_refptr<WebRTCStatsCollectorCallback> rtc_callback =
+      WebRTCStatsCollectorCallback::Create(success, failure);
+  if (!rtc_peerconnection_.get() || !rtc_peerconnection_factory_.get()) {
+    webrtc::MutexLock cs(callback_crt_sec_.get());
+    failure("Failed to initialize PeerConnection");
+    return false;
+  }
+  RTCRtpSenderImpl* impl = static_cast<RTCRtpSenderImpl*>(sender.get());
+  rtc_peerconnection_->GetStats(impl->rtc_rtp_sender(), rtc_callback);
   return true;
 }
 
-bool RTCPeerConnectionImpl::GetStats(
-    const RTCVideoTrack* track,
-    scoped_refptr<TrackStatsObserver> observer) {
-  VideoTrackImpl* impl = static_cast<VideoTrackImpl*>((RTCVideoTrack*)track);
-  rtc::scoped_refptr<WebRTCStatsObserver> rtc_observer =
-      WebRTCStatsObserver::Create(observer, "recv");
-  rtc_peerconnection_->GetStats(
-      rtc_observer.get(), impl->rtc_track().get(),
-      webrtc::PeerConnectionInterface::kStatsOutputLevelDebug);
+bool RTCPeerConnectionImpl::GetStats(scoped_refptr<RTCRtpReceiver> receiver,
+                                     OnStatsCollectorSuccess success,
+                                     OnStatsCollectorFailure failure) {
+  rtc::scoped_refptr<WebRTCStatsCollectorCallback> rtc_callback =
+      WebRTCStatsCollectorCallback::Create(success, failure);
+  if (!rtc_peerconnection_.get() || !rtc_peerconnection_factory_.get()) {
+    webrtc::MutexLock cs(callback_crt_sec_.get());
+    failure("Failed to initialize PeerConnection");
+    return false;
+  }
+  RTCRtpReceiverImpl* impl = static_cast<RTCRtpReceiverImpl*>(receiver.get());
+  rtc_peerconnection_->GetStats(impl->rtp_receiver(), rtc_callback);
   return true;
 }
 
@@ -821,8 +831,9 @@ scoped_refptr<RTCRtpSender> RTCPeerConnectionImpl::AddTrack(
 
 bool RTCPeerConnectionImpl::RemoveTrack(scoped_refptr<RTCRtpSender> render) {
   RTCRtpSenderImpl* impl = static_cast<RTCRtpSenderImpl*>(render.get());
-  webrtc::RTCError err = rtc_peerconnection_->RemoveTrackOrError(impl->rtc_rtp_sender());
-  if(err.ok()) {
+  webrtc::RTCError err =
+      rtc_peerconnection_->RemoveTrackOrError(impl->rtc_rtp_sender());
+  if (err.ok()) {
     return true;
   }
   return false;
@@ -884,83 +895,6 @@ void WebRTCStatsCollectorCallback::OnStatsDelivered(
     iter++;
   }
   success_(reports);
-}
-
-void WebRTCStatsObserver::OnComplete(const webrtc::StatsReports& reports) {
-  MediaTrackStatistics stats;
-
-  for (auto report : reports) {
-    // 		for (auto kv : report->values())
-    // 		{
-    // 			LOG_WARNING(<< kv.second->display_name() << ": "
-    // << kv.second->ToString());
-    // 		}
-
-    const webrtc::StatsReport::Value* kv =
-        report->FindValue(webrtc::StatsReport::kStatsValueNameBytesReceived);
-    if (kv) {
-      stats.bytes_received = kv->int64_val();
-    }
-    kv = report->FindValue(webrtc::StatsReport::kStatsValueNameBytesSent);
-    if (kv) {
-      stats.bytes_sent = kv->int64_val();
-    }
-
-    kv = report->FindValue(webrtc::StatsReport::kStatsValueNameRtt);
-    if (kv) {
-      stats.rtt = kv->int64_val();
-    }
-
-    kv = report->FindValue(webrtc::StatsReport::kStatsValueNamePacketsSent);
-    if (kv) {
-      stats.packets_sent = kv->int_val();
-    }
-
-    kv = report->FindValue(webrtc::StatsReport::kStatsValueNameFrameRateSent);
-    if (kv) {
-      stats.frame_rate_sent = kv->int_val();
-    }
-
-    kv = report->FindValue(
-        webrtc::StatsReport::kStatsValueNameFrameRateReceived);
-    if (kv) {
-      stats.frame_rate_received = kv->int_val();
-    }
-
-    kv = report->FindValue(webrtc::StatsReport::kStatsValueNamePacketsReceived);
-    if (kv) {
-      stats.packets_received = kv->int_val();
-    }
-
-    kv = report->FindValue(webrtc::StatsReport::kStatsValueNamePacketsLost);
-    if (kv) {
-      stats.packets_lost = kv->int_val();
-    }
-
-    kv = report->FindValue(webrtc::StatsReport::kStatsValueNameSsrc);
-    if (kv) {
-      stats.ssrc = kv->int64_val();
-    }
-
-    kv = report->FindValue(webrtc::StatsReport::kStatsValueNameTrackId);
-    if (kv) {
-      stats.msid = string(kv->static_string_val());
-    }
-
-    kv = report->FindValue(webrtc::StatsReport::kStatsValueNameMediaType);
-    if (kv) {
-      stats.kind = string(kv->static_string_val());
-    }
-
-    stats.direction = direction_;
-  }
-
-  if (observer_)
-    observer_->OnComplete(stats);
-
-  observer_ = nullptr;
-
-  this->Release();
 }
 
 MediaRTCStatsImpl::MediaRTCStatsImpl(std::unique_ptr<webrtc::RTCStats> stats)

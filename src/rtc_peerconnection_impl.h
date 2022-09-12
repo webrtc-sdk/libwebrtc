@@ -130,11 +130,13 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
       const string label,
       RTCDataChannelInit* dataChannelDict) override;
 
-  virtual bool GetStats(const RTCAudioTrack* track,
-                        scoped_refptr<TrackStatsObserver> observer) override;
+  virtual bool GetStats(scoped_refptr<RTCRtpSender> sender,
+                        OnStatsCollectorSuccess success,
+                        OnStatsCollectorFailure failure) override;
 
-  virtual bool GetStats(const RTCVideoTrack* track,
-                        scoped_refptr<TrackStatsObserver> observer) override;
+  virtual bool GetStats(scoped_refptr<RTCRtpReceiver> receiver,
+                        OnStatsCollectorSuccess success,
+                        OnStatsCollectorFailure failure) override;
 
   virtual void GetStats(OnStatsCollectorSuccess success,
                         OnStatsCollectorFailure failure) override;
