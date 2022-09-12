@@ -221,11 +221,13 @@ class RTCPeerConnection : public RefCountInterface {
 
   virtual vector<scoped_refptr<RTCMediaStream>> remote_streams() = 0;
 
-  virtual bool GetStats(const RTCAudioTrack* track,
-                        scoped_refptr<TrackStatsObserver> observer) = 0;
+  virtual bool GetStats(scoped_refptr<RTCRtpSender> sender,
+                        OnStatsCollectorSuccess success,
+                        OnStatsCollectorFailure failure) = 0;
 
-  virtual bool GetStats(const RTCVideoTrack* track,
-                        scoped_refptr<TrackStatsObserver> observer) = 0;
+  virtual bool GetStats(scoped_refptr<RTCRtpReceiver> receiver,
+                        OnStatsCollectorSuccess success,
+                        OnStatsCollectorFailure failure) = 0;
 
   virtual void GetStats(OnStatsCollectorSuccess success,
                         OnStatsCollectorFailure failure) = 0;

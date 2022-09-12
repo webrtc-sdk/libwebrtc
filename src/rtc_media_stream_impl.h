@@ -10,32 +10,6 @@
 
 namespace libwebrtc {
 
-class WebRTCStatsObserver : public webrtc::StatsObserver {
- public:
-  WebRTCStatsObserver(scoped_refptr<TrackStatsObserver> observer,
-                      std::string direction)
-      : observer_(observer), direction_(direction) {}
-
-  virtual ~WebRTCStatsObserver() {}
-
-  static rtc::scoped_refptr<WebRTCStatsObserver> Create(
-      scoped_refptr<TrackStatsObserver> observer,
-      std::string direction) {
-    rtc::scoped_refptr<WebRTCStatsObserver> rtc_stats_observer =
-        rtc::scoped_refptr<WebRTCStatsObserver>(
-            new rtc::RefCountedObject<WebRTCStatsObserver>(observer,
-                                                           direction));
-    rtc_stats_observer->AddRef();
-    return rtc_stats_observer;
-  }
-
-  virtual void OnComplete(const webrtc::StatsReports& reports) override;
-
- private:
-  scoped_refptr<TrackStatsObserver> observer_;
-  std::string direction_;
-};
-
 class WebRTCStatsCollectorCallback : public webrtc::RTCStatsCollectorCallback {
  public:
   WebRTCStatsCollectorCallback(OnStatsCollectorSuccess success,
