@@ -3,6 +3,11 @@
 WebRTC C++ wrapper
 A C++ binary wrapper for webrtc, mainly used for flutter-webrtc desktop (windows, linux, embedded) version release.
 
+possible supported platforms
+- [x] Windows (x86,x64)
+- [x] Linux (x86,x64)
+- [ ] Embedded Linux (armv7, arm64)
+
 ## Note
 
 Use the https://github.com/webrtc-sdk/webrtc.git branch m104_release to compile.
