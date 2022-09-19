@@ -15,161 +15,162 @@ if (is_android) {
 }
 
 config("external_config") {
-  include_dirs = [
-      "include",
-  ]
-  if(is_win){
-      defines = [ "LIB_WEBRTC_API_DLL", ]
+  include_dirs = [ "include" ]
+  if (is_win) {
+    defines = [ "LIB_WEBRTC_API_DLL" ]
   }
 }
 
-rtc_shared_library("libwebrtc"){
+rtc_shared_library("libwebrtc") {
   libs = []
   include_dirs = [
     ".",
     "include",
-    
   ]
 
-  defines = [ 
+  defines = [
     "USE_LIBYUV",
     "WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE",
   ]
 
-  if(is_win){
-      defines += [ "LIB_WEBRTC_API_EXPORTS", "WEBRTC_WIN", ]
+  if (is_win) {
+    defines += [
+      "LIB_WEBRTC_API_EXPORTS",
+      "WEBRTC_WIN",
+    ]
   }
 
   public_configs = [ ":external_config" ]
 
   sources = [
+    "include/base/atomicops.h",
+    "include/base/fixed_size_function.h",
+    "include/base/portable.h",
+    "include/base/refcount.h",
+    "include/base/refcountedobject.h",
+    "include/base/scoped_ref_ptr.h",
     "include/libwebrtc.h",
     "include/rtc_audio_device.h",
-    "include/rtc_audio_track.h",
     "include/rtc_audio_source.h",
+    "include/rtc_audio_track.h",
     "include/rtc_data_channel.h",
+    "include/rtc_dtls_transport.h",
+    "include/rtc_dtmf_sender.h",
     "include/rtc_ice_candidate.h",
     "include/rtc_media_stream.h",
     "include/rtc_media_track.h",
     "include/rtc_mediaconstraints.h",
     "include/rtc_peerconnection.h",
     "include/rtc_peerconnection_factory.h",
-    "include/rtc_session_description.h",
-    "include/rtc_types.h",
-    "include/rtc_video_track.h",
-    "include/rtc_video_device.h",
-    "include/rtc_video_frame.h",
-    "include/rtc_video_source.h",
-    "include/rtc_video_renderer.h",
-    "include/rtc_rtp_sender.h",
-    "include/rtc_rtp_transceiver.h",
     "include/rtc_rtp_parameters.h",
     "include/rtc_rtp_receiver.h",
-    "include/rtc_dtls_transport.h",
-    "include/rtc_dtmf_sender.h",
-
-    "include/base/atomicops.h",
-    "include/base/fixed_size_function.h",
-    "include/base/refcount.h",
-    "include/base/refcountedobject.h",
-    "include/base/scoped_ref_ptr.h",
-    "include/base/portable.h",
-
-    "src/libwebrtc.cc",
+    "include/rtc_rtp_sender.h",
+    "include/rtc_rtp_transceiver.h",
+    "include/rtc_session_description.h",
+    "include/rtc_types.h",
+    "include/rtc_video_device.h",
+    "include/rtc_video_frame.h",
+    "include/rtc_video_renderer.h",
+    "include/rtc_video_source.h",
+    "include/rtc_video_track.h",
     "src/base/portable.cc",
-    "src/rtc_audio_device_impl.h",
-    "src/rtc_audio_device_impl.cc",
-    "src/rtc_audio_source_impl.h",
-    "src/rtc_audio_source_impl.cc",
-    "src/rtc_audio_track_impl.h",
-    "src/rtc_audio_track_impl.cc",
-    "src/rtc_data_channel_impl.h",
-    "src/rtc_data_channel_impl.cc",
-    "src/rtc_ice_candidate_impl.h",
-    "src/rtc_ice_candidate_impl.cc",
-    "src/rtc_peerconnection_impl.h",
-    "src/rtc_peerconnection_impl.cc",
-    "src/rtc_peerconnection_factory_impl.h",
-    "src/rtc_peerconnection_factory_impl.cc",
-    "src/rtc_session_description_impl.h",
-    "src/rtc_session_description_impl.cc",
-    "src/rtc_video_frame_impl.h",
-    "src/rtc_video_frame_impl.cc",
-    "src/rtc_video_track_impl.h",
-    "src/rtc_video_track_impl.cc",
-    "src/rtc_video_sink_adapter.h",
-    "src/rtc_video_sink_adapter.cc",
-    "src/rtc_video_source_impl.h",
-    "src/rtc_video_source_impl.cc",
-    "src/rtc_video_device_impl.h",
-    "src/rtc_video_device_impl.cc",
-    "src/rtc_media_stream_impl.h",
-    "src/rtc_media_stream_impl.cc",
-    "src/rtc_mediaconstraints_impl.h",
-    "src/rtc_mediaconstraints_impl.cc",
-    "src/internal/video_capturer.h",
-    "src/internal/video_capturer.cc",
-    "src/internal/vcm_capturer.h",
     "src/internal/vcm_capturer.cc",
-
-    "src/rtc_rtp_sender_impl.cc",
-    "src/rtc_rtp_sender_impl.h",
-    "src/rtc_rtp_transceiver_impl.cc",
-    "src/rtc_rtp_transceiver_impl.h",
-    "src/rtc_rtp_parameters_impl.cc",
-    "src/rtc_rtp_parameters_impl.h",
-    "src/rtc_rtp_receive_imp.cc",
-    "src/rtc_rtp_receive_imp.h",
+    "src/internal/vcm_capturer.h",
+    "src/internal/video_capturer.cc",
+    "src/internal/video_capturer.h",
+    "src/libwebrtc.cc",
+    "src/rtc_audio_device_impl.cc",
+    "src/rtc_audio_device_impl.h",
+    "src/rtc_audio_source_impl.cc",
+    "src/rtc_audio_source_impl.h",
+    "src/rtc_audio_track_impl.cc",
+    "src/rtc_audio_track_impl.h",
+    "src/rtc_data_channel_impl.cc",
+    "src/rtc_data_channel_impl.h",
     "src/rtc_dtls_transport_impl.cc",
     "src/rtc_dtls_transport_impl.h",
     "src/rtc_dtmf_sender_impl.cc",
     "src/rtc_dtmf_sender_impl.h",
+    "src/rtc_ice_candidate_impl.cc",
+    "src/rtc_ice_candidate_impl.h",
+    "src/rtc_media_stream_impl.cc",
+    "src/rtc_media_stream_impl.h",
+    "src/rtc_mediaconstraints_impl.cc",
+    "src/rtc_mediaconstraints_impl.h",
+    "src/rtc_peerconnection_factory_impl.cc",
+    "src/rtc_peerconnection_factory_impl.h",
+    "src/rtc_peerconnection_impl.cc",
+    "src/rtc_peerconnection_impl.h",
+    "src/rtc_rtp_parameters_impl.cc",
+    "src/rtc_rtp_parameters_impl.h",
+    "src/rtc_rtp_receive_imp.cc",
+    "src/rtc_rtp_receive_imp.h",
+    "src/rtc_rtp_sender_impl.cc",
+    "src/rtc_rtp_sender_impl.h",
+    "src/rtc_rtp_transceiver_impl.cc",
+    "src/rtc_rtp_transceiver_impl.h",
+    "src/rtc_session_description_impl.cc",
+    "src/rtc_session_description_impl.h",
+    "src/rtc_video_device_impl.cc",
+    "src/rtc_video_device_impl.h",
+    "src/rtc_video_frame_impl.cc",
+    "src/rtc_video_frame_impl.h",
+    "src/rtc_video_sink_adapter.cc",
+    "src/rtc_video_sink_adapter.h",
+    "src/rtc_video_source_impl.cc",
+    "src/rtc_video_source_impl.h",
+    "src/rtc_video_track_impl.cc",
+    "src/rtc_video_track_impl.h",
   ]
 
   # intel media sdk
-  if(is_win && libwebrtc_intel_media_sdk) {
+  if (is_win && libwebrtc_intel_media_sdk) {
     sources += [
-      "src/win/commontypes.h",
-      "src/win/msdkcommon.h",
-      "src/win/mediautils.h",
-      "src/win/mediautils.cc",
-      "src/win/d3d_allocator.h",
-      "src/win/d3d_allocator.cc",
-      "src/win/d3d11_allocator.h",
-      "src/win/d3d11_allocator.cc",
-      "src/win/msdkvideobase.h",
-      "src/win/msdkvideobase.cc",
-      "src/win/msdkvideoencoder.h",
-      "src/win/msdkvideoencoder.cc",
-      "src/win/base_allocator.h",
       "src/win/base_allocator.cc",
-      "src/win/sysmem_allocator.h",
-      "src/win/sysmem_allocator.cc",
-      "src/win/msdkvideoencoderfactory.h",
-      "src/win/msdkvideoencoderfactory.cc",
-      "src/win/mediacapabilities.h",
-      "src/win/mediacapabilities.cc",
-      "src/win/codecutils.h",
+      "src/win/base_allocator.h",
       "src/win/codecutils.cc",
-      "src/win/msdkvideodecoder.h",
-      "src/win/msdkvideodecoder.cc",
-      "src/win/msdkvideodecoderfactory.h",
-      "src/win/msdkvideodecoderfactory.cc",
-      "src/win/d3dnativeframe.h",
+      "src/win/codecutils.h",
+      "src/win/commontypes.h",
+      "src/win/d3d11_allocator.cc",
+      "src/win/d3d11_allocator.h",
       "src/win/d3d11_manager.h",
+      "src/win/d3d_allocator.cc",
+      "src/win/d3d_allocator.h",
+      "src/win/d3dnativeframe.h",
+      "src/win/mediacapabilities.cc",
+      "src/win/mediacapabilities.h",
+      "src/win/mediautils.cc",
+      "src/win/mediautils.h",
+      "src/win/msdkcommon.h",
+      "src/win/msdkvideobase.cc",
+      "src/win/msdkvideobase.h",
+      "src/win/msdkvideodecoder.cc",
+      "src/win/msdkvideodecoder.h",
+      "src/win/msdkvideodecoderfactory.cc",
+      "src/win/msdkvideodecoderfactory.h",
+      "src/win/msdkvideoencoder.cc",
+      "src/win/msdkvideoencoder.h",
+      "src/win/msdkvideoencoderfactory.cc",
+      "src/win/msdkvideoencoderfactory.h",
       "src/win/nativehandlebuffer.h",
+      "src/win/sysmem_allocator.cc",
+      "src/win/sysmem_allocator.h",
     ]
     include_dirs += [ "src/win/include" ]
-    defines += [ "USE_INTEL_MEDIA_SDK", ]
+    defines += [ "USE_INTEL_MEDIA_SDK" ]
     configs += [ "//build/config/win:windowed" ]
-    libs += [ "libmfx_vs2015.lib", "dxgi.lib", "d3d11.lib", ]
+    libs += [
+      "libmfx_vs2015.lib",
+      "dxgi.lib",
+      "d3d11.lib",
+    ]
     lib_dirs = [ "src\win\lib\x64" ]
     ldflags = [
       "/ignore:4098",
       "/ignore:4099",
-    ]  
+    ]
   }
-  
+
   if (is_win && is_clang) {
     cflags = [
       "-Wno-microsoft-extra-qualification",
@@ -182,43 +183,43 @@ rtc_shared_library("libwebrtc"){
   }
 
   deps = [
-      "../api:create_peerconnection_factory",
-      "../api:libjingle_peerconnection_api",
-      "../api/audio_codecs:builtin_audio_decoder_factory",
-      "../api/audio_codecs:builtin_audio_encoder_factory",
-      "../api/video_codecs:builtin_video_decoder_factory",
-      "../api/video_codecs:builtin_video_encoder_factory",
-      "../api/video:video_frame",
-      "../sdk:media_constraints",
-      "../media:rtc_audio_video",
-      "../media:rtc_internal_video_codecs",
-      "../media:rtc_media",
-      "../media:rtc_media_base",
-      "../modules/audio_device:audio_device",
-      "../modules/audio_processing:api",
-      "../modules/audio_processing:audio_processing",
-      "../modules/video_capture:video_capture_module",
-      "../pc:libjingle_peerconnection",
-      "../rtc_base:rtc_base",
-      "//third_party/abseil-cpp/absl/memory",
-      "//third_party/libyuv",
+    "../api:create_peerconnection_factory",
+    "../api:libjingle_peerconnection_api",
+    "../api/audio_codecs:builtin_audio_decoder_factory",
+    "../api/audio_codecs:builtin_audio_encoder_factory",
+    "../api/video:video_frame",
+    "../api/video_codecs:builtin_video_decoder_factory",
+    "../api/video_codecs:builtin_video_encoder_factory",
+    "../media:rtc_audio_video",
+    "../media:rtc_internal_video_codecs",
+    "../media:rtc_media",
+    "../media:rtc_media_base",
+    "../modules/audio_device:audio_device",
+    "../modules/audio_processing:api",
+    "../modules/audio_processing:audio_processing",
+    "../modules/video_capture:video_capture_module",
+    "../pc:libjingle_peerconnection",
+    "../rtc_base:rtc_base",
+    "../sdk:media_constraints",
+    "//third_party/abseil-cpp/absl/memory",
+    "//third_party/libyuv",
   ]
-  
+
   # screen capture device
-  if(libwebrtc_desktop_capture) {
-    defines += [ "RTC_DESKTOP_DEVICE"]
+  if (libwebrtc_desktop_capture) {
+    defines += [ "RTC_DESKTOP_DEVICE" ]
     sources += [
-      "include/rtc_desktop_device.h",
       "include/rtc_desktop_capturer.h",
+      "include/rtc_desktop_device.h",
       "include/rtc_desktop_media_list.h",
-      "src/rtc_desktop_device_impl.h",
-      "src/rtc_desktop_device_impl.cc",
-      "src/rtc_desktop_capturer_impl.h",
-      "src/rtc_desktop_capturer_impl.cc",
-      "src/rtc_desktop_media_list_impl.h",
-      "src/rtc_desktop_media_list_impl.cc",  
       "src/interanl/desktop_capturer.h",
-      "src/internal/desktop_capturer.cc", 
+      "src/internal/desktop_capturer.cc",
+      "src/rtc_desktop_capturer_impl.cc",
+      "src/rtc_desktop_capturer_impl.h",
+      "src/rtc_desktop_device_impl.cc",
+      "src/rtc_desktop_device_impl.h",
+      "src/rtc_desktop_media_list_impl.cc",
+      "src/rtc_desktop_media_list_impl.h",
     ]
     deps += [
       "../modules/desktop_capture",
@@ -226,4 +227,3 @@ rtc_shared_library("libwebrtc"){
     ]
   }
 }
-
