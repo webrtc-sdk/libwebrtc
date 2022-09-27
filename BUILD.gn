@@ -76,6 +76,8 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_video_source.h",
     "include/rtc_video_track.h",
     "src/base/portable.cc",
+    "src/internal/crypto.cc",
+    "src/internal/crypto.h",
     "src/internal/vcm_capturer.cc",
     "src/internal/vcm_capturer.h",
     "src/internal/video_capturer.cc",
@@ -208,6 +210,7 @@ rtc_shared_library("libwebrtc") {
     "../rtc_base:rtc_base",
     "../sdk:media_constraints",
     "//third_party/abseil-cpp/absl/memory",
+    "//third_party/boringssl:boringssl",
     "//third_party/libyuv",
   ]
 
