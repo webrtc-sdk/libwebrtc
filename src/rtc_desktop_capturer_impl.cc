@@ -52,6 +52,22 @@ RTCDesktopCapturerImpl::~RTCDesktopCapturerImpl() {
   thread_->Stop();
 }
 
+RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(uint32_t fps,
+                                                              uint32_t x,
+                                                              uint32_t y,
+                                                              uint32_t w,
+                                                              uint32_t h) {
+  x_ = x;
+  y_ = y;
+  w_ = w;
+  h_ = h;
+  if (!w_||!h) {
+    x_ = 0;
+    y_ = 0;
+  } 
+  return Start(fps);
+}
+
 RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
     uint32_t fps) {
   if(fps == 0) {
@@ -169,6 +185,8 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
   __try
 #endif
   {
+    width = w_ > 0 ? w_ : width;
+    height = h_ > 0 ? h_ : height;
     if (!i420_buffer_ || !i420_buffer_.get() ||
         i420_buffer_->width() * i420_buffer_->height() != width * height) {
       i420_buffer_ = webrtc::I420Buffer::Create(width, height);
@@ -177,13 +195,13 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
     libyuv::ConvertToI420(frame->data(), 0, i420_buffer_->MutableDataY(),
                           i420_buffer_->StrideY(), i420_buffer_->MutableDataU(),
                           i420_buffer_->StrideU(), i420_buffer_->MutableDataV(),
-                          i420_buffer_->StrideV(), 0, 0,
+                          i420_buffer_->StrideV(), x_, y_,
 #ifdef WEBRTC_WIN
                           rect_.width(),
                           rect_.height(),
 #else
-                          width,
-                          height,
+                          frame->size().width();
+                          frame->size().height();
 #endif
                           width, height, libyuv::kRotate0,
                           libyuv::FOURCC_ARGB);

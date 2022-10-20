@@ -51,8 +51,13 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   void DeRegisterDesktopCapturerObserver() override  {
     observer_ = nullptr;
   }
-
   CaptureState Start(uint32_t fps) override;
+
+  CaptureState Start(uint32_t fps,
+                     uint32_t x,
+                     uint32_t y,
+                     uint32_t w,
+                     uint32_t h) override;
 
   void Stop() override;
 
@@ -81,6 +86,10 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   webrtc::DesktopCapturer::Result result_ = webrtc::DesktopCapturer::Result::SUCCESS;
   rtc::Thread* signaling_thread_ = nullptr;
   scoped_refptr<MediaSource> source_;
+  uint32_t x_ = 0;
+  uint32_t y_ = 0;
+  uint32_t w_ = 0;
+  uint32_t h_ = 0;
 };
 
 }  // namespace webrtc
