@@ -212,7 +212,7 @@ rtc_shared_library("libwebrtc") {
       "include/rtc_desktop_capturer.h",
       "include/rtc_desktop_device.h",
       "include/rtc_desktop_media_list.h",
-      "src/interanl/desktop_capturer.h",
+      "src/internal/desktop_capturer.h",
       "src/internal/desktop_capturer.cc",
       "src/rtc_desktop_capturer_impl.cc",
       "src/rtc_desktop_capturer_impl.h",
