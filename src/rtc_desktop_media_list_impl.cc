@@ -254,7 +254,6 @@ void MediaSourceImpl::SaveCaptureResult(
         RTC_LOG(LS_ERROR) << "Could not convert input frame to RGB.";
         return;
       }
-#ifdef JPEG_
       int quality = 80;
       unsigned char* out_buffer = NULL;
       unsigned long out_size = 0;
@@ -294,7 +293,6 @@ void MediaSourceImpl::SaveCaptureResult(
             , thumbnail_.begin());
 
       free(out_buffer);
-#endif
   }
 #ifdef WEBRTC_WIN
   __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
