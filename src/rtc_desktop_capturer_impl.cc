@@ -36,8 +36,8 @@ RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
   thread_->Start();
   options_ = webrtc::DesktopCaptureOptions::CreateDefault();
   options_.set_detect_updated_region(true);
-#ifdef _MSC_VER
-  options_.set_allow_directx_capturer(false);
+#ifdef WEBRTC_WIN
+  options_.set_allow_directx_capturer(true);
 #endif
   thread_->Invoke<void>(RTC_FROM_HERE, [this, type] {
     if (type == kScreen) {
