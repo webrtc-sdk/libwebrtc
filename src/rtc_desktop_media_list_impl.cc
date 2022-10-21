@@ -40,8 +40,8 @@ RTCDesktopMediaListImpl::RTCDesktopMediaListImpl(DesktopType type, rtc::Thread* 
   thread_->Start();
   options_ = webrtc::DesktopCaptureOptions::CreateDefault();
   options_.set_detect_updated_region(true);
-#ifdef _MSC_VER
-  options_.set_allow_directx_capturer(false);
+#ifdef WEBRTC_WIN
+  options_.set_allow_directx_capturer(true);
 #endif
   callback_ = std::make_unique<CallbackProxy>();
   thread_->Invoke<void>(RTC_FROM_HERE, [this, type] {
@@ -254,7 +254,7 @@ void MediaSourceImpl::SaveCaptureResult(
         RTC_LOG(LS_ERROR) << "Could not convert input frame to RGB.";
         return;
       }
-
+#ifdef JPEG_
       int quality = 80;
       unsigned char* out_buffer = NULL;
       unsigned long out_size = 0;
@@ -294,6 +294,7 @@ void MediaSourceImpl::SaveCaptureResult(
             , thumbnail_.begin());
 
       free(out_buffer);
+#endif
   }
 #ifdef WEBRTC_WIN
   __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
