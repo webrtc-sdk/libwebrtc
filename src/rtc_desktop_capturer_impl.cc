@@ -53,18 +53,18 @@ RTCDesktopCapturerImpl::~RTCDesktopCapturerImpl() {
 }
 
 RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(uint32_t fps,
-                                                              uint32_t x,
-                                                              uint32_t y,
-                                                              uint32_t w,
-                                                              uint32_t h) {
+                                                                   uint32_t x,
+                                                                   uint32_t y,
+                                                                   uint32_t w,
+                                                                   uint32_t h) {
   x_ = x;
   y_ = y;
   w_ = w;
   h_ = h;
-  if (!w_||!h) {
+  if (!w_ || !h) {
     x_ = 0;
     y_ = 0;
-  } 
+  }
   return Start(fps);
 }
 
