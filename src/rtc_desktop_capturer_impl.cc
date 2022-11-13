@@ -39,6 +39,11 @@ RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
 #ifdef WEBRTC_WIN
   options_.set_allow_directx_capturer(true);
 #endif
+#ifdef WEBRTC_LINUX
+  if (type == kScreen) {
+    options_.set_allow_pipewire(true);
+  }
+#endif
   thread_->Invoke<void>(RTC_FROM_HERE, [this, type] {
     if (type == kScreen) {
       capturer_ = std::make_unique<webrtc::DesktopAndCursorComposer>(webrtc::DesktopCapturer::CreateScreenCapturer(options_), options_);

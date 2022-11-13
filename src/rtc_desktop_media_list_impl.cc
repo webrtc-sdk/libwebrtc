@@ -43,6 +43,11 @@ RTCDesktopMediaListImpl::RTCDesktopMediaListImpl(DesktopType type, rtc::Thread* 
 #ifdef WEBRTC_WIN
   options_.set_allow_directx_capturer(true);
 #endif
+#ifdef WEBRTC_LINUX
+  if (type == kScreen) {
+    options_.set_allow_pipewire(true);
+  }
+#endif
   callback_ = std::make_unique<CallbackProxy>();
   thread_->Invoke<void>(RTC_FROM_HERE, [this, type] {
     if (type == kScreen) {
