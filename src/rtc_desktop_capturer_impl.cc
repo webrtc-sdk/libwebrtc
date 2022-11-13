@@ -200,8 +200,8 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
                           rect_.width(),
                           rect_.height(),
 #else
-                          frame->size().width();
-                          frame->size().height();
+                          width,
+                          height,
 #endif
                           width, height, libyuv::kRotate0,
                           libyuv::FOURCC_ARGB);
