@@ -37,6 +37,7 @@ RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
   options_ = webrtc::DesktopCaptureOptions::CreateDefault();
   options_.set_detect_updated_region(true);
 #ifdef WEBRTC_WIN
+  options_.set_allow_wgc_capturer(true);
   options_.set_allow_directx_capturer(true);
 #endif
 #ifdef WEBRTC_LINUX
@@ -181,12 +182,7 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
   int width = frame->size().width();
   int height = frame->size().height();
 #ifdef WEBRTC_WIN
-  webrtc::DesktopRect rect_ = webrtc::DesktopRect::MakeWH(width, height);
-
-  if (type_ != kScreen) {
-    webrtc::GetWindowRect(reinterpret_cast<HWND>(source_id_), &rect_);
-  }
-
+  webrtc::DesktopRect rect_ = frame->rect();
   __try
 #endif
   {
