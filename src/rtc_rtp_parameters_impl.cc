@@ -127,8 +127,8 @@ bool RTCRtpEncodingParametersImpl::operator!=(
 webrtc::RtpEncodingParameters RTCRtpEncodingParametersImpl::rtp_parameters() {
   return rtp_encoding_parameters_;
 }
-RTCRtpParametersImpl::RTCRtpParametersImpl(
-    webrtc::RtpParameters rtp_parameters) {}
+RTCRtpParametersImpl::RTCRtpParametersImpl(webrtc::RtpParameters rtp_parameters)
+    : rtp_parameters_(rtp_parameters) {}
 webrtc::RtpParameters RTCRtpParametersImpl::rtp_parameters() {
   return rtp_parameters_;
 }
