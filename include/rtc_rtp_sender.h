@@ -47,6 +47,10 @@ class RTCRtpSender : public RefCountInterface {
       scoped_refptr<RTCFrameEncryptor> frame_encryptor) = 0;
 
   virtual scoped_refptr<RTCFrameEncryptor> GetFrameEncryptor() const = 0;
+
+  virtual bool EnableGcmCryptoSuites(vector<uint8_t> key) = 0;
+
+  virtual bool DisableGcmCryptoSuites() = 0;
 };
 
 }  // namespace libwebrtc

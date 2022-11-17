@@ -8,15 +8,15 @@ Crypto::Crypto() {}
 
 Crypto::~Crypto() {}
 
-int Crypto::initialize() {
-  return 0;
-}
+std::vector<uint8_t> Crypto::key;
+std::vector<uint8_t> Crypto::iv;
+
 
 bool Crypto::generateAesKey(const Cipher& cihper,
-                            std::string* aes_key,
-                            std::string* aes_iv) {
-  unsigned char* aesKey = (unsigned char*)malloc(cihper.key_length());
-  unsigned char* aesIv = (unsigned char*)malloc(cihper.iv_length());
+                            std::vector<uint8_t>& aes_key,
+                            std::vector<uint8_t>& aes_iv) {
+  uint8_t* aesKey = (uint8_t*)malloc(cihper.key_length());
+  uint8_t* aesIv = (uint8_t*)malloc(cihper.iv_length());
 
   if (aesKey == NULL || aesIv == NULL) {
     return false;
@@ -31,9 +31,11 @@ bool Crypto::generateAesKey(const Cipher& cihper,
     return false;
   }
 
-  aes_key->assign((char*)aesKey, cihper.key_length());
-  aes_iv->assign((char*)aesIv, cihper.iv_length());
+  aes_key.assign(aesKey, aesKey + cihper.key_length());
+  aes_iv.assign(aesIv, aesIv + cihper.iv_length());
 
+  free(aesKey);
+  free(aesIv);
   return true;
 }
 
@@ -86,23 +88,28 @@ bool Crypto::Cipher::initialize() {
   return true;
 }
 
-bool Crypto::Cipher::setkey(const std::string& key, const std::string& iv) {
+bool Crypto::Cipher::setkey(const std::vector<uint8_t> key,
+                            const std::vector<uint8_t> iv) {
   if (!initialized_) {
     std::cout << "Cipher not initialized" << std::endl;
     return false;
   }
+
+  key_ = key;
+  iv_ = iv;
+
   switch (type_) {
     case Type::kEncrypt:
-      if (!EVP_EncryptInit_ex(ctx_, cipher_, NULL, (uint8_t*)key.data(),
-                              (uint8_t*)iv.data())) {
+      if (!EVP_EncryptInit_ex(ctx_, cipher_, NULL, (uint8_t*)key_.data(),
+                              (uint8_t*)iv_.data())) {
         std::cout << "EVP_EncryptInit_ex failed" << std::endl;
         return false;
       }
       break;
 
     case Type::kDecrypt:
-      if (!EVP_DecryptInit_ex(ctx_, cipher_, NULL, (uint8_t*)key.data(),
-                              (uint8_t*)iv.data())) {
+      if (!EVP_DecryptInit_ex(ctx_, cipher_, NULL, (uint8_t*)key_.data(),
+                              (uint8_t*)iv_.data())) {
         std::cout << "EVP_DecryptInit_ex failed" << std::endl;
         return false;
       }
@@ -114,13 +121,37 @@ bool Crypto::Cipher::update(const uint8_t* in,
                             size_t in_len,
                             uint8_t* out,
                             size_t* out_len) {
-  int output_len = 0;
-  int len = 0;
-  uint8_t* out_data = out;  // new uint8_t[in_len + EVP_MAX_BLOCK_LENGTH];
+  //int output_len = 0;
+  //int len = 0;
+  //uint8_t* out_data = out;  // new uint8_t[in_len + EVP_MAX_BLOCK_LENGTH];
 
+  //memcpy(out, in, in_len);
+  for (size_t i = 0; i < in_len; i++) {
+    out[i] = int8_t(in[i]) ^int8_t('a');
+  }
+  *out_len = in_len;
+  return true;
+  /*
   if (!initialized_) {
     std::cout << "Cipher not initialized" << std::endl;
     return false;
+  }
+
+    switch (type_) {
+    case Type::kEncrypt:
+      if (!EVP_EncryptInit_ex(ctx_, cipher_, NULL, (uint8_t*)key_.data(),
+                              (uint8_t*)iv_.data())) {
+        std::cout << "EVP_EncryptInit_ex failed" << std::endl;
+        return false;
+      }
+      break;
+
+    case Type::kDecrypt:
+      if (!EVP_DecryptInit_ex(ctx_, cipher_, NULL, (uint8_t*)key_.data(),
+                              (uint8_t*)iv_.data())) {
+        std::cout << "EVP_DecryptInit_ex failed" << std::endl;
+        return false;
+      }
   }
 
   if (EVP_CipherUpdate(ctx_, out_data, &len, in, in_len) != 1) {
@@ -135,6 +166,7 @@ bool Crypto::Cipher::update(const uint8_t* in,
   output_len += len;
   *out_len = output_len;
   return true;
+  */
 }
 
 size_t Crypto::Cipher::key_length() const {

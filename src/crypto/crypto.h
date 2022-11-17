@@ -1,5 +1,5 @@
-#ifndef CRYPTO_HXX
-#define CRYPTO_HXX
+#ifndef LIBWEBRTC_CRYPTO_HXX
+#define LIBWEBRTC_CRYPTO_HXX
 
 #include <openssl/aes.h>
 #include <openssl/err.h>
@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
+#include <vector>
 
 namespace libwebrtc {
 
@@ -22,18 +23,18 @@ class Crypto {
     kAes256Cbc,
     kNull
   };
+  
+  enum class Type { kEncrypt = 0, kDecrypt };
 
   class Cipher {
    public:
-    enum class Type { kEncrypt = 0, kDecrypt };
-
-   public:
     Cipher(Algorithm algorithm, Type type);
-    ~Cipher();
+    virtual ~Cipher();
 
     virtual bool initialize();
 
-    virtual bool setkey(const std::string& key, const std::string& iv);
+    virtual bool setkey(const std::vector<uint8_t> key,
+                        std::vector<uint8_t> iv);
 
     virtual bool update(const uint8_t* in,
                         size_t in_len,
@@ -44,6 +45,10 @@ class Crypto {
 
     virtual size_t iv_length() const;
 
+    virtual const std::vector<uint8_t>& key() { return key_; }
+
+    virtual const std::vector<uint8_t>& iv() { return iv_; }
+
    private:
     Algorithm algorithm_;
     Type type_;
@@ -52,19 +57,22 @@ class Crypto {
     size_t aesKeyLength = 0;
     size_t aesIvLength = 0;
     bool initialized_ = false;
+    std::vector<uint8_t> key_;
+    std::vector<uint8_t> iv_;
   };
 
  public:
   Crypto();
   ~Crypto();
 
-  virtual int initialize();
+  static bool generateAesKey(const Cipher& chpper,
+                      std::vector<uint8_t>& aesKey,
+                      std::vector<uint8_t>& aesIv);
 
-  bool generateAesKey(const Cipher& chpper,
-                      std::string* aesKey,
-                      std::string* aesIv);
+  static std::vector<uint8_t> key;
+  static std::vector<uint8_t> iv;
 };
 
 }  // namespace libwebrtc
 
-#endif
+#endif //LIBWEBRTC_CRYPTO_HXX

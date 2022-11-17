@@ -76,8 +76,6 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_video_source.h",
     "include/rtc_video_track.h",
     "src/base/portable.cc",
-    "src/internal/crypto.cc",
-    "src/internal/crypto.h",
     "src/internal/vcm_capturer.cc",
     "src/internal/vcm_capturer.h",
     "src/internal/video_capturer.cc",
@@ -129,6 +127,12 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_video_source_impl.h",
     "src/rtc_video_track_impl.cc",
     "src/rtc_video_track_impl.h",
+    "src/crypto/gcm_frame_decryptor.cc",
+    "src/crypto/gcm_frame_decryptor.h",
+    "src/crypto/gcm_frame_encryptor.cc",
+    "src/crypto/gcm_frame_encryptor.h",
+    "src/crypto/crypto.cc",
+    "src/crypto/crypto.h",
   ]
 
   # intel media sdk

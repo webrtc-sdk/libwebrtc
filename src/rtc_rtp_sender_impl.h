@@ -3,10 +3,12 @@
 
 #include "api/rtp_sender_interface.h"
 #include "api/scoped_refptr.h"
+#include "rtc_base/ref_counted_object.h"
 
+#include "crypto/gcm_frame_encryptor.h"
+#include "rtc_frame_encryptor_impl.h"
 #include "rtc_rtp_sender.h"
 
-#include "rtc_frame_encryptor_impl.h"
 
 namespace libwebrtc {
 
@@ -34,17 +36,38 @@ class RTCRtpSenderImpl : public RTCRtpSender {
   virtual void SetFrameEncryptor(
       scoped_refptr<RTCFrameEncryptor> frame_encryptor) override {
     frame_encryptor_ = frame_encryptor;
-    rtp_sender_->SetFrameEncryptor(
-        static_cast<RTCFrameEncryptorImpl*>(frame_encryptor.get())
-            ->rtc_frame_encryptor());
+    if (frame_encryptor_ != nullptr) {
+      rtp_sender_->SetFrameEncryptor(
+          static_cast<RTCFrameEncryptorImpl*>(frame_encryptor.get())
+              ->rtc_frame_encryptor());
+    } else {
+      rtp_sender_->SetFrameEncryptor(nullptr);
+    }
   }
 
   virtual scoped_refptr<RTCFrameEncryptor> GetFrameEncryptor() const override {
-      return frame_encryptor_;
+    return frame_encryptor_;
   }
+
+  virtual bool EnableGcmCryptoSuites(vector<uint8_t> key) override {
+    if (!gcm_frame_encryptor_) {
+      gcm_frame_encryptor_ = rtc::scoped_refptr<webrtc::GCMFrameEncryptor>(
+          new webrtc::GCMFrameEncryptor());
+    }
+    gcm_frame_encryptor_->SetKey(key.std_vector());
+    rtp_sender_->SetFrameEncryptor(gcm_frame_encryptor_);
+    return true;
+  }
+
+  virtual bool DisableGcmCryptoSuites() override {
+    rtp_sender_->SetFrameEncryptor(nullptr);
+    return true;
+  }
+
  private:
   rtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender_;
   scoped_refptr<RTCFrameEncryptor> frame_encryptor_;
+  rtc::scoped_refptr<webrtc::GCMFrameEncryptor> gcm_frame_encryptor_;
 };
 }  // namespace libwebrtc
 
