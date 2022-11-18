@@ -211,7 +211,8 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
                           width, height, libyuv::kRotate0,
                           libyuv::FOURCC_ARGB);
 
-    OnFrame(webrtc::VideoFrame(i420_buffer_, 0, 0, webrtc::kVideoRotation_0));
+    OnFrame(webrtc::VideoFrame(i420_buffer_, 0, rtc::TimeMillis(),
+                               webrtc::kVideoRotation_0));
   }
 #ifdef WEBRTC_WIN
   __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
