@@ -76,6 +76,8 @@ void VideoCapturer::UpdateVideoAdapter() {
     std::pair<int, int> target_aspect_ratiot(size.width, size.height);
     video_adapter_.OnOutputFormatRequest(
         target_aspect_ratiot, wants.max_pixel_count, wants.max_framerate_fps);
+  } else {
+    video_adapter_.OnSinkWants(wants);
   }
 }
 
