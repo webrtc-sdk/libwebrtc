@@ -3,6 +3,7 @@
 
 #include "api/frame_transformer_interface.h"
 #include "rtc_base/synchronization/mutex.h"
+#include "rtc_base/buffer.h"
 
 namespace libwebrtc {
 
@@ -25,19 +26,19 @@ class FrameCryptorTransformer
   virtual void UnregisterTransformedFrameCallback() override;
   virtual void Transform(
       std::unique_ptr<webrtc::TransformableFrameInterface> frame) override;
-  virtual void SetKey(std::vector<uint8_t> key_bytes) {
-    aesKey_ = key_bytes;
-  }
+  virtual void SetKey(std::vector<uint8_t> key_bytes) { aesKey_ = key_bytes; }
 
  private:
-  virtual void encryptFrame(
-      std::unique_ptr<webrtc::TransformableFrameInterface> frame);
-  virtual void decryptFrame(
-      std::unique_ptr<webrtc::TransformableFrameInterface> frame);
+  void encryptFrame(std::unique_ptr<webrtc::TransformableFrameInterface> frame);
+  void decryptFrame(std::unique_ptr<webrtc::TransformableFrameInterface> frame);
+  rtc::Buffer makeIv(uint32_t ssrc, uint32_t timestamp);
+
+ private:
   mutable webrtc::Mutex mutex_;
   MediaType type_;
   rtc::scoped_refptr<webrtc::TransformedFrameCallback> sink_callback_;
   std::vector<uint8_t> aesKey_;
+  std::map<uint32_t, uint32_t> sendCounts_;
 };
 
 }  // namespace libwebrtc
