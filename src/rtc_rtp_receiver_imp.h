@@ -4,9 +4,8 @@
 #include "api/rtp_receiver_interface.h"
 #include "rtc_rtp_receiver.h"
 
-#include "crypto/gcm_frame_decryptor.h"
+#include "crypto/frame_cryptor_transformer.h"
 #include "rtc_frame_decryptor_impl.h"
-
 
 namespace libwebrtc {
 class RTCRtpReceiverImpl : public RTCRtpReceiver,
@@ -47,12 +46,24 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
   virtual void OnFirstPacketReceived(cricket::MediaType media_type) override;
 
   virtual bool EnableGcmCryptoSuites(vector<uint8_t> key) override {
+    /*
     if (!gcm_frame_decryptor_) {
       gcm_frame_decryptor_ = rtc::scoped_refptr<webrtc::GCMFrameDecryptor>(
           new webrtc::GCMFrameDecryptor());
     }
     gcm_frame_decryptor_->SetKey(key.std_vector());
     rtp_receiver_->SetFrameDecryptor(gcm_frame_decryptor_);
+    */
+    if (!e2ee_transformer_) {
+      e2ee_transformer_ = rtc::scoped_refptr<FrameCryptorTransformer>(
+          new FrameCryptorTransformer(
+              rtp_receiver_->track()->kind() == "audio"
+                  ? FrameCryptorTransformer::MediaType::kAudioFrame
+                  : FrameCryptorTransformer::MediaType::kVideoFrame));
+    }
+    e2ee_transformer_->SetKey(key.std_vector());
+    rtp_receiver_->SetDepacketizerToDecoderFrameTransformer(e2ee_transformer_);
+
     return true;
   }
 
@@ -65,7 +76,7 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver_;
   RTCRtpReceiverObserver* observer_;
   scoped_refptr<RTCFrameDecryptor> frame_decryptor_;
-  rtc::scoped_refptr<webrtc::GCMFrameDecryptor> gcm_frame_decryptor_;
+  rtc::scoped_refptr<libwebrtc::FrameCryptorTransformer> e2ee_transformer_;
 };  // namespace libwebrtc
 
 }  // namespace libwebrtc

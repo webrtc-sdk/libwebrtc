@@ -127,12 +127,8 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_video_source_impl.h",
     "src/rtc_video_track_impl.cc",
     "src/rtc_video_track_impl.h",
-    "src/crypto/gcm_frame_decryptor.cc",
-    "src/crypto/gcm_frame_decryptor.h",
-    "src/crypto/gcm_frame_encryptor.cc",
-    "src/crypto/gcm_frame_encryptor.h",
-    "src/crypto/crypto.cc",
-    "src/crypto/crypto.h",
+    "src/crypto/frame_cryptor_transformer.cc",
+    "src/crypto/frame_cryptor_transformer.h",
   ]
 
   # intel media sdk
