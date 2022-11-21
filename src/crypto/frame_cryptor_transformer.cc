@@ -16,7 +16,7 @@
 #define CRYPTO_BUFFER_SIZE 65535
 #define GCM_TAG_SIZE 16
 #define IV_SIZE 12
-#define KEY_SIZE 32
+#define MAX_KEY_SIZE 32
 
 namespace libwebrtc {
 
@@ -37,9 +37,16 @@ size_t crypto_decrypt_buffer(const uint8_t* key,
 std::string to_hex(unsigned char* data, int len);
 
 FrameCryptorTransformer::FrameCryptorTransformer(MediaType type) : type_(type) {
-  aesKey_ = {97,  145, 133, 203, 63,  197, 49,  232, 87,  159, 169,
-             200, 59,  195, 77,  75,  150, 173, 189, 232, 44,  39,
-             8,   149, 250, 6,   238, 170, 255, 17,  110, 107};
+  aesKey_.resize(MAX_KEY_SIZE);
+}
+
+void FrameCryptorTransformer::SetKey(const std::string& key) {
+  if(key.size() > MAX_KEY_SIZE) {
+    RTC_LOG(LS_ERROR) << "Key size is too large";
+    return;
+  }
+  memset(aesKey_.data(), 0, MAX_KEY_SIZE);
+  memcpy(aesKey_.data(), key.data(), key.length());
 }
 
 void FrameCryptorTransformer::RegisterTransformedFrameSinkCallback(

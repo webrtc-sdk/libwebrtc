@@ -26,7 +26,7 @@ class FrameCryptorTransformer
   virtual void UnregisterTransformedFrameCallback() override;
   virtual void Transform(
       std::unique_ptr<webrtc::TransformableFrameInterface> frame) override;
-  virtual void SetKey(std::vector<uint8_t> key_bytes) { aesKey_ = key_bytes; }
+  virtual void SetKey(const std::string& key);
 
  private:
   void encryptFrame(std::unique_ptr<webrtc::TransformableFrameInterface> frame);

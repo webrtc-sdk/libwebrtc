@@ -48,7 +48,7 @@ class RTCRtpSenderImpl : public RTCRtpSender {
     return frame_encryptor_;
   }
 
-  virtual bool EnableGcmCryptoSuites(vector<uint8_t> key) override {
+  virtual bool EnableGcmCryptoSuites(const string& key) override {
     /*
     if (!gcm_frame_encryptor_) {
       gcm_frame_encryptor_ = rtc::scoped_refptr<webrtc::GCMFrameEncryptor>(
@@ -64,7 +64,7 @@ class RTCRtpSenderImpl : public RTCRtpSender {
                   ? FrameCryptorTransformer::MediaType::kAudioFrame
                   : FrameCryptorTransformer::MediaType::kVideoFrame));
     }
-    e2ee_transformer_->SetKey(key.std_vector());
+    e2ee_transformer_->SetKey(key.std_string());
     rtp_sender_->SetEncoderToPacketizerFrameTransformer(e2ee_transformer_);
     return true;
   }
