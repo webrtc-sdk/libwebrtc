@@ -200,8 +200,8 @@ rtc::Buffer FrameCryptorTransformer::makeIv(uint32_t ssrc, uint32_t timestamp) {
   rtc::ArrayView<uint32_t> ivView = rtc::ArrayView<uint32_t>(
       reinterpret_cast<uint32_t*>(iv.data()), IV_SIZE / 4);
   if (!sendCounts_[ssrc]) {
-    // TOOD:
-    // sendCounts_[ssrc] = Math.floor(Math.random() * 0xFFFF);
+    srand((unsigned) time(NULL));
+    sendCounts_[ssrc] = floor(rand() * 0xFFFF);
   }
   uint32_t sendCount = sendCounts_[ssrc];
   ivView[0] = ssrc;
