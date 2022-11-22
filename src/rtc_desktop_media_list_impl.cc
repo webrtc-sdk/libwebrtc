@@ -79,9 +79,7 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload, bool get_th
   }
 
   webrtc::DesktopCapturer::SourceList new_sources;
-  thread_->Invoke<void>(RTC_FROM_HERE, [this,&new_sources] {
-    capturer_->GetSourceList(&new_sources);
-  });
+  capturer_->GetSourceList(&new_sources);
 
   typedef std::set<webrtc::DesktopCapturer::SourceId> SourceSet;
   SourceSet new_source_set;
