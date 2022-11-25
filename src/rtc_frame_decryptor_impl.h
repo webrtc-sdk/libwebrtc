@@ -15,19 +15,22 @@ class RTCFrameDecryptorInternal : public webrtc::FrameDecryptorInterface {
         get_max_plaintext_byte_size_callback_(get_max_plaintext_byte_size) {}
 
   virtual Result Decrypt(cricket::MediaType media_type,
+                         const webrtc::VideoFrameType* frame_type,
                          const std::vector<uint32_t>& csrcs,
                          rtc::ArrayView<const uint8_t> additional_data,
                          rtc::ArrayView<const uint8_t> encrypted_frame,
                          rtc::ArrayView<uint8_t> frame) override {
-    //DecryptResult res =
-    //      decrypt_callback_(ConvertMediaType(media_type), csrcs, additional_data,
+    // DecryptResult res =
+    //      decrypt_callback_(ConvertMediaType(media_type), csrcs,
+    //      additional_data,
     //                        encrypted_frame, frame);
-                            
+
     return webrtc::FrameDecryptorInterface::Result(
         webrtc::FrameDecryptorInterface::Status::kOk, 0);
   }
 
   virtual size_t GetMaxPlaintextByteSize(cricket::MediaType media_type,
+                                         const webrtc::VideoFrameType* frame_type,
                                          size_t encrypted_frame_size) override {
     return get_max_plaintext_byte_size_callback_(ConvertMediaType(media_type),
                                                  encrypted_frame_size);

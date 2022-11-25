@@ -1,5 +1,6 @@
 #include "frame_cryptor_transformer.h"
 #include "api/array_view.h"
+#include "rtc_base/byte_buffer.h"
 #include "rtc_base/logging.h"
 
 #include <openssl/aes.h>
@@ -13,40 +14,100 @@
 #include <sstream>
 #include <string>
 
-#define CRYPTO_BUFFER_SIZE 65535
-#define GCM_TAG_SIZE 16
 #define IV_SIZE 12
-#define MAX_KEY_SIZE 32
+
+enum class EncryptOrDecrypt { kEncrypt = 0, kDecrypt };
+
+#define Success 0
+#define ErrorUnexpected -1
+#define OperationError -2
+#define ErrorDataTooSmall -3
+#define ErrorInvalidAesGcmTagLength -4
+
+const EVP_AEAD* GetAesGcmAlgorithmFromKeySize(size_t key_size_bytes) {
+  switch (key_size_bytes) {
+    case 16:
+      return EVP_aead_aes_128_gcm();
+    case 32:
+      return EVP_aead_aes_256_gcm();
+    default:
+      return nullptr;
+  }
+}
+
+int AeadEncryptDecrypt(EncryptOrDecrypt mode,
+                       const std::vector<uint8_t> raw_key,
+                       const rtc::ArrayView<uint8_t> data,
+                       unsigned int tag_length_bytes,
+                       rtc::ArrayView<uint8_t> iv,
+                       rtc::ArrayView<uint8_t> additional_data,
+                       const EVP_AEAD* aead_alg,
+                       std::vector<uint8_t>* buffer) {
+  bssl::ScopedEVP_AEAD_CTX ctx;
+
+  if (!aead_alg)
+    return ErrorUnexpected;
+
+  if (!EVP_AEAD_CTX_init(ctx.get(), aead_alg, raw_key.data(), raw_key.size(),
+                         tag_length_bytes, nullptr)) {
+    return OperationError;
+  }
+
+  size_t len;
+  int ok;
+
+  if (mode == EncryptOrDecrypt::kDecrypt) {
+    if (data.size() < tag_length_bytes)
+      return ErrorDataTooSmall;
+
+    buffer->resize(data.size() - tag_length_bytes);
+
+    ok = EVP_AEAD_CTX_open(ctx.get(), buffer->data(), &len, buffer->size(),
+                           iv.data(), iv.size(), data.data(), data.size(),
+                           additional_data.data(), additional_data.size());
+  } else {
+    buffer->resize(data.size() + EVP_AEAD_max_overhead(aead_alg));
+
+    ok = EVP_AEAD_CTX_seal(ctx.get(), buffer->data(), &len, buffer->size(),
+                           iv.data(), iv.size(), data.data(), data.size(),
+                           additional_data.data(), additional_data.size());
+  }
+
+  if (!ok)
+    return OperationError;
+  buffer->resize(len);
+
+  return Success;
+}
+
+int AesGcmEncryptDecrypt(EncryptOrDecrypt mode,
+                         const std::vector<uint8_t>& raw_key,
+                         rtc::ArrayView<uint8_t> iv,
+                         rtc::ArrayView<uint8_t> additional_data,
+                         const rtc::ArrayView<uint8_t> data,
+                         std::vector<uint8_t>* buffer) {
+  unsigned int tag_length_bits = 128;
+  return AeadEncryptDecrypt(
+      mode, raw_key, data, tag_length_bits / 8, iv, additional_data,
+      GetAesGcmAlgorithmFromKeySize(raw_key.size()), buffer);
+}
 
 namespace libwebrtc {
 
 uint8_t get_unencrypted_bytes(webrtc::TransformableFrameInterface* frame,
                               FrameCryptorTransformer::MediaType type);
-size_t crypto_encrypt_buffer(const uint8_t* key,
-                             const uint8_t* iv,
-                             const uint8_t* in,
-                             size_t inlen,
-                             uint8_t* out,
-                             size_t outlen);
-size_t crypto_decrypt_buffer(const uint8_t* key,
-                             const uint8_t* iv,
-                             const uint8_t* in,
-                             size_t inlen,
-                             uint8_t* out,
-                             size_t outlen);
 std::string to_hex(unsigned char* data, int len);
 
 FrameCryptorTransformer::FrameCryptorTransformer(MediaType type) : type_(type) {
-  aesKey_.resize(MAX_KEY_SIZE);
+  aesKey_.resize(32);
 }
 
-void FrameCryptorTransformer::SetKey(const std::string& key) {
-  if(key.size() > MAX_KEY_SIZE) {
-    RTC_LOG(LS_ERROR) << "Key size is too large";
+void FrameCryptorTransformer::SetKey(const std::vector<uint8_t>& key) {
+  if (key.size() != 16 && key.size() != 32) {
+    RTC_LOG(LS_ERROR) << "key size must be 16 or 32 bytes";
     return;
   }
-  memset(aesKey_.data(), 0, MAX_KEY_SIZE);
-  memcpy(aesKey_.data(), key.data(), key.length());
+  aesKey_ = key;
 }
 
 void FrameCryptorTransformer::RegisterTransformedFrameSinkCallback(
@@ -118,28 +179,32 @@ void FrameCryptorTransformer::encryptFrame(
   rtc::Buffer frameTrailer(2);
   frameTrailer[0] = IV_SIZE;
   frameTrailer[1] = keyIndex;
-  auto iv = makeIv(frame->GetSsrc(), frame->GetTimestamp());
+  rtc::Buffer iv = makeIv(frame->GetSsrc(), frame->GetTimestamp());
 
   rtc::Buffer payload(date_in.size() - unencrypted_bytes);
   for (size_t i = unencrypted_bytes; i < date_in.size(); i++) {
     payload[i - unencrypted_bytes] = date_in[i];
   }
 
-  uint8_t encbuffer[CRYPTO_BUFFER_SIZE];
-  size_t enclen =
-      crypto_encrypt_buffer(aesKey_.data(), iv.data(), payload.data(),
-                            payload.size(), encbuffer, sizeof(encbuffer));
+  std::vector<uint8_t> buffer;
+  AesGcmEncryptDecrypt(EncryptOrDecrypt::kEncrypt, aesKey_, iv, frameHeader,
+                       payload, &buffer);
 
-  rtc::Buffer encrypted_payload(encbuffer, enclen);
+  rtc::Buffer encrypted_payload(buffer.data(), buffer.size());
   rtc::Buffer data_out;
   data_out.AppendData(frameHeader);
   data_out.AppendData(encrypted_payload);
   data_out.AppendData(iv);
   data_out.AppendData(frameTrailer);
+
+  RTC_CHECK_EQ(data_out.size(), frameHeader.size() + encrypted_payload.size() +
+                                    iv.size() + frameTrailer.size());
+
   frame->SetData(data_out);
 
   RTC_LOG(LS_INFO) << "FrameCryptorTransformer::encryptFrame() ivLength="
                    << static_cast<int>(iv.size())
+                   << " unencrypted_bytes=" << static_cast<int>(unencrypted_bytes)
                    << " keyIndex=" << static_cast<int>(keyIndex)
                    << " aesKey=" << to_hex(aesKey_.data(), aesKey_.size())
                    << " iv=" << to_hex(iv.data(), iv.size());
@@ -163,6 +228,10 @@ void FrameCryptorTransformer::decryptFrame(
   uint8_t ivLength = frameTrailer[0];
   uint8_t keyIndex = frameTrailer[1];
 
+  if (ivLength != IV_SIZE  || (keyIndex < 0 || keyIndex >= 10)) {
+    return;
+  }
+
   rtc::Buffer iv = rtc::Buffer(ivLength);
   for (size_t i = 0; i < ivLength; i++) {
     iv[i] = date_in[date_in.size() - 2 - ivLength + i];
@@ -173,13 +242,10 @@ void FrameCryptorTransformer::decryptFrame(
   for (size_t i = unencrypted_bytes; i < date_in.size() - ivLength - 2; i++) {
     encrypted_payload[i - unencrypted_bytes] = date_in[i];
   }
-
-  uint8_t decbuffer[CRYPTO_BUFFER_SIZE];
-  size_t declen = crypto_decrypt_buffer(
-      aesKey_.data(), iv.data(), encrypted_payload.data(),
-      encrypted_payload.size(), decbuffer, sizeof decbuffer);
-
-  rtc::Buffer payload(decbuffer, declen);
+  std::vector<uint8_t> buffer;
+  AesGcmEncryptDecrypt(EncryptOrDecrypt::kDecrypt, aesKey_, iv, frameHeader,
+                       encrypted_payload, &buffer);
+  rtc::Buffer payload(buffer.data(), buffer.size());
   rtc::Buffer data_out;
   data_out.AppendData(frameHeader);
   data_out.AppendData(payload);
@@ -187,6 +253,7 @@ void FrameCryptorTransformer::decryptFrame(
 
   RTC_LOG(LS_INFO) << "FrameCryptorTransformer::decryptFrame() ivLength="
                    << static_cast<int>(ivLength)
+                   << " unencrypted_bytes=" << static_cast<int>(unencrypted_bytes)
                    << " keyIndex=" << static_cast<int>(keyIndex)
                    << " aesKey=" << to_hex(aesKey_.data(), aesKey_.size())
                    << " iv=" << to_hex(iv.data(), iv.size());
@@ -196,19 +263,22 @@ void FrameCryptorTransformer::decryptFrame(
 }
 
 rtc::Buffer FrameCryptorTransformer::makeIv(uint32_t ssrc, uint32_t timestamp) {
-  rtc::Buffer iv = rtc::Buffer(IV_SIZE);
-  rtc::ArrayView<uint32_t> ivView = rtc::ArrayView<uint32_t>(
-      reinterpret_cast<uint32_t*>(iv.data()), IV_SIZE / 4);
-  if (!sendCounts_[ssrc]) {
-    srand((unsigned) time(NULL));
+  uint32_t sendCount = 0;
+  if (sendCounts_.find(ssrc) == sendCounts_.end()) {
+    srand((unsigned)time(NULL));
     sendCounts_[ssrc] = floor(rand() * 0xFFFF);
+  } else {
+    sendCount = sendCounts_[ssrc];
   }
-  uint32_t sendCount = sendCounts_[ssrc];
-  ivView[0] = ssrc;
-  ivView[1] = timestamp;
-  ivView[2] = sendCount % 0xFFFF;
+  rtc::ByteBufferWriter buf;
+  buf.WriteUInt32(ssrc);
+  buf.WriteUInt32(timestamp);
+  buf.WriteUInt32(sendCount % 0xFFFF);
   sendCounts_[ssrc] = sendCount + 1;
-  return iv;
+
+  RTC_CHECK_EQ(buf.Length(), IV_SIZE);
+
+  return rtc::Buffer(buf.Data(), buf.Length());
 }
 
 uint8_t get_unencrypted_bytes(webrtc::TransformableFrameInterface* frame,
@@ -224,92 +294,6 @@ uint8_t get_unencrypted_bytes(webrtc::TransformableFrameInterface* frame,
     default:
       return 0;
   }
-}
-
-size_t crypto_encrypt_buffer(const uint8_t* key,
-                             const uint8_t* iv,
-                             const uint8_t* in,
-                             size_t inlen,
-                             uint8_t* out,
-                             size_t outlen) {
-  EVP_CIPHER_CTX* ctx;
-  uint8_t tag[GCM_TAG_SIZE];
-  int olen;
-  int len = 0;
-  int ret = 0;
-
-  /* output buffer does not have enough room */
-  if (outlen < inlen + sizeof tag + sizeof iv)
-    return 0;
-
-  ctx = EVP_CIPHER_CTX_new();
-  if (ctx == NULL)
-    return 0;
-
-  EVP_EncryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, key, iv);
-
-  /* encrypt buffer */
-  if (!EVP_EncryptUpdate(ctx, out + len, &olen, in, inlen))
-    goto end;
-  len += olen;
-
-  /* finalize and write last chunk if any */
-  if (!EVP_EncryptFinal(ctx, out + len, &olen))
-    goto end;
-  len += olen;
-
-  /* get and append tag */
-  EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, sizeof tag, tag);
-  memcpy(out + len, tag, sizeof tag);
-  ret = len + sizeof tag;
-
-end:
-  EVP_CIPHER_CTX_free(ctx);
-  return ret;
-}
-
-size_t crypto_decrypt_buffer(const uint8_t* key,
-                             const uint8_t* iv,
-                             const uint8_t* in,
-                             size_t inlen,
-                             uint8_t* out,
-                             size_t outlen) {
-  EVP_CIPHER_CTX* ctx;
-  uint8_t tag[GCM_TAG_SIZE];
-  int olen;
-  int len = 0;
-  int ret = 0;
-
-  /* out does not have enough room */
-  if (outlen < inlen - sizeof tag)
-    return 0;
-
-  /* extract tag */
-  memcpy(tag, in + inlen - sizeof tag, sizeof tag);
-  inlen -= sizeof tag;
-
-  ctx = EVP_CIPHER_CTX_new();
-  if (ctx == NULL)
-    return 0;
-
-  EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, key, iv);
-
-  /* set expected tag */
-  EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, sizeof tag, tag);
-
-  /* decrypt buffer */
-  if (!EVP_DecryptUpdate(ctx, out, &olen, in, inlen))
-    goto end;
-  len += olen;
-
-  /* finalize, write last chunk if any and perform authentication check */
-  if (!EVP_DecryptFinal_ex(ctx, out + len, &olen))
-    goto end;
-  ret = len + olen;
-
-end:
-  EVP_CIPHER_CTX_free(ctx);
-  return ret;
 }
 
 std::string to_hex(unsigned char* data, int len) {

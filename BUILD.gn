@@ -37,6 +37,7 @@ rtc_shared_library("libwebrtc") {
     defines += [
       "LIB_WEBRTC_API_EXPORTS",
       "WEBRTC_WIN",
+      "HAVE_BOOLEAN",
     ]
   }
 

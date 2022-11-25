@@ -48,7 +48,7 @@ class RTCRtpSender : public RefCountInterface {
 
   virtual scoped_refptr<RTCFrameEncryptor> GetFrameEncryptor() const = 0;
 
-  virtual bool EnableGcmCryptoSuites(const string& key) = 0;
+  virtual bool EnableGcmCryptoSuites(const vector<uint8_t>& key) = 0;
 
   virtual bool DisableGcmCryptoSuites() = 0;
 };

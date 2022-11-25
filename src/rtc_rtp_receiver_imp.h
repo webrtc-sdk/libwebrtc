@@ -45,15 +45,7 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
 
   virtual void OnFirstPacketReceived(cricket::MediaType media_type) override;
 
-  virtual bool EnableGcmCryptoSuites(const string& key) override {
-    /*
-    if (!gcm_frame_decryptor_) {
-      gcm_frame_decryptor_ = rtc::scoped_refptr<webrtc::GCMFrameDecryptor>(
-          new webrtc::GCMFrameDecryptor());
-    }
-    gcm_frame_decryptor_->SetKey(key.std_vector());
-    rtp_receiver_->SetFrameDecryptor(gcm_frame_decryptor_);
-    */
+  virtual bool EnableGcmCryptoSuites(const vector<uint8_t>& key) override {
     if (!e2ee_transformer_) {
       e2ee_transformer_ = rtc::scoped_refptr<FrameCryptorTransformer>(
           new FrameCryptorTransformer(
@@ -61,9 +53,8 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
                   ? FrameCryptorTransformer::MediaType::kAudioFrame
                   : FrameCryptorTransformer::MediaType::kVideoFrame));
     }
-    e2ee_transformer_->SetKey(key.std_string());
+    e2ee_transformer_->SetKey(key.std_vector());
     rtp_receiver_->SetDepacketizerToDecoderFrameTransformer(e2ee_transformer_);
-
     return true;
   }
 

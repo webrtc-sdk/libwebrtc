@@ -16,19 +16,24 @@ class RTCFrameEncryptorInternal : public webrtc::FrameEncryptorInterface {
         get_max_ciphertext_byte_size_callback_(get_max_ciphertext_byte_size) {}
 
   virtual int Encrypt(cricket::MediaType media_type,
+                      webrtc::VideoFrameType* frame_type,
                       uint32_t ssrc,
+                      uint32_t timestamp,
                       rtc::ArrayView<const uint8_t> additional_data,
                       rtc::ArrayView<const uint8_t> frame,
                       rtc::ArrayView<uint8_t> encrypted_frame,
                       size_t* bytes_written) override {
-    //return encrypt_callback_(ConvertMediaType(media_type), ssrc, additional_data, frame,
+    // return encrypt_callback_(ConvertMediaType(media_type), ssrc,
+    // additional_data, frame,
     //                         encrypted_frame, bytes_written);
     return 0;
   }
 
   virtual size_t GetMaxCiphertextByteSize(cricket::MediaType media_type,
+                                          webrtc::VideoFrameType* frame_type,
                                           size_t frame_size) override {
-    return get_max_ciphertext_byte_size_callback_(ConvertMediaType(media_type), frame_size);
+    return get_max_ciphertext_byte_size_callback_(ConvertMediaType(media_type),
+                                                  frame_size);
   }
 
   RTCMediaType ConvertMediaType(cricket::MediaType media_type) {
