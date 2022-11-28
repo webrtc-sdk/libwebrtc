@@ -5,7 +5,6 @@
 #include "rtc_rtp_receiver.h"
 
 #include "crypto/frame_cryptor_transformer.h"
-#include "rtc_frame_decryptor_impl.h"
 
 namespace libwebrtc {
 class RTCRtpReceiverImpl : public RTCRtpReceiver,
@@ -26,23 +25,6 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
   virtual void SetObserver(RTCRtpReceiverObserver* observer) override;
   virtual void SetJitterBufferMinimumDelay(double delay_seconds) override;
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver();
-
-  virtual void SetFrameDecryptor(
-      scoped_refptr<RTCFrameDecryptor> frame_decryptor) override {
-    frame_decryptor_ = frame_decryptor;
-    if (frame_decryptor_ != nullptr) {
-      rtp_receiver_->SetFrameDecryptor(
-          static_cast<RTCFrameDecryptorImpl*>(frame_decryptor.get())
-              ->rtc_frame_decryptor());
-    } else {
-      rtp_receiver_->SetFrameDecryptor(nullptr);
-    }
-  }
-
-  virtual scoped_refptr<RTCFrameDecryptor> GetFrameDecryptor() const override {
-    return frame_decryptor_;
-  }
-
   virtual void OnFirstPacketReceived(cricket::MediaType media_type) override;
 
   virtual bool EnableGcmCryptoSuites(const vector<uint8_t>& key) override {
@@ -66,7 +48,6 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
  private:
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver_;
   RTCRtpReceiverObserver* observer_;
-  scoped_refptr<RTCFrameDecryptor> frame_decryptor_;
   rtc::scoped_refptr<libwebrtc::FrameCryptorTransformer> e2ee_transformer_;
 };  // namespace libwebrtc
 

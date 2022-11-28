@@ -6,7 +6,6 @@
 #include "rtc_base/ref_counted_object.h"
 
 #include "crypto/frame_cryptor_transformer.h"
-#include "rtc_frame_encryptor_impl.h"
 #include "rtc_rtp_sender.h"
 
 namespace libwebrtc {
@@ -32,22 +31,6 @@ class RTCRtpSenderImpl : public RTCRtpSender {
   rtc::scoped_refptr<webrtc::RtpSenderInterface> rtc_rtp_sender() {
     return rtp_sender_;
   }
-  virtual void SetFrameEncryptor(
-      scoped_refptr<RTCFrameEncryptor> frame_encryptor) override {
-    frame_encryptor_ = frame_encryptor;
-    if (frame_encryptor_ != nullptr) {
-      rtp_sender_->SetFrameEncryptor(
-          static_cast<RTCFrameEncryptorImpl*>(frame_encryptor.get())
-              ->rtc_frame_encryptor());
-    } else {
-      rtp_sender_->SetFrameEncryptor(nullptr);
-    }
-  }
-
-  virtual scoped_refptr<RTCFrameEncryptor> GetFrameEncryptor() const override {
-    return frame_encryptor_;
-  }
-
   virtual bool EnableGcmCryptoSuites(const vector<uint8_t>& key) override {
     if (!e2ee_transformer_) {
       e2ee_transformer_ = rtc::scoped_refptr<FrameCryptorTransformer>(
@@ -68,7 +51,6 @@ class RTCRtpSenderImpl : public RTCRtpSender {
 
  private:
   rtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender_;
-  scoped_refptr<RTCFrameEncryptor> frame_encryptor_;
   rtc::scoped_refptr<libwebrtc::FrameCryptorTransformer> e2ee_transformer_;
 };
 }  // namespace libwebrtc
