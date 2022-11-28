@@ -45,11 +45,14 @@ int AeadEncryptDecrypt(EncryptOrDecrypt mode,
                        std::vector<uint8_t>* buffer) {
   bssl::ScopedEVP_AEAD_CTX ctx;
 
-  if (!aead_alg)
+  if (!aead_alg) {
+    RTC_LOG(LS_ERROR) << "Invalid AES-GCM key size.";
     return ErrorUnexpected;
+  }
 
   if (!EVP_AEAD_CTX_init(ctx.get(), aead_alg, raw_key.data(), raw_key.size(),
                          tag_length_bytes, nullptr)) {
+    RTC_LOG(LS_ERROR) << "Failed to initialize AES-GCM context.";
     return OperationError;
   }
 
@@ -57,8 +60,10 @@ int AeadEncryptDecrypt(EncryptOrDecrypt mode,
   int ok;
 
   if (mode == EncryptOrDecrypt::kDecrypt) {
-    if (data.size() < tag_length_bytes)
+    if (data.size() < tag_length_bytes) {
+      RTC_LOG(LS_ERROR) << "Data too small for AES-GCM tag.";
       return ErrorDataTooSmall;
+    }
 
     buffer->resize(data.size() - tag_length_bytes);
 
@@ -73,8 +78,11 @@ int AeadEncryptDecrypt(EncryptOrDecrypt mode,
                            additional_data.data(), additional_data.size());
   }
 
-  if (!ok)
+  if (!ok) {
+    RTC_LOG(LS_ERROR) << "Failed to perform AES-GCM operation.";
     return OperationError;
+  }
+  
   buffer->resize(len);
 
   return Success;
@@ -187,27 +195,28 @@ void FrameCryptorTransformer::encryptFrame(
   }
 
   std::vector<uint8_t> buffer;
-  AesGcmEncryptDecrypt(EncryptOrDecrypt::kEncrypt, aesKey_, iv, frameHeader,
-                       payload, &buffer);
+  if (AesGcmEncryptDecrypt(EncryptOrDecrypt::kEncrypt, aesKey_, iv, frameHeader,
+                           payload, &buffer) == Success) {
+    rtc::Buffer encrypted_payload(buffer.data(), buffer.size());
+    rtc::Buffer data_out;
+    data_out.AppendData(frameHeader);
+    data_out.AppendData(encrypted_payload);
+    data_out.AppendData(iv);
+    data_out.AppendData(frameTrailer);
 
-  rtc::Buffer encrypted_payload(buffer.data(), buffer.size());
-  rtc::Buffer data_out;
-  data_out.AppendData(frameHeader);
-  data_out.AppendData(encrypted_payload);
-  data_out.AppendData(iv);
-  data_out.AppendData(frameTrailer);
+    RTC_CHECK_EQ(data_out.size(), frameHeader.size() +
+                                      encrypted_payload.size() + iv.size() +
+                                      frameTrailer.size());
 
-  RTC_CHECK_EQ(data_out.size(), frameHeader.size() + encrypted_payload.size() +
-                                    iv.size() + frameTrailer.size());
+    frame->SetData(data_out);
 
-  frame->SetData(data_out);
-
-  RTC_LOG(LS_INFO) << "FrameCryptorTransformer::encryptFrame() ivLength="
-                   << static_cast<int>(iv.size())
-                   << " unencrypted_bytes=" << static_cast<int>(unencrypted_bytes)
-                   << " keyIndex=" << static_cast<int>(keyIndex)
-                   << " aesKey=" << to_hex(aesKey_.data(), aesKey_.size())
-                   << " iv=" << to_hex(iv.data(), iv.size());
+    RTC_LOG(LS_INFO) << "FrameCryptorTransformer::encryptFrame() ivLength="
+                     << static_cast<int>(iv.size()) << " unencrypted_bytes="
+                     << static_cast<int>(unencrypted_bytes)
+                     << " keyIndex=" << static_cast<int>(keyIndex)
+                     << " aesKey=" << to_hex(aesKey_.data(), aesKey_.size())
+                     << " iv=" << to_hex(iv.data(), iv.size());
+  }
 
   if (sink_callback_)
     sink_callback_->OnTransformedFrame(std::move(frame));
@@ -228,7 +237,7 @@ void FrameCryptorTransformer::decryptFrame(
   uint8_t ivLength = frameTrailer[0];
   uint8_t keyIndex = frameTrailer[1];
 
-  if (ivLength != IV_SIZE  || (keyIndex < 0 || keyIndex >= 10)) {
+  if (ivLength != IV_SIZE || (keyIndex < 0 || keyIndex >= 10)) {
     return;
   }
 
@@ -243,21 +252,21 @@ void FrameCryptorTransformer::decryptFrame(
     encrypted_payload[i - unencrypted_bytes] = date_in[i];
   }
   std::vector<uint8_t> buffer;
-  AesGcmEncryptDecrypt(EncryptOrDecrypt::kDecrypt, aesKey_, iv, frameHeader,
-                       encrypted_payload, &buffer);
-  rtc::Buffer payload(buffer.data(), buffer.size());
-  rtc::Buffer data_out;
-  data_out.AppendData(frameHeader);
-  data_out.AppendData(payload);
-  frame->SetData(data_out);
+  if (AesGcmEncryptDecrypt(EncryptOrDecrypt::kDecrypt, aesKey_, iv, frameHeader,
+                           encrypted_payload, &buffer) == Success) {
+    rtc::Buffer payload(buffer.data(), buffer.size());
+    rtc::Buffer data_out;
+    data_out.AppendData(frameHeader);
+    data_out.AppendData(payload);
+    frame->SetData(data_out);
 
-  RTC_LOG(LS_INFO) << "FrameCryptorTransformer::decryptFrame() ivLength="
-                   << static_cast<int>(ivLength)
-                   << " unencrypted_bytes=" << static_cast<int>(unencrypted_bytes)
-                   << " keyIndex=" << static_cast<int>(keyIndex)
-                   << " aesKey=" << to_hex(aesKey_.data(), aesKey_.size())
-                   << " iv=" << to_hex(iv.data(), iv.size());
-
+    RTC_LOG(LS_INFO) << "FrameCryptorTransformer::decryptFrame() ivLength="
+                     << static_cast<int>(ivLength) << " unencrypted_bytes="
+                     << static_cast<int>(unencrypted_bytes)
+                     << " keyIndex=" << static_cast<int>(keyIndex)
+                     << " aesKey=" << to_hex(aesKey_.data(), aesKey_.size())
+                     << " iv=" << to_hex(iv.data(), iv.size());
+  }
   if (sink_callback_)
     sink_callback_->OnTransformedFrame(std::move(frame));
 }
