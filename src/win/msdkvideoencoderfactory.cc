@@ -35,10 +35,10 @@ MSDKVideoEncoderFactory::MSDKVideoEncoderFactory() {
   supported_codec_types_.push_back(webrtc::kVideoCodecVP8);
   supported_codec_types_.push_back(webrtc::kVideoCodecVP9);
   supported_codec_types_.push_back(webrtc::kVideoCodecAV1);
-
 }
 
-std::unique_ptr<webrtc::VideoEncoder> MSDKVideoEncoderFactory::CreateVideoEncoder(
+std::unique_ptr<webrtc::VideoEncoder>
+MSDKVideoEncoderFactory::CreateVideoEncoder(
     const webrtc::SdpVideoFormat& format) {
   bool vp9_hw = false, vp8_hw = false, av1_hw = false, h264_hw = false;
   for (auto& codec : supported_codec_types_) {
@@ -70,7 +70,7 @@ MSDKVideoEncoderFactory::GetSupportedFormats() const {
   // supports with those provided by built-in H.264 encoder
   for (const webrtc::SdpVideoFormat& format :
        owt::base::CodecUtils::SupportedH264Codecs())
-  supported_codecs.push_back(format);
+    supported_codecs.push_back(format);
   supported_codecs.push_back(webrtc::SdpVideoFormat(cricket::kVp8CodecName));
   for (const webrtc::SdpVideoFormat& format : webrtc::SupportedVP9Codecs())
     supported_codecs.push_back(format);

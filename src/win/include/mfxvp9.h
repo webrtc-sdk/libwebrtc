@@ -1,15 +1,15 @@
 // Copyright (c) 2018-2019 Intel Corporation
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-// 
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,24 +30,23 @@ extern "C" {
 
 /* Extended Buffer Ids */
 enum {
-    MFX_EXTBUFF_VP9_DECODED_FRAME_INFO = MFX_MAKEFOURCC('9','D','F','I')
+  MFX_EXTBUFF_VP9_DECODED_FRAME_INFO = MFX_MAKEFOURCC('9', 'D', 'F', 'I')
 };
 
 MFX_PACK_BEGIN_USUAL_STRUCT()
 typedef struct {
-    mfxExtBuffer Header;
+  mfxExtBuffer Header;
 
-    mfxU16       DisplayWidth;
-    mfxU16       DisplayHeight;
-    mfxU16       reserved[58];
+  mfxU16 DisplayWidth;
+  mfxU16 DisplayHeight;
+  mfxU16 reserved[58];
 } mfxExtVP9DecodedFrameInfo;
 MFX_PACK_END()
 
 #endif
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif
 
 #endif
-

@@ -35,7 +35,7 @@ class AudioDeviceImpl : public RTCAudioDevice, public webrtc::AudioDeviceSink {
 
   int32_t OnDeviceChange(OnDeviceChangeCallback listener) override;
 
-protected:
+ protected:
   void OnDevicesUpdated() override;
 
  private:
