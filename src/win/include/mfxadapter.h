@@ -7,8 +7,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,15 +26,17 @@
 #include "mfxstructures.h"
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
-mfxStatus MFX_CDECL MFXQueryAdapters(mfxComponentInfo* input_info, mfxAdaptersInfo* adapters);
-mfxStatus MFX_CDECL MFXQueryAdaptersDecode(mfxBitstream* bitstream, mfxU32 codec_id, mfxAdaptersInfo* adapters);
+mfxStatus MFX_CDECL MFXQueryAdapters(mfxComponentInfo* input_info,
+                                     mfxAdaptersInfo* adapters);
+mfxStatus MFX_CDECL MFXQueryAdaptersDecode(mfxBitstream* bitstream,
+                                           mfxU32 codec_id,
+                                           mfxAdaptersInfo* adapters);
 mfxStatus MFX_CDECL MFXQueryAdaptersNumber(mfxU32* num_adapters);
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif
 
-#endif // __MFXADAPTER_H__
+#endif  // __MFXADAPTER_H__
 #endif

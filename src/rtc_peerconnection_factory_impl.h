@@ -85,7 +85,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<RTCVideoSource> CreateDesktopSource_d(
       scoped_refptr<RTCDesktopCapturer> capturer,
       const char* video_source_label,
-      scoped_refptr<RTCMediaConstraints> constraints);    
+      scoped_refptr<RTCMediaConstraints> constraints);
 #endif
  private:
   rtc::Thread* worker_thread_ = nullptr;

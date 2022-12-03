@@ -6,10 +6,10 @@
 #define OWT_BASE_WIN_D3D11_MANAGER_H
 
 #include <atlbase.h>
-#include <dxgi1_2.h>
 #include <d3d11_2.h>
-#include <mfobjects.h>
+#include <dxgi1_2.h>
 #include <mfapi.h>
+#include <mfobjects.h>
 #include "rtc_base/logging.h"
 #include "rtc_base/ref_count.h"
 
@@ -49,7 +49,8 @@ class D3D11Manager : public rtc::RefCountInterface {
       return false;
     }
 
-    UINT creation_flags = D3D11_CREATE_DEVICE_VIDEO_SUPPORT | D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+    UINT creation_flags =
+        D3D11_CREATE_DEVICE_VIDEO_SUPPORT | D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 
     D3D_FEATURE_LEVEL feature_levels_in[] = {
         D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1,
@@ -87,21 +88,13 @@ class D3D11Manager : public rtc::RefCountInterface {
     return true;
   }
 
-  CComPtr<IMFDXGIDeviceManager> GetManager() {
-      return manager_;
-  }
+  CComPtr<IMFDXGIDeviceManager> GetManager() { return manager_; }
 
-  CComPtr<ID3D11Device> GetDevice() {
-      return device_;
-  }
+  CComPtr<ID3D11Device> GetDevice() { return device_; }
 
-  CComPtr<ID3D11DeviceContext> GetDeviceContext() {
-      return ctx_;
-  }
+  CComPtr<ID3D11DeviceContext> GetDeviceContext() { return ctx_; }
 
-  CComPtr<ID3D10Multithread> GetMultiThread() {
-      return mt_;
-  }
+  CComPtr<ID3D10Multithread> GetMultiThread() { return mt_; }
 
  private:
   CComPtr<IMFDXGIDeviceManager> manager_;
@@ -113,4 +106,4 @@ class D3D11Manager : public rtc::RefCountInterface {
 };
 }  // namespace base
 }  // namespace owt
-#endif //OWT_BASE_WIN_D3D11_MANAGER_H
+#endif  // OWT_BASE_WIN_D3D11_MANAGER_H

@@ -1,10 +1,10 @@
 #ifndef LIB_WEBRTC_RTC_DATA_CHANNEL_IMPL_HXX
 #define LIB_WEBRTC_RTC_DATA_CHANNEL_IMPL_HXX
 
-#include "rtc_data_channel.h"
-#include "rtc_types.h"
 #include "api/data_channel_interface.h"
 #include "rtc_base/synchronization/mutex.h"
+#include "rtc_data_channel.h"
+#include "rtc_types.h"
 
 namespace libwebrtc {
 
@@ -14,7 +14,9 @@ class RTCDataChannelImpl : public RTCDataChannel,
   RTCDataChannelImpl(
       rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel);
 
-  virtual void Send(const uint8_t* data, uint32_t size, bool binary = false) override;
+  virtual void Send(const uint8_t* data,
+                    uint32_t size,
+                    bool binary = false) override;
 
   virtual void Close() override;
 

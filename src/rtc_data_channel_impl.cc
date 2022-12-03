@@ -9,11 +9,12 @@ RTCDataChannelImpl::RTCDataChannelImpl(
   label_ = rtc_data_channel_->label();
 }
 
-void RTCDataChannelImpl::Send(const uint8_t* data, uint32_t size, bool binary /*= false*/) {
-  
-    rtc::CopyOnWriteBuffer copyOnWriteBuffer(data, size);
-    webrtc::DataBuffer buffer(copyOnWriteBuffer, binary);
-    rtc_data_channel_->Send(buffer);  
+void RTCDataChannelImpl::Send(const uint8_t* data,
+                              uint32_t size,
+                              bool binary /*= false*/) {
+  rtc::CopyOnWriteBuffer copyOnWriteBuffer(data, size);
+  webrtc::DataBuffer buffer(copyOnWriteBuffer, binary);
+  rtc_data_channel_->Send(buffer);
 }
 
 void RTCDataChannelImpl::Close() {
