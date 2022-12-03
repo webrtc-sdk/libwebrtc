@@ -2,20 +2,20 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "src/win/msdkvideoencoder.h"
 #include <string>
 #include <vector>
-#include "absl/algorithm/container.h"
-#include "common_video/h264/h264_common.h"
 #include "libyuv/convert_from.h"
 #include "mfxcommon.h"
-#include "rtc_base/checks.h"
-#include "rtc_base/logging.h"
-#include "rtc_base/system/file_wrapper.h"
-#include "rtc_base/thread.h"
-#include "src/win/d3d_allocator.h"
+#include "absl/algorithm/container.h"
 #include "src/win/mediautils.h"
+#include "src/win/d3d_allocator.h"
 #include "src/win/msdkvideobase.h"
+#include "src/win/msdkvideoencoder.h"
+#include "common_video/h264/h264_common.h"
+#include "rtc_base/checks.h"
+#include "rtc_base/system/file_wrapper.h"
+#include "rtc_base/logging.h"
+#include "rtc_base/thread.h"
 #include "system_wrappers/include/field_trial.h"
 
 using namespace rtc;
@@ -56,9 +56,9 @@ MSDKVideoEncoder::MSDKVideoEncoder(const cricket::VideoCodec& format)
     rtc::SimpleStringBuilder ssb(filename_buffer);
     ssb << encoder_dump_file_name_ << "/webrtc_send_stream_"
         << rtc::TimeMicros() << ".ivf";
-    dump_writer_ = webrtc::IvfFileWriter::Wrap(
-        webrtc::FileWrapper::OpenWriteOnly(ssb.str()),
-        /* byte_limit= */ 100000000);
+    dump_writer_ =
+        webrtc::IvfFileWriter::Wrap(webrtc::FileWrapper::OpenWriteOnly(
+            ssb.str()), /* byte_limit= */ 100000000);
   }
 }
 
@@ -100,6 +100,7 @@ int MSDKVideoEncoder::InitEncode(const webrtc::VideoCodec* codec_settings,
         return InitEncodeOnEncoderThread(codec_settings, number_of_cores,
                                          max_payload_size);
       });
+                
 }
 
 mfxStatus MSDKConvertFrameRate(mfxF64 dFrameRate,
@@ -149,6 +150,7 @@ int MSDKVideoEncoder::InitEncodeOnEncoderThread(
       return WEBRTC_VIDEO_CODEC_ERR_PARAMETER;
   }
 
+
   // If already inited, what we need to do is to reset the encoder,
   // instead of setting it all over again.
   if (inited_) {
@@ -158,6 +160,7 @@ int MSDKVideoEncoder::InitEncodeOnEncoderThread(
     // Settings change, we need to reconfigure the allocator.
     // Alternatively we totally reinitialize the encoder here.
   } else {
+
   }
   MSDKFactory* factory = MSDKFactory::Get();
   // We're not using d3d11.
@@ -182,7 +185,7 @@ int MSDKVideoEncoder::InitEncodeOnEncoderThread(
   if (m_pmfx_enc_ == nullptr) {
     return WEBRTC_VIDEO_CODEC_ERROR;
   }
-
+#if 0
   // Init the encoding params:
   MSDK_ZERO_MEMORY(m_mfx_enc_params_);
   m_enc_ext_params_.clear();
@@ -192,8 +195,8 @@ int MSDKVideoEncoder::InitEncodeOnEncoderThread(
   m_mfx_enc_params_.mfx.RateControlMethod = MFX_RATECONTROL_CQP;
   m_mfx_enc_params_.mfx.QPI = 31;
   m_mfx_enc_params_.mfx.QPP = 31;
-
-  // m_mfx_enc_params_.mfx.NumSlice = 0;
+  
+  //m_mfx_enc_params_.mfx.NumSlice = 0;
   MSDKConvertFrameRate(30, &m_mfx_enc_params_.mfx.FrameInfo.FrameRateExtN,
                        &m_mfx_enc_params_.mfx.FrameInfo.FrameRateExtD);
   m_mfx_enc_params_.mfx.EncodedOrder = 0;
@@ -234,7 +237,68 @@ int MSDKVideoEncoder::InitEncodeOnEncoderThread(
     m_enc_ext_params_.push_back((mfxExtBuffer*)&extendedCodingOptions);
     m_enc_ext_params_.push_back((mfxExtBuffer*)&extendedCodingOptions2);
   }
+#else
+  MSDK_ZERO_MEMORY(m_mfx_enc_params_);
+  m_enc_ext_params_.clear();
+  m_mfx_enc_params_.mfx.CodecId = codec_id;
+  // m_mfx_enc_params_.mfx.CodecProfile = MFX_PROFILE_AVC_MAIN;
+  // m_mfx_enc_params_.mfx.CodecLevel = MFX_LEVEL_AVC_31;
+  m_mfx_enc_params_.mfx.TargetUsage = MFX_TARGETUSAGE_BALANCED;
+  m_mfx_enc_params_.mfx.GopPicSize = codec_settings->maxFramerate * 5;
+  // //Encoder参数设置：
+  // //禁止B帧
+  m_mfx_enc_params_.mfx.GopRefDist = 1;
+  // 同步模式
+  m_mfx_enc_params_.AsyncDepth = 1;
+  //帧的引用计数
+  m_mfx_enc_params_.mfx.NumRefFrame = 2;
+  //每个视频帧中的切片数； 每个切片包含一个或多个小块行。
+  m_mfx_enc_params_.mfx.NumSlice = 0;
+  // IdrInterval指定了IDR帧的间隔，单位为I帧；若IdrInterval=0，则每个I帧均为IDR帧。若IdrInterval=1，则每隔一个I帧为IDR帧
+  m_mfx_enc_params_.mfx.IdrInterval = 0;
 
+  m_mfx_enc_params_.mfx.TargetKbps =
+      codec_settings->minBitrate < 1000 ? 1000 : codec_settings->minBitrate;
+  m_mfx_enc_params_.mfx.MaxKbps =
+      codec_settings->maxBitrate < 3000 ? 3000 : codec_settings->maxBitrate;
+  ;
+  m_mfx_enc_params_.mfx.RateControlMethod = MFX_RATECONTROL_VBR;
+  MSDKConvertFrameRate(30, &m_mfx_enc_params_.mfx.FrameInfo.FrameRateExtN,
+                       &m_mfx_enc_params_.mfx.FrameInfo.FrameRateExtD);
+  m_mfx_enc_params_.mfx.EncodedOrder = 0;
+  m_mfx_enc_params_.mfx.FrameInfo.FourCC = MFX_FOURCC_NV12;
+  m_mfx_enc_params_.mfx.FrameInfo.ChromaFormat = MFX_CHROMAFORMAT_YUV420;
+  m_mfx_enc_params_.mfx.FrameInfo.PicStruct = MFX_PICSTRUCT_PROGRESSIVE;
+  m_mfx_enc_params_.mfx.FrameInfo.CropX = 0;
+  m_mfx_enc_params_.mfx.FrameInfo.CropY = 0;
+  m_mfx_enc_params_.mfx.FrameInfo.CropW = codec_settings->width;
+  m_mfx_enc_params_.mfx.FrameInfo.CropH = codec_settings->height;
+  m_mfx_enc_params_.mfx.FrameInfo.Height = MSDK_ALIGN16(codec_settings->height);
+  m_mfx_enc_params_.mfx.FrameInfo.Width = MSDK_ALIGN16(codec_settings->width);
+  m_mfx_enc_params_.IOPattern = MFX_IOPATTERN_IN_SYSTEM_MEMORY;
+
+  mfxExtCodingOption extendedCodingOptions;
+  MSDK_ZERO_MEMORY(extendedCodingOptions);
+  extendedCodingOptions.Header.BufferId = MFX_EXTBUFF_CODING_OPTION;
+  extendedCodingOptions.Header.BufferSz = sizeof(extendedCodingOptions);
+  extendedCodingOptions.AUDelimiter = MFX_CODINGOPTION_OFF;
+  extendedCodingOptions.PicTimingSEI = MFX_CODINGOPTION_OFF;
+  extendedCodingOptions.VuiNalHrdParameters = MFX_CODINGOPTION_OFF;
+  mfxExtCodingOption2 extendedCodingOptions2;
+  MSDK_ZERO_MEMORY(extendedCodingOptions2);
+  extendedCodingOptions2.Header.BufferId = MFX_EXTBUFF_CODING_OPTION2;
+  extendedCodingOptions2.Header.BufferSz = sizeof(extendedCodingOptions2);
+  extendedCodingOptions2.RepeatPPS = MFX_CODINGOPTION_OFF;
+  if (codec_id == MFX_CODEC_AVC || codec_id == MFX_CODEC_HEVC) {
+    m_enc_ext_params_.push_back((mfxExtBuffer*)&extendedCodingOptions);
+    m_enc_ext_params_.push_back((mfxExtBuffer*)&extendedCodingOptions2);
+  }
+ #endif
+  sts = m_pmfx_enc_->Query(&m_mfx_enc_params_, &m_mfx_enc_params_);
+  if (sts < 0) {
+    RTC_LOG(LS_ERROR) << "m_pmfx_enc_->Query Error:" << sts;
+    return WEBRTC_VIDEO_CODEC_ERROR;
+  }
 #if (MFX_VERSION >= 1025)
   uint32_t timeout = MSDKFactory::Get()->MFETimeout();
   // Do not enable MFE for VP9 at present.
@@ -271,6 +335,7 @@ int MSDKVideoEncoder::InitEncodeOnEncoderThread(
                3);
   if (num_temporal_layers_ == 0)
     num_temporal_layers_ = 1;
+ 
 
   if (!m_enc_ext_params_.empty()) {
     m_mfx_enc_params_.ExtParam =
@@ -300,7 +365,7 @@ int MSDKVideoEncoder::InitEncodeOnEncoderThread(
   nEncSurfNum = EncRequest.NumFrameSuggested;
   EncRequest.NumFrameSuggested = EncRequest.NumFrameMin = nEncSurfNum;
   sts = m_pmfx_allocator_->Alloc(m_pmfx_allocator_->pthis, &EncRequest,
-                                 &m_enc_response_);
+                               &m_enc_response_);
   if (MFX_ERR_NONE != sts) {
     return WEBRTC_VIDEO_CODEC_ERROR;
   }
@@ -312,12 +377,11 @@ int MSDKVideoEncoder::InitEncodeOnEncoderThread(
   }
   for (int i = 0; i < m_enc_response_.NumFrameActual; i++) {
     memset(&(m_penc_surfaces_[i]), 0, sizeof(mfxFrameSurface1));
-    MSDK_MEMCPY_VAR(m_penc_surfaces_[i].Info,
-                    &(m_mfx_enc_params_.mfx.FrameInfo), sizeof(mfxFrameInfo));
+    MSDK_MEMCPY_VAR(m_penc_surfaces_[i].Info, &(m_mfx_enc_params_.mfx.FrameInfo),
+                    sizeof(mfxFrameInfo));
     // Since we're not going to share it with sdk. we need to lock it here.
-    sts = m_pmfx_allocator_->Lock(m_pmfx_allocator_->pthis,
-                                  m_enc_response_.mids[i],
-                                  &(m_penc_surfaces_[i].Data));
+    sts = m_pmfx_allocator_->Lock(m_pmfx_allocator_->pthis, m_enc_response_.mids[i],
+                                &(m_penc_surfaces_[i].Data));
     if (MFX_ERR_NONE != sts) {
       return WEBRTC_VIDEO_CODEC_ERROR;
     }
@@ -387,7 +451,7 @@ int MSDKVideoEncoder::Encode(
     }
   }
   sts = m_pmfx_enc_->GetVideoParam(&m_mfx_enc_params_);
-
+  
   nEncSurfIdx =
       MSDKGetFreeSurface(m_penc_surfaces_, m_enc_response_.NumFrameActual);
   if (MSDK_INVALID_SURF_IDX == nEncSurfIdx) {
@@ -396,7 +460,7 @@ int MSDKVideoEncoder::Encode(
 
   pSurf = &m_penc_surfaces_[nEncSurfIdx];
   sts = m_pmfx_allocator_->Lock(m_pmfx_allocator_->pthis, pSurf->Data.MemId,
-                                &(pSurf->Data));
+                              &(pSurf->Data));
   if (MFX_ERR_NONE != sts) {
     return WEBRTC_VIDEO_CODEC_ERROR;
   }
@@ -405,13 +469,13 @@ int MSDKVideoEncoder::Encode(
   mfxFrameData& pData = pSurf->Data;
   pData.FrameOrder = m_frames_processed_;
 
-  if (MFX_FOURCC_NV12 != pInfo.FourCC && MFX_FOURCC_YV12 != pInfo.FourCC &&
-      MFX_FOURCC_P010 != pInfo.FourCC && MFX_FOURCC_Y410 != pInfo.FourCC) {
+  if (MFX_FOURCC_NV12 != pInfo.FourCC && MFX_FOURCC_YV12 != pInfo.FourCC 
+      && MFX_FOURCC_P010 != pInfo.FourCC && MFX_FOURCC_Y410 != pInfo.FourCC) {
     RTC_LOG(LS_ERROR) << "Invalid surface format allocated by frame allocator.";
     return WEBRTC_VIDEO_CODEC_ERROR;
   }
   mfxU16 w, h, pitch;
-  mfxU8* ptr;
+  //mfxU8* ptr;
   if (pInfo.CropH > 0 && pInfo.CropW > 0) {
     w = pInfo.CropW;
     h = pInfo.CropH;
@@ -421,7 +485,7 @@ int MSDKVideoEncoder::Encode(
   }
 
   pitch = pData.Pitch;
-  ptr = pData.Y + pInfo.CropX + pInfo.CropY * pData.Pitch;
+  //ptr = pData.Y + pInfo.CropX + pInfo.CropY * pData.Pitch;
 
   if (MFX_FOURCC_NV12 == pInfo.FourCC) {
     rtc::scoped_refptr<webrtc::I420BufferInterface> buffer(
@@ -439,13 +503,12 @@ int MSDKVideoEncoder::Encode(
         input_image.video_frame_buffer()->ToI420());
     libyuv::I420ToI010(buffer->DataY(), buffer->StrideY(), buffer->DataU(),
                        buffer->StrideU(), buffer->DataV(), buffer->StrideV(),
-                       pData.Y16, pitch, pData.U16, pitch, pData.V16, pitch, w,
-                       h);
+                       pData.Y16, pitch, pData.U16, pitch, pData.V16, pitch, w, h);
   }
 
   // Done with the frame
   sts = m_pmfx_allocator_->Unlock(m_pmfx_allocator_->pthis, pSurf->Data.MemId,
-                                  &(pSurf->Data));
+                                &(pSurf->Data));
   if (MFX_ERR_NONE != sts) {
     return WEBRTC_VIDEO_CODEC_ERROR;
   }
@@ -462,8 +525,7 @@ int MSDKVideoEncoder::Encode(
   }
 
   MSDK_ZERO_MEMORY(bs);
-  mfxU32 bsDataSize =
-      param.mfx.FrameInfo.Width * param.mfx.FrameInfo.Height * 4;
+  mfxU32 bsDataSize = param.mfx.FrameInfo.Width * param.mfx.FrameInfo.Height * 4;
   mfxU8* pbsData = new mfxU8[bsDataSize];
   mfxU8* newPbsData = nullptr;
   if (pbsData == nullptr) {
@@ -518,7 +580,7 @@ retry:
   uint8_t* encoded_data = static_cast<uint8_t*>(bs.Data) + bs.DataOffset;
   int encoded_data_size = bs.DataLength;
 
-  // webrtc::EncodedImage encodedFrame(encoded_data, encoded_data_size,
+  //webrtc::EncodedImage encodedFrame(encoded_data, encoded_data_size,
   //                                  encoded_data_size);
 
   webrtc::EncodedImage encodedFrame;
@@ -533,6 +595,7 @@ retry:
   encodedFrame.SetEncodedData(
       webrtc::EncodedImageBuffer::Create(encoded_data, encoded_data_size));
 
+
   webrtc::CodecSpecificInfo info;
   memset(&info, 0, sizeof(info));
   info.codecType = codec_type_;
@@ -541,8 +604,8 @@ retry:
   if (codec_type_ == webrtc::kVideoCodecH264) {
     int temporal_id = 0, priority_id = 0;
     bool is_idr = false;
-    bool need_frame_marking = MediaUtils::GetH264TemporalInfo(
-        encoded_data, encoded_data_size, temporal_id, priority_id, is_idr);
+    bool need_frame_marking = MediaUtils::GetH264TemporalInfo(encoded_data,
+        encoded_data_size, temporal_id, priority_id, is_idr);
     if (need_frame_marking) {
       info.codecSpecific.H264.temporal_idx = temporal_id;
       info.codecSpecific.H264.idr_frame = is_idr;
@@ -620,17 +683,15 @@ webrtc::VideoEncoder::EncoderInfo MSDKVideoEncoder::GetEncoderInfo() const {
   EncoderInfo info;
   info.supports_native_handle = false;
   info.is_hardware_accelerated = true;
-  info.has_internal_source = false;
   info.implementation_name = "IntelMediaSDK";
   // Disable frame-dropper for MSDK.
   info.has_trusted_rate_controller = true;
   info.scaling_settings = VideoEncoder::ScalingSettings::kOff;
-
+  
   // MSDK encoders do not support simulcast. Stack will rely on SimulcastAdapter
   // to enable simulcast(for AVC/AV1).
   info.supports_simulcast = false;
-  webrtc::VideoEncoder::ResolutionBitrateLimits rate_limit(
-      1280 * 720, 30 * 1024, 30 * 1024, 60 * 1024 * 1024);
+  webrtc::VideoEncoder::ResolutionBitrateLimits rate_limit(1280 * 720, 30 * 1024, 30 * 1024, 60 * 1024 * 1024);
 
   info.resolution_bitrate_limits.push_back(rate_limit);
 

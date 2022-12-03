@@ -4,33 +4,51 @@
 #ifndef OWT_BASE_COMMONTYPES_H_
 #define OWT_BASE_COMMONTYPES_H_
 #include <string>
-#include <unordered_map>
 #include <vector>
+#include <unordered_map>
 namespace owt {
 namespace base {
 /// Audio codec
 enum class AudioCodec : int {
-  kPcmu = 1,  ///< g711 u-law
-  kPcma,      ///< g711 a-law
-  kOpus,      ///< opus
-  kG722,      ///< g722
-  kIsac,      ///< iSAC
-  kIlbc,      ///< iLBC
-  kAac,       ///< AAC or HE-AAC
-  kAc3,       ///< AC3
-  kAsao,      ///< Nellymoser
+  kPcmu = 1,   ///< g711 u-law
+  kPcma,   ///< g711 a-law
+  kOpus,   ///< opus
+  kG722,   ///< g722
+  kIsac,   ///< iSAC
+  kIlbc,   ///< iLBC
+  kAac,    ///< AAC or HE-AAC
+  kAc3,    ///< AC3
+  kAsao,   ///< Nellymoser
   kUnknown
 };
 /// Video codec
-enum class VideoCodec : int { kVp8 = 1, kVp9, kH264, kH265, kAv1, kUnknown };
+enum class VideoCodec : int {
+  kVp8 = 1,
+  kVp9,
+  kH264,
+  kH265,
+  kAv1,
+  kUnknown
+};
 /// Track kind
-enum class TrackKind : int { kAudio = 1, kVideo, kAudioAndVideo, kUnknown };
+enum class TrackKind : int {
+  kAudio = 1,
+  kVideo,
+  kAudioAndVideo,
+  kUnknown
+};
 /// Network priority
-enum class NetworkPriority : int { kVeryLow, kLow, kMedium, kHigh, kDefault };
+enum class NetworkPriority : int {
+  kVeryLow,
+  kLow,
+  kMedium,
+  kHigh,
+  kDefault
+};
 /// This class represents a resolution value.
 struct Resolution {
   /// Construct an instance with width and height equal to 0.
-  explicit Resolution() : width(0), height(0) {}
+  explicit Resolution(): width(0), height(0) {}
   /// Construct an instance with specify width and height.
   Resolution(unsigned long w, unsigned long h) : width(w), height(h) {}
   bool operator==(const Resolution& rhs) const {
@@ -61,8 +79,7 @@ struct AudioCodecParameters {
   /// Construct an instance of AudioCodecParameters with default param.
   AudioCodecParameters()
       : name(AudioCodec::kUnknown), channel_count(0), clock_rate(0) {}
-  /// Construct an instance of AudioCodecParameters with codec name/channel
-  /// count and clock rate.
+  /// Construct an instance of AudioCodecParameters with codec name/channel count and clock rate.
   AudioCodecParameters(const AudioCodec& codec_name,
                        unsigned long channel_count,
                        unsigned long clock_rate)
@@ -178,10 +195,15 @@ enum class DataSourceInfo : int {
   kUnknown
 };
 /// TransportType
-enum class TransportType : int { kWebRTC = 1, kWebTransport, kUnknown = 99 };
+enum class TransportType : int {
+  kWebRTC = 1,
+  kWebTransport,
+  kUnknown = 99
+};
 /// TransportContraints
 struct TransportConstraints {
-  explicit TransportConstraints() : type(TransportType::kWebRTC) {}
+  explicit TransportConstraints()
+      : type(TransportType::kWebRTC) {}
 
   TransportType type;
 };
@@ -189,29 +211,23 @@ struct TransportConstraints {
 /// Stream source.
 struct StreamSourceInfo {
   explicit StreamSourceInfo()
-      : audio(AudioSourceInfo::kUnknown),
-        video(VideoSourceInfo::kUnknown)
+    : audio(AudioSourceInfo::kUnknown),
+      video(VideoSourceInfo::kUnknown)
 #ifdef OWT_ENABLE_QUIC
-        ,
-        data(DataSourceInfo::kUnknown)
+      ,data(DataSourceInfo::kUnknown)
 #endif
-  {
-  }
-  StreamSourceInfo(AudioSourceInfo audio_source,
-                   VideoSourceInfo video_source
+  {}
+  StreamSourceInfo(AudioSourceInfo audio_source, VideoSourceInfo video_source
 #ifdef OWT_ENABLE_QUIC
-                   ,
-                   DataSourceInfo data_source
+  , DataSourceInfo data_source
 #endif
-                   )
-      : audio(audio_source),
-        video(video_source)
+  )
+    : audio(audio_source),
+      video(video_source)
 #ifdef OWT_ENABLE_QUIC
-        ,
-        data(data_source)
+      ,data(data_source)
 #endif
-  {
-  }
+  {}
   /// The audio source info of the stream
   AudioSourceInfo audio;
   /// The video source info of the stream

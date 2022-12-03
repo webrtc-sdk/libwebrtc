@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "src/win/mediacapabilities.h"
 #include <string>
 #include <vector>
 #include "mfxcommon.h"
 #include "mfxstructures.h"
+#include "src/win/mediacapabilities.h"
 #include "rtc_base/logging.h"
 
 namespace owt {
@@ -47,7 +47,6 @@ MediaCapabilities::SupportedCapabilitiesForVideoEncoder(
 
   bool support_h264 = false, h264_lp = false, h264_argb = false;
   bool support_vp9_8 = false, support_vp9_10 = false;
-  bool is_discrete_graphics = false;
 
   // Check platform type.
   if (inited_) {
@@ -65,10 +64,6 @@ MediaCapabilities::SupportedCapabilitiesForVideoEncoder(
         support_vp9_8 = true;
         support_vp9_10 = true;
       }
-#endif
-#if (MFX_VERSION >= 1031)
-      if (mfx_platform_.MediaAdapterType == MFX_MEDIA_DISCRETE)
-        is_discrete_graphics = true;
 #endif
       // Query platform capability for specific codec. Only check for
       // VP9/HEVC/AVC at this stage, as AV1 HW encoding is not enabled.
@@ -129,7 +124,8 @@ MediaCapabilities::SupportedCapabilitiesForVideoEncoder(
             vp9_10_cap.sampling_modes.push_back(SamplingMode::kY410);
             capabilities.push_back(vp9_10_cap);
           }
-        } else if (codec == owt::base::VideoCodec::kH264) {
+        }
+        else if (codec == owt::base::VideoCodec::kH264) {
           memset(&video_param, 0, sizeof(video_param));
           video_param.mfx.CodecId = MFX_CODEC_AVC;
           // Don't check profiles. We know we can support from CB up to High.
@@ -199,7 +195,8 @@ MediaCapabilities::SupportedCapabilitiesForVideoDecoder(
           avc_cap.max_resolution = {3840, 2160};
           capabilities.push_back(avc_cap);
         }
-      } else if (codec == owt::base::VideoCodec::kAv1) {
+      }
+      else if (codec == owt::base::VideoCodec::kAv1) {
         // Disallow potential AV1 SW decoder.
 #if (MFX_VERSION < 1031)
         continue;
@@ -261,6 +258,7 @@ MediaCapabilities* MediaCapabilities::Get() {
 MediaCapabilities::MediaCapabilities() {}
 
 MediaCapabilities::~MediaCapabilities() {
+
   if (mfx_encoder_) {
     mfx_encoder_->Close();
     mfx_encoder_.reset();
@@ -272,9 +270,11 @@ MediaCapabilities::~MediaCapabilities() {
   if (msdk_factory_ && mfx_session_) {
     msdk_factory_->DestroySession(mfx_session_);
   }
+
 }
 
 bool MediaCapabilities::Init() {
+
   bool res = false;
   msdk_factory_ = owt::base::MSDKFactory::Get();
   if (!msdk_factory_)
@@ -299,7 +299,10 @@ bool MediaCapabilities::Init() {
     inited_ = true;
 failed:
   return res;
+
 }
+
+
 
 }  // namespace base
 }  // namespace owt

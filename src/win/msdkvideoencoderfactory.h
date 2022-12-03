@@ -7,8 +7,8 @@
 
 #include <vector>
 #include "api/video/video_codec_type.h"
-#include "api/video_codecs/sdp_video_format.h"
 #include "api/video_codecs/video_encoder.h"
+#include "api/video_codecs/sdp_video_format.h"
 #include "api/video_codecs/video_encoder_factory.h"
 #include "src/win/mediacapabilities.h"
 
@@ -23,8 +23,8 @@ class MSDKVideoEncoderFactory : public webrtc::VideoEncoderFactory {
 
   std::vector<webrtc::SdpVideoFormat> GetSupportedFormats() const override;
 
-  webrtc::VideoEncoderFactory::CodecInfo QueryVideoEncoder(
-      const webrtc::SdpVideoFormat& format) const override;
+  //webrtc::VideoEncoderFactory::CodecInfo QueryVideoEncoder(
+  //    const webrtc::SdpVideoFormat& format) const override;
 
  private:
   std::vector<webrtc::VideoCodecType> supported_codec_types_;

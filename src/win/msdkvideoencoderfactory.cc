@@ -35,24 +35,13 @@ MSDKVideoEncoderFactory::MSDKVideoEncoderFactory() {
   supported_codec_types_.push_back(webrtc::kVideoCodecVP8);
   supported_codec_types_.push_back(webrtc::kVideoCodecVP9);
   supported_codec_types_.push_back(webrtc::kVideoCodecAV1);
+
 }
 
-std::unique_ptr<webrtc::VideoEncoder>
-MSDKVideoEncoderFactory::CreateVideoEncoder(
+std::unique_ptr<webrtc::VideoEncoder> MSDKVideoEncoderFactory::CreateVideoEncoder(
     const webrtc::SdpVideoFormat& format) {
-  bool vp9_hw = false, vp8_hw = false, av1_hw = false, h264_hw = false;
-  for (auto& codec : supported_codec_types_) {
-    if (codec == webrtc::kVideoCodecAV1)
-      av1_hw = false;
-    else if (codec == webrtc::kVideoCodecH264)
-      h264_hw = true;
-    else if (codec == webrtc::kVideoCodecVP8)
-      vp8_hw = false;
-    else if (codec == webrtc::kVideoCodecVP9)
-      vp9_hw = false;
-  }
   // VP8 encoding will always use SW impl.
-  if (absl::EqualsIgnoreCase(format.name, cricket::kVp8CodecName) && !vp8_hw)
+  if (absl::EqualsIgnoreCase(format.name, cricket::kVp8CodecName))
     return webrtc::VP8Encoder::Create();
   // VP9 encoding will only be enabled on ICL+;
   else if (absl::EqualsIgnoreCase(format.name, cricket::kVp9CodecName))
@@ -70,24 +59,21 @@ MSDKVideoEncoderFactory::GetSupportedFormats() const {
   // supports with those provided by built-in H.264 encoder
   for (const webrtc::SdpVideoFormat& format :
        owt::base::CodecUtils::SupportedH264Codecs())
-    supported_codecs.push_back(format);
+  supported_codecs.push_back(format);
   supported_codecs.push_back(webrtc::SdpVideoFormat(cricket::kVp8CodecName));
   for (const webrtc::SdpVideoFormat& format : webrtc::SupportedVP9Codecs())
     supported_codecs.push_back(format);
-  if (webrtc::kIsLibaomAv1EncoderSupported) {
-    supported_codecs.push_back(webrtc::SdpVideoFormat(cricket::kAv1CodecName));
-  }
 
   return supported_codecs;
 }
 
-webrtc::VideoEncoderFactory::CodecInfo
-MSDKVideoEncoderFactory::QueryVideoEncoder(
-    const webrtc::SdpVideoFormat& format) const {
-  webrtc::VideoEncoderFactory::CodecInfo info;
-  info.has_internal_source = false;
-  return info;
-}
+//webrtc::VideoEncoderFactory::CodecInfo
+//MSDKVideoEncoderFactory::QueryVideoEncoder(
+//    const webrtc::SdpVideoFormat& format) const {
+//  webrtc::VideoEncoderFactory::CodecInfo info;
+//  info.has_internal_source = false;
+//  return info;
+//}
 
 }  // namespace base
 }  // namespace owt

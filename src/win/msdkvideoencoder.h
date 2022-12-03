@@ -9,17 +9,17 @@
 #include <cstddef>
 #include <memory>
 #include <vector>
-#include "api/video_codecs/video_codec.h"
-#include "api/video_codecs/video_encoder.h"
 #include "base_allocator.h"
-#include "media/base/codec.h"
 #include "mfxplugin++.h"
 #include "mfxvideo++.h"
 #include "mfxvideo.h"
-#include "modules/video_coding/codecs/h264/include/h264.h"
-#include "modules/video_coding/utility/ivf_file_writer.h"
-#include "rtc_base/thread.h"
 #include "sysmem_allocator.h"
+#include "modules/video_coding/utility/ivf_file_writer.h"
+#include "api/video_codecs/video_codec.h"
+#include "api/video_codecs/video_encoder.h"
+#include "media/base/codec.h"
+#include "modules/video_coding/codecs/h264/include/h264.h"
+#include "rtc_base/thread.h"
 
 namespace owt {
 namespace base {
@@ -72,10 +72,16 @@ class MSDKVideoEncoder : public webrtc::VideoEncoder {
   cricket::VideoCodec rtp_codec_parameters_;
   uint8_t num_temporal_layers_ = 1;
 
+
   MFXVideoSession* m_mfx_session_;
   std::unique_ptr<MFXVideoENCODE> m_pmfx_enc_;
   std::shared_ptr<SysMemFrameAllocator> m_pmfx_allocator_;
   mfxVideoParam m_mfx_enc_params_;
+
+
+
+
+
 
   // TODO(johny): MSDK will remove the version macro usage for headers.
   // Turn this on when appropriate.
@@ -90,6 +96,7 @@ class MSDKVideoEncoder : public webrtc::VideoEncoder {
   mfxU32 m_frames_processed_;
   std::unique_ptr<rtc::Thread> encoder_thread_;
   std::atomic<bool> inited_;
+
 
   std::unique_ptr<webrtc::IvfFileWriter> dump_writer_;
   bool enable_bitstream_dump_ = false;

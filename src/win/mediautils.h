@@ -5,9 +5,9 @@
 #ifndef OWT_BASE_MEDIAUTILS_H_
 #define OWT_BASE_MEDIAUTILS_H_
 
-#include <string>
 #include "absl/types/optional.h"
 #include "api/video_codecs/sdp_video_format.h"
+#include <string>
 #include "src/win/commontypes.h"
 
 namespace owt {
@@ -81,7 +81,7 @@ enum class H265ProfileId : int {
   kMain10,
   kMainStillPicture,
   kMainRExt,  // Range extension
-  kScc        // Screen content extension.
+  kScc  // Screen content extension.
 };
 
 /// Level ID as negotiated in SDP level-id field.
@@ -139,7 +139,8 @@ struct H264CodecCapability {
   H264Profile profile;
 };
 
-struct VP8CodecCapability {};
+struct VP8CodecCapability {
+};
 
 struct AV1CodecCapability {
   AV1Profile profile;
@@ -160,6 +161,7 @@ union CodecSpecificInfoUnion {
   ~CodecSpecificInfoUnion() {}
 };
 
+
 class MediaUtils {
  public:
   static std::string GetResolutionName(const Resolution& resolution);
@@ -178,6 +180,6 @@ class MediaUtils {
   static absl::optional<H265ProfileId> ParseSdpForH265Profile(
       const webrtc::SdpVideoFormat::Parameters& params);
 };
-}  // namespace base
-}  // namespace owt
+}
+}
 #endif  // OWT_BASE_MEDIAUTILS_H_
