@@ -22,6 +22,7 @@ namespace base {
 int32_t MSDKVideoDecoder::Release() {
     WipeMfxBitstream(&m_mfx_bs_);
     if (m_mfx_session_) {
+      m_pmfx_dec_ = nullptr;
       MSDKFactory* factory = MSDKFactory::Get();
       if (factory) {
         factory->UnloadMSDKPlugin(m_mfx_session_, &m_plugin_id_);
