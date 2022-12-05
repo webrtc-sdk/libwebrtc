@@ -4,7 +4,7 @@
 #include "api/rtp_receiver_interface.h"
 #include "rtc_rtp_receiver.h"
 
-#include "crypto/frame_cryptor_transformer.h"
+#include "api/crypto/frame_crypto_transformer.h"
 
 namespace libwebrtc {
 class RTCRtpReceiverImpl : public RTCRtpReceiver,
@@ -29,26 +29,39 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
 
   virtual bool EnableGcmCryptoSuites(const vector<uint8_t>& key) override {
     if (!e2ee_transformer_) {
-      e2ee_transformer_ = rtc::scoped_refptr<FrameCryptorTransformer>(
-          new FrameCryptorTransformer(
-              rtp_receiver_->track()->kind() == "audio"
-                  ? FrameCryptorTransformer::MediaType::kAudioFrame
-                  : FrameCryptorTransformer::MediaType::kVideoFrame));
+
+      if (!key_manager_) {
+        key_manager_ = std::make_shared<webrtc::KeyManagerImpl>();
+      }
+      
+      auto mediaType =
+          rtp_receiver_->track()->kind() == "audio"
+              ? webrtc::FrameCryptorTransformer::MediaType::kAudioFrame
+              : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
+      e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
+          new webrtc::FrameCryptorTransformer(
+              mediaType, webrtc::FrameCryptorTransformer::Algorithm::kAesGcm,
+              key_manager_));
     }
-    e2ee_transformer_->SetKey(key.std_vector());
+    key_manager_->SetKey(0, key.std_vector());
     rtp_receiver_->SetDepacketizerToDecoderFrameTransformer(e2ee_transformer_);
+    e2ee_transformer_->SetEnabled(true);
     return true;
   }
 
   virtual bool DisableGcmCryptoSuites() override {
-    rtp_receiver_->SetFrameDecryptor(nullptr);
-    return true;
+    if(e2ee_transformer_) {
+      e2ee_transformer_->SetEnabled(false);
+      return true;
+    }
+    return false;
   }
 
  private:
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver_;
   RTCRtpReceiverObserver* observer_;
-  rtc::scoped_refptr<libwebrtc::FrameCryptorTransformer> e2ee_transformer_;
+  rtc::scoped_refptr<webrtc::FrameCryptorTransformer> e2ee_transformer_;
+  std::shared_ptr<webrtc::KeyManagerImpl> key_manager_;
 };  // namespace libwebrtc
 
 }  // namespace libwebrtc
