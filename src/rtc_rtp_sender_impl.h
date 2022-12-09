@@ -3,9 +3,6 @@
 
 #include "api/rtp_sender_interface.h"
 #include "api/scoped_refptr.h"
-#include "rtc_base/ref_counted_object.h"
-
-#include "api/crypto/frame_crypto_transformer.h"
 #include "rtc_rtp_sender.h"
 
 namespace libwebrtc {
@@ -28,9 +25,11 @@ class RTCRtpSenderImpl : public RTCRtpSender {
   virtual bool set_parameters(
       const scoped_refptr<RTCRtpParameters> parameters) override;
   virtual scoped_refptr<RTCDtmfSender> dtmf_sender() const override;
+
   rtc::scoped_refptr<webrtc::RtpSenderInterface> rtc_rtp_sender() {
     return rtp_sender_;
   }
+
  private:
   rtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender_;
 };

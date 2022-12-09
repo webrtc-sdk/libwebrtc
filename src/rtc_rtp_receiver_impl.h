@@ -4,8 +4,6 @@
 #include "api/rtp_receiver_interface.h"
 #include "rtc_rtp_receiver.h"
 
-#include "api/crypto/frame_crypto_transformer.h"
-
 namespace libwebrtc {
 class RTCRtpReceiverImpl : public RTCRtpReceiver,
                            webrtc::RtpReceiverObserverInterface {
@@ -29,7 +27,9 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
  private:
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver_;
   RTCRtpReceiverObserver* observer_;
-  void OnFirstPacketReceived(cricket::MediaType media_type) override;
+
+  virtual void OnFirstPacketReceived(cricket::MediaType media_type) override;
+
 };  // namespace libwebrtc
 
 }  // namespace libwebrtc
