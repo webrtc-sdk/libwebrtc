@@ -12,7 +12,7 @@
 #include "rtc_ice_candidate_impl.h"
 #include "rtc_media_stream_impl.h"
 #include "rtc_mediaconstraints_impl.h"
-#include "rtc_rtp_receiver_imp.h"
+#include "rtc_rtp_receiver_impl.h"
 #include "rtc_rtp_sender_impl.h"
 #include "rtc_rtp_transceiver_impl.h"
 

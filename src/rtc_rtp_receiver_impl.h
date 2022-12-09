@@ -25,7 +25,6 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
   virtual void SetObserver(RTCRtpReceiverObserver* observer) override;
   virtual void SetJitterBufferMinimumDelay(double delay_seconds) override;
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver();
-  virtual void OnFirstPacketReceived(cricket::MediaType media_type) override;
 
   virtual bool EnableGcmCryptoSuites(const vector<uint8_t>& key) override {
     if (!e2ee_transformer_) {
@@ -62,6 +61,7 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
   RTCRtpReceiverObserver* observer_;
   rtc::scoped_refptr<webrtc::FrameCryptorTransformer> e2ee_transformer_;
   std::shared_ptr<webrtc::DefaultKeyManager> key_manager_;
+  void OnFirstPacketReceived(cricket::MediaType media_type) override;
 };  // namespace libwebrtc
 
 }  // namespace libwebrtc

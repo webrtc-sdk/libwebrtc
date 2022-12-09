@@ -1,4 +1,4 @@
-#include "rtc_rtp_receiver_imp.h"
+#include "rtc_rtp_receiver_impl.h"
 
 #include "base/refcountedobject.h"
 #include "rtc_audio_track_impl.h"
@@ -31,10 +31,12 @@ scoped_refptr<RTCMediaTrack> RTCRtpReceiverImpl::track() const {
   }
   if (track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
     return scoped_refptr<RTCMediaTrack>(new RefCountedObject<VideoTrackImpl>(
-        rtc::scoped_refptr<webrtc::VideoTrackInterface>(static_cast<webrtc::VideoTrackInterface*>(track.get()))));
+        rtc::scoped_refptr<webrtc::VideoTrackInterface>(
+            static_cast<webrtc::VideoTrackInterface*>(track.get()))));
   } else if (track->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
     return scoped_refptr<RTCMediaTrack>(new RefCountedObject<AudioTrackImpl>(
-        rtc::scoped_refptr<webrtc::AudioTrackInterface>(static_cast<webrtc::AudioTrackInterface*>(track.get()))));
+        rtc::scoped_refptr<webrtc::AudioTrackInterface>(
+            static_cast<webrtc::AudioTrackInterface*>(track.get()))));
   }
   return scoped_refptr<RTCMediaTrack>();
 }
