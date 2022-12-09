@@ -43,12 +43,13 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor {
                       scoped_refptr<RTCRtpReceiver> receiver);
   ~RTCFrameCryptorImpl();
 
-  bool setEnabled(bool enabled) override;
+  bool SetEnabled(bool enabled) override;
   bool enabled() const override;
   bool SetKeyIndex(int index) override;
   int key_index() const override;
 
  private:
+  mutable webrtc::Mutex mutex_;
   bool enabled_;
   int key_index_;
   rtc::scoped_refptr<webrtc::FrameCryptorTransformer> e2ee_transformer_;

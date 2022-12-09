@@ -69,23 +69,27 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(Algorithm algorithm,
 
 RTCFrameCryptorImpl::~RTCFrameCryptorImpl() {}
 
-bool RTCFrameCryptorImpl::setEnabled(bool enabled) {
+bool RTCFrameCryptorImpl::SetEnabled(bool enabled) {
+  webrtc::MutexLock lock(&mutex_);
   enabled_ = enabled;
   e2ee_transformer_->SetEnabled(enabled_);
   return true;
 }
 
 bool RTCFrameCryptorImpl::enabled() const {
+  webrtc::MutexLock lock(&mutex_);
   return enabled_;
 }
 
 bool RTCFrameCryptorImpl::SetKeyIndex(int index) {
+  webrtc::MutexLock lock(&mutex_);
   key_index_ = index;
   e2ee_transformer_->SetKeyIndex(key_index_);
   return true;
 }
 
 int RTCFrameCryptorImpl::key_index() const {
+  webrtc::MutexLock lock(&mutex_);
   return key_index_;
 }
 

@@ -6,7 +6,6 @@
 #include "rtc_rtp_sender.h"
 #include "rtc_types.h"
 
-
 namespace libwebrtc {
 
 enum class Algorithm {
@@ -39,11 +38,11 @@ class KeyManager : public RefCountInterface {
 class RTCFrameCryptor : public RefCountInterface {
  public:
   /// Enable/Disable frame crypto for the sender or receiver.
-  virtual bool setEnabled(bool enabled) = 0;
+  virtual bool SetEnabled(bool enabled) = 0;
 
   /// Get the enabled state for the sender or receiver.
   virtual bool enabled() const = 0;
-  
+
   /// Set the key index for the sender or receiver.
   /// If the key index is not set, the key index will be set to 0.
   virtual bool SetKeyIndex(int index) = 0;
@@ -57,16 +56,16 @@ class RTCFrameCryptor : public RefCountInterface {
 
 class FrameCyrptorFactory {
   /// Create a frame cyrptor from a [RTCRtpSender].
-  LIB_WEBRTC_API static scoped_refptr<RTCFrameCryptor> frameCyrptorFromRtpSender(
-      scoped_refptr<RTCRtpSender> sender,
-      Algorithm algorithm,
-      scoped_refptr<KeyManager> keyManager);
+  LIB_WEBRTC_API static scoped_refptr<RTCFrameCryptor>
+  frameCyrptorFromRtpSender(scoped_refptr<RTCRtpSender> sender,
+                            Algorithm algorithm,
+                            scoped_refptr<KeyManager> keyManager);
 
   /// Create a frame cyrptor from a [RTCRtpReceiver].
-  LIB_WEBRTC_API static scoped_refptr<RTCFrameCryptor> frameCyrptorFromRtpReceiver(
-      scoped_refptr<RTCRtpReceiver> receiver,
-      Algorithm algorithm,
-      scoped_refptr<KeyManager> keyManager);
+  LIB_WEBRTC_API static scoped_refptr<RTCFrameCryptor>
+  frameCyrptorFromRtpReceiver(scoped_refptr<RTCRtpReceiver> receiver,
+                              Algorithm algorithm,
+                              scoped_refptr<KeyManager> keyManager);
 };
 
 }  // namespace libwebrtc
