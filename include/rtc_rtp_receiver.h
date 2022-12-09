@@ -47,9 +47,6 @@ class RTCRtpReceiver : public RefCountInterface {
 
   virtual bool DisableGcmCryptoSuites() = 0;
 
-  // virtual Vector<RtpSource> GetSources() const = 0;
-  // virtual void SetDepacketizerToDecoderFrameTransformer(
-  //    scoped_refptr<FrameTransformerInterface> frame_transformer) = 0;
 };
 
 }  // namespace libwebrtc

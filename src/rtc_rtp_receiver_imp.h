@@ -31,7 +31,7 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
     if (!e2ee_transformer_) {
 
       if (!key_manager_) {
-        key_manager_ = std::make_shared<webrtc::KeyManagerImpl>();
+        key_manager_ = std::make_shared<webrtc::DefaultKeyManager>();
       }
       
       auto mediaType =
@@ -61,7 +61,7 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver_;
   RTCRtpReceiverObserver* observer_;
   rtc::scoped_refptr<webrtc::FrameCryptorTransformer> e2ee_transformer_;
-  std::shared_ptr<webrtc::KeyManagerImpl> key_manager_;
+  std::shared_ptr<webrtc::DefaultKeyManager> key_manager_;
 };  // namespace libwebrtc
 
 }  // namespace libwebrtc
