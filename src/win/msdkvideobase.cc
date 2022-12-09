@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "atlbase.h"
-#include "d3d_allocator.h"
-#include "d3d11_allocator.h"
-#include "mfxdefs.h"
 #include "msdkvideobase.h"
+#include "atlbase.h"
+#include "d3d11_allocator.h"
+#include "d3d_allocator.h"
+#include "mfxdefs.h"
 
 #include "rtc_base/logging.h"
 
@@ -182,7 +182,8 @@ void MSDKFactory::UnloadMSDKPlugin(MFXVideoSession* session,
   }
 }
 
-bool MSDKFactory::QueryPlatform(MFXVideoSession* session, mfxPlatform* platform) {
+bool MSDKFactory::QueryPlatform(MFXVideoSession* session,
+                                mfxPlatform* platform) {
   if (!session || !platform)
     return false;
 

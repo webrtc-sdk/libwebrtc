@@ -67,7 +67,6 @@ bool MediaStreamImpl::RemoveTrack(scoped_refptr<RTCAudioTrack> track) {
 bool MediaStreamImpl::RemoveTrack(scoped_refptr<RTCVideoTrack> track) {
   VideoTrackImpl* track_impl = static_cast<VideoTrackImpl*>(track.get());
   if (rtc_media_stream_->RemoveTrack(track_impl->rtc_track())) {
-
     auto it = std::find(video_tracks_.begin(), video_tracks_.end(), track);
     if (it != video_tracks_.end())
       video_tracks_.erase(it);

@@ -2,21 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include "src/win/codecutils.h"
 #include "absl/memory/memory.h"
 #include "absl/strings/match.h"
 #include "absl/types/optional.h"
-#include "media/base/media_constants.h"
-#include "src/win/codecutils.h"
 #include "api/video_codecs/h264_profile_level_id.h"
+#include "media/base/media_constants.h"
 
 namespace owt {
 namespace base {
 
 webrtc::SdpVideoFormat CreateH264Format(webrtc::H264Profile profile,
-                                webrtc::H264Level level,
-                                const std::string& packetization_mode) {
+                                        webrtc::H264Level level,
+                                        const std::string& packetization_mode) {
   const absl::optional<std::string> profile_string =
-      webrtc::H264ProfileLevelIdToString(webrtc::H264ProfileLevelId(profile, level));
+      webrtc::H264ProfileLevelIdToString(
+          webrtc::H264ProfileLevelId(profile, level));
   return webrtc::SdpVideoFormat(
       cricket::kH264CodecName,
       {{cricket::kH264FmtpProfileLevelId, *profile_string},
@@ -25,15 +26,18 @@ webrtc::SdpVideoFormat CreateH264Format(webrtc::H264Profile profile,
 }
 
 std::vector<webrtc::SdpVideoFormat> CodecUtils::SupportedH264Codecs() {
-  return {
-      CreateH264Format(webrtc::H264Profile::kProfileBaseline, webrtc::H264Level::kLevel3_1, "1"),
-      CreateH264Format(webrtc::H264Profile::kProfileBaseline, webrtc::H264Level::kLevel3_1, "0"),
-      CreateH264Format(webrtc::H264Profile::kProfileConstrainedBaseline, webrtc::H264Level::kLevel3_1, "1"),
-      CreateH264Format(webrtc::H264Profile::kProfileConstrainedBaseline, webrtc::H264Level::kLevel3_1,
-                       "0")};
-}  
+  return {CreateH264Format(webrtc::H264Profile::kProfileBaseline,
+                           webrtc::H264Level::kLevel3_1, "1"),
+          CreateH264Format(webrtc::H264Profile::kProfileBaseline,
+                           webrtc::H264Level::kLevel3_1, "0"),
+          CreateH264Format(webrtc::H264Profile::kProfileConstrainedBaseline,
+                           webrtc::H264Level::kLevel3_1, "1"),
+          CreateH264Format(webrtc::H264Profile::kProfileConstrainedBaseline,
+                           webrtc::H264Level::kLevel3_1, "0")};
+}
 
-webrtc::VideoCodecType CodecUtils::ConvertSdpFormatToCodecType(webrtc::SdpVideoFormat format){
+webrtc::VideoCodecType CodecUtils::ConvertSdpFormatToCodecType(
+    webrtc::SdpVideoFormat format) {
   if (absl::EqualsIgnoreCase(format.name, cricket::kVp8CodecName)) {
     return webrtc::kVideoCodecVP8;
   } else if (absl::EqualsIgnoreCase(format.name, cricket::kVp9CodecName)) {
@@ -43,8 +47,7 @@ webrtc::VideoCodecType CodecUtils::ConvertSdpFormatToCodecType(webrtc::SdpVideoF
 
   } else if (absl::EqualsIgnoreCase(format.name, cricket::kAv1CodecName)) {
     return webrtc::kVideoCodecAV1;
-  }
-  else {
+  } else {
     return webrtc::kVideoCodecGeneric;
   }
 }

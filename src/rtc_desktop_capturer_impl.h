@@ -17,8 +17,8 @@
 #ifndef LIBWEBRTC_RTC_DESKTOP_CAPTURER_IMPL_HXX
 #define LIBWEBRTC_RTC_DESKTOP_CAPTURER_IMPL_HXX
 
-#include "include/rtc_types.h"
 #include "include/rtc_desktop_capturer.h"
+#include "include/rtc_types.h"
 
 #include "api/video/i420_buffer.h"
 #include "api/video/video_frame.h"
@@ -48,23 +48,25 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
     observer_ = observer;
   }
 
-  void DeRegisterDesktopCapturerObserver() override  {
-    observer_ = nullptr;
-  }
-
+  void DeRegisterDesktopCapturerObserver() override { observer_ = nullptr; }
   CaptureState Start(uint32_t fps) override;
+
+  CaptureState Start(uint32_t fps,
+                     uint32_t x,
+                     uint32_t y,
+                     uint32_t w,
+                     uint32_t h) override;
 
   void Stop() override;
 
   bool IsRunning() override;
 
-  scoped_refptr<MediaSource> source() override {
-      return source_;
-  }
+  scoped_refptr<MediaSource> source() override { return source_; }
 
  protected:
-  virtual void OnCaptureResult(webrtc::DesktopCapturer::Result result,
-                               std::unique_ptr<webrtc::DesktopFrame> frame) override;
+  virtual void OnCaptureResult(
+      webrtc::DesktopCapturer::Result result,
+      std::unique_ptr<webrtc::DesktopFrame> frame) override;
   virtual void OnMessage(rtc::Message* msg) override;
 
  private:
@@ -76,13 +78,18 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   CaptureState capture_state_ = CS_STOPPED;
   DesktopType type_;
   webrtc::DesktopCapturer::SourceId source_id_;
-  DesktopCapturerObserver *observer_ = nullptr;
-  uint32_t capture_delay_ = 1000; // 1s
-  webrtc::DesktopCapturer::Result result_ = webrtc::DesktopCapturer::Result::SUCCESS;
+  DesktopCapturerObserver* observer_ = nullptr;
+  uint32_t capture_delay_ = 1000;  // 1s
+  webrtc::DesktopCapturer::Result result_ =
+      webrtc::DesktopCapturer::Result::SUCCESS;
   rtc::Thread* signaling_thread_ = nullptr;
   scoped_refptr<MediaSource> source_;
+  uint32_t x_ = 0;
+  uint32_t y_ = 0;
+  uint32_t w_ = 0;
+  uint32_t h_ = 0;
 };
 
-}  // namespace webrtc
+}  // namespace libwebrtc
 
 #endif  // LIBWEBRTC_RTC_DESKTOP_CAPTURER_IMPL_HXX

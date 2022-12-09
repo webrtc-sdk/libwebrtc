@@ -4,8 +4,9 @@
 namespace libwebrtc {
 
 AudioDeviceImpl::AudioDeviceImpl(
-      rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module,rtc::Thread* worker_thread)
-      : audio_device_module_(audio_device_module),worker_thread_(worker_thread) {
+    rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module,
+    rtc::Thread* worker_thread)
+    : audio_device_module_(audio_device_module), worker_thread_(worker_thread) {
   audio_device_module_->SetAudioDeviceSink(this);
 }
 
@@ -50,7 +51,6 @@ int32_t AudioDeviceImpl::SetPlayoutDevice(uint16_t index) {
     } else {
       return audio_device_module_->SetPlayoutDevice(index);
     }
-
   });
 }
 
@@ -69,12 +69,13 @@ int32_t AudioDeviceImpl::SetRecordingDevice(uint16_t index) {
 }
 
 int32_t AudioDeviceImpl::OnDeviceChange(OnDeviceChangeCallback listener) {
-  listener_= listener;
+  listener_ = listener;
   return 0;
 }
 
 void AudioDeviceImpl::OnDevicesUpdated() {
-  if(listener_) listener_();
+  if (listener_)
+    listener_();
 }
 
 }  // namespace libwebrtc

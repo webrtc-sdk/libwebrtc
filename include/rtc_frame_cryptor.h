@@ -22,10 +22,10 @@ class KeyManager : public RefCountInterface {
   LIB_WEBRTC_API static scoped_refptr<KeyManager> Create();
 
   /// Set the key at the given index.
-  virtual bool setKey(int index, vector<uint8_t> key) = 0;
+  virtual bool SetKey(int index, vector<uint8_t> key) = 0;
 
   /// Set the keys.
-  virtual bool setKeys(vector<vector<uint8_t>> keys) = 0;
+  virtual bool SetKeys(vector<vector<uint8_t>> keys) = 0;
 
   /// Get the keys.
   virtual const vector<vector<uint8_t>> keys() const = 0;

@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include "src/win/mediacapabilities.h"
 #include <string>
 #include <vector>
 #include "mfxcommon.h"
 #include "mfxstructures.h"
-#include "src/win/mediacapabilities.h"
 #include "rtc_base/logging.h"
 
 namespace owt {
@@ -129,8 +129,7 @@ MediaCapabilities::SupportedCapabilitiesForVideoEncoder(
             vp9_10_cap.sampling_modes.push_back(SamplingMode::kY410);
             capabilities.push_back(vp9_10_cap);
           }
-        }
-        else if (codec == owt::base::VideoCodec::kH264) {
+        } else if (codec == owt::base::VideoCodec::kH264) {
           memset(&video_param, 0, sizeof(video_param));
           video_param.mfx.CodecId = MFX_CODEC_AVC;
           // Don't check profiles. We know we can support from CB up to High.
@@ -200,8 +199,7 @@ MediaCapabilities::SupportedCapabilitiesForVideoDecoder(
           avc_cap.max_resolution = {3840, 2160};
           capabilities.push_back(avc_cap);
         }
-      }
-      else if (codec == owt::base::VideoCodec::kAv1) {
+      } else if (codec == owt::base::VideoCodec::kAv1) {
         // Disallow potential AV1 SW decoder.
 #if (MFX_VERSION < 1031)
         continue;
@@ -263,7 +261,6 @@ MediaCapabilities* MediaCapabilities::Get() {
 MediaCapabilities::MediaCapabilities() {}
 
 MediaCapabilities::~MediaCapabilities() {
-
   if (mfx_encoder_) {
     mfx_encoder_->Close();
     mfx_encoder_.reset();
@@ -275,11 +272,9 @@ MediaCapabilities::~MediaCapabilities() {
   if (msdk_factory_ && mfx_session_) {
     msdk_factory_->DestroySession(mfx_session_);
   }
-
 }
 
 bool MediaCapabilities::Init() {
-
   bool res = false;
   msdk_factory_ = owt::base::MSDKFactory::Get();
   if (!msdk_factory_)
@@ -304,10 +299,7 @@ bool MediaCapabilities::Init() {
     inited_ = true;
 failed:
   return res;
-
 }
-
-
 
 }  // namespace base
 }  // namespace owt
