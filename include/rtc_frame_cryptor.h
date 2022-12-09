@@ -28,7 +28,7 @@ class KeyManager : public RefCountInterface {
   virtual bool SetKeys(vector<vector<uint8_t>> keys) = 0;
 
   /// Get the keys.
-  virtual const vector<vector<uint8_t>> keys() const = 0;
+  virtual const vector<vector<uint8_t>> GetKeys() const = 0;
 
  protected:
   virtual ~KeyManager() {}
@@ -36,7 +36,7 @@ class KeyManager : public RefCountInterface {
 
 /// Frame encryption/decryption.
 ///
-class FrameCyrptor {
+class RTCFrameCryptor : public RefCountInterface {
  public:
   /// Enable/Disable frame crypto for the sender or receiver.
   virtual bool setEnabled(bool enabled) = 0;
@@ -52,18 +52,18 @@ class FrameCyrptor {
   virtual int key_index() const = 0;
 
  protected:
-  virtual ~FrameCyrptor() {}
+  virtual ~RTCFrameCryptor() {}
 };
 
 class FrameCyrptorFactory {
   /// Create a frame cyrptor from a [RTCRtpSender].
-  LIB_WEBRTC_API static scoped_refptr<FrameCyrptor> frameCyrptorFromRtpSender(
+  LIB_WEBRTC_API static scoped_refptr<RTCFrameCryptor> frameCyrptorFromRtpSender(
       scoped_refptr<RTCRtpSender> sender,
       Algorithm algorithm,
       scoped_refptr<KeyManager> keyManager);
 
   /// Create a frame cyrptor from a [RTCRtpReceiver].
-  LIB_WEBRTC_API static scoped_refptr<FrameCyrptor> frameCyrptorFromRtpReceiver(
+  LIB_WEBRTC_API static scoped_refptr<RTCFrameCryptor> frameCyrptorFromRtpReceiver(
       scoped_refptr<RTCRtpReceiver> receiver,
       Algorithm algorithm,
       scoped_refptr<KeyManager> keyManager);

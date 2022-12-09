@@ -31,39 +31,8 @@ class RTCRtpSenderImpl : public RTCRtpSender {
   rtc::scoped_refptr<webrtc::RtpSenderInterface> rtc_rtp_sender() {
     return rtp_sender_;
   }
-  virtual bool EnableGcmCryptoSuites(const vector<uint8_t>& key) override {
-    if (!e2ee_transformer_) {
-      if (!key_manager_) {
-        key_manager_ = std::make_shared<webrtc::DefaultKeyManager>();
-      }
-
-      auto mediaType =
-          rtp_sender_->track()->kind() == "audio"
-              ? webrtc::FrameCryptorTransformer::MediaType::kAudioFrame
-              : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
-      e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
-          new webrtc::FrameCryptorTransformer(
-              mediaType, webrtc::FrameCryptorTransformer::Algorithm::kAesGcm,
-              key_manager_));
-    }
-    key_manager_->SetKey(0, key.std_vector());
-    rtp_sender_->SetEncoderToPacketizerFrameTransformer(e2ee_transformer_);
-    e2ee_transformer_->SetEnabled(true);
-    return true;
-  }
-
-  virtual bool DisableGcmCryptoSuites() override {
-    if(e2ee_transformer_) {
-      e2ee_transformer_->SetEnabled(false);
-      return true;
-    }
-    return false;
-  }
-
  private:
   rtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender_;
-  rtc::scoped_refptr<webrtc::FrameCryptorTransformer> e2ee_transformer_;
-  std::shared_ptr<webrtc::DefaultKeyManager> key_manager_;
 };
 }  // namespace libwebrtc
 

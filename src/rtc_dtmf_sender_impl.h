@@ -1,6 +1,6 @@
 
-#ifndef LIB_WEBRTC_DTMF_SENDER_INTERFACE_H_
-#define LIB_WEBRTC_DTMF_SENDER_INTERFACE_H_
+#ifndef LIB_WEBRTC_DTMF_SENDER_IMPL_H_
+#define LIB_WEBRTC_DTMF_SENDER_IMPL_H_
 
 #include <string>
 
@@ -45,4 +45,4 @@ class RTCDtmfSenderImpl : public RTCDtmfSender,
 
 }  // namespace libwebrtc
 
-#endif  // API_DTMF_SENDER_INTERFACE_H_
+#endif  // LIB_WEBRTC_DTMF_SENDER_IMPL_H_

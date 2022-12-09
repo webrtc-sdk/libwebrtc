@@ -43,10 +43,6 @@ class RTCRtpReceiver : public RefCountInterface {
 
   virtual void SetJitterBufferMinimumDelay(double delay_seconds) = 0;
 
-  virtual bool EnableGcmCryptoSuites(const vector<uint8_t>& key) = 0;
-
-  virtual bool DisableGcmCryptoSuites() = 0;
-
 };
 
 }  // namespace libwebrtc

@@ -26,41 +26,9 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
   virtual void SetJitterBufferMinimumDelay(double delay_seconds) override;
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver();
 
-  virtual bool EnableGcmCryptoSuites(const vector<uint8_t>& key) override {
-    if (!e2ee_transformer_) {
-
-      if (!key_manager_) {
-        key_manager_ = std::make_shared<webrtc::DefaultKeyManager>();
-      }
-      
-      auto mediaType =
-          rtp_receiver_->track()->kind() == "audio"
-              ? webrtc::FrameCryptorTransformer::MediaType::kAudioFrame
-              : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
-      e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
-          new webrtc::FrameCryptorTransformer(
-              mediaType, webrtc::FrameCryptorTransformer::Algorithm::kAesGcm,
-              key_manager_));
-    }
-    key_manager_->SetKey(0, key.std_vector());
-    rtp_receiver_->SetDepacketizerToDecoderFrameTransformer(e2ee_transformer_);
-    e2ee_transformer_->SetEnabled(true);
-    return true;
-  }
-
-  virtual bool DisableGcmCryptoSuites() override {
-    if(e2ee_transformer_) {
-      e2ee_transformer_->SetEnabled(false);
-      return true;
-    }
-    return false;
-  }
-
  private:
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver_;
   RTCRtpReceiverObserver* observer_;
-  rtc::scoped_refptr<webrtc::FrameCryptorTransformer> e2ee_transformer_;
-  std::shared_ptr<webrtc::DefaultKeyManager> key_manager_;
   void OnFirstPacketReceived(cricket::MediaType media_type) override;
 };  // namespace libwebrtc
 

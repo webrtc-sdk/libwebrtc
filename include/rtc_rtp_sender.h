@@ -40,10 +40,6 @@ class RTCRtpSender : public RefCountInterface {
       const scoped_refptr<RTCRtpParameters> parameters) = 0;
 
   virtual scoped_refptr<RTCDtmfSender> dtmf_sender() const = 0;
-
-  virtual bool EnableGcmCryptoSuites(const vector<uint8_t>& key) = 0;
-
-  virtual bool DisableGcmCryptoSuites() = 0;
 };
 
 }  // namespace libwebrtc
