@@ -26,8 +26,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(Algorithm algorithm,
       key_index_(0),
       key_manager_(key_manager),
       sender_(sender) {
-  std::shared_ptr<webrtc::KeyManager> keyImpl(
-      static_cast<DefaultKeyManagerImpl*>(key_manager.get()));
+  auto keyImpl = static_cast<DefaultKeyManagerImpl*>(key_manager.get());
   RTCRtpSenderImpl* impl = static_cast<RTCRtpSenderImpl*>(sender.get());
   auto mediaType =
       impl->rtc_rtp_sender()->track()->kind() == "audio"
@@ -36,7 +35,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(Algorithm algorithm,
   e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
       new webrtc::FrameCryptorTransformer(
           mediaType, webrtc::FrameCryptorTransformer::Algorithm::kAesGcm,
-          keyImpl));
+          keyImpl->rtc_key_manager()));
 
   impl->rtc_rtp_sender()->SetEncoderToPacketizerFrameTransformer(
       e2ee_transformer_);
@@ -50,8 +49,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(Algorithm algorithm,
       key_index_(0),
       key_manager_(key_manager),
       receiver_(receiver) {
-  std::shared_ptr<webrtc::KeyManager> keyImpl(
-      static_cast<DefaultKeyManagerImpl*>(key_manager.get()));
+ auto keyImpl = static_cast<DefaultKeyManagerImpl*>(key_manager.get());
   RTCRtpReceiverImpl* impl = static_cast<RTCRtpReceiverImpl*>(receiver.get());
   auto mediaType =
       impl->rtp_receiver()->track()->kind() == "audio"
@@ -60,7 +58,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(Algorithm algorithm,
   e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
       new webrtc::FrameCryptorTransformer(
           mediaType, webrtc::FrameCryptorTransformer::Algorithm::kAesGcm,
-          keyImpl));
+          keyImpl->rtc_key_manager()));
 
   impl->rtp_receiver()->SetDepacketizerToDecoderFrameTransformer(
       e2ee_transformer_);
@@ -102,7 +100,7 @@ DefaultKeyManagerImpl::DefaultKeyManagerImpl() {}
 DefaultKeyManagerImpl::~DefaultKeyManagerImpl() {}
 
 bool DefaultKeyManagerImpl::SetKey(int index, vector<uint8_t> key) {
-  if (index > kMaxKeySize) {
+  if (index > webrtc::KeyManager::kMaxKeySize) {
     return false;
   }
   webrtc::MutexLock lock(&mutex_);
