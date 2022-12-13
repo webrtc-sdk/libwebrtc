@@ -9,10 +9,8 @@
 namespace libwebrtc {
 
 enum class Algorithm {
-  kAes128Gcm,
-  kAes256Gcm,
-  kAes128Cbc,
-  kAes256Cbc,
+  kAesGcm = 0,
+  kAesCbc,
 };
 
 /// Shared secret key for frame encryption.

@@ -19,6 +19,19 @@ scoped_refptr<RTCFrameCryptor> FrameCyrptorFactory::frameCyrptorFromRtpReceiver(
                                                    receiver);
 }
 
+webrtc::FrameCryptorTransformer::Algorithm AlgorithmToFrameCryptorAlgorithm(
+    Algorithm algorithm) {
+  switch (algorithm) {
+    case Algorithm::kAesGcm:
+      return webrtc::FrameCryptorTransformer::Algorithm::kAesGcm;
+    case Algorithm::kAesCbc:
+      return webrtc::FrameCryptorTransformer::Algorithm::kAesCbc;
+    default:
+      return webrtc::FrameCryptorTransformer::Algorithm::kAesGcm;
+  }
+}
+
+
 RTCFrameCryptorImpl::RTCFrameCryptorImpl(Algorithm algorithm,
                                          scoped_refptr<KeyManager> key_manager,
                                          scoped_refptr<RTCRtpSender> sender)
@@ -34,7 +47,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(Algorithm algorithm,
           : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
   e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
       new webrtc::FrameCryptorTransformer(
-          mediaType, webrtc::FrameCryptorTransformer::Algorithm::kAesGcm,
+          mediaType, AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_manager()));
 
   impl->rtc_rtp_sender()->SetEncoderToPacketizerFrameTransformer(
@@ -57,7 +70,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(Algorithm algorithm,
           : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
   e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
       new webrtc::FrameCryptorTransformer(
-          mediaType, webrtc::FrameCryptorTransformer::Algorithm::kAesGcm,
+          mediaType, AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_manager()));
 
   impl->rtp_receiver()->SetDepacketizerToDecoderFrameTransformer(
