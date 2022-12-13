@@ -9,22 +9,69 @@
 #include "api/rtp_receiver_interface.h"
 #include "api/rtp_sender_interface.h"
 
-
 namespace libwebrtc {
 
 class DefaultKeyManagerImpl : public KeyManager {
  public:
-  DefaultKeyManagerImpl();
-  ~DefaultKeyManagerImpl();
+  DefaultKeyManagerImpl() {
+    impl_ =
+        new rtc::RefCountedObject<DefaultKeyManagerImpl::KeyManagerImpl>(this);
+  }
+  ~DefaultKeyManagerImpl() {}
   /// Set the key at the given index.
-  bool SetKey(int index, vector<uint8_t> key) override;
+  bool SetKey(const std::string participant_id,
+              int index,
+              vector<uint8_t> key) override {
+    if (index > webrtc::KeyManager::kMaxKeySize) {
+      return false;
+    }
+
+    if (keys_.find(participant_id) == keys_.end()) {
+      keys_[participant_id] = std::vector<std::vector<uint8_t>>();
+    }
+
+    webrtc::MutexLock lock(&mutex_);
+    if (index + 1 > (int)keys_.size()) {
+      keys_[participant_id].resize(index + 1);
+    }
+    keys_[participant_id][index] = key.std_vector();
+    return true;
+  }
 
   /// Set the keys.
-  bool SetKeys(vector<vector<uint8_t>> keys) override;
+  bool SetKeys(const std::string participant_id,
+               vector<vector<uint8_t>> keys) override {
+    webrtc::MutexLock lock(&mutex_);
+    if (keys_.find(participant_id) == keys_.end()) {
+      keys_[participant_id] = std::vector<std::vector<uint8_t>>();
+    }
 
-  const vector<vector<uint8_t>> GetKeys() const override;
+    keys_[participant_id].clear();
+    for (auto key : keys.std_vector()) {
+      keys_[participant_id].push_back(key.std_vector());
+    }
+    return true;
+  }
 
-  const std::vector<std::vector<uint8_t>> keys() const;
+  const vector<vector<uint8_t>> GetKeys(
+      const std::string participant_id) const override {
+    webrtc::MutexLock lock(&mutex_);
+    if (keys_.find(participant_id) == keys_.end()) {
+      return vector<vector<uint8_t>>();
+    }
+
+    return keys_.find(participant_id)->second;
+  }
+
+  const std::vector<std::vector<uint8_t>> keys(
+      const std::string participant_id) const {
+    webrtc::MutexLock lock(&mutex_);
+    if (keys_.find(participant_id) == keys_.end()) {
+      return std::vector<std::vector<uint8_t>>();
+    }
+
+    return keys_.find(participant_id)->second;
+  }
 
   rtc::scoped_refptr<webrtc::KeyManager> rtc_key_manager() { return impl_; }
 
@@ -33,8 +80,9 @@ class DefaultKeyManagerImpl : public KeyManager {
    public:
     KeyManagerImpl(DefaultKeyManagerImpl* parent) : parent_(parent) {}
     ~KeyManagerImpl() {}
-    const std::vector<std::vector<uint8_t>> keys() const override {
-      return parent_->keys();
+    const std::vector<std::vector<uint8_t>> keys(
+        const std::string participant_id) const override {
+      return parent_->keys(participant_id);
     }
 
    private:
@@ -43,17 +91,19 @@ class DefaultKeyManagerImpl : public KeyManager {
 
  private:
   rtc::scoped_refptr<KeyManagerImpl> impl_;
-  std::vector<std::vector<uint8_t>> keys_;
+  std::map<std::string, std::vector<std::vector<uint8_t>>> keys_;
   mutable webrtc::Mutex mutex_;
 };
 
 class RTCFrameCryptorImpl : public RTCFrameCryptor {
  public:
-  RTCFrameCryptorImpl(Algorithm algorithm,
+  RTCFrameCryptorImpl(const std::string participant_id,
+                      Algorithm algorithm,
                       scoped_refptr<KeyManager> key_manager,
                       scoped_refptr<RTCRtpSender> sender);
 
-  RTCFrameCryptorImpl(Algorithm algorithm,
+  RTCFrameCryptorImpl(const std::string participant_id,
+                      Algorithm algorithm,
                       scoped_refptr<KeyManager> key_manager,
                       scoped_refptr<RTCRtpReceiver> receiver);
   ~RTCFrameCryptorImpl();
@@ -67,6 +117,7 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor {
   mutable webrtc::Mutex mutex_;
   bool enabled_;
   int key_index_;
+  std::string participant_id_;
   rtc::scoped_refptr<webrtc::FrameCryptorTransformer> e2ee_transformer_;
   scoped_refptr<KeyManager> key_manager_;
   scoped_refptr<RTCRtpSender> sender_;
