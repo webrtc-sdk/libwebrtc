@@ -108,7 +108,9 @@ scoped_refptr<KeyManager> KeyManager::Create() {
   return new RefCountedObject<DefaultKeyManagerImpl>();
 }
 
-DefaultKeyManagerImpl::DefaultKeyManagerImpl() {}
+DefaultKeyManagerImpl::DefaultKeyManagerImpl() {
+  impl_ = new rtc::RefCountedObject<DefaultKeyManagerImpl::KeyManagerImpl>(this);
+}
 
 DefaultKeyManagerImpl::~DefaultKeyManagerImpl() {}
 
@@ -117,7 +119,7 @@ bool DefaultKeyManagerImpl::SetKey(int index, vector<uint8_t> key) {
     return false;
   }
   webrtc::MutexLock lock(&mutex_);
-  if (index > (int)keys_.size()) {
+  if (index + 1 > (int)keys_.size()) {
     keys_.resize(index + 1);
   }
   keys_[index] = key.std_vector();
