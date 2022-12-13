@@ -2,7 +2,7 @@
 
 namespace libwebrtc {
 
-scoped_refptr<RTCFrameCryptor> FrameCyrptorFactory::frameCyrptorFromRtpSender(
+scoped_refptr<RTCFrameCryptor> FrameCryptorFactory::frameCryptorFromRtpSender(
     scoped_refptr<RTCRtpSender> sender,
     Algorithm algorithm,
     scoped_refptr<KeyManager> keyManager) {
@@ -11,7 +11,7 @@ scoped_refptr<RTCFrameCryptor> FrameCyrptorFactory::frameCyrptorFromRtpSender(
 }
 
 /// Create a frame cyrptor from a [RTCRtpReceiver].
-scoped_refptr<RTCFrameCryptor> FrameCyrptorFactory::frameCyrptorFromRtpReceiver(
+scoped_refptr<RTCFrameCryptor> FrameCryptorFactory::frameCryptorFromRtpReceiver(
     scoped_refptr<RTCRtpReceiver> receiver,
     Algorithm algorithm,
     scoped_refptr<KeyManager> keyManager) {
