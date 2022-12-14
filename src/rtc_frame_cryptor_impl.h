@@ -112,12 +112,13 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor {
   bool enabled() const override;
   bool SetKeyIndex(int index) override;
   int key_index() const override;
+  const std::string participant_id() const override { return participant_id_; }
 
  private:
+  std::string participant_id_;
   mutable webrtc::Mutex mutex_;
   bool enabled_;
   int key_index_;
-  std::string participant_id_;
   rtc::scoped_refptr<webrtc::FrameCryptorTransformer> e2ee_transformer_;
   scoped_refptr<KeyManager> key_manager_;
   scoped_refptr<RTCRtpSender> sender_;
