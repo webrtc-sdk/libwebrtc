@@ -19,48 +19,50 @@ class DefaultKeyManagerImpl : public KeyManager {
   }
   ~DefaultKeyManagerImpl() {}
   /// Set the key at the given index.
-  bool SetKey(const std::string participant_id,
+  bool SetKey(const string participant_id,
               int index,
               vector<uint8_t> key) override {
     if (index > webrtc::KeyManager::kMaxKeySize) {
       return false;
     }
-
-    if (keys_.find(participant_id) == keys_.end()) {
-      keys_[participant_id] = std::vector<std::vector<uint8_t>>();
+    auto id = participant_id.std_string();
+    if (keys_.find(id) == keys_.end()) {
+      keys_[id] = std::vector<std::vector<uint8_t>>();
     }
 
     webrtc::MutexLock lock(&mutex_);
-    if (index + 1 > (int)keys_.size()) {
-      keys_[participant_id].resize(index + 1);
+    if (index + 1 > (int)keys_[id].size()) {
+      keys_[id].resize(index + 1);
     }
-    keys_[participant_id][index] = key.std_vector();
+    keys_[id][index] = key.std_vector();
     return true;
   }
 
   /// Set the keys.
-  bool SetKeys(const std::string participant_id,
+  bool SetKeys(const string participant_id,
                vector<vector<uint8_t>> keys) override {
     webrtc::MutexLock lock(&mutex_);
-    if (keys_.find(participant_id) == keys_.end()) {
-      keys_[participant_id] = std::vector<std::vector<uint8_t>>();
+    auto id = participant_id.std_string();
+    if (keys_.find(id) == keys_.end()) {
+      keys_[id] = std::vector<std::vector<uint8_t>>();
     }
 
-    keys_[participant_id].clear();
+    keys_[id].clear();
     for (auto key : keys.std_vector()) {
-      keys_[participant_id].push_back(key.std_vector());
+      keys_[id].push_back(key.std_vector());
     }
     return true;
   }
 
   const vector<vector<uint8_t>> GetKeys(
-      const std::string participant_id) const override {
+      const string participant_id) const override {
     webrtc::MutexLock lock(&mutex_);
-    if (keys_.find(participant_id) == keys_.end()) {
+    auto id = participant_id.std_string();
+    if (keys_.find(id) == keys_.end()) {
       return vector<vector<uint8_t>>();
     }
 
-    return keys_.find(participant_id)->second;
+    return keys_.find(id)->second;
   }
 
   const std::vector<std::vector<uint8_t>> keys(
@@ -97,12 +99,12 @@ class DefaultKeyManagerImpl : public KeyManager {
 
 class RTCFrameCryptorImpl : public RTCFrameCryptor {
  public:
-  RTCFrameCryptorImpl(const std::string participant_id,
+  RTCFrameCryptorImpl(const string participant_id,
                       Algorithm algorithm,
                       scoped_refptr<KeyManager> key_manager,
                       scoped_refptr<RTCRtpSender> sender);
 
-  RTCFrameCryptorImpl(const std::string participant_id,
+  RTCFrameCryptorImpl(const string participant_id,
                       Algorithm algorithm,
                       scoped_refptr<KeyManager> key_manager,
                       scoped_refptr<RTCRtpReceiver> receiver);
@@ -112,10 +114,10 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor {
   bool enabled() const override;
   bool SetKeyIndex(int index) override;
   int key_index() const override;
-  const std::string participant_id() const override { return participant_id_; }
+  const string participant_id() const override { return participant_id_; }
 
  private:
-  std::string participant_id_;
+  string participant_id_;
   mutable webrtc::Mutex mutex_;
   bool enabled_;
   int key_index_;

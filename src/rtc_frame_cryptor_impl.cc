@@ -3,7 +3,7 @@
 namespace libwebrtc {
 
 scoped_refptr<RTCFrameCryptor> FrameCryptorFactory::frameCryptorFromRtpSender(
-    const std::string participant_id,
+    const string participant_id,
     scoped_refptr<RTCRtpSender> sender,
     Algorithm algorithm,
     scoped_refptr<KeyManager> keyManager) {
@@ -13,7 +13,7 @@ scoped_refptr<RTCFrameCryptor> FrameCryptorFactory::frameCryptorFromRtpSender(
 
 /// Create a frame cyrptor from a [RTCRtpReceiver].
 scoped_refptr<RTCFrameCryptor> FrameCryptorFactory::frameCryptorFromRtpReceiver(
-    const std::string participant_id,
+    const string participant_id,
     scoped_refptr<RTCRtpReceiver> receiver,
     Algorithm algorithm,
     scoped_refptr<KeyManager> keyManager) {
@@ -33,7 +33,7 @@ webrtc::FrameCryptorTransformer::Algorithm AlgorithmToFrameCryptorAlgorithm(
   }
 }
 
-RTCFrameCryptorImpl::RTCFrameCryptorImpl(const std::string participant_id,
+RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
                                          Algorithm algorithm,
                                          scoped_refptr<KeyManager> key_manager,
                                          scoped_refptr<RTCRtpSender> sender)
@@ -50,7 +50,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(const std::string participant_id,
           : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
   e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
       new webrtc::FrameCryptorTransformer(
-          participant_id_, mediaType,
+          participant_id_.std_string(), mediaType,
           AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_manager()));
 
@@ -59,7 +59,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(const std::string participant_id,
   e2ee_transformer_->SetEnabled(false);
 }
 
-RTCFrameCryptorImpl::RTCFrameCryptorImpl(const std::string participant_id,
+RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
                                          Algorithm algorithm,
                                          scoped_refptr<KeyManager> key_manager,
                                          scoped_refptr<RTCRtpReceiver> receiver)
@@ -76,7 +76,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(const std::string participant_id,
           : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
   e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
       new webrtc::FrameCryptorTransformer(
-          participant_id_, mediaType,
+          participant_id_.std_string(), mediaType,
           AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_manager()));
 
