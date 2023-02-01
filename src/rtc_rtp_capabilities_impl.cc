@@ -143,8 +143,6 @@ void RTCRtpCodecCapabilityImpl::set_sdp_fmtp_line(const string& sdp_fmtp_line) {
       rtp_codec_capability_.parameters[""] = parameter;
     }
   }
-
-  rtp_codec_capability_.parameters = {};
 }
 
 webrtc::RtpCodecCapability RTCRtpCodecCapabilityImpl::rtp_codec_capability() {

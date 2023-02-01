@@ -12,7 +12,7 @@ namespace libwebrtc {
 
 class RTCRtpCodecCapability : public RefCountInterface {
  public:
-  static scoped_refptr<RTCRtpCodecCapability> Create();
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpCodecCapability> Create();
 
   virtual void set_mime_type(const string& mime_type) = 0;
   virtual void set_clock_rate(int clock_rate) = 0;
