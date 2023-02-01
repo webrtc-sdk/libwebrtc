@@ -29,6 +29,7 @@ class RTCRtpCodecCapability : public RefCountInterface {
 };
 
 class RTCRtpHeaderExtensionCapability : public RefCountInterface {
+public:
   virtual const string uri() = 0;
   virtual void set_uri(const string uri) = 0;
 
@@ -40,6 +41,7 @@ class RTCRtpHeaderExtensionCapability : public RefCountInterface {
 };
 
 class RTCRtpCapabilities : public RefCountInterface {
+public:
   virtual const vector<scoped_refptr<RTCRtpCodecCapability>> codecs() = 0;
   virtual void set_codecs(
       const vector<scoped_refptr<RTCRtpCodecCapability>> codecs) = 0;
