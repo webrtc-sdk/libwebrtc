@@ -72,6 +72,12 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
     return rtc_peerconnection_factory_;
   }
 
+  scoped_refptr<RTCRtpCapabilities> GetRtpSenderCapabilities(
+      RTCMediaType media_type) override;
+
+  scoped_refptr<RTCRtpCapabilities> GetRtpReceiverCapabilities(
+      RTCMediaType media_type) override;
+
  protected:
   void CreateAudioDeviceModule_w();
 

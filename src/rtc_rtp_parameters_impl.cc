@@ -3,14 +3,6 @@
 #include "base/refcountedobject.h"
 namespace libwebrtc {
 
-template <typename T>
-T get_optional_value(absl::optional<T> opt, T default_value) {
-  if (opt.has_value())
-    return opt.value();
- 
- return default_value;
-}
-
 LIB_WEBRTC_API scoped_refptr<RTCRtpEncodingParameters>
 RTCRtpEncodingParameters::Create() {
   return new RefCountedObject<RTCRtpEncodingParametersImpl>();
@@ -48,7 +40,7 @@ void RTCRtpEncodingParametersImpl::set_network_priority(RTCPriority value) {
 }
 
 int RTCRtpEncodingParametersImpl::max_bitrate_bps() {
-  return get_optional_value<int>(rtp_encoding_parameters_.max_bitrate_bps, 0);
+  return rtp_encoding_parameters_.max_bitrate_bps.value_or(0);
 }
 
 void RTCRtpEncodingParametersImpl::set_max_bitrate_bps(int value) {
@@ -56,7 +48,7 @@ void RTCRtpEncodingParametersImpl::set_max_bitrate_bps(int value) {
 }
 
 int RTCRtpEncodingParametersImpl::min_bitrate_bps() {
-  return get_optional_value<int>(rtp_encoding_parameters_.min_bitrate_bps, 0);
+  return rtp_encoding_parameters_.min_bitrate_bps.value_or(0);
 }
 
 void RTCRtpEncodingParametersImpl::set_min_bitrate_bps(int value) {
@@ -64,8 +56,7 @@ void RTCRtpEncodingParametersImpl::set_min_bitrate_bps(int value) {
 }
 
 double RTCRtpEncodingParametersImpl::max_framerate() {
-  return get_optional_value<double>(rtp_encoding_parameters_.max_framerate,
-                                    0.0);
+  return rtp_encoding_parameters_.max_framerate.value_or(0);
 }
 
 void RTCRtpEncodingParametersImpl::set_max_framerate(double value) {
@@ -73,8 +64,7 @@ void RTCRtpEncodingParametersImpl::set_max_framerate(double value) {
 }
 
 int RTCRtpEncodingParametersImpl::num_temporal_layers() {
-  return get_optional_value<int>(rtp_encoding_parameters_.num_temporal_layers,
-                                 1);
+  return rtp_encoding_parameters_.num_temporal_layers.value_or(1);
 }
 
 void RTCRtpEncodingParametersImpl::set_num_temporal_layers(int value) {
@@ -82,9 +72,7 @@ void RTCRtpEncodingParametersImpl::set_num_temporal_layers(int value) {
 }
 
 double RTCRtpEncodingParametersImpl::scale_resolution_down_by() {
-  return get_optional_value<double>(
-      rtp_encoding_parameters_.scale_resolution_down_by,
-                                 1.0);
+  return rtp_encoding_parameters_.scale_resolution_down_by.value_or(1.0);
 }
 
 void RTCRtpEncodingParametersImpl::set_scale_resolution_down_by(double value) {
@@ -356,7 +344,7 @@ void RTCRtpCodecParametersImpl::set_payload_type(int value) {
 }
 
 int RTCRtpCodecParametersImpl::clock_rate() {
-  return get_optional_value<int>(rtp_codec_parameters_.clock_rate, 0);
+  return rtp_codec_parameters_.clock_rate.value_or(0);
 }
 
 void RTCRtpCodecParametersImpl::set_clock_rate(int value) {
@@ -364,7 +352,7 @@ void RTCRtpCodecParametersImpl::set_clock_rate(int value) {
 }
 
 int RTCRtpCodecParametersImpl::num_channels() {
-  return get_optional_value<int>(rtp_codec_parameters_.num_channels, 1);
+  return rtp_codec_parameters_.num_channels.value_or(1);
 }
 
 void RTCRtpCodecParametersImpl::set_num_channels(int value) {
@@ -372,7 +360,7 @@ void RTCRtpCodecParametersImpl::set_num_channels(int value) {
 }
 
 int RTCRtpCodecParametersImpl::max_ptime() {
-  return get_optional_value<int>(rtp_codec_parameters_.max_ptime, 0);
+  return rtp_codec_parameters_.max_ptime.value_or(0);
 }
 
 void RTCRtpCodecParametersImpl::set_max_ptime(int value) {
@@ -380,7 +368,7 @@ void RTCRtpCodecParametersImpl::set_max_ptime(int value) {
 }
 
 int RTCRtpCodecParametersImpl::ptime() {
-  return get_optional_value<int>(rtp_codec_parameters_.ptime, 0);
+  return rtp_codec_parameters_.ptime.value_or(0);
 }
 
 void RTCRtpCodecParametersImpl::set_ptime(int value) {

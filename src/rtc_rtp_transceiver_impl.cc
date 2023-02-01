@@ -1,4 +1,5 @@
 #include "rtc_rtp_transceiver_impl.h"
+#include <src/rtc_rtp_capabilities_impl.h>
 #include <src/rtc_rtp_parameters_impl.h>
 #include <src/rtc_rtp_receiver_impl.h>
 #include <src/rtc_rtp_sender_impl.h>
@@ -148,4 +149,15 @@ const string RTCRtpTransceiverImpl::mid() const {
 RTCMediaType RTCRtpTransceiverImpl::media_type() const {
   return static_cast<RTCMediaType>(rtp_transceiver_->media_type());
 }
+
+void RTCRtpTransceiverImpl::SetCodecPreferences(
+    vector<scoped_refptr<RTCRtpCodecCapability>> codecs) {
+  std::vector<webrtc::RtpCodecCapability> list;
+  for (auto codec : codecs.std_vector()) {
+    auto impl = static_cast<RTCRtpCodecCapabilityImpl*>(codec.get());
+    list.push_back(impl->rtp_codec_capability());
+  }
+  rtp_transceiver_->SetCodecPreferences(list);
+}
+
 }  // namespace libwebrtc

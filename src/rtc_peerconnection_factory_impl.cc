@@ -3,8 +3,10 @@
 #include "rtc_media_stream_impl.h"
 #include "rtc_mediaconstraints_impl.h"
 #include "rtc_peerconnection_impl.h"
+#include "rtc_rtp_capabilities_impl.h"
 #include "rtc_video_device_impl.h"
 #include "rtc_video_source_impl.h"
+
 
 #include "api/audio_codecs/builtin_audio_decoder_factory.h"
 #include "api/audio_codecs/builtin_audio_encoder_factory.h"
@@ -294,6 +296,63 @@ scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
   scoped_refptr<AudioTrackImpl> track = scoped_refptr<AudioTrackImpl>(
       new RefCountedObject<AudioTrackImpl>(audio_track));
   return track;
+}
+
+scoped_refptr<RTCRtpCapabilities>
+RTCPeerConnectionFactoryImpl::GetRtpSenderCapabilities(
+    RTCMediaType media_type) {
+  if (rtc::Thread::Current() != signaling_thread_) {
+    scoped_refptr<RTCRtpCapabilities> capabilities =
+        signaling_thread_->Invoke<scoped_refptr<RTCRtpCapabilities>>(
+            RTC_FROM_HERE, [this, media_type] {
+              return GetRtpSenderCapabilities(media_type);
+            });
+    return capabilities;
+  }
+
+  cricket::MediaType type = cricket::MediaType::MEDIA_TYPE_AUDIO;
+  switch (media_type) {
+    case RTCMediaType::AUDIO:
+      type = cricket::MediaType::MEDIA_TYPE_AUDIO;
+      break;
+    case RTCMediaType::VIDEO:
+      type = cricket::MediaType::MEDIA_TYPE_VIDEO;
+      break;
+    default:
+      break;
+  }
+  webrtc::RtpCapabilities rtp_capabilities =
+      rtc_peerconnection_factory_->GetRtpSenderCapabilities(type);
+  return scoped_refptr<RTCRtpCapabilities>(
+      new RefCountedObject<RTCRtpCapabilitiesImpl>(rtp_capabilities));
+}
+
+scoped_refptr<RTCRtpCapabilities>
+RTCPeerConnectionFactoryImpl::GetRtpReceiverCapabilities(
+    RTCMediaType media_type) {
+  if (rtc::Thread::Current() != signaling_thread_) {
+    scoped_refptr<RTCRtpCapabilities> capabilities =
+        signaling_thread_->Invoke<scoped_refptr<RTCRtpCapabilities>>(
+            RTC_FROM_HERE, [this, media_type] {
+              return GetRtpSenderCapabilities(media_type);
+            });
+    return capabilities;
+  }
+  cricket::MediaType type = cricket::MediaType::MEDIA_TYPE_AUDIO;
+  switch (media_type) {
+    case RTCMediaType::AUDIO:
+      type = cricket::MediaType::MEDIA_TYPE_AUDIO;
+      break;
+    case RTCMediaType::VIDEO:
+      type = cricket::MediaType::MEDIA_TYPE_VIDEO;
+      break;
+    default:
+      break;
+  }
+  webrtc::RtpCapabilities rtp_capabilities =
+      rtc_peerconnection_factory_->GetRtpReceiverCapabilities(type);
+  return scoped_refptr<RTCRtpCapabilities>(
+      new RefCountedObject<RTCRtpCapabilitiesImpl>(rtp_capabilities));
 }
 
 }  // namespace libwebrtc
