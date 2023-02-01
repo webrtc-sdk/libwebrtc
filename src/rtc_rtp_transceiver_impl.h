@@ -46,6 +46,8 @@ class RTCRtpTransceiverImpl : public RTCRtpTransceiver {
   virtual RTCRtpTransceiverDirection fired_direction() const override;
   virtual const string StopStandard() override;
   virtual void StopInternal() override;
+  virtual void SetCodecPreferences(
+      vector<scoped_refptr<RTCRtpCodecCapability>> codecs) override;
 
   rtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver();
 
