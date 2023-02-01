@@ -230,8 +230,7 @@ RTCRtcpParametersImpl::RTCRtcpParametersImpl(
     : rtcp_parameters_(rtcp_parameters) {}
 
 uint32_t RTCRtcpParametersImpl::ssrc() {
-  return get_optional_value<uint32_t>(rtcp_parameters_.ssrc,
-                                 0);
+  return rtcp_parameters_.ssrc.value_or(0);
 }
 
 void RTCRtcpParametersImpl::set_ssrc(uint32_t value) {
