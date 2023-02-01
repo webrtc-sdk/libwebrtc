@@ -39,7 +39,7 @@ void RTCRtpEncodingParametersImpl::set_network_priority(RTCPriority value) {
 }
 
 int RTCRtpEncodingParametersImpl::max_bitrate_bps() {
-  return rtp_encoding_parameters_.max_bitrate_bps.value();
+  return rtp_encoding_parameters_.max_bitrate_bps.value_or(0);
 }
 
 void RTCRtpEncodingParametersImpl::set_max_bitrate_bps(int value) {
@@ -47,7 +47,7 @@ void RTCRtpEncodingParametersImpl::set_max_bitrate_bps(int value) {
 }
 
 int RTCRtpEncodingParametersImpl::min_bitrate_bps() {
-  return rtp_encoding_parameters_.min_bitrate_bps.value();
+  return rtp_encoding_parameters_.min_bitrate_bps.value_or(0);
 }
 
 void RTCRtpEncodingParametersImpl::set_min_bitrate_bps(int value) {
@@ -55,7 +55,7 @@ void RTCRtpEncodingParametersImpl::set_min_bitrate_bps(int value) {
 }
 
 double RTCRtpEncodingParametersImpl::max_framerate() {
-  return rtp_encoding_parameters_.max_framerate.value();
+  return rtp_encoding_parameters_.max_framerate.value_or(0);
 }
 
 void RTCRtpEncodingParametersImpl::set_max_framerate(double value) {
@@ -63,7 +63,7 @@ void RTCRtpEncodingParametersImpl::set_max_framerate(double value) {
 }
 
 int RTCRtpEncodingParametersImpl::num_temporal_layers() {
-  return rtp_encoding_parameters_.num_temporal_layers.value();
+  return rtp_encoding_parameters_.num_temporal_layers.value_or(1);
 }
 
 void RTCRtpEncodingParametersImpl::set_num_temporal_layers(int value) {
@@ -71,7 +71,7 @@ void RTCRtpEncodingParametersImpl::set_num_temporal_layers(int value) {
 }
 
 double RTCRtpEncodingParametersImpl::scale_resolution_down_by() {
-  return rtp_encoding_parameters_.scale_resolution_down_by.value();
+  return rtp_encoding_parameters_.scale_resolution_down_by.value_or(1.0);
 }
 
 void RTCRtpEncodingParametersImpl::set_scale_resolution_down_by(double value) {
@@ -342,7 +342,7 @@ void RTCRtpCodecParametersImpl::set_payload_type(int value) {
 }
 
 int RTCRtpCodecParametersImpl::clock_rate() {
-  return rtp_codec_parameters_.clock_rate.value();
+  return rtp_codec_parameters_.clock_rate.value_or(0);
 }
 
 void RTCRtpCodecParametersImpl::set_clock_rate(int value) {
@@ -350,7 +350,7 @@ void RTCRtpCodecParametersImpl::set_clock_rate(int value) {
 }
 
 int RTCRtpCodecParametersImpl::num_channels() {
-  return rtp_codec_parameters_.num_channels.value();
+  return rtp_codec_parameters_.num_channels.value_or(1);
 }
 
 void RTCRtpCodecParametersImpl::set_num_channels(int value) {
@@ -358,7 +358,7 @@ void RTCRtpCodecParametersImpl::set_num_channels(int value) {
 }
 
 int RTCRtpCodecParametersImpl::max_ptime() {
-  return rtp_codec_parameters_.max_ptime.value();
+  return rtp_codec_parameters_.max_ptime.value_or(0);
 }
 
 void RTCRtpCodecParametersImpl::set_max_ptime(int value) {
@@ -366,7 +366,7 @@ void RTCRtpCodecParametersImpl::set_max_ptime(int value) {
 }
 
 int RTCRtpCodecParametersImpl::ptime() {
-  return rtp_codec_parameters_.ptime.value();
+  return rtp_codec_parameters_.ptime.value_or(0);
 }
 
 void RTCRtpCodecParametersImpl::set_ptime(int value) {
