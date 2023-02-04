@@ -94,6 +94,49 @@ bool RTCFrameCryptorImpl::SetEnabled(bool enabled) {
   return true;
 }
 
+void RTCFrameCryptorImpl::RegisterRTCFrameCryptorObserver(
+    RTCFrameCryptorObserver* observer) {
+  webrtc::MutexLock lock(&mutex_);
+  observer_ = observer;
+}
+
+void RTCFrameCryptorImpl::DeRegisterRTCFrameCryptorObserver() {
+  webrtc::MutexLock lock(&mutex_);
+  observer_ = nullptr;
+}
+
+void RTCFrameCryptorImpl::OnFrameCryptionError(
+    const std::string participant_id,
+    webrtc::FrameCryptionError error) {
+  {
+    RTCFrameCryptionState state = RTCFrameCryptionState::kNew;
+    switch (error) {
+      case webrtc::FrameCryptionError::kNew:
+        state = RTCFrameCryptionState::kNew;
+        break;
+      case webrtc::FrameCryptionError::kOk:
+        state = RTCFrameCryptionState::kOk;
+        break;
+      case webrtc::FrameCryptionError::kDecryptionFailed:
+        state = RTCFrameCryptionState::kDecryptionFailed;
+        break;
+      case webrtc::FrameCryptionError::kEncryptionFailed:
+        state = RTCFrameCryptionState::kEncryptionFailed;
+        break;
+      case webrtc::FrameCryptionError::kMissingKey:
+        state = RTCFrameCryptionState::kMissingKey;
+        break;
+      case webrtc::FrameCryptionError::kInternalError:
+        state = RTCFrameCryptionState::kInternalError;
+        break;
+    }
+    webrtc::MutexLock lock(&mutex_);
+    if (observer_) {
+      observer_->OnFrameCryptionStateChanged(participant_id, state);
+    }
+  }
+}
+
 bool RTCFrameCryptorImpl::enabled() const {
   webrtc::MutexLock lock(&mutex_);
   return enabled_;

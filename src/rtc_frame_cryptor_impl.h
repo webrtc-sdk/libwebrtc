@@ -97,7 +97,8 @@ class DefaultKeyManagerImpl : public KeyManager {
   mutable webrtc::Mutex mutex_;
 };
 
-class RTCFrameCryptorImpl : public RTCFrameCryptor {
+class RTCFrameCryptorImpl : public RTCFrameCryptor,
+                            public webrtc::FrameCryptorTransformerObserver {
  public:
   RTCFrameCryptorImpl(const string participant_id,
                       Algorithm algorithm,
@@ -110,11 +111,19 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor {
                       scoped_refptr<RTCRtpReceiver> receiver);
   ~RTCFrameCryptorImpl();
 
+  void RegisterRTCFrameCryptorObserver(
+      RTCFrameCryptorObserver* observer) override;
+
+  void DeRegisterRTCFrameCryptorObserver() override;
+
   bool SetEnabled(bool enabled) override;
   bool enabled() const override;
   bool SetKeyIndex(int index) override;
   int key_index() const override;
   const string participant_id() const override { return participant_id_; }
+
+  void OnFrameCryptionError(const std::string participant_id,
+                            webrtc::FrameCryptionError error) override;
 
  private:
   string participant_id_;
@@ -125,6 +134,7 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor {
   scoped_refptr<KeyManager> key_manager_;
   scoped_refptr<RTCRtpSender> sender_;
   scoped_refptr<RTCRtpReceiver> receiver_;
+  RTCFrameCryptorObserver* observer_ = nullptr;
 };
 
 }  // namespace libwebrtc
