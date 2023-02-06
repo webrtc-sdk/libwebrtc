@@ -53,7 +53,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
           participant_id_.std_string(), mediaType,
           AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_manager()));
-
+  e2ee_transformer_->SetFrameCryptorTransformerObserver(this);
   impl->rtc_rtp_sender()->SetEncoderToPacketizerFrameTransformer(
       e2ee_transformer_);
   e2ee_transformer_->SetEnabled(false);
@@ -79,7 +79,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
           participant_id_.std_string(), mediaType,
           AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_manager()));
-
+  e2ee_transformer_->SetFrameCryptorTransformerObserver(this);
   impl->rtp_receiver()->SetDepacketizerToDecoderFrameTransformer(
       e2ee_transformer_);
   e2ee_transformer_->SetEnabled(false);
@@ -132,7 +132,7 @@ void RTCFrameCryptorImpl::OnFrameCryptionError(
     }
     webrtc::MutexLock lock(&mutex_);
     if (observer_) {
-      observer_->OnFrameCryptionStateChanged(participant_id, state);
+      observer_->OnFrameCryptionStateChanged(participant_id_, state);
     }
   }
 }
