@@ -103,6 +103,7 @@ void RTCFrameCryptorImpl::RegisterRTCFrameCryptorObserver(
 void RTCFrameCryptorImpl::DeRegisterRTCFrameCryptorObserver() {
   webrtc::MutexLock lock(&mutex_);
   observer_ = nullptr;
+  e2ee_transformer_->SetFrameCryptorTransformerObserver(nullptr);
 }
 
 void RTCFrameCryptorImpl::OnFrameCryptionError(

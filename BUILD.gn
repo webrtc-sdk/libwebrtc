@@ -64,6 +64,7 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_data_channel.h",
     "include/rtc_dtls_transport.h",
     "include/rtc_dtmf_sender.h",
+    "include/rtc_frame_cryptor.h",
     "include/rtc_ice_candidate.h",
     "include/rtc_media_stream.h",
     "include/rtc_media_track.h",
