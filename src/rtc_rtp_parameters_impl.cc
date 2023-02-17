@@ -1,7 +1,9 @@
 #include "rtc_rtp_parameters_impl.h"
 
 #include "base/refcountedobject.h"
+
 namespace libwebrtc {
+ 
 LIB_WEBRTC_API scoped_refptr<RTCRtpEncodingParameters>
 RTCRtpEncodingParameters::Create() {
   return new RefCountedObject<RTCRtpEncodingParametersImpl>();
@@ -14,7 +16,7 @@ RTCRtpEncodingParametersImpl::RTCRtpEncodingParametersImpl(
     : rtp_encoding_parameters_(rtp_encoding_parameters) {}
 
 uint32_t RTCRtpEncodingParametersImpl::ssrc() {
-  return rtp_encoding_parameters_.ssrc.value();
+  return rtp_encoding_parameters_.ssrc.value_or(0);
 }
 
 void RTCRtpEncodingParametersImpl::set_ssrc(uint32_t value) {
@@ -229,7 +231,7 @@ RTCRtcpParametersImpl::RTCRtcpParametersImpl(
     : rtcp_parameters_(rtcp_parameters) {}
 
 uint32_t RTCRtcpParametersImpl::ssrc() {
-  return rtcp_parameters_.ssrc.value();
+  return rtcp_parameters_.ssrc.value_or(0);
 }
 
 void RTCRtcpParametersImpl::set_ssrc(uint32_t value) {
