@@ -22,15 +22,12 @@ class DefaultKeyManagerImpl : public KeyManager {
   bool SetKey(const string participant_id,
               int index,
               vector<uint8_t> key) override {
-    if (index > webrtc::KeyManager::kMaxKeySize) {
-      return false;
-    }
+    webrtc::MutexLock lock(&mutex_);
     auto id = participant_id.std_string();
     if (keys_.find(id) == keys_.end()) {
       keys_[id] = std::vector<std::vector<uint8_t>>();
     }
 
-    webrtc::MutexLock lock(&mutex_);
     if (index + 1 > (int)keys_[id].size()) {
       keys_[id].resize(index + 1);
     }
@@ -56,13 +53,7 @@ class DefaultKeyManagerImpl : public KeyManager {
 
   const vector<vector<uint8_t>> GetKeys(
       const string participant_id) const override {
-    webrtc::MutexLock lock(&mutex_);
-    auto id = participant_id.std_string();
-    if (keys_.find(id) == keys_.end()) {
-      return vector<vector<uint8_t>>();
-    }
-
-    return keys_.find(id)->second;
+    return keys(participant_id.std_string());
   }
 
   const std::vector<std::vector<uint8_t>> keys(
