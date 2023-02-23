@@ -17,17 +17,12 @@
 #include "rtc_desktop_media_list_impl.h"
 #include "rtc_base/checks.h"
 #include "third_party/libyuv/include/libyuv.h"
+#include "internal/jpeg_util.h"
+
 #ifdef WEBRTC_WIN
 #include "modules/desktop_capture/win/window_capture_utils.h"
 #endif
-extern "C" {
-#if defined(USE_SYSTEM_LIBJPEG)
-#include <jpeglib.h>
-#else
-// Include directory supplied by gn
-#include "jpeglib.h"  // NOLINT
-#endif
-}
+
 
 #include <fstream>
 #include <iostream>
@@ -255,43 +250,11 @@ void MediaSourceImpl::SaveCaptureResult(
       RTC_LOG(LS_ERROR) << "Could not convert input frame to RGB.";
       return;
     }
-    int quality = 80;
-    unsigned char* out_buffer = NULL;
-    unsigned long out_size = 0;
-    // Invoking LIBJPEG
-    struct jpeg_compress_struct cinfo;
-    struct jpeg_error_mgr jerr;
-    JSAMPROW row_pointer[1];
-    cinfo.err = jpeg_std_error(&jerr);
-    jpeg_create_compress(&cinfo);
 
-    jpeg_mem_dest(&cinfo, &out_buffer, &out_size);
-
-    int width = input_frame.width();
-    int height = input_frame.height();
-
-    cinfo.image_width = width;
-    cinfo.image_height = height;
-    cinfo.input_components = kColorPlanes;
-    cinfo.in_color_space = JCS_EXT_BGR;
-    jpeg_set_defaults(&cinfo);
-    jpeg_set_quality(&cinfo, quality, TRUE);
-
-    jpeg_start_compress(&cinfo, TRUE);
-    int row_stride = width * kColorPlanes;
-    while (cinfo.next_scanline < cinfo.image_height) {
-      row_pointer[0] = &rgb_buf.get()[cinfo.next_scanline * row_stride];
-      jpeg_write_scanlines(&cinfo, row_pointer, 1);
-    }
-
-    jpeg_finish_compress(&cinfo);
-    jpeg_destroy_compress(&cinfo);
-
-    thumbnail_.resize(out_size);
-
-    std::copy(out_buffer, out_buffer + out_size, thumbnail_.begin());
-
-    free(out_buffer);
+    // Create a thumbnail image from the captured frame.
+    thumbnail_ = EncodeRGBToJpeg(
+        (const unsigned char*)rgb_buf.get(), input_frame.width(),
+        input_frame.height(), kColorPlanes, 75);
   }
 #ifdef WEBRTC_WIN
   __except (filterException(GetExceptionCode(), GetExceptionInformation())) {

@@ -37,7 +37,6 @@ rtc_shared_library("libwebrtc") {
     defines += [
       "LIB_WEBRTC_API_EXPORTS",
       "WEBRTC_WIN",
-      "HAVE_BOOLEAN",
     ]
   }
 
@@ -88,6 +87,8 @@ rtc_shared_library("libwebrtc") {
     "src/internal/vcm_capturer.h",
     "src/internal/video_capturer.cc",
     "src/internal/video_capturer.h",
+    "src/internal/jpeg_util.cc",
+    "src/internal/jpeg_util.h",
     "src/libwebrtc.cc",
     "src/rtc_audio_device_impl.cc",
     "src/rtc_audio_device_impl.h",
