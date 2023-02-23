@@ -41,7 +41,7 @@ int32_t AudioDeviceImpl::RecordingDeviceName(uint16_t index,
 }
 
 int32_t AudioDeviceImpl::SetPlayoutDevice(uint16_t index) {
-  worker_thread_->PostTask([this,index] {
+  worker_thread_->PostTask([this, index] {
     RTC_DCHECK_RUN_ON(worker_thread_);
     if (audio_device_module_->Playing()) {
       audio_device_module_->StopPlayout();
@@ -56,7 +56,7 @@ int32_t AudioDeviceImpl::SetPlayoutDevice(uint16_t index) {
 }
 
 int32_t AudioDeviceImpl::SetRecordingDevice(uint16_t index) {
-  worker_thread_->PostTask([this,index] {
+  worker_thread_->PostTask([this, index] {
     RTC_DCHECK_RUN_ON(worker_thread_);
     if (audio_device_module_->Recording()) {
       audio_device_module_->StopRecording();

@@ -8,6 +8,6 @@ class Helper {
  public:
   LIB_WEBRTC_API static string CreateRandomUuid();
 };
-}
+}  // namespace libwebrtc
 
 #endif  // HELPER_HXX
