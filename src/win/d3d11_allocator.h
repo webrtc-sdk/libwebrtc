@@ -69,7 +69,7 @@ namespace base {
 |b31=1|31 bits remained for pointer to extended memid|
 |b31=0|31 bits remained for surface pointer          |
 +---+---+-------------------------------------------*/
-//#pragma warning (disable:4293)
+// #pragma warning (disable:4293)
 class MFXReadWriteMid {
   static const uintptr_t bits_offset =
       std::numeric_limits<uintptr_t>::digits - 1;

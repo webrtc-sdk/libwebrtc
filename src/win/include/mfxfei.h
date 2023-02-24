@@ -68,7 +68,7 @@ MFX_DEPRECATED typedef struct {
 
   struct mfxExtFeiPreEncMVPredictorsMB {
     mfxI16Pair MV[2]; /* 0 for L0 and 1 for L1 */
-  } * MB;
+  }* MB;
 } mfxExtFeiPreEncMVPredictors;
 MFX_PACK_END()
 
@@ -95,7 +95,7 @@ MFX_DEPRECATED typedef struct {
 
   struct mfxExtFeiPreEncMVMB {
     mfxI16Pair MV[16][2];
-  } * MB;
+  }* MB;
 } mfxExtFeiPreEncMV;
 MFX_PACK_END()
 
@@ -125,7 +125,7 @@ MFX_DEPRECATED typedef struct {
     mfxU32 Variance8x8[4];
     mfxU32 PixelAverage16x16;
     mfxU32 PixelAverage8x8[4];
-  } * MB;
+  }* MB;
 } mfxExtFeiPreEncMBStat;
 MFX_PACK_END()
 
@@ -174,7 +174,7 @@ MFX_DEPRECATED typedef struct {
     mfxU32 reserved;
     mfxI16Pair MV[4][2]; /* first index is predictor number, second is 0 for L0
                             and 1 for L1 */
-  } * MB;
+  }* MB;
 } mfxExtFeiEncMVPredictors;
 MFX_PACK_END()
 
@@ -204,7 +204,7 @@ MFX_DEPRECATED typedef struct {
     mfxU32 reserved4 : 16;
     mfxU32 TargetSizeInWord : 8;
     mfxU32 MaxSizeInWord : 8;
-  } * MB;
+  }* MB;
 } mfxExtFeiEncMBCtrl;
 MFX_PACK_END()
 
@@ -233,7 +233,7 @@ MFX_DEPRECATED typedef struct {
   struct mfxExtFeiEncMVMB {
     mfxI16Pair MV[16][2]; /* first index is block (4x4 pixels) number, second is
                              0 for L0 and 1 for L1 */
-  } * MB;
+  }* MB;
 } mfxExtFeiEncMV;
 MFX_PACK_END()
 
@@ -251,7 +251,7 @@ MFX_DEPRECATED typedef struct {
     mfxU16 ColocatedMbDistortion;
     mfxU16 reserved;
     mfxU32 reserved1[2];
-  } * MB;
+  }* MB;
 } mfxExtFeiEncMBStat;
 MFX_PACK_END()
 
@@ -522,7 +522,7 @@ MFX_DEPRECATED typedef struct {
       mfxU16 reserved[2];
     } RefL0[32], RefL1[32]; /* index in mfxPAKInput::L0Surface array */
 
-  } * Slice;
+  }* Slice;
 } mfxExtFeiSliceHeader;
 MFX_PACK_END()
 

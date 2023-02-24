@@ -1800,7 +1800,7 @@ typedef struct {
     mfxU32 Bottom; /* Bottom Area's coordinate. */
 
     mfxU16 reserved2[8];
-  } * Areas; /* Array of areas. */
+  }* Areas; /* Array of areas. */
 } mfxExtEncoderIPCMArea;
 MFX_PACK_END()
 

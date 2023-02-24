@@ -12,10 +12,10 @@ extern "C" {
 namespace libwebrtc {
 
 std::vector<unsigned char> EncodeRGBToJpeg(const unsigned char* rgb_buf,
-                                     int width,
-                                     int height,
-                                     int color_planes,
-                                     int quality) {
+                                           int width,
+                                           int height,
+                                           int color_planes,
+                                           int quality) {
   std::vector<unsigned char> result;
   unsigned char* out_buffer = NULL;
   unsigned long out_size = 0;
@@ -38,7 +38,8 @@ std::vector<unsigned char> EncodeRGBToJpeg(const unsigned char* rgb_buf,
   jpeg_start_compress(&cinfo, TRUE);
   int row_stride = width * color_planes;
   while (cinfo.next_scanline < cinfo.image_height) {
-    row_pointer[0] = &((unsigned char *)rgb_buf)[cinfo.next_scanline * row_stride];
+    row_pointer[0] =
+        &((unsigned char*)rgb_buf)[cinfo.next_scanline * row_stride];
     jpeg_write_scanlines(&cinfo, row_pointer, 1);
   }
 

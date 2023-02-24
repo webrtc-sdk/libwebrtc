@@ -15,14 +15,13 @@
  */
 
 #include "rtc_desktop_media_list_impl.h"
+#include "internal/jpeg_util.h"
 #include "rtc_base/checks.h"
 #include "third_party/libyuv/include/libyuv.h"
-#include "internal/jpeg_util.h"
 
 #ifdef WEBRTC_WIN
 #include "modules/desktop_capture/win/window_capture_utils.h"
 #endif
-
 
 #include <fstream>
 #include <iostream>
@@ -252,9 +251,9 @@ void MediaSourceImpl::SaveCaptureResult(
     }
 
     // Create a thumbnail image from the captured frame.
-    thumbnail_ = EncodeRGBToJpeg(
-        (const unsigned char*)rgb_buf.get(), input_frame.width(),
-        input_frame.height(), kColorPlanes, 75);
+    thumbnail_ = EncodeRGBToJpeg((const unsigned char*)rgb_buf.get(),
+                                 input_frame.width(), input_frame.height(),
+                                 kColorPlanes, 75);
   }
 #ifdef WEBRTC_WIN
   __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
