@@ -17,8 +17,8 @@ Use the https://github.com/webrtc-sdk/webrtc.git branch m104_release to compile.
 ### Create checkout dir
 
 ```bash
-mkdir webrtc_src_m104
-cd webrtc_src_m104
+mkdir libwebrtc_build
+cd libwebrtc_build
 ```
 
 ### Create .gclient
@@ -64,11 +64,13 @@ index e60d7dd0bd..b9b6acab8b 100644
    group("default") {
      testonly = true
 -    deps = [ ":webrtc" ]
-+    deps = [ ":webrtc","//libwebrtc:libwebrtc", ]
++    deps = [ ":webrtc","//libwebrtc", ]
      if (rtc_build_examples) {
        deps += [ "examples" ]
      }
 ```
+
+## for Windows
 
 ### GN
 
