@@ -6,7 +6,7 @@ A C++ binary wrapper for webrtc, mainly used for flutter-webrtc desktop (windows
 possible supported platforms
 - [x] Windows (x86,x64)
 - [x] Linux (x86,x64)
-- [ ] Embedded Linux (armv7, arm64)
+- [x] Embedded Linux (armv7, arm64)
 
 ## Note
 
@@ -83,8 +83,22 @@ cd src
 gn gen out-debug/Windows-x64 --args="target_os=\"win\" target_cpu=\"x64\" is_component_build=false is_clang=true is_debug=true rtc_use_h264=true ffmpeg_branding=\"Chrome\" rtc_include_tests=false rtc_build_examples=false libwebrtc_desktop_capture=true" --ide=vs2019
 ```
 
-### Compile
+### Compile for windows
 
 ```bash
 ninja -C out-debug/Windows-x64 libwebrtc
 ```
+
+## for Linux
+```bash
+export ARCH=x64 # x86, x64, arm, arm64
+gn gen out/Linux-$ARCH --args="target_os=\"linux\" target_cpu=\"$ARCH\" is_debug=false rtc_include_tests=false rtc_use_h264=true ffmpeg_branding=\"Chrome\" is_component_build=false use_rtti=true use_custom_libcxx=false rtc_enable_protobuf=false"
+```
+
+### Compile for Linux
+
+```bash
+ninja -C out-debug/Windows-x64 libwebrtc
+```
+
+
