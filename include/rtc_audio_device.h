@@ -81,6 +81,14 @@ class RTCAudioDevice : public RefCountInterface {
    */
   virtual int32_t OnDeviceChange(OnDeviceChangeCallback listener) = 0;
 
+  virtual int32_t SetMicrophoneVolume(uint32_t volume) = 0;
+  
+  virtual int32_t MicrophoneVolume(uint32_t& volume) = 0;
+
+  virtual int32_t SetSpeakerVolume(uint32_t volume) = 0;
+  
+  virtual int32_t SpeakerVolume(uint32_t& volume) = 0;
+
  protected:
   virtual ~RTCAudioDevice() {}
 };
