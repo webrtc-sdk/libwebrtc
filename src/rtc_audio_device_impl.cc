@@ -70,6 +70,22 @@ int32_t AudioDeviceImpl::SetRecordingDevice(uint16_t index) {
   return 0;
 }
 
+int32_t AudioDeviceImpl::SetMicrophoneVolume(uint32_t volume) {
+   return audio_device_module_->SetMicrophoneVolume(volume);
+}
+
+int32_t AudioDeviceImpl::MicrophoneVolume(uint32_t& volume) {
+  return audio_device_module_->MicrophoneVolume(&volume);
+}
+
+int32_t AudioDeviceImpl::SetSpeakerVolume(uint32_t volume) {
+  return audio_device_module_->SetSpeakerVolume(volume);
+}
+
+int32_t AudioDeviceImpl::SpeakerVolume(uint32_t& volume) {
+  return audio_device_module_->SpeakerVolume(&volume);
+}
+
 int32_t AudioDeviceImpl::OnDeviceChange(OnDeviceChangeCallback listener) {
   listener_ = listener;
   return 0;
