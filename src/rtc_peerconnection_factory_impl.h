@@ -22,9 +22,7 @@ namespace libwebrtc {
 
 class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
  public:
-  RTCPeerConnectionFactoryImpl(rtc::Thread* worker_thread,
-                               rtc::Thread* signaling_thread,
-                               rtc::Thread* network_thread);
+  RTCPeerConnectionFactoryImpl();
 
   virtual ~RTCPeerConnectionFactoryImpl();
 
@@ -94,9 +92,9 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
       scoped_refptr<RTCMediaConstraints> constraints);
 #endif
  private:
-  rtc::Thread* worker_thread_ = nullptr;
-  rtc::Thread* signaling_thread_ = nullptr;
-  rtc::Thread* network_thread_ = nullptr;
+  std::unique_ptr<rtc::Thread> worker_thread_;
+  std::unique_ptr<rtc::Thread> signaling_thread_;
+  std::unique_ptr<rtc::Thread> network_thread_;
   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
       rtc_peerconnection_factory_;
   rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;

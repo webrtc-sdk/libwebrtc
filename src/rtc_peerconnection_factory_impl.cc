@@ -42,17 +42,22 @@ std::unique_ptr<webrtc::VideoDecoderFactory> CreateIntelVideoDecoderFactory() {
 }
 #endif
 
-RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl(
-    rtc::Thread* worker_thread,
-    rtc::Thread* signaling_thread,
-    rtc::Thread* network_thread)
-    : worker_thread_(worker_thread),
-      signaling_thread_(signaling_thread),
-      network_thread_(network_thread) {}
+RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl() {}
 
 RTCPeerConnectionFactoryImpl::~RTCPeerConnectionFactoryImpl() {}
 
 bool RTCPeerConnectionFactoryImpl::Initialize() {
+  worker_thread_ = rtc::Thread::Create();
+  worker_thread_->SetName("worker_thread", nullptr);
+  RTC_CHECK(worker_thread_->Start()) << "Failed to start thread";
+
+  signaling_thread_ = rtc::Thread::Create();
+  signaling_thread_->SetName("signaling_thread", nullptr);
+  RTC_CHECK(signaling_thread_->Start()) << "Failed to start thread";
+
+  network_thread_ = rtc::Thread::CreateWithSocketServer();
+  network_thread_->SetName("network_thread", nullptr);
+  RTC_CHECK(network_thread_->Start()) << "Failed to start thread";
   if (!audio_device_module_) {
     task_queue_factory_ = webrtc::CreateDefaultTaskQueueFactory();
     worker_thread_->Invoke<void>(RTC_FROM_HERE,
@@ -61,7 +66,7 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
 
   if (!rtc_peerconnection_factory_) {
     rtc_peerconnection_factory_ = webrtc::CreatePeerConnectionFactory(
-        network_thread_, worker_thread_, signaling_thread_,
+        network_thread_.get(), worker_thread_.get(), signaling_thread_.get(),
         audio_device_module_, webrtc::CreateBuiltinAudioEncoderFactory(),
         webrtc::CreateBuiltinAudioDecoderFactory(),
 #if defined(USE_INTEL_MEDIA_SDK)
@@ -138,7 +143,7 @@ scoped_refptr<RTCAudioDevice> RTCPeerConnectionFactoryImpl::GetAudioDevice() {
   if (!audio_device_impl_)
     audio_device_impl_ =
         scoped_refptr<AudioDeviceImpl>(new RefCountedObject<AudioDeviceImpl>(
-            audio_device_module_, worker_thread_));
+            audio_device_module_, worker_thread_.get()));
 
   return audio_device_impl_;
 }
@@ -146,8 +151,8 @@ scoped_refptr<RTCAudioDevice> RTCPeerConnectionFactoryImpl::GetAudioDevice() {
 scoped_refptr<RTCVideoDevice> RTCPeerConnectionFactoryImpl::GetVideoDevice() {
   if (!video_device_impl_)
     video_device_impl_ = scoped_refptr<RTCVideoDeviceImpl>(
-        new RefCountedObject<RTCVideoDeviceImpl>(signaling_thread_,
-                                                 worker_thread_));
+        new RefCountedObject<RTCVideoDeviceImpl>(signaling_thread_.get(),
+                                                 worker_thread_.get()));
 
   return video_device_impl_;
 }
@@ -167,7 +172,7 @@ scoped_refptr<RTCDesktopDevice>
 RTCPeerConnectionFactoryImpl::GetDesktopDevice() {
   if (!desktop_device_impl_) {
     desktop_device_impl_ = scoped_refptr<RTCDesktopDeviceImpl>(
-        new RefCountedObject<RTCDesktopDeviceImpl>(signaling_thread_));
+        new RefCountedObject<RTCDesktopDeviceImpl>(signaling_thread_.get()));
   }
   return desktop_device_impl_;
 }
@@ -177,7 +182,7 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource(
     scoped_refptr<RTCVideoCapturer> capturer,
     const string video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
-  if (rtc::Thread::Current() != signaling_thread_) {
+  if (rtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCVideoSource> source =
         signaling_thread_->Invoke<scoped_refptr<RTCVideoSource>>(
             RTC_FROM_HERE, [this, capturer, video_source_label, constraints] {
@@ -214,7 +219,7 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource(
     scoped_refptr<RTCDesktopCapturer> capturer,
     const string video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
-  if (rtc::Thread::Current() != signaling_thread_) {
+  if (rtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCVideoSource> source =
         signaling_thread_->Invoke<scoped_refptr<RTCVideoSource>>(
             RTC_FROM_HERE, [this, capturer, video_source_label, constraints] {
@@ -300,7 +305,7 @@ scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
 scoped_refptr<RTCRtpCapabilities>
 RTCPeerConnectionFactoryImpl::GetRtpSenderCapabilities(
     RTCMediaType media_type) {
-  if (rtc::Thread::Current() != signaling_thread_) {
+  if (rtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCRtpCapabilities> capabilities =
         signaling_thread_->Invoke<scoped_refptr<RTCRtpCapabilities>>(
             RTC_FROM_HERE, [this, media_type] {
@@ -329,7 +334,7 @@ RTCPeerConnectionFactoryImpl::GetRtpSenderCapabilities(
 scoped_refptr<RTCRtpCapabilities>
 RTCPeerConnectionFactoryImpl::GetRtpReceiverCapabilities(
     RTCMediaType media_type) {
-  if (rtc::Thread::Current() != signaling_thread_) {
+  if (rtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCRtpCapabilities> capabilities =
         signaling_thread_->Invoke<scoped_refptr<RTCRtpCapabilities>>(
             RTC_FROM_HERE, [this, media_type] {
