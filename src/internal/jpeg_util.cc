@@ -1,5 +1,8 @@
 #include "jpeg_util.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 extern "C" {
 #if defined(USE_SYSTEM_LIBJPEG)
 #include <jpeglib.h>
