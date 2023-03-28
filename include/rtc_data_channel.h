@@ -6,9 +6,10 @@
 namespace libwebrtc {
 
 /**
- * The RTCDataChannelState enum represents the possible states of a WebRTC data channel.
- * Data channels are used to transmit non-audio/video data over a WebRTC peer connection.
- * The possible states are: connecting, open, closing, and closed.
+ * The RTCDataChannelState enum represents the possible states of a WebRTC data
+ * channel. Data channels are used to transmit non-audio/video data over a
+ * WebRTC peer connection. The possible states are: connecting, open, closing,
+ * and closed.
  */
 enum RTCDataChannelState {
   RTCDataChannelConnecting,
@@ -18,10 +19,10 @@ enum RTCDataChannelState {
 };
 
 /**
- * The RTCDataChannelInit struct represents the configuration options for a WebRTC data channel.
- * These options include whether the channel is ordered and reliable, the maximum retransmit time
- * and number of retransmits, the protocol to use (sctp or quic), whether the channel is negotiated,
- * and the channel ID.
+ * The RTCDataChannelInit struct represents the configuration options for a
+ * WebRTC data channel. These options include whether the channel is ordered and
+ * reliable, the maximum retransmit time and number of retransmits, the protocol
+ * to use (sctp or quic), whether the channel is negotiated, and the channel ID.
  */
 struct RTCDataChannelInit {
   bool ordered = true;
@@ -34,8 +35,9 @@ struct RTCDataChannelInit {
 };
 
 /**
- * The RTCDataChannelObserver class is an interface for receiving events related to a WebRTC data channel.
- * These events include changes in the channel's state and incoming messages.
+ * The RTCDataChannelObserver class is an interface for receiving events related
+ * to a WebRTC data channel. These events include changes in the channel's state
+ * and incoming messages.
  */
 class RTCDataChannelObserver {
  public:
@@ -47,8 +49,8 @@ class RTCDataChannelObserver {
 
   /**
    * Called when a message is received on the data channel.
-   * The message buffer, its length, and a boolean indicating whether the message is binary
-   * are passed as parameters.
+   * The message buffer, its length, and a boolean indicating whether the
+   * message is binary are passed as parameters.
    */
   virtual void OnMessage(const char* buffer, int length, bool binary) = 0;
 
@@ -61,15 +63,16 @@ class RTCDataChannelObserver {
 
 /**
  * The RTCDataChannel class represents a data channel in WebRTC.
- * Data channels are used to transmit non-audio/video data over a WebRTC peer connection.
- * This class provides a base interface for data channels to implement, allowing them to be used
- * with WebRTC's data channel mechanisms.
+ * Data channels are used to transmit non-audio/video data over a WebRTC peer
+ * connection. This class provides a base interface for data channels to
+ * implement, allowing them to be used with WebRTC's data channel mechanisms.
  */
 class RTCDataChannel : public RefCountInterface {
  public:
   /**
    * Sends data over the data channel.
-   * The data buffer, its size, and a boolean indicating whether the data is binary are passed as parameters.
+   * The data buffer, its size, and a boolean indicating whether the data is
+   * binary are passed as parameters.
    */
   virtual void Send(const uint8_t* data,
                     uint32_t size,
@@ -107,7 +110,6 @@ class RTCDataChannel : public RefCountInterface {
   virtual RTCDataChannelState state() = 0;
 
  protected:
-
   virtual ~RTCDataChannel() {}
 };
 

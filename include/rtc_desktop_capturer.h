@@ -97,37 +97,37 @@ class RTCDesktopCapturer : public RefCountInterface {
 
 /**
  * @brief Observer interface for desktop capturer events.
- * 
- * This class defines the interface for an observer of the DesktopCapturer class,
- * allowing clients to be notified of events such as when capturing begins or ends, 
- * and when an error occurs.
+ *
+ * This class defines the interface for an observer of the DesktopCapturer
+ * class, allowing clients to be notified of events such as when capturing
+ * begins or ends, and when an error occurs.
  */
 class DesktopCapturerObserver {
  public:
   /**
    * @brief Called when desktop capture starts.
-   * 
+   *
    * @param capturer A reference to the capturer that started capturing.
    */
   virtual void OnStart(scoped_refptr<RTCDesktopCapturer> capturer) = 0;
-  
+
   /**
    * @brief Called when desktop capture is paused.
-   * 
+   *
    * @param capturer A reference to the capturer that paused capturing.
    */
   virtual void OnPaused(scoped_refptr<RTCDesktopCapturer> capturer) = 0;
-  
+
   /**
    * @brief Called when desktop capture stops.
-   * 
+   *
    * @param capturer A reference to the capturer that stopped capturing.
    */
   virtual void OnStop(scoped_refptr<RTCDesktopCapturer> capturer) = 0;
-  
+
   /**
    * @brief Called when an error occurs during desktop capture.
-   * 
+   *
    * @param capturer A reference to the capturer that encountered an error.
    */
   virtual void OnError(scoped_refptr<RTCDesktopCapturer> capturer) = 0;

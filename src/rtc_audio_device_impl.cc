@@ -71,7 +71,7 @@ int32_t AudioDeviceImpl::SetRecordingDevice(uint16_t index) {
 }
 
 int32_t AudioDeviceImpl::SetMicrophoneVolume(uint32_t volume) {
-   return audio_device_module_->SetMicrophoneVolume(volume);
+  return audio_device_module_->SetMicrophoneVolume(volume);
 }
 
 int32_t AudioDeviceImpl::MicrophoneVolume(uint32_t& volume) {
