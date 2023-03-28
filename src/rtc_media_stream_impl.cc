@@ -1,4 +1,4 @@
-﻿#include "rtc_media_stream_impl.h"
+#include "rtc_media_stream_impl.h"
 
 #include <algorithm>
 
