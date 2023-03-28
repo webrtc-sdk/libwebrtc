@@ -1,4 +1,4 @@
-﻿#include "rtc_audio_track_impl.h"
+#include "rtc_audio_track_impl.h"
 
 namespace libwebrtc {
 

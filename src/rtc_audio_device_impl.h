@@ -32,9 +32,9 @@ class AudioDeviceImpl : public RTCAudioDevice, public webrtc::AudioDeviceSink {
   int32_t SetPlayoutDevice(uint16_t index) override;
 
   int32_t SetRecordingDevice(uint16_t index) override;
-  
+
   int32_t SetMicrophoneVolume(uint32_t volume) override;
-  
+
   int32_t MicrophoneVolume(uint32_t& volume) override;
 
   int32_t SetSpeakerVolume(uint32_t volume) override;

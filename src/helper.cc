@@ -3,8 +3,9 @@
 
 namespace libwebrtc {
 /**
- * Generates a random UUID string using the WebRTC library function rtc::CreateRandomUuid().
- * 
+ * Generates a random UUID string using the WebRTC library function
+ * rtc::CreateRandomUuid().
+ *
  * @return A string representation of a random UUID.
  */
 string Helper::CreateRandomUuid() {
