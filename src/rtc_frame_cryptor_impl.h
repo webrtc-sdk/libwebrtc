@@ -28,8 +28,8 @@ class DefaultKeyManagerImpl : public KeyManager {
     return impl_->SetKey(participant_id.std_string(), index, key.std_vector());
   }
 
-  void RatchetKey(const string participant_id, int key_index) override {
-    impl_->RatchetKey(participant_id.std_string(), key_index);
+  vector<uint8_t> RatchetKey(const string participant_id, int key_index) override {
+    return impl_->RatchetKey(participant_id.std_string(), key_index);
   }
 
   rtc::scoped_refptr<webrtc::KeyManager> rtc_key_manager() { return impl_; }
@@ -63,8 +63,8 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor,
   int key_index() const override;
   const string participant_id() const override { return participant_id_; }
 
-  void OnFrameCryptionError(const std::string participant_id,
-                            webrtc::FrameCryptionError error) override;
+  void OnFrameCryptionStateChanged(const std::string participant_id,
+                            webrtc::FrameCryptionState error) override;
 
  private:
   string participant_id_;

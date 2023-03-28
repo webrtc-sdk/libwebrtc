@@ -106,28 +106,31 @@ void RTCFrameCryptorImpl::DeRegisterRTCFrameCryptorObserver() {
   e2ee_transformer_->SetFrameCryptorTransformerObserver(nullptr);
 }
 
-void RTCFrameCryptorImpl::OnFrameCryptionError(
+void RTCFrameCryptorImpl::OnFrameCryptionStateChanged(
     const std::string participant_id,
-    webrtc::FrameCryptionError error) {
+    webrtc::FrameCryptionState error) {
   {
     RTCFrameCryptionState state = RTCFrameCryptionState::kNew;
     switch (error) {
-      case webrtc::FrameCryptionError::kNew:
+      case webrtc::FrameCryptionState::kNew:
         state = RTCFrameCryptionState::kNew;
         break;
-      case webrtc::FrameCryptionError::kOk:
+      case webrtc::FrameCryptionState::kOk:
         state = RTCFrameCryptionState::kOk;
         break;
-      case webrtc::FrameCryptionError::kDecryptionFailed:
+      case webrtc::FrameCryptionState::kDecryptionFailed:
         state = RTCFrameCryptionState::kDecryptionFailed;
         break;
-      case webrtc::FrameCryptionError::kEncryptionFailed:
+      case webrtc::FrameCryptionState::kEncryptionFailed:
         state = RTCFrameCryptionState::kEncryptionFailed;
         break;
-      case webrtc::FrameCryptionError::kMissingKey:
+      case webrtc::FrameCryptionState::kMissingKey:
         state = RTCFrameCryptionState::kMissingKey;
         break;
-      case webrtc::FrameCryptionError::kInternalError:
+      case webrtc::FrameCryptionState::kKeyRatcheted:
+        state = RTCFrameCryptionState::kKeyRatcheted;
+        break;
+      case webrtc::FrameCryptionState::kInternalError:
         state = RTCFrameCryptionState::kInternalError;
         break;
     }
