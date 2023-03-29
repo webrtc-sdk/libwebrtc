@@ -158,7 +158,7 @@ int RTCFrameCryptorImpl::key_index() const {
   return key_index_;
 }
 
-scoped_refptr<KeyManager> KeyManager::Create(KeyProviderOptions *options) {
+scoped_refptr<KeyManager> KeyManager::Create(KeyProviderOptions* options) {
   return new RefCountedObject<DefaultKeyManagerImpl>(options);
 }
 
