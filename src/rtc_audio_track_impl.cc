@@ -14,4 +14,8 @@ AudioTrackImpl::~AudioTrackImpl() {
   RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
 }
 
+void AudioTrackImpl::SetVolume(double volume) {
+  rtc_track_->GetSource()->SetVolume(volume);
+}
+
 }  // namespace libwebrtc
