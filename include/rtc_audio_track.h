@@ -17,7 +17,7 @@ class RTCAudioTrack : public RTCMediaTrack {
   // volume in [0-10]
   virtual void SetVolume(double volume) = 0;
 
-  // audio level [0, 127]
+  // audio level [0,32767]
   virtual bool GetAudioLevel(int* level) = 0;
   
  protected:
