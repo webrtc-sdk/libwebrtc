@@ -6,9 +6,9 @@ scoped_refptr<RTCFrameCryptor> FrameCryptorFactory::frameCryptorFromRtpSender(
     const string participant_id,
     scoped_refptr<RTCRtpSender> sender,
     Algorithm algorithm,
-    scoped_refptr<KeyManager> keyManager) {
+    scoped_refptr<KeyProvider> key_provider) {
   return new RefCountedObject<RTCFrameCryptorImpl>(participant_id, algorithm,
-                                                   keyManager, sender);
+                                                   key_provider, sender);
 }
 
 /// Create a frame cyrptor from a [RTCRtpReceiver].
@@ -16,9 +16,9 @@ scoped_refptr<RTCFrameCryptor> FrameCryptorFactory::frameCryptorFromRtpReceiver(
     const string participant_id,
     scoped_refptr<RTCRtpReceiver> receiver,
     Algorithm algorithm,
-    scoped_refptr<KeyManager> keyManager) {
+    scoped_refptr<KeyProvider> key_provider) {
   return new RefCountedObject<RTCFrameCryptorImpl>(participant_id, algorithm,
-                                                   keyManager, receiver);
+                                                   key_provider, receiver);
 }
 
 webrtc::FrameCryptorTransformer::Algorithm AlgorithmToFrameCryptorAlgorithm(
@@ -35,14 +35,14 @@ webrtc::FrameCryptorTransformer::Algorithm AlgorithmToFrameCryptorAlgorithm(
 
 RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
                                          Algorithm algorithm,
-                                         scoped_refptr<KeyManager> key_manager,
+                                         scoped_refptr<KeyProvider> key_provider,
                                          scoped_refptr<RTCRtpSender> sender)
     : participant_id_(participant_id),
       enabled_(false),
       key_index_(0),
-      key_manager_(key_manager),
+      key_provider_(key_provider),
       sender_(sender) {
-  auto keyImpl = static_cast<DefaultKeyManagerImpl*>(key_manager.get());
+  auto keyImpl = static_cast<DefaultKeyProviderImpl*>(key_provider.get());
   RTCRtpSenderImpl* impl = static_cast<RTCRtpSenderImpl*>(sender.get());
   auto mediaType =
       impl->rtc_rtp_sender()->track()->kind() == "audio"
@@ -52,7 +52,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
       new webrtc::FrameCryptorTransformer(
           participant_id_.std_string(), mediaType,
           AlgorithmToFrameCryptorAlgorithm(algorithm),
-          keyImpl->rtc_key_manager()));
+          keyImpl->rtc_key_provider()));
   e2ee_transformer_->SetFrameCryptorTransformerObserver(this);
   impl->rtc_rtp_sender()->SetEncoderToPacketizerFrameTransformer(
       e2ee_transformer_);
@@ -61,14 +61,14 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
 
 RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
                                          Algorithm algorithm,
-                                         scoped_refptr<KeyManager> key_manager,
+                                         scoped_refptr<KeyProvider> key_provider,
                                          scoped_refptr<RTCRtpReceiver> receiver)
     : participant_id_(participant_id),
       enabled_(false),
       key_index_(0),
-      key_manager_(key_manager),
+      key_provider_(key_provider),
       receiver_(receiver) {
-  auto keyImpl = static_cast<DefaultKeyManagerImpl*>(key_manager.get());
+  auto keyImpl = static_cast<DefaultKeyProviderImpl*>(key_provider.get());
   RTCRtpReceiverImpl* impl = static_cast<RTCRtpReceiverImpl*>(receiver.get());
   auto mediaType =
       impl->rtp_receiver()->track()->kind() == "audio"
@@ -78,7 +78,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
       new webrtc::FrameCryptorTransformer(
           participant_id_.std_string(), mediaType,
           AlgorithmToFrameCryptorAlgorithm(algorithm),
-          keyImpl->rtc_key_manager()));
+          keyImpl->rtc_key_provider()));
   e2ee_transformer_->SetFrameCryptorTransformerObserver(this);
   impl->rtp_receiver()->SetDepacketizerToDecoderFrameTransformer(
       e2ee_transformer_);
@@ -158,8 +158,8 @@ int RTCFrameCryptorImpl::key_index() const {
   return key_index_;
 }
 
-scoped_refptr<KeyManager> KeyManager::Create(KeyProviderOptions* options) {
-  return new RefCountedObject<DefaultKeyManagerImpl>(options);
+scoped_refptr<KeyProvider> KeyProvider::Create(KeyProviderOptions* options) {
+  return new RefCountedObject<DefaultKeyProviderImpl>(options);
 }
 
 }  // namespace libwebrtc

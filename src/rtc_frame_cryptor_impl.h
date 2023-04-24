@@ -10,17 +10,17 @@
 #include "api/rtp_sender_interface.h"
 
 namespace libwebrtc {
-class DefaultKeyManagerImpl : public KeyManager {
+class DefaultKeyProviderImpl : public KeyProvider {
  public:
-  DefaultKeyManagerImpl(KeyProviderOptions* options) {
+  DefaultKeyProviderImpl(KeyProviderOptions* options) {
     webrtc::KeyProviderOptions rtc_options;
     rtc_options.shared_key = options->shared_key;
     rtc_options.ratchet_salt = options->ratchet_salt.std_vector();
     rtc_options.ratchet_window_size = options->ratchet_window_size;
     impl_ =
-        new rtc::RefCountedObject<webrtc::DefaultKeyManagerImpl>(rtc_options);
+        new rtc::RefCountedObject<webrtc::DefaultKeyProviderImpl>(rtc_options);
   }
-  ~DefaultKeyManagerImpl() {}
+  ~DefaultKeyProviderImpl() {}
   /// Set the key at the given index.
   bool SetKey(const string participant_id,
               int index,
@@ -33,10 +33,10 @@ class DefaultKeyManagerImpl : public KeyManager {
     return impl_->RatchetKey(participant_id.std_string(), key_index);
   }
 
-  rtc::scoped_refptr<webrtc::KeyManager> rtc_key_manager() { return impl_; }
+  rtc::scoped_refptr<webrtc::KeyProvider> rtc_key_provider() { return impl_; }
 
  private:
-  rtc::scoped_refptr<webrtc::DefaultKeyManagerImpl> impl_;
+  rtc::scoped_refptr<webrtc::DefaultKeyProviderImpl> impl_;
 };
 
 class RTCFrameCryptorImpl : public RTCFrameCryptor,
@@ -44,12 +44,12 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor,
  public:
   RTCFrameCryptorImpl(const string participant_id,
                       Algorithm algorithm,
-                      scoped_refptr<KeyManager> key_manager,
+                      scoped_refptr<KeyProvider> key_provider,
                       scoped_refptr<RTCRtpSender> sender);
 
   RTCFrameCryptorImpl(const string participant_id,
                       Algorithm algorithm,
-                      scoped_refptr<KeyManager> key_manager,
+                      scoped_refptr<KeyProvider> key_provider,
                       scoped_refptr<RTCRtpReceiver> receiver);
   ~RTCFrameCryptorImpl();
 
@@ -73,7 +73,7 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor,
   bool enabled_;
   int key_index_;
   rtc::scoped_refptr<webrtc::FrameCryptorTransformer> e2ee_transformer_;
-  scoped_refptr<KeyManager> key_manager_;
+  scoped_refptr<KeyProvider> key_provider_;
   scoped_refptr<RTCRtpSender> sender_;
   scoped_refptr<RTCRtpReceiver> receiver_;
   RTCFrameCryptorObserver* observer_ = nullptr;
