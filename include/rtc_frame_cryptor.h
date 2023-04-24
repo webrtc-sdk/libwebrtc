@@ -16,6 +16,7 @@ enum class Algorithm {
 struct KeyProviderOptions {
   bool shared_key;
   vector<uint8_t> ratchet_salt;
+  vector<uint8_t> uncrypted_magic_bytes;
   int ratchet_window_size;
   KeyProviderOptions()
       : shared_key(false),
