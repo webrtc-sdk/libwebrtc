@@ -120,6 +120,10 @@ class RTCRtpParametersImpl : public RTCRtpParameters {
   virtual bool operator==(scoped_refptr<RTCRtpParameters> o) const override;
   virtual bool operator!=(scoped_refptr<RTCRtpParameters> o) const override;
 
+  virtual RTCDegradationPreference GetDegradationPreference() override;
+  virtual void SetDegradationPreference(
+      RTCDegradationPreference value) override;
+
   webrtc::RtpParameters rtp_parameters();
 
  private:

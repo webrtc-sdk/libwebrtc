@@ -21,6 +21,8 @@ class AudioTrackImpl : public RTCAudioTrack {
 
   virtual ~AudioTrackImpl();
 
+  virtual void SetVolume(double volume) override;
+
   virtual const string kind() const override { return kind_; }
 
   virtual const string id() const override { return id_; }
