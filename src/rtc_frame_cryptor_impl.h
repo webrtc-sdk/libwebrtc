@@ -16,6 +16,8 @@ class DefaultKeyProviderImpl : public KeyProvider {
     webrtc::KeyProviderOptions rtc_options;
     rtc_options.shared_key = options->shared_key;
     rtc_options.ratchet_salt = options->ratchet_salt.std_vector();
+    rtc_options.uncrypted_magic_bytes =
+        options->uncrypted_magic_bytes.std_vector();
     rtc_options.ratchet_window_size = options->ratchet_window_size;
     impl_ =
         new rtc::RefCountedObject<webrtc::DefaultKeyProviderImpl>(rtc_options);
