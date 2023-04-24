@@ -35,6 +35,12 @@ class DefaultKeyProviderImpl : public KeyProvider {
     return impl_->RatchetKey(participant_id.std_string(), key_index);
   }
 
+
+  vector<uint8_t> ExportKey(const string participant_id,
+                                     int key_index)override {
+    return impl_->ExportKey(participant_id.std_string(), key_index);
+  }
+
   rtc::scoped_refptr<webrtc::KeyProvider> rtc_key_provider() { return impl_; }
 
  private:
