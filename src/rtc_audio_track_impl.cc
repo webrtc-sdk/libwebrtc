@@ -18,4 +18,8 @@ void AudioTrackImpl::SetVolume(double volume) {
   rtc_track_->GetSource()->SetVolume(volume);
 }
 
+bool AudioTrackImpl::GetAudioLevel(int* level) {
+  return rtc_track_->GetSource()->GetSignalLevel(level);
+}
+
 }  // namespace libwebrtc
