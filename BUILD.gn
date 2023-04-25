@@ -63,6 +63,7 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_data_channel.h",
     "include/rtc_dtls_transport.h",
     "include/rtc_dtmf_sender.h",
+    "include/rtc_frame_cryptor.h",
     "include/rtc_ice_candidate.h",
     "include/rtc_media_stream.h",
     "include/rtc_media_track.h",
@@ -101,6 +102,8 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_dtls_transport_impl.h",
     "src/rtc_dtmf_sender_impl.cc",
     "src/rtc_dtmf_sender_impl.h",
+    "src/rtc_frame_cryptor_impl.cc",
+    "src/rtc_frame_cryptor_impl.h",
     "src/rtc_ice_candidate_impl.cc",
     "src/rtc_ice_candidate_impl.h",
     "src/rtc_media_stream_impl.cc",
@@ -199,6 +202,7 @@ rtc_shared_library("libwebrtc") {
     "../api:libjingle_peerconnection_api",
     "../api/audio_codecs:builtin_audio_decoder_factory",
     "../api/audio_codecs:builtin_audio_encoder_factory",
+    "../api/crypto:frame_crypto_transformer",
     "../api/video:video_frame",
     "../api/video_codecs:builtin_video_decoder_factory",
     "../api/video_codecs:builtin_video_encoder_factory",
@@ -214,6 +218,7 @@ rtc_shared_library("libwebrtc") {
     "../rtc_base:rtc_base",
     "../sdk:media_constraints",
     "//third_party/abseil-cpp/absl/memory",
+    "//third_party/boringssl:boringssl",
     "//third_party/libyuv",
   ]
 
