@@ -114,7 +114,7 @@ void RTCRtpCodecCapabilityImpl::set_clock_rate(int clock_rate) {
 }
 
 int RTCRtpCodecCapabilityImpl::channels() const {
-  return rtp_codec_capability_.num_channels.value_or(1);
+  return rtp_codec_capability_.num_channels.value_or(-1);
 }
 
 void RTCRtpCodecCapabilityImpl::set_channels(int channels) {
