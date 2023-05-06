@@ -52,7 +52,7 @@ scoped_refptr<RTCVideoCapturer> RTCVideoDeviceImpl::Create(const char* name,
   return signaling_thread_->Invoke<scoped_refptr<RTCVideoCapturerImpl>>(
       RTC_FROM_HERE, [vcm] {
         return scoped_refptr<RTCVideoCapturerImpl>(
-            new RefCountedObject<RTCVideoCapturerImpl>(absl::WrapUnique(vcm)));
+            new RefCountedObject<RTCVideoCapturerImpl>(vcm));
       });
 }
 

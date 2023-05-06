@@ -30,6 +30,12 @@ class VideoCapturer : public rtc::VideoSourceInterface<VideoFrame> {
   VideoCapturer();
   virtual ~VideoCapturer();
 
+  virtual bool StartCapture() { return false; }
+
+  virtual bool CaptureStarted() { return false; }
+
+  virtual void StopCapture() {}
+
   void AddOrUpdateSink(rtc::VideoSinkInterface<VideoFrame>* sink,
                        const rtc::VideoSinkWants& wants) override;
   void RemoveSink(rtc::VideoSinkInterface<VideoFrame>* sink) override;
