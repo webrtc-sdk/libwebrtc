@@ -4,6 +4,8 @@
 #include <src/rtc_rtp_receiver_impl.h>
 #include <src/rtc_rtp_sender_impl.h>
 
+#include <sstream>
+
 namespace libwebrtc {
 
 LIB_WEBRTC_API scoped_refptr<RTCRtpTransceiverInit>
@@ -158,6 +160,12 @@ void RTCRtpTransceiverImpl::SetCodecPreferences(
     list.push_back(impl->rtp_codec_capability());
   }
   rtp_transceiver_->SetCodecPreferences(list);
+}
+
+const string RTCRtpTransceiverImpl::transceiver_id() const {
+  std::stringstream ss;
+  ss << "transceiver_" << rtp_transceiver_.get();
+  return ss.str();
 }
 
 }  // namespace libwebrtc
