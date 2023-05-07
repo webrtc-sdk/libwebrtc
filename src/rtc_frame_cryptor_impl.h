@@ -35,9 +35,8 @@ class DefaultKeyProviderImpl : public KeyProvider {
     return impl_->RatchetKey(participant_id.std_string(), key_index);
   }
 
-
   vector<uint8_t> ExportKey(const string participant_id,
-                                     int key_index)override {
+                            int key_index) override {
     return impl_->ExportKey(participant_id.std_string(), key_index);
   }
 

@@ -33,10 +33,11 @@ webrtc::FrameCryptorTransformer::Algorithm AlgorithmToFrameCryptorAlgorithm(
   }
 }
 
-RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
-                                         Algorithm algorithm,
-                                         scoped_refptr<KeyProvider> key_provider,
-                                         scoped_refptr<RTCRtpSender> sender)
+RTCFrameCryptorImpl::RTCFrameCryptorImpl(
+    const string participant_id,
+    Algorithm algorithm,
+    scoped_refptr<KeyProvider> key_provider,
+    scoped_refptr<RTCRtpSender> sender)
     : participant_id_(participant_id),
       enabled_(false),
       key_index_(0),
@@ -59,10 +60,11 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
   e2ee_transformer_->SetEnabled(false);
 }
 
-RTCFrameCryptorImpl::RTCFrameCryptorImpl(const string participant_id,
-                                         Algorithm algorithm,
-                                         scoped_refptr<KeyProvider> key_provider,
-                                         scoped_refptr<RTCRtpReceiver> receiver)
+RTCFrameCryptorImpl::RTCFrameCryptorImpl(
+    const string participant_id,
+    Algorithm algorithm,
+    scoped_refptr<KeyProvider> key_provider,
+    scoped_refptr<RTCRtpReceiver> receiver)
     : participant_id_(participant_id),
       enabled_(false),
       key_index_(0),

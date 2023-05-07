@@ -15,14 +15,27 @@ namespace libwebrtc {
 class RTCVideoCapturerImpl : public RTCVideoCapturer {
  public:
   RTCVideoCapturerImpl(
-      std::unique_ptr<webrtc::internal::VideoCapturer> video_capturer)
-      : video_capturer_(std::move(video_capturer)) {}
-  std::unique_ptr<webrtc::internal::VideoCapturer> video_capturer() {
-    return std::move(video_capturer_);
+      std::shared_ptr<webrtc::internal::VideoCapturer> video_capturer)
+      : video_capturer_(video_capturer) {}
+  std::shared_ptr<webrtc::internal::VideoCapturer> video_capturer() {
+    return video_capturer_;
+  }
+
+  bool StartCapture() override {
+    return video_capturer_ != nullptr && video_capturer_->StartCapture();
+  }
+
+  bool CaptureStarted() override {
+    return video_capturer_ != nullptr && video_capturer_->CaptureStarted();
+  }
+
+  void StopCapture() override {
+    if (video_capturer_ != nullptr)
+      video_capturer_->StopCapture();
   }
 
  private:
-  std::unique_ptr<webrtc::internal::VideoCapturer> video_capturer_;
+  std::shared_ptr<webrtc::internal::VideoCapturer> video_capturer_;
 };
 
 class RTCVideoDeviceImpl : public RTCVideoDevice {

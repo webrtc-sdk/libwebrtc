@@ -24,17 +24,24 @@ namespace internal {
 class VcmCapturer : public VideoCapturer,
                     public rtc::VideoSinkInterface<VideoFrame> {
  public:
-  static VcmCapturer* Create(rtc::Thread* worker_thread,
-                             size_t width,
-                             size_t height,
-                             size_t target_fps,
-                             size_t capture_device_index);
+  static std::shared_ptr<VcmCapturer> Create(rtc::Thread* worker_thread,
+                                             size_t width,
+                                             size_t height,
+                                             size_t target_fps,
+                                             size_t capture_device_index);
+  VcmCapturer(rtc::Thread* worker_thread);
+
   virtual ~VcmCapturer();
+
+  bool StartCapture() override;
+
+  bool CaptureStarted() override;
+
+  void StopCapture() override;
 
   void OnFrame(const VideoFrame& frame) override;
 
  private:
-  VcmCapturer(rtc::Thread* worker_thread);
   bool Init(size_t width,
             size_t height,
             size_t target_fps,
@@ -52,14 +59,14 @@ class CapturerTrackSource : public webrtc::VideoTrackSource {
       rtc::Thread* worker_thread);
 
  public:
-  explicit CapturerTrackSource(std::unique_ptr<VideoCapturer> capturer)
-      : VideoTrackSource(/*remote=*/false), capturer_(std::move(capturer)) {}
+  explicit CapturerTrackSource(std::shared_ptr<VideoCapturer> capturer)
+      : VideoTrackSource(/*remote=*/false), capturer_(capturer) {}
 
  private:
   rtc::VideoSourceInterface<webrtc::VideoFrame>* source() override {
     return capturer_.get();
   }
-  std::unique_ptr<VideoCapturer> capturer_;
+  std::shared_ptr<VideoCapturer> capturer_;
 };
 }  // namespace internal
 }  // namespace webrtc
