@@ -405,6 +405,15 @@ bool RTCPeerConnectionImpl::Initialize() {
 
   offer_answer_options_.use_rtp_mux = configuration_.use_rtp_mux;
 
+  config.disable_ipv6 = configuration_.disable_ipv6;
+  config.disable_ipv6_on_wifi = configuration_.disable_ipv6_on_wifi;
+  config.disable_link_local_networks =
+      configuration_.disable_link_local_networks;
+  config.max_ipv6_networks = configuration_.max_ipv6_networks;
+
+  if (configuration_.screencast_min_bitrate > 0)
+    config.screencast_min_bitrate = configuration_.screencast_min_bitrate;
+
   RTCMediaConstraintsImpl* media_constraints =
       static_cast<RTCMediaConstraintsImpl*>(constraints_.get());
   webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),
