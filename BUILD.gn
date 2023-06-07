@@ -12,6 +12,17 @@ if (is_android) {
   import("//build/config/mac/rules.gni")
 } else if (is_ios) {
   import("//build/config/ios/rules.gni")
+} else if (is_linux) {
+  import("//build/config/linux/pkg_config.gni")
+}
+
+if (is_linux) {
+  pkg_config("gio") {
+    packages = [
+      "gio-2.0",
+      "gio-unix-2.0",
+    ]
+  }
 }
 
 config("external_config") {
@@ -242,7 +253,14 @@ rtc_shared_library("libwebrtc") {
     ]
     deps += [
       "../modules/desktop_capture",
-      "//third_party/libjpeg_turbo:libjpeg",
     ]
+    if (is_linux) {
+      configs += [ ":gio" ]
+    }
+    if(is_mac || is_win || is_linux) {
+      deps += [
+        "//third_party/libjpeg_turbo:libjpeg",
+      ]
+    }
   }
 }
