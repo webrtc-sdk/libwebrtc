@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "api/data_channel_interface.h"
-#include "base/callback_forward.h"
 #include "pc/media_session.h"
 #include "rtc_base/logging.h"
 #include "rtc_data_channel_impl.h"
@@ -405,7 +404,7 @@ bool RTCPeerConnectionImpl::Initialize() {
 
   offer_answer_options_.use_rtp_mux = configuration_.use_rtp_mux;
 
-  config.disable_ipv6 = configuration_.disable_ipv6;
+  //config.disable_ipv6 = configuration_.disable_ipv6;
   config.disable_ipv6_on_wifi = configuration_.disable_ipv6_on_wifi;
   config.disable_link_local_networks =
       configuration_.disable_link_local_networks;
@@ -918,7 +917,7 @@ const string MediaRTCStatsImpl::type() {
 }
 
 int64_t MediaRTCStatsImpl::timestamp_us() {
-  return stats_->timestamp_us();
+  return stats_->timestamp().us();
 }
 
 const string MediaRTCStatsImpl::ToJson() {

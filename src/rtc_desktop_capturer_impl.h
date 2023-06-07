@@ -34,7 +34,6 @@ namespace libwebrtc {
 
 class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
                                public webrtc::DesktopCapturer::Callback,
-                               public rtc::MessageHandler,
                                public webrtc::internal::VideoCapturer {
  public:
   RTCDesktopCapturerImpl(DesktopType type,
@@ -67,7 +66,6 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   virtual void OnCaptureResult(
       webrtc::DesktopCapturer::Result result,
       std::unique_ptr<webrtc::DesktopFrame> frame) override;
-  virtual void OnMessage(rtc::Message* msg) override;
 
  private:
   void CaptureFrame();

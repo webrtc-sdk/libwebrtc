@@ -3,8 +3,6 @@
 
 #include "api/media_stream_interface.h"
 #include "api/peer_connection_interface.h"
-#include "api/stats_types.h"
-
 #include "rtc_media_stream.h"
 #include "rtc_peerconnection.h"
 

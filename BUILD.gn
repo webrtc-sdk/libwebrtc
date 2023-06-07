@@ -215,7 +215,7 @@ rtc_shared_library("libwebrtc") {
     "../modules/audio_processing:audio_processing",
     "../modules/video_capture:video_capture_module",
     "../pc:libjingle_peerconnection",
-    "../rtc_base:rtc_base",
+    "../rtc_base:threading",
     "../sdk:media_constraints",
     "//third_party/abseil-cpp/absl/memory",
     "//third_party/boringssl:boringssl",
