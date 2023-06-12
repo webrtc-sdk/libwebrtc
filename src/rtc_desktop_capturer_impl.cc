@@ -61,10 +61,8 @@ RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
 }
 
 RTCDesktopCapturerImpl::~RTCDesktopCapturerImpl() {
-  thread_->BlockingCall([this] {
-    capturer_.reset();
-  });
   thread_->Stop();
+  capturer_.reset();
 }
 
 RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(uint32_t fps,
