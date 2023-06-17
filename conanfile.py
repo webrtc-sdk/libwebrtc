@@ -10,16 +10,26 @@ class LibWebRTCConan(ConanFile):
     description = "WebRTC C++ wrapper A C++ binary wrapper for webrtc, mainly used for flutter-webrtc desktop (windows, linux, embedded) version release."
     homepage = "https://github.com/webrtc-sdk/libwebrtc"
     license = 'Apache License 2.0'
+    topics = ("webrtc")
 
     settings = 'os', 'build_type', 'arch'
+    options = {
+        "use_h264": [True, False],
+    }
+
+    default_options = {
+        "use_h264": True,
+    }
+    
     generators = [ "CMakeDeps" ]
 
     depot_tools_repository = 'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
-    depot_tools_release = 'a104c01252f54997e672490e7ab6cb7e15295a98'
+    depot_tools_release = '1b72044e33798aa3c5144d609dab8ff65dac0247'
     depot_tools_dir = 'depot_tools'
     
     webrtc_release = 'm104'
     webrtc_dir = 'src'
+
 
     def source(self):
         self.run(f'git clone {self.depot_tools_repository} {self.depot_tools_dir}')
@@ -55,7 +65,7 @@ class LibWebRTCConan(ConanFile):
 
 
     def _set_depot_tools_environment_variables(self):
-        depot_tools_path = os.path.join(os.path.sep, self.source_path, self.depot_tools_dir)
+        depot_tools_path = os.path.join(os.path.sep, self.build_folder, self.depot_tools_dir)
         os.environ['PATH'] += os.pathsep + depot_tools_path
         os.environ['DEPOT_TOOLS_WIN_TOOLCHAIN'] = '0'
         os.environ['DEPOT_TOOLS_UPDATE'] = '0'
@@ -80,8 +90,6 @@ solutions = [
 
 
     def _setup_linux_dependencies(self):
-        print('-- Setting up WebRTC for Linux')
-
         self.run('sed -i "s/} snapcraft/} /gi" build/install-build-deps.sh')
         self.run('build/install-build-deps.sh --no-prompt')
 
@@ -126,7 +134,7 @@ solutions = [
         else:
             raise 'Unsupported Operating System'
         
-        if self.setting.build_type == 'Debug':
+        if self.settings.build_type == 'Debug':
             args.append('is_debug=true')
         else:
             args.append('is_debug=false')
@@ -141,14 +149,17 @@ solutions = [
         else:
             args.append('libwebrtc_desktop_capture=false')
 
+        if self.options.use_h264:
+            args.append('rtc_use_h264=true')
+            args.append('ffmpeg_branding=\\\"Chrome\\\"')
+        
         args.append('is_component_build=false')
-        args.append('rtc_use_h264=true')
-        args.append('ffmpeg_branding=\\\"Chrome\\\"')
         args.append('rtc_include_tests=false')
         args.append('rtc_build_examples=false')
 
         return " ".join(args)
     
+
     def _build_webrtc(self):
         with chdir(self, 'src'):
             gn_args = self._gn_args()
@@ -157,6 +168,10 @@ solutions = [
             self.run("ninja -C out")
 
             self.run("ninja -C out libwebrtc")
+
+
+    def generate(self):
+        pass
 
 
     def build(self):
