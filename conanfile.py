@@ -1,13 +1,16 @@
 import fileinput
 from conan import ConanFile
-from conan.tools.files import chdir, mkdir, save, load
-import pathlib
+from conan.tools.files import chdir, copy
 import os
 
 
 class LibWebRTCConan(ConanFile):
     name = 'libwebrtc'
     version = '0.0.1'
+    description = "WebRTC C++ wrapper A C++ binary wrapper for webrtc, mainly used for flutter-webrtc desktop (windows, linux, embedded) version release."
+    homepage = "https://github.com/webrtc-sdk/libwebrtc"
+    license = 'Apache License 2.0'
+
     settings = 'os', 'build_type', 'arch'
     generators = [ "CMakeDeps" ]
 
@@ -16,41 +19,49 @@ class LibWebRTCConan(ConanFile):
     depot_tools_dir = 'depot_tools'
     
     webrtc_release = 'm104'
-    webrtc_dir = 'webrtc'
+    webrtc_dir = 'src'
+
+    def source(self):
+        self.run(f'git clone {self.depot_tools_repository} {self.depot_tools_dir}')
 
 
-    def setup_depot_tools(self):
-        try:
-            with chdir(self, self.depot_tools_dir):
-                print('-- Depot tools directory already exists')
-        except:
-            print('-- Setting up depot tools')
-
-            self.run(f'git clone {self.depot_tools_repository} {self.depot_tools_dir}')
-
-            # gclient has to be called twice, on windows if it's called once, 
-            # after a switch to specified branch there are issue with python paths
-            with chdir(self, self.depot_tools_dir):
-                os.environ['DEPOT_TOOLS_WIN_TOOLCHAIN'] = '0'
-
-                self.run('gclient')
-
-                self.run(f'git checkout {self.depot_tools_release}')
-
-                os.environ['DEPOT_TOOLS_UPDATE'] = '0'
-
-                self.run('gclient')
+    def export_sources(self):
+        destination_path = os.path.join(os.path.sep, self.export_sources_path, self.webrtc_dir, self.name)
+        
+        copy(self, "BUILD.gn", self.recipe_folder, destination_path)
+        
+        headers = os.path.join(os.path.sep, self.recipe_folder, "include")
+        headers_destination = os.path.join(destination_path, "include")
+        copy(self, "*", headers, headers_destination)
+        
+        sources = os.path.join(os.path.sep, self.recipe_folder, "src")
+        sources_destination = os.path.join(destination_path, "src")
+        copy(self, "*", sources, sources_destination)
 
 
-    def set_depot_tools_environment_variables(self):
-        current_path = pathlib.Path(__file__).parent.resolve()
-        depot_tools_path = os.path.join(os.path.sep, str(current_path), 'build','externals', self.depot_tools_dir)
+    def _setup_depot_tools(self):
+        # gclient has to be called twice, on windows if it's called once, 
+        # after a switch to specified branch there are issue with python paths
+        with chdir(self, self.depot_tools_dir):
+            os.environ['DEPOT_TOOLS_WIN_TOOLCHAIN'] = '0'
+
+            self.run('gclient')
+
+            self.run(f'git checkout {self.depot_tools_release}')
+
+            os.environ['DEPOT_TOOLS_UPDATE'] = '0'
+
+            self.run('gclient')
+
+
+    def _set_depot_tools_environment_variables(self):
+        depot_tools_path = os.path.join(os.path.sep, self.source_path, self.depot_tools_dir)
         os.environ['PATH'] += os.pathsep + depot_tools_path
         os.environ['DEPOT_TOOLS_WIN_TOOLCHAIN'] = '0'
         os.environ['DEPOT_TOOLS_UPDATE'] = '0'
 
 
-    def create_gclient_configuration(self):
+    def _create_gclient_configuration(self):
         gclientFileContent = """\
 solutions = [
   {{
@@ -68,31 +79,9 @@ solutions = [
             file.writelines(gclientFileContent)
 
 
-    def setup_webrtc(self):
-        try:
-           with chdir(self, self.webrtc_dir):
-               return
-        except:
-           print('-- Setting up WebRTC')
+    def _setup_linux_dependencies(self):
+        print('-- Setting up WebRTC for Linux')
 
-        self.create_gclient_configuration()
-        
-        self.run('gclient sync')
-
-
-    def source(self):
-        mkdir(self, "build")
-        with chdir(self, 'build'):
-            mkdir(self, "externals")
-            with chdir(self, 'externals'):
-                self.setup_depot_tools()
-
-                self.set_depot_tools_environment_variables()
-
-                self.setup_webrtc()
-
-
-    def setup_webrtc_on_linux(self):
         self.run('sed -i "s/} snapcraft/} /gi" build/install-build-deps.sh')
         self.run('build/install-build-deps.sh --no-prompt')
 
@@ -104,55 +93,65 @@ solutions = [
             raise 'Unsupported Linux distribution'
 
 
-    def configure_webrtc(self):
-        try:
-            load(self, 'webrtc_configuration_lock')
-            return
-        except:
-           print('-- Configure WebRTC')
+    def _setup_webrtc(self):
+        self._create_gclient_configuration()
+        
+        self.run('gclient sync')
 
-        with chdir(self, self.webrtc_dir):
+        with chdir(self, 'src'):
             if self.settings.os == 'Linux':
-                self.setup_webrtc_on_linux()
+                self._setup_linux_dependencies()
 
             with fileinput.FileInput('BUILD.gn', inplace=True) as file:
                 for line in file:
-                    print(line.replace("deps = [ \":webrtc\" ]", "deps = [ \":webrtc\", \"../../../libwebrtc\" ]"), end='')
-
-        save(self, 'webrtc_configuration_lock', '')
+                    print(line.replace("deps = [ \":webrtc\" ]", "deps = [ \":webrtc\", \"//libwebrtc\" ]"), end='')
 
 
-    def gn_args(self):
+    def _gn_args(self):
         args = []
 
-        args.append('is_clang=true')
-        args.append('is_debug=false')
-        args.append('rtc_include_tests=false')
-        args.append('is_component_build=false')
-        args.append('rtc_use_h264=true')
-        args.append('ffmpeg_branding=\"Chrome\"')
-
         if self.settings.os == 'Windows':
-            args.append('target_os=\"win\"')
-            args.append('libwebrtc_desktop_capture=true')
-
-        if self.settings.os == 'Linux':
-            args.append('target_os=\"linux\"')
+            args.append('target_os=\\\"win\\\"')
+        elif self.settings.os == 'Linux':
+            args.append('target_os=\\\"linux\\\"')
 
             if self.settings.arch == 'x86_64':
-                args.append('target_cpu=\"x64\"')
+                args.append('target_cpu=\\\"x64\\\"')
+            elif self.settings.arch == 'x86':
+                args.append('target_cpu=\\\"x86\\\"')
             elif self.settings.arch == 'armv8':
-                args.append('target_cpu=\"arm64\"')
+                args.append('target_cpu=\\\"arm64\\\"')
             else:
-                raise 'Unsupported Linux distribution'
+                raise 'Unsupported Linux Architecture'
+        else:
+            raise 'Unsupported Operating System'
+        
+        if self.setting.build_type == 'Debug':
+            args.append('is_debug=true')
+        else:
+            args.append('is_debug=false')
+
+        if self.settings.os == 'Windows':
+            args.append('is_clang=true')
+        else:
+            args.append('is_clang=false')
+
+        if self.settings.os == 'Windows':
+            args.append('libwebrtc_desktop_capture=true')
+        else:
+            args.append('libwebrtc_desktop_capture=false')
+
+        args.append('is_component_build=false')
+        args.append('rtc_use_h264=true')
+        args.append('ffmpeg_branding=\\\"Chrome\\\"')
+        args.append('rtc_include_tests=false')
+        args.append('rtc_build_examples=false')
 
         return " ".join(args)
-
-
-    def build_webrtc(self):
+    
+    def _build_webrtc(self):
         with chdir(self, 'src'):
-            gn_args = self.gn_args()
-
+            gn_args = self._gn_args()
             self.run(f'gn gen out --args="{gn_args}"')
 
             self.run("ninja -C out")
@@ -161,9 +160,27 @@ solutions = [
 
 
     def build(self):
-        with chdir(self, 'externals'):
-            self.set_depot_tools_environment_variables()
+        self._setup_depot_tools()
 
-            self.configure_webrtc()
+        self._set_depot_tools_environment_variables()
 
-            self.build_webrtc()
+        self._setup_webrtc()
+
+        self._build_webrtc()
+
+
+    def package(self):
+        copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
+        
+        copy(self, "*.h", src=os.path.join(self.source_folder, "include"), dst=os.path.join(self.package_folder, "include"))
+        copy(self, "*.h", src=os.path.join(self.source_folder, "include", "base"), dst=os.path.join(self.package_folder, "include", "base"))
+
+        copy(self, "libwebrtc.dll", src=os.path.join(self.build_folder, "out"), dst=os.path.join(self.package_folder, "lib"))
+        copy(self, "libwebrtc.so", src=os.path.join(self.build_folder, "out"), dst=os.path.join(self.package_folder, "lib"))
+
+
+    def package_info(self):
+        self.cpp_info.includedirs = ["include"]
+        
+        self.cpp_info.libdirs = ["lib"]
+        self.cpp_info.libs = ["libwebrtc"]
