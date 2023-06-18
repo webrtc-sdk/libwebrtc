@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import fileinput
 from conan import ConanFile
 from conan.tools.files import chdir, copy
@@ -38,6 +40,7 @@ class LibWebRTCConan(ConanFile):
     def export_sources(self):
         destination_path = os.path.join(os.path.sep, self.export_sources_path, self.webrtc_dir, self.name)
         
+        copy(self, "LICENSE", self.recipe_folder, destination_path)
         copy(self, "BUILD.gn", self.recipe_folder, destination_path)
         
         headers = os.path.join(os.path.sep, self.recipe_folder, "include")
@@ -104,7 +107,7 @@ solutions = [
     def _setup_webrtc(self):
         self._create_gclient_configuration()
         
-        self.run('gclient sync')
+        self.run('gclient sync --jobs 16')
 
         with chdir(self, 'src'):
             if self.settings.os == 'Linux':
@@ -185,13 +188,15 @@ solutions = [
 
 
     def package(self):
-        copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
+        sources_folder = os.path.join(self.build_folder, 'src', 'libwebrtc')
+        copy(self, pattern="LICENSE", src=sources_folder, dst=os.path.join(self.package_folder, "licenses"))
         
-        copy(self, "*.h", src=os.path.join(self.source_folder, "include"), dst=os.path.join(self.package_folder, "include"))
-        copy(self, "*.h", src=os.path.join(self.source_folder, "include", "base"), dst=os.path.join(self.package_folder, "include", "base"))
+        copy(self, '*.h', src=os.path.join(sources_folder, 'include'), dst=os.path.join(self.package_folder, 'include'))
+        copy(self, '*.h', src=os.path.join(sources_folder, 'include', 'base'), dst=os.path.join(self.package_folder, 'include', 'base'))
 
-        copy(self, "libwebrtc.dll", src=os.path.join(self.build_folder, "out"), dst=os.path.join(self.package_folder, "lib"))
-        copy(self, "libwebrtc.so", src=os.path.join(self.build_folder, "out"), dst=os.path.join(self.package_folder, "lib"))
+        copy(self, 'libwebrtc.dll.lib', src=os.path.join(self.build_folder, 'src', 'out'), dst=os.path.join(self.package_folder, 'lib'), keep_path=False)
+        copy(self, 'libwebrtc.dll', src=os.path.join(self.build_folder, 'src', 'out'), dst=os.path.join(self.package_folder, 'bin'), keep_path=False)
+        copy(self, 'libwebrtc.so', src=os.path.join(self.build_folder, 'src', 'out'), dst=os.path.join(self.package_folder, 'lib'), keep_path=False)
 
 
     def package_info(self):
@@ -199,3 +204,4 @@ solutions = [
         
         self.cpp_info.libdirs = ["lib"]
         self.cpp_info.libs = ["libwebrtc"]
+        self.cpp_info.libs = ["libwebrtc.dll"]
