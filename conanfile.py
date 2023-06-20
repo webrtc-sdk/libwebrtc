@@ -56,8 +56,6 @@ class LibWebRTCConan(ConanFile):
         # gclient has to be called twice, on windows if it's called once, 
         # after a switch to specified branch there are issue with python paths
         with chdir(self, self.depot_tools_dir):
-            os.environ['DEPOT_TOOLS_WIN_TOOLCHAIN'] = '0'
-
             self.run('gclient')
 
             self.run(f'git checkout {self.depot_tools_release}')
@@ -71,7 +69,6 @@ class LibWebRTCConan(ConanFile):
         depot_tools_path = os.path.join(os.path.sep, self.build_folder, self.depot_tools_dir)
         os.environ['PATH'] += os.pathsep + depot_tools_path
         os.environ['DEPOT_TOOLS_WIN_TOOLCHAIN'] = '0'
-        os.environ['DEPOT_TOOLS_UPDATE'] = '0'
 
 
     def _create_gclient_configuration(self):
@@ -144,13 +141,9 @@ solutions = [
 
         if self.settings.os == 'Windows':
             args.append('is_clang=true')
-        else:
-            args.append('is_clang=false')
-
-        if self.settings.os == 'Windows':
             args.append('libwebrtc_desktop_capture=true')
         else:
-            args.append('libwebrtc_desktop_capture=false')
+            args.append('use_custom_libcxx=false')
 
         if self.options.use_h264:
             args.append('rtc_use_h264=true')
@@ -178,9 +171,9 @@ solutions = [
 
 
     def build(self):
-        self._setup_depot_tools()
-
         self._set_depot_tools_environment_variables()
+
+        self._setup_depot_tools()
 
         self._setup_webrtc()
 
@@ -195,7 +188,7 @@ solutions = [
         copy(self, '*.h', src=os.path.join(sources_folder, 'include', 'base'), dst=os.path.join(self.package_folder, 'include', 'base'))
 
         copy(self, 'libwebrtc.dll.lib', src=os.path.join(self.build_folder, 'src', 'out'), dst=os.path.join(self.package_folder, 'lib'), keep_path=False)
-        copy(self, 'libwebrtc.dll', src=os.path.join(self.build_folder, 'src', 'out'), dst=os.path.join(self.package_folder, 'bin'), keep_path=False)
+        copy(self, 'libwebrtc.dll', src=os.path.join(self.build_folder, 'src', 'out'), dst=os.path.join(self.package_folder, 'lib'), keep_path=False)
         copy(self, 'libwebrtc.so', src=os.path.join(self.build_folder, 'src', 'out'), dst=os.path.join(self.package_folder, 'lib'), keep_path=False)
 
 
@@ -203,5 +196,7 @@ solutions = [
         self.cpp_info.includedirs = ["include"]
         
         self.cpp_info.libdirs = ["lib"]
-        self.cpp_info.libs = ["libwebrtc"]
-        self.cpp_info.libs = ["libwebrtc.dll"]
+        if self.settings.os == 'Windows':
+            self.cpp_info.libs = ["libwebrtc.dll"]
+        else:
+            self.cpp_info.libs = ["libwebrtc.so"]
