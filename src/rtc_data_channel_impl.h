@@ -35,6 +35,8 @@ class RTCDataChannelImpl : public RTCDataChannel,
   }
 
  protected:
+  virtual ~RTCDataChannelImpl();
+
   virtual void OnStateChange() override;
 
   virtual void OnMessage(const webrtc::DataBuffer& buffer) override;
