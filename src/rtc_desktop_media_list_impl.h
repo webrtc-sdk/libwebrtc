@@ -70,8 +70,7 @@ class MediaSourceImpl : public MediaSource {
   DesktopType type_;
 };
 
-class RTCDesktopMediaListImpl : public rtc::MessageHandler,
-                                public RTCDesktopMediaList {
+class RTCDesktopMediaListImpl : public RTCDesktopMediaList {
  public:
   enum CaptureState { CS_RUNNING, CS_STOPPED, CS_FAILED };
 
@@ -97,10 +96,6 @@ class RTCDesktopMediaListImpl : public rtc::MessageHandler,
 
   bool GetThumbnail(scoped_refptr<MediaSource> source,
                     bool notify = false) override;
-
- protected:
-  virtual void OnMessage(rtc::Message* msg) override;
-
  private:
   class CallbackProxy : public webrtc::DesktopCapturer::Callback {
    public:

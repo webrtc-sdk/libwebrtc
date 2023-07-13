@@ -39,8 +39,7 @@ bool VcmCapturer::Init(size_t width,
     return false;
   }
 
-  vcm_ = worker_thread_->Invoke<rtc::scoped_refptr<VideoCaptureModule>>(
-      RTC_FROM_HERE,
+  vcm_ = worker_thread_->BlockingCall(
       [&] { return webrtc::VideoCaptureFactory::Create(unique_name); });
 
   if (!vcm_) {
@@ -76,8 +75,8 @@ std::shared_ptr<VcmCapturer> VcmCapturer::Create(rtc::Thread* worker_thread,
 }
 
 bool VcmCapturer::StartCapture() {
-  int32_t result = worker_thread_->Invoke<bool>(
-      RTC_FROM_HERE, [&] { return vcm_->StartCapture(capability_); });
+  int32_t result = worker_thread_->BlockingCall(
+      [&] { return vcm_->StartCapture(capability_); });
 
   if (result != 0) {
     Destroy();
@@ -88,13 +87,14 @@ bool VcmCapturer::StartCapture() {
 }
 
 bool VcmCapturer::CaptureStarted() {
-  return vcm_ != nullptr && worker_thread_->Invoke<bool>(RTC_FROM_HERE, [&] {
+  return vcm_ != nullptr &&
+         worker_thread_->BlockingCall([&] {
     return vcm_->CaptureStarted();
   });
 }
 
 void VcmCapturer::StopCapture() {
-  worker_thread_->Invoke<void>(RTC_FROM_HERE, [&] {
+  worker_thread_->BlockingCall([&] {
     vcm_->StopCapture();
     // Release reference to VCM.
     vcm_ = nullptr;

@@ -25,7 +25,7 @@ int16_t AudioDeviceImpl::RecordingDevices() {
 int32_t AudioDeviceImpl::PlayoutDeviceName(uint16_t index,
                                            char name[kAdmMaxDeviceNameSize],
                                            char guid[kAdmMaxGuidSize]) {
-  return worker_thread_->Invoke<int32_t>(RTC_FROM_HERE, [&] {
+  return worker_thread_->BlockingCall([&] {
     RTC_DCHECK_RUN_ON(worker_thread_);
     return audio_device_module_->PlayoutDeviceName(index, name, guid);
   });
@@ -34,7 +34,7 @@ int32_t AudioDeviceImpl::PlayoutDeviceName(uint16_t index,
 int32_t AudioDeviceImpl::RecordingDeviceName(uint16_t index,
                                              char name[kAdmMaxDeviceNameSize],
                                              char guid[kAdmMaxGuidSize]) {
-  return worker_thread_->Invoke<int32_t>(RTC_FROM_HERE, [&] {
+  return worker_thread_->BlockingCall([&] {
     RTC_DCHECK_RUN_ON(worker_thread_);
     return audio_device_module_->RecordingDeviceName(index, name, guid);
   });
@@ -71,7 +71,7 @@ int32_t AudioDeviceImpl::SetRecordingDevice(uint16_t index) {
 }
 
 int32_t AudioDeviceImpl::SetMicrophoneVolume(uint32_t volume) {
-  return worker_thread_->Invoke<int32_t>(RTC_FROM_HERE, [&, volume] {
+  return worker_thread_->BlockingCall([&, volume] {
     RTC_DCHECK_RUN_ON(worker_thread_);
     return audio_device_module_->SetMicrophoneVolume(volume);
   });
@@ -79,14 +79,14 @@ int32_t AudioDeviceImpl::SetMicrophoneVolume(uint32_t volume) {
 
 int32_t AudioDeviceImpl::MicrophoneVolume(uint32_t& volume) {
   uint32_t* volume_ = &volume;
-  return worker_thread_->Invoke<int32_t>(RTC_FROM_HERE, [&, volume_] {
+  return worker_thread_->BlockingCall([&, volume_] {
     RTC_DCHECK_RUN_ON(worker_thread_);
     return audio_device_module_->MicrophoneVolume(volume_);
   });
 }
 
 int32_t AudioDeviceImpl::SetSpeakerVolume(uint32_t volume) {
-  return worker_thread_->Invoke<int32_t>(RTC_FROM_HERE, [&, volume] {
+  return worker_thread_->BlockingCall([&, volume] {
     RTC_DCHECK_RUN_ON(worker_thread_);
     return audio_device_module_->SetSpeakerVolume(volume);
   });
@@ -94,7 +94,7 @@ int32_t AudioDeviceImpl::SetSpeakerVolume(uint32_t volume) {
 
 int32_t AudioDeviceImpl::SpeakerVolume(uint32_t& volume) {
   uint32_t* volume_ = &volume;
-  return worker_thread_->Invoke<int32_t>(RTC_FROM_HERE, [&, volume_] {
+  return worker_thread_->BlockingCall([&, volume_] {
     RTC_DCHECK_RUN_ON(worker_thread_);
     return audio_device_module_->SpeakerVolume(volume_);
   });

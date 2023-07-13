@@ -398,19 +398,21 @@ void RTCRtpCodecParametersImpl::set_num_channels(int value) {
 }
 
 int RTCRtpCodecParametersImpl::max_ptime() {
-  return rtp_codec_parameters_.max_ptime.value_or(0);
+  //return rtp_codec_parameters_.max_ptime.value_or(0);
+  return 0;
 }
 
 void RTCRtpCodecParametersImpl::set_max_ptime(int value) {
-  rtp_codec_parameters_.max_ptime = value;
+  //rtp_codec_parameters_.max_ptime = value;
 }
 
 int RTCRtpCodecParametersImpl::ptime() {
-  return rtp_codec_parameters_.ptime.value_or(0);
+  //return rtp_codec_parameters_.ptime.value_or(0);
+  return 0;
 }
 
 void RTCRtpCodecParametersImpl::set_ptime(int value) {
-  rtp_codec_parameters_.ptime = value;
+  //rtp_codec_parameters_.ptime = value;
 }
 
 const vector<scoped_refptr<RTCRtcpFeedback>>
