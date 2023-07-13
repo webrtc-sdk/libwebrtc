@@ -11,7 +11,7 @@ RTCDataChannelImpl::RTCDataChannelImpl(
 
 RTCDataChannelImpl::~RTCDataChannelImpl() {
   rtc_data_channel_->UnregisterObserver();
-};
+}
 
 void RTCDataChannelImpl::Send(const uint8_t* data,
                               uint32_t size,
