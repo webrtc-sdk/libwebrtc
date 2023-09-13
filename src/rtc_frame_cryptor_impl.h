@@ -19,10 +19,24 @@ class DefaultKeyProviderImpl : public KeyProvider {
     rtc_options.uncrypted_magic_bytes =
         options->uncrypted_magic_bytes.std_vector();
     rtc_options.ratchet_window_size = options->ratchet_window_size;
+    rtc_options.failure_tolerance = options->failure_tolerance;
     impl_ =
         new rtc::RefCountedObject<webrtc::DefaultKeyProviderImpl>(rtc_options);
   }
   ~DefaultKeyProviderImpl() {}
+
+  bool SetSharedKey(int index, vector<uint8_t> key) override {
+    return impl_->SetSharedKey(index, key.std_vector());
+  }
+
+  vector<uint8_t> RatchetSharedKey(int key_index) override {
+    return impl_->RatchetSharedKey(key_index);
+  }
+
+  vector<uint8_t> ExportSharedKey(int key_index) override {
+    return impl_->ExportSharedKey(key_index);
+  }
+
   /// Set the key at the given index.
   bool SetKey(const string participant_id,
               int index,
@@ -38,6 +52,10 @@ class DefaultKeyProviderImpl : public KeyProvider {
   vector<uint8_t> ExportKey(const string participant_id,
                             int key_index) override {
     return impl_->ExportKey(participant_id.std_string(), key_index);
+  }
+
+  void SetSifTrailer(vector<uint8_t> trailer) override {
+    impl_->SetSifTrailer(trailer.std_vector());
   }
 
   rtc::scoped_refptr<webrtc::KeyProvider> rtc_key_provider() { return impl_; }
