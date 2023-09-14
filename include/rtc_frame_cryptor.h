@@ -42,8 +42,6 @@ class KeyProvider : public RefCountInterface {
 
   virtual vector<uint8_t> ExportSharedKey(int key_index) = 0;
 
-  virtual bool SetRatchetSalt(vector<uint8_t> salt) = 0;
-
   /// Set the key at the given index.
   virtual bool SetKey(const string participant_id,
                       int index,
