@@ -81,7 +81,7 @@ void RTCRtpEncodingParametersImpl::set_scale_resolution_down_by(double value) {
 }
 
 const string RTCRtpEncodingParametersImpl::scalability_mode() {
-  auto temp = rtp_encoding_parameters_.scalability_mode.value();
+  auto temp = rtp_encoding_parameters_.scalability_mode.value_or("");
   return temp;
 }
 
