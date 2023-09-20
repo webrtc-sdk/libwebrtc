@@ -76,6 +76,10 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<RTCRtpCapabilities> GetRtpReceiverCapabilities(
       RTCMediaType media_type) override;
 
+  rtc::Thread* signaling_thread() {
+    return signaling_thread_.get();
+  }
+
  protected:
   void CreateAudioDeviceModule_w();
 

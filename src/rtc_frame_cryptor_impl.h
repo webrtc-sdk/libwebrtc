@@ -64,22 +64,45 @@ class DefaultKeyProviderImpl : public KeyProvider {
   rtc::scoped_refptr<webrtc::DefaultKeyProviderImpl> impl_;
 };
 
-class RTCFrameCryptorImpl : public RTCFrameCryptor,
-                            public webrtc::FrameCryptorTransformerObserver {
+
+class RTCFrameCryptorObserverAdapter : public webrtc::FrameCryptorTransformerObserver {
+  public:
+  RTCFrameCryptorObserverAdapter() = default;
+  void OnFrameCryptionStateChanged(const std::string participant_id,
+                                   webrtc::FrameCryptionState error) override;
+
+  void RegisterObserver(scoped_refptr<RTCFrameCryptorObserver> observer) {
+    webrtc::MutexLock lock(&mutex_);
+    observer_ = observer;
+  }
+
+  void DeRegisterObserver() {
+    webrtc::MutexLock lock(&mutex_);
+    observer_ = nullptr;
+  }
+
+  private:
+    mutable webrtc::Mutex mutex_;
+    scoped_refptr<RTCFrameCryptorObserver> observer_;
+};
+
+class RTCFrameCryptorImpl : public RTCFrameCryptor {
  public:
-  RTCFrameCryptorImpl(const string participant_id,
+  RTCFrameCryptorImpl(scoped_refptr<RTCPeerConnectionFactory> factory,
+                     const string participant_id,
                       Algorithm algorithm,
                       scoped_refptr<KeyProvider> key_provider,
                       scoped_refptr<RTCRtpSender> sender);
 
-  RTCFrameCryptorImpl(const string participant_id,
+  RTCFrameCryptorImpl(scoped_refptr<RTCPeerConnectionFactory> factory, 
+                      const string participant_id,
                       Algorithm algorithm,
                       scoped_refptr<KeyProvider> key_provider,
                       scoped_refptr<RTCRtpReceiver> receiver);
   ~RTCFrameCryptorImpl();
 
   void RegisterRTCFrameCryptorObserver(
-      RTCFrameCryptorObserver* observer) override;
+      scoped_refptr<RTCFrameCryptorObserver> observer) override;
 
   void DeRegisterRTCFrameCryptorObserver() override;
 
@@ -88,9 +111,6 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor,
   bool SetKeyIndex(int index) override;
   int key_index() const override;
   const string participant_id() const override { return participant_id_; }
-
-  void OnFrameCryptionStateChanged(const std::string participant_id,
-                                   webrtc::FrameCryptionState error) override;
 
  private:
   string participant_id_;
@@ -101,7 +121,7 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor,
   scoped_refptr<KeyProvider> key_provider_;
   scoped_refptr<RTCRtpSender> sender_;
   scoped_refptr<RTCRtpReceiver> receiver_;
-  RTCFrameCryptorObserver* observer_ = nullptr;
+  rtc::scoped_refptr<RTCFrameCryptorObserverAdapter> observer_;
 };
 
 }  // namespace libwebrtc

@@ -1,23 +1,26 @@
 #include "rtc_frame_cryptor_impl.h"
+#include "rtc_peerconnection_factory_impl.h"
 
 namespace libwebrtc {
 
 scoped_refptr<RTCFrameCryptor> FrameCryptorFactory::frameCryptorFromRtpSender(
+    scoped_refptr<RTCPeerConnectionFactory> factory,
     const string participant_id,
     scoped_refptr<RTCRtpSender> sender,
     Algorithm algorithm,
     scoped_refptr<KeyProvider> key_provider) {
-  return new RefCountedObject<RTCFrameCryptorImpl>(participant_id, algorithm,
+  return new RefCountedObject<RTCFrameCryptorImpl>(factory, participant_id, algorithm,
                                                    key_provider, sender);
 }
 
 /// Create a frame cyrptor from a [RTCRtpReceiver].
 scoped_refptr<RTCFrameCryptor> FrameCryptorFactory::frameCryptorFromRtpReceiver(
+    scoped_refptr<RTCPeerConnectionFactory> factory,
     const string participant_id,
     scoped_refptr<RTCRtpReceiver> receiver,
     Algorithm algorithm,
     scoped_refptr<KeyProvider> key_provider) {
-  return new RefCountedObject<RTCFrameCryptorImpl>(participant_id, algorithm,
+  return new RefCountedObject<RTCFrameCryptorImpl>(factory, participant_id, algorithm,
                                                    key_provider, receiver);
 }
 
@@ -34,6 +37,7 @@ webrtc::FrameCryptorTransformer::Algorithm AlgorithmToFrameCryptorAlgorithm(
 }
 
 RTCFrameCryptorImpl::RTCFrameCryptorImpl(
+    scoped_refptr<RTCPeerConnectionFactory> factory,
     const string participant_id,
     Algorithm algorithm,
     scoped_refptr<KeyProvider> key_provider,
@@ -42,7 +46,9 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
       enabled_(false),
       key_index_(0),
       key_provider_(key_provider),
-      sender_(sender) {
+      sender_(sender),
+      observer_(rtc::make_ref_counted<RTCFrameCryptorObserverAdapter>()) {
+  auto factoryImpl = static_cast<RTCPeerConnectionFactoryImpl*>(factory.get());
   auto keyImpl = static_cast<DefaultKeyProviderImpl*>(key_provider.get());
   RTCRtpSenderImpl* impl = static_cast<RTCRtpSenderImpl*>(sender.get());
   auto mediaType =
@@ -50,17 +56,18 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
           ? webrtc::FrameCryptorTransformer::MediaType::kAudioFrame
           : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
   e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
-      new webrtc::FrameCryptorTransformer(
+      new webrtc::FrameCryptorTransformer(factoryImpl->signaling_thread(),
           participant_id_.std_string(), mediaType,
           AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_provider()));
-  e2ee_transformer_->SetFrameCryptorTransformerObserver(this);
+  e2ee_transformer_->RegisterFrameCryptorTransformerObserver(observer_);
   impl->rtc_rtp_sender()->SetEncoderToPacketizerFrameTransformer(
       e2ee_transformer_);
   e2ee_transformer_->SetEnabled(false);
 }
 
 RTCFrameCryptorImpl::RTCFrameCryptorImpl(
+    scoped_refptr<RTCPeerConnectionFactory> factory,
     const string participant_id,
     Algorithm algorithm,
     scoped_refptr<KeyProvider> key_provider,
@@ -69,7 +76,9 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
       enabled_(false),
       key_index_(0),
       key_provider_(key_provider),
-      receiver_(receiver) {
+      receiver_(receiver),
+      observer_(rtc::make_ref_counted<libwebrtc::RTCFrameCryptorObserverAdapter>()) {
+  auto factoryImpl = static_cast<RTCPeerConnectionFactoryImpl*>(factory.get());
   auto keyImpl = static_cast<DefaultKeyProviderImpl*>(key_provider.get());
   RTCRtpReceiverImpl* impl = static_cast<RTCRtpReceiverImpl*>(receiver.get());
   auto mediaType =
@@ -77,11 +86,11 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
           ? webrtc::FrameCryptorTransformer::MediaType::kAudioFrame
           : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
   e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
-      new webrtc::FrameCryptorTransformer(
+      new webrtc::FrameCryptorTransformer(factoryImpl->signaling_thread(),
           participant_id_.std_string(), mediaType,
           AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_provider()));
-  e2ee_transformer_->SetFrameCryptorTransformerObserver(this);
+  e2ee_transformer_->RegisterFrameCryptorTransformerObserver(observer_);
   impl->rtp_receiver()->SetDepacketizerToDecoderFrameTransformer(
       e2ee_transformer_);
   e2ee_transformer_->SetEnabled(false);
@@ -96,19 +105,18 @@ bool RTCFrameCryptorImpl::SetEnabled(bool enabled) {
   return true;
 }
 
-void RTCFrameCryptorImpl::RegisterRTCFrameCryptorObserver(
-    RTCFrameCryptorObserver* observer) {
+void RTCFrameCryptorImpl::RegisterRTCFrameCryptorObserver(scoped_refptr<RTCFrameCryptorObserver> observer) {
   webrtc::MutexLock lock(&mutex_);
-  observer_ = observer;
+  observer_->RegisterObserver(observer);
 }
 
 void RTCFrameCryptorImpl::DeRegisterRTCFrameCryptorObserver() {
   webrtc::MutexLock lock(&mutex_);
-  observer_ = nullptr;
-  e2ee_transformer_->SetFrameCryptorTransformerObserver(nullptr);
+  observer_->DeRegisterObserver();
+  e2ee_transformer_->UnRegisterFrameCryptorTransformerObserver();
 }
 
-void RTCFrameCryptorImpl::OnFrameCryptionStateChanged(
+void RTCFrameCryptorObserverAdapter::OnFrameCryptionStateChanged(
     const std::string participant_id,
     webrtc::FrameCryptionState error) {
   {
@@ -138,7 +146,7 @@ void RTCFrameCryptorImpl::OnFrameCryptionStateChanged(
     }
     webrtc::MutexLock lock(&mutex_);
     if (observer_) {
-      observer_->OnFrameCryptionStateChanged(participant_id_, state);
+      observer_->OnFrameCryptionStateChanged(participant_id, state);
     }
   }
 }
