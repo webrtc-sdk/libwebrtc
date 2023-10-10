@@ -10,7 +10,7 @@ possible supported platforms
 
 ## Note
 
-Use the https://github.com/webrtc-sdk/webrtc.git branch m104_release to compile.
+Use the https://github.com/webrtc-sdk/webrtc.git branch m114_release to compile.
 
 ## Usage
 
@@ -27,7 +27,7 @@ cd libwebrtc_build
 solutions = [
   {
     "name"        : 'src',
-    "url"         : 'https://github.com/webrtc-sdk/webrtc.git@m104_release',
+    "url"         : 'https://github.com/webrtc-sdk/webrtc.git@m114_release',
     "deps_file"   : 'DEPS',
     "managed"     : False,
     "custom_deps" : {
@@ -72,15 +72,17 @@ index e60d7dd0bd..b9b6acab8b 100644
 
 ## for Windows
 
+Download and install the Visual Studio Community 2022
+
 ### GN
 
 ```bash
 set DEPOT_TOOLS_WIN_TOOLCHAIN=0
-set GYP_MSVS_VERSION=2019
+set GYP_MSVS_VERSION=2022
 set GYP_GENERATORS=ninja,msvs-ninja
-set GYP_MSVS_OVERRIDE_PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community
+set GYP_MSVS_OVERRIDE_PATH=C:\Program Files (x86)\Microsoft Visual Studio\2022\Community
 cd src
-gn gen out-debug/Windows-x64 --args="target_os=\"win\" target_cpu=\"x64\" is_component_build=false is_clang=true is_debug=true rtc_use_h264=true ffmpeg_branding=\"Chrome\" rtc_include_tests=false rtc_build_examples=false libwebrtc_desktop_capture=true" --ide=vs2019
+gn gen out-debug/Windows-x64 --args="target_os=\"win\" target_cpu=\"x64\" is_component_build=false is_clang=true is_debug=true rtc_use_h264=true ffmpeg_branding=\"Chrome\" rtc_include_tests=false rtc_build_examples=false libwebrtc_desktop_capture=true" --ide=vs2022
 ```
 
 ### Compile for windows
