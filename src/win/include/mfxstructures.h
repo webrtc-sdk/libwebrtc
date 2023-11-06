@@ -97,19 +97,14 @@ enum {
   MFX_FOURCC_YUY2 = MFX_MAKEFOURCC('Y', 'U', 'Y', '2'),
 #if (MFX_VERSION >= 1028)
   MFX_FOURCC_RGB565 = MFX_MAKEFOURCC(
-      'R',
-      'G',
-      'B',
+      'R', 'G', 'B',
       '2'), /* 2 bytes per pixel, uint16 in little-endian format, where 0-4 bits
                are blue, bits 5-10 are green and bits 11-15 are red */
   MFX_FOURCC_RGBP = MFX_MAKEFOURCC('R', 'G', 'B', 'P'),
 #endif
   MFX_FOURCC_RGB3 = MFX_MAKEFOURCC('R', 'G', 'B', '3'), /* deprecated */
-  MFX_FOURCC_RGB4 =
-      MFX_MAKEFOURCC('R',
-                     'G',
-                     'B',
-                     '4'), /* ARGB in that order, A channel is 8 MSBs */
+  MFX_FOURCC_RGB4 = MFX_MAKEFOURCC(
+      'R', 'G', 'B', '4'), /* ARGB in that order, A channel is 8 MSBs */
   MFX_FOURCC_P8 = 41,      /*  D3DFMT_P8   */
   MFX_FOURCC_P8_TEXTURE = MFX_MAKEFOURCC('P', '8', 'M', 'B'),
   MFX_FOURCC_P010 = MFX_MAKEFOURCC('P', '0', '1', '0'),
@@ -117,36 +112,22 @@ enum {
   MFX_FOURCC_P016 = MFX_MAKEFOURCC('P', '0', '1', '6'),
 #endif
   MFX_FOURCC_P210 = MFX_MAKEFOURCC('P', '2', '1', '0'),
-  MFX_FOURCC_BGR4 =
-      MFX_MAKEFOURCC('B',
-                     'G',
-                     'R',
-                     '4'), /* ABGR in that order, A channel is 8 MSBs */
-  MFX_FOURCC_A2RGB10 =
-      MFX_MAKEFOURCC('R',
-                     'G',
-                     '1',
-                     '0'), /* ARGB in that order, A channel is two MSBs */
+  MFX_FOURCC_BGR4 = MFX_MAKEFOURCC(
+      'B', 'G', 'R', '4'), /* ABGR in that order, A channel is 8 MSBs */
+  MFX_FOURCC_A2RGB10 = MFX_MAKEFOURCC(
+      'R', 'G', '1', '0'), /* ARGB in that order, A channel is two MSBs */
   MFX_FOURCC_ARGB16 = MFX_MAKEFOURCC(
-      'R',
-      'G',
-      '1',
+      'R', 'G', '1',
       '6'), /* ARGB in that order, 64 bits, A channel is 16 MSBs */
   MFX_FOURCC_ABGR16 = MFX_MAKEFOURCC(
-      'B',
-      'G',
-      '1',
+      'B', 'G', '1',
       '6'), /* ABGR in that order, 64 bits, A channel is 16 MSBs */
   MFX_FOURCC_R16 = MFX_MAKEFOURCC('R', '1', '6', 'U'),
   MFX_FOURCC_AYUV = MFX_MAKEFOURCC(
-      'A',
-      'Y',
-      'U',
+      'A', 'Y', 'U',
       'V'), /* YUV 4:4:4, AYUV in that order, A channel is 8 MSBs */
   MFX_FOURCC_AYUV_RGB4 = MFX_MAKEFOURCC(
-      'A',
-      'V',
-      'U',
+      'A', 'V', 'U',
       'Y'), /* ARGB in that order, A channel is 8 MSBs stored in AYUV surface*/
   MFX_FOURCC_UYVY = MFX_MAKEFOURCC('U', 'Y', 'V', 'Y'),
 #if (MFX_VERSION >= 1027)
@@ -157,20 +138,13 @@ enum {
   MFX_FOURCC_Y216 = MFX_MAKEFOURCC('Y', '2', '1', '6'),
   MFX_FOURCC_Y416 = MFX_MAKEFOURCC('Y', '4', '1', '6'),
 #endif
-  MFX_FOURCC_NV21 =
-      MFX_MAKEFOURCC('N',
-                     'V',
-                     '2',
-                     '1'), /* Same as NV12 but with weaved V and U values. */
+  MFX_FOURCC_NV21 = MFX_MAKEFOURCC(
+      'N', 'V', '2', '1'), /* Same as NV12 but with weaved V and U values. */
   MFX_FOURCC_IYUV = MFX_MAKEFOURCC(
-      'I',
-      'Y',
-      'U',
+      'I', 'Y', 'U',
       'V'), /* Same as  YV12 except that the U and V plane order is reversed. */
   MFX_FOURCC_I010 = MFX_MAKEFOURCC(
-      'I',
-      '0',
-      '1',
+      'I', '0', '1',
       '0'), /* 10-bit YUV 4:2:0, each component has its own plane. */
 };
 
@@ -1800,7 +1774,7 @@ typedef struct {
     mfxU32 Bottom; /* Bottom Area's coordinate. */
 
     mfxU16 reserved2[8];
-  } * Areas; /* Array of areas. */
+  }* Areas; /* Array of areas. */
 } mfxExtEncoderIPCMArea;
 MFX_PACK_END()
 

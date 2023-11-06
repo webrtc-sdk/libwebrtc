@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "src/win/msdkvideodecoder.h"
+
 #include "api/scoped_refptr.h"
 #include "mfxadapter.h"
 #include "msdkvideobase.h"
@@ -85,8 +86,7 @@ bool MSDKVideoDecoder::CreateD3D11Device() {
   mfxU32 num_adapters;
   sts = MFXQueryAdaptersNumber(&num_adapters);
 
-  if (sts != MFX_ERR_NONE)
-    return false;
+  if (sts != MFX_ERR_NONE) return false;
 
   std::vector<mfxAdapterInfo> display_data(num_adapters);
   mfxAdaptersInfo adapters = {display_data.data(), mfxU32(display_data.size()),
@@ -185,8 +185,7 @@ int32_t MSDKVideoDecoder::InitDecodeOnCodecThread() {
   uint32_t codec_id = MFX_CODEC_AVC;
 
   if (inited_) {
-    if (m_pmfx_dec_)
-      m_pmfx_dec_->Close();
+    if (m_pmfx_dec_) m_pmfx_dec_->Close();
     MSDK_SAFE_DELETE_ARRAY(m_pinput_surfaces_);
 
     if (m_pmfx_allocator_) {
@@ -250,8 +249,7 @@ int32_t MSDKVideoDecoder::InitDecodeOnCodecThread() {
 }
 
 int32_t MSDKVideoDecoder::Decode(const webrtc::EncodedImage& inputImage,
-                                 bool missingFrames,
-                                 int64_t renderTimeMs) {
+                                 bool missingFrames, int64_t renderTimeMs) {
   mfxStatus sts = MFX_ERR_NONE;
   mfxFrameSurface1* pOutputSurface = nullptr;
 
@@ -440,8 +438,7 @@ mfxStatus MSDKVideoDecoder::ExtendMfxBitstream(mfxBitstream* pBitstream,
 }
 
 void MSDKVideoDecoder::ReadFromInputStream(mfxBitstream* pBitstream,
-                                           const uint8_t* data,
-                                           size_t len) {
+                                           const uint8_t* data, size_t len) {
   if (m_mfx_bs_.MaxLength < len) {
     // Remaining BS size is not enough to hold current image, we enlarge it the
     // gap*2.

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <map>
 #include <string>
+
 #include "absl/types/optional.h"
 #include "common_video/h264/h264_common.h"
 // #include "common_video/h264/prefix_parser.h"
@@ -94,11 +95,8 @@ absl::optional<unsigned int> MediaUtils::GetH264TemporalLayers() {
   layers = std::max(layers, 1u);
   return layers;
 }
-bool ParseSlice(const uint8_t* slice,
-                size_t length,
-                int& temporal_id,
-                int& priority_id,
-                bool& is_idr) {
+bool ParseSlice(const uint8_t* slice, size_t length, int& temporal_id,
+                int& priority_id, bool& is_idr) {
   // using namespace webrtc;
   // webrtc::H264::NaluType nalu_type = webrtc::H264::ParseNaluType(slice[0]);
   // absl::optional<PrefixParser::PrefixState> prefix_state;
@@ -122,10 +120,8 @@ bool ParseSlice(const uint8_t* slice,
 
   return false;
 }
-bool MediaUtils::GetH264TemporalInfo(uint8_t* buffer,
-                                     size_t buffer_length,
-                                     int& temporal_id,
-                                     int& priority_id,
+bool MediaUtils::GetH264TemporalInfo(uint8_t* buffer, size_t buffer_length,
+                                     int& temporal_id, int& priority_id,
                                      bool& is_idr) {
   bool prefix_nal_found = false;
   std::vector<webrtc::H264::NaluIndex> nalu_indices =
@@ -134,16 +130,14 @@ bool MediaUtils::GetH264TemporalInfo(uint8_t* buffer,
     prefix_nal_found =
         ParseSlice(&buffer[index.payload_start_offset], index.payload_size,
                    temporal_id, priority_id, is_idr);
-    if (prefix_nal_found)
-      return true;
+    if (prefix_nal_found) return true;
   }
   return prefix_nal_found;
 }
 
 absl::optional<AV1Profile> StringToAV1Profile(const std::string& str) {
   const absl::optional<int> i = rtc::StringToNumber<int>(str);
-  if (!i.has_value())
-    return absl::nullopt;
+  if (!i.has_value()) return absl::nullopt;
 
   switch (i.value()) {
     case 0:
@@ -161,8 +155,7 @@ absl::optional<AV1Profile> StringToAV1Profile(const std::string& str) {
 absl::optional<H265ProfileId> StringToH265Profile(const std::string& str) {
 #ifdef OWT_USE_MSDK
   const absl::optional<int> i = rtc::StringToNumber<int>(str);
-  if (!i.has_value())
-    return absl::nullopt;
+  if (!i.has_value()) return absl::nullopt;
   // See ISO/IEC-23008-2 section A.3.5. we use the general_profile_idc
   // as the profile-id per RFC 7798.
   switch (i.value()) {
@@ -189,8 +182,7 @@ absl::optional<AV1Profile> MediaUtils::ParseSdpForAV1Profile(
     const webrtc::SdpVideoFormat::Parameters& params) {
   const char kAV1FmtpProfileId[] = "profile";
   const auto profile_it = params.find(kAV1FmtpProfileId);
-  if (profile_it == params.end())
-    return AV1Profile::kMain;
+  if (profile_it == params.end()) return AV1Profile::kMain;
   const std::string& profile_str = profile_it->second;
   return StringToAV1Profile(profile_str);
 }
@@ -199,8 +191,7 @@ absl::optional<H265ProfileId> MediaUtils::ParseSdpForH265Profile(
     const webrtc::SdpVideoFormat::Parameters& params) {
   const char kHEVCFmtpProfileId[] = "profile-id";
   const auto profile_it = params.find(kHEVCFmtpProfileId);
-  if (profile_it == params.end())
-    return H265ProfileId::kMain;
+  if (profile_it == params.end()) return H265ProfileId::kMain;
   const std::string& profile_str = profile_it->second;
   return StringToH265Profile(profile_str);
 }

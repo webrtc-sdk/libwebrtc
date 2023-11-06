@@ -41,9 +41,11 @@ https://software.intel.com/en-us/media-client-solutions-support.
 #define OWT_BASE_WIN_BASEALLOCATOR_H__
 
 #include <string.h>
+
 #include <functional>
 #include <list>
 #include <memory>
+
 #include "mfxvideo.h"
 #include "msdkcommon.h"
 
@@ -75,17 +77,13 @@ class MFXFrameAllocator : public mfxFrameAllocator {
   virtual mfxStatus FreeFrames(mfxFrameAllocResponse* response) = 0;
 
  private:
-  static mfxStatus MFX_CDECL Alloc_(mfxHDL pthis,
-                                    mfxFrameAllocRequest* request,
+  static mfxStatus MFX_CDECL Alloc_(mfxHDL pthis, mfxFrameAllocRequest* request,
                                     mfxFrameAllocResponse* response);
-  static mfxStatus MFX_CDECL Lock_(mfxHDL pthis,
-                                   mfxMemId mid,
+  static mfxStatus MFX_CDECL Lock_(mfxHDL pthis, mfxMemId mid,
                                    mfxFrameData* ptr);
-  static mfxStatus MFX_CDECL Unlock_(mfxHDL pthis,
-                                     mfxMemId mid,
+  static mfxStatus MFX_CDECL Unlock_(mfxHDL pthis, mfxMemId mid,
                                      mfxFrameData* ptr);
-  static mfxStatus MFX_CDECL GetHDL_(mfxHDL pthis,
-                                     mfxMemId mid,
+  static mfxStatus MFX_CDECL GetHDL_(mfxHDL pthis, mfxMemId mid,
                                      mfxHDL* handle);
   static mfxStatus MFX_CDECL Free_(mfxHDL pthis,
                                    mfxFrameAllocResponse* response);
@@ -136,10 +134,8 @@ class BaseFrameAllocator : public MFXFrameAllocator {
 
     // compare responses by actual frame size, alignment (w and h) is up to
     // application
-    UniqueResponse(const mfxFrameAllocResponse& response,
-                   mfxU16 width,
-                   mfxU16 height,
-                   mfxU16 type)
+    UniqueResponse(const mfxFrameAllocResponse& response, mfxU16 width,
+                   mfxU16 height, mfxU16 type)
         : mfxFrameAllocResponse(response),
           m_width(width),
           m_height(height),
@@ -182,8 +178,7 @@ class BaseFrameAllocator : public MFXFrameAllocator {
   std::list<UniqueResponse> m_ExtResponses;
 
   struct IsSame : public std::binary_function<mfxFrameAllocResponse,
-                                              mfxFrameAllocResponse,
-                                              bool> {
+                                              mfxFrameAllocResponse, bool> {
     bool operator()(const mfxFrameAllocResponse& l,
                     const mfxFrameAllocResponse& r) const {
       return r.mids != 0 && l.mids != 0 && r.mids[0] == l.mids[0] &&
@@ -240,9 +235,7 @@ class MFXBufferAllocator : public mfxBufferAllocator {
   virtual mfxStatus FreeBuffer(mfxMemId mid) = 0;
 
  private:
-  static mfxStatus MFX_CDECL Alloc_(mfxHDL pthis,
-                                    mfxU32 nbytes,
-                                    mfxU16 type,
+  static mfxStatus MFX_CDECL Alloc_(mfxHDL pthis, mfxU32 nbytes, mfxU16 type,
                                     mfxMemId* mid);
   static mfxStatus MFX_CDECL Lock_(mfxHDL pthis, mfxMemId mid, mfxU8** ptr);
   static mfxStatus MFX_CDECL Unlock_(mfxHDL pthis, mfxMemId mid);

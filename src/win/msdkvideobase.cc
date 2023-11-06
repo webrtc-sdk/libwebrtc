@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "msdkvideobase.h"
+
 #include "atlbase.h"
 #include "d3d11_allocator.h"
 #include "d3d_allocator.h"
 #include "mfxdefs.h"
-
 #include "rtc_base/logging.h"
 
 namespace owt {
@@ -19,8 +19,7 @@ MSDKFactory* MSDKFactory::singleton = nullptr;
 static bool AreGuidsEqual(const mfxPluginUID* guid_first,
                           const mfxPluginUID* guid_second) {
   for (size_t i = 0; i < sizeof(mfxPluginUID); i++) {
-    if (guid_first->Data[i] != guid_second->Data[i])
-      return false;
+    if (guid_first->Data[i] != guid_second->Data[i]) return false;
   }
   return true;
 }
@@ -50,9 +49,7 @@ void MSDKFactory::MFETimeout(uint32_t timeout) {
   mfe_timeout = timeout < 100 ? timeout : 100;
 }
 
-uint32_t MSDKFactory::MFETimeout() {
-  return mfe_timeout;
-}
+uint32_t MSDKFactory::MFETimeout() { return mfe_timeout; }
 
 MSDKFactory* MSDKFactory::Get() {
   std::lock_guard<std::mutex> lock(get_singleton_mutex);
@@ -72,13 +69,11 @@ MSDKFactory* MSDKFactory::Get() {
 MFXVideoSession* MSDKFactory::InternalCreateSession(bool use_d3d11) {
   mfxStatus sts = MFX_ERR_NONE;
   mfxIMPL impl = MFX_IMPL_HARDWARE_ANY;
-  if (use_d3d11)
-    impl |= MFX_IMPL_VIA_D3D11;
+  if (use_d3d11) impl |= MFX_IMPL_VIA_D3D11;
   mfxVersion version = {{3, 1}};
 
   MFXVideoSession* session = new MFXVideoSession();
-  if (!session)
-    return nullptr;
+  if (!session) return nullptr;
 
   sts = session->Init(impl, &version);
   if (sts != MFX_ERR_NONE) {
@@ -118,8 +113,7 @@ void MSDKFactory::DestroySession(MFXVideoSession* session) {
   }
 }
 
-bool MSDKFactory::LoadDecoderPlugin(uint32_t codec_id,
-                                    MFXVideoSession* session,
+bool MSDKFactory::LoadDecoderPlugin(uint32_t codec_id, MFXVideoSession* session,
                                     mfxPluginUID* plugin_id) {
   mfxStatus sts = MFX_ERR_NONE;
 
@@ -155,8 +149,7 @@ bool MSDKFactory::LoadDecoderPlugin(uint32_t codec_id,
   return true;
 }
 
-bool MSDKFactory::LoadEncoderPlugin(uint32_t codec_id,
-                                    MFXVideoSession* session,
+bool MSDKFactory::LoadEncoderPlugin(uint32_t codec_id, MFXVideoSession* session,
                                     mfxPluginUID* plugin_id) {
   mfxStatus sts = MFX_ERR_NONE;
   switch (codec_id) {
@@ -184,8 +177,7 @@ void MSDKFactory::UnloadMSDKPlugin(MFXVideoSession* session,
 
 bool MSDKFactory::QueryPlatform(MFXVideoSession* session,
                                 mfxPlatform* platform) {
-  if (!session || !platform)
-    return false;
+  if (!session || !platform) return false;
 
   mfxStatus sts = MFX_ERR_NONE;
   sts = MFXVideoCORE_QueryPlatform(*session, platform);

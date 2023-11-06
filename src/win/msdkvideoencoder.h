@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <memory>
 #include <vector>
+
 #include "api/video_codecs/video_codec.h"
 #include "api/video_codecs/video_encoder.h"
 #include "base_allocator.h"
@@ -37,8 +38,7 @@ class MSDKVideoEncoder : public webrtc::VideoEncoder {
   virtual ~MSDKVideoEncoder();
 
   static std::unique_ptr<MSDKVideoEncoder> Create(cricket::VideoCodec format);
-  int InitEncode(const webrtc::VideoCodec* codec_settings,
-                 int number_of_cores,
+  int InitEncode(const webrtc::VideoCodec* codec_settings, int number_of_cores,
                  size_t max_payload_size) override;
   int Encode(const webrtc::VideoFrame& input_image,
              const std::vector<webrtc::VideoFrameType>* frame_types) override;
@@ -53,10 +53,8 @@ class MSDKVideoEncoder : public webrtc::VideoEncoder {
 
  private:
   int InitEncodeOnEncoderThread(const webrtc::VideoCodec* codec_settings,
-                                int number_of_cores,
-                                size_t max_payload_size);
-  int32_t NextNaluPosition(uint8_t* buffer,
-                           size_t buffer_size,
+                                int number_of_cores, size_t max_payload_size);
+  int32_t NextNaluPosition(uint8_t* buffer, size_t buffer_size,
                            uint8_t* sc_length);
   mfxU16 MSDKGetFreeSurface(mfxFrameSurface1* pSurfacesPool, mfxU16 nPoolSize);
   mfxU16 MSDKGetFreeSurfaceIndex(mfxFrameSurface1* pSurfacesPool,

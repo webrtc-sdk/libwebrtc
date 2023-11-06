@@ -25,8 +25,7 @@ class VcmCapturer : public VideoCapturer,
                     public rtc::VideoSinkInterface<VideoFrame> {
  public:
   static std::shared_ptr<VcmCapturer> Create(rtc::Thread* worker_thread,
-                                             size_t width,
-                                             size_t height,
+                                             size_t width, size_t height,
                                              size_t target_fps,
                                              size_t capture_device_index);
   VcmCapturer(rtc::Thread* worker_thread);
@@ -42,9 +41,7 @@ class VcmCapturer : public VideoCapturer,
   void OnFrame(const VideoFrame& frame) override;
 
  private:
-  bool Init(size_t width,
-            size_t height,
-            size_t target_fps,
+  bool Init(size_t width, size_t height, size_t target_fps,
             size_t capture_device_index);
   void Destroy();
 

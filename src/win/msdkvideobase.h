@@ -14,8 +14,10 @@
 #include <mfxplugin++.h>
 #include <mfxvideo++.h>
 #include <mfxvp8.h>
+
 #include <memory>
 #include <mutex>
+
 #include "msdkcommon.h"
 #include "src/win/d3d11_allocator.h"
 #include "src/win/d3d_allocator.h"
@@ -38,11 +40,9 @@ class MSDKFactory {
   MFXVideoSession* GetMainSession();
 
   bool QueryPlatform(MFXVideoSession* session, mfxPlatform* platform);
-  bool LoadDecoderPlugin(uint32_t codec_id,
-                         MFXVideoSession* session,
+  bool LoadDecoderPlugin(uint32_t codec_id, MFXVideoSession* session,
                          mfxPluginUID* plugin_id);
-  bool LoadEncoderPlugin(uint32_t codec_id,
-                         MFXVideoSession* session,
+  bool LoadEncoderPlugin(uint32_t codec_id, MFXVideoSession* session,
                          mfxPluginUID* plugin_id);
   void UnloadMSDKPlugin(MFXVideoSession* session, mfxPluginUID* plugin_id);
 

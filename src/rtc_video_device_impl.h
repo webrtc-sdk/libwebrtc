@@ -1,14 +1,13 @@
 #ifndef LIB_WEBRTC_VIDEO_DEVICE_IMPL_HXX
 #define LIB_WEBRTC_VIDEO_DEVICE_IMPL_HXX
 
-#include "rtc_video_device.h"
+#include <memory>
 
 #include "modules/video_capture/video_capture.h"
 #include "rtc_base/thread.h"
+#include "rtc_video_device.h"
 #include "src/internal/vcm_capturer.h"
 #include "src/internal/video_capturer.h"
-
-#include <memory>
 
 namespace libwebrtc {
 
@@ -30,8 +29,7 @@ class RTCVideoCapturerImpl : public RTCVideoCapturer {
   }
 
   void StopCapture() override {
-    if (video_capturer_ != nullptr)
-      video_capturer_->StopCapture();
+    if (video_capturer_ != nullptr) video_capturer_->StopCapture();
   }
 
  private:
@@ -45,18 +43,14 @@ class RTCVideoDeviceImpl : public RTCVideoDevice {
  public:
   uint32_t NumberOfDevices() override;
 
-  int32_t GetDeviceName(uint32_t deviceNumber,
-                        char* deviceNameUTF8,
-                        uint32_t deviceNameLength,
-                        char* deviceUniqueIdUTF8,
+  int32_t GetDeviceName(uint32_t deviceNumber, char* deviceNameUTF8,
+                        uint32_t deviceNameLength, char* deviceUniqueIdUTF8,
                         uint32_t deviceUniqueIdUTF8Length,
                         char* productUniqueIdUTF8 = 0,
                         uint32_t productUniqueIdUTF8Length = 0) override;
 
-  scoped_refptr<RTCVideoCapturer> Create(const char* name,
-                                         uint32_t index,
-                                         size_t width,
-                                         size_t height,
+  scoped_refptr<RTCVideoCapturer> Create(const char* name, uint32_t index,
+                                         size_t width, size_t height,
                                          size_t target_fps) override;
 
  private:

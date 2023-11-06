@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "src/win/codecutils.h"
+
 #include "absl/memory/memory.h"
 #include "absl/strings/match.h"
 #include "absl/types/optional.h"

@@ -15,6 +15,7 @@
  */
 
 #include "rtc_desktop_media_list_impl.h"
+
 #include "internal/jpeg_util.h"
 #include "rtc_base/checks.h"
 #include "third_party/libyuv/include/libyuv.h"
@@ -56,9 +57,7 @@ RTCDesktopMediaListImpl::RTCDesktopMediaListImpl(DesktopType type,
   });
 }
 
-RTCDesktopMediaListImpl::~RTCDesktopMediaListImpl() {
-  thread_->Stop();
-}
+RTCDesktopMediaListImpl::~RTCDesktopMediaListImpl() { thread_->Stop(); }
 
 int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload,
                                                   bool get_thumbnail) {
@@ -66,18 +65,16 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload,
     for (auto source : sources_) {
       if (observer_) {
         auto source_ptr = source.get();
-        signaling_thread_->BlockingCall([&, source_ptr]() {
-          observer_->OnMediaSourceRemoved(source_ptr);
-        });
+        signaling_thread_->BlockingCall(
+            [&, source_ptr]() { observer_->OnMediaSourceRemoved(source_ptr); });
       }
     }
     sources_.clear();
   }
 
   webrtc::DesktopCapturer::SourceList new_sources;
-  thread_->BlockingCall([this, &new_sources] {
-    capturer_->GetSourceList(&new_sources);
-  });
+  thread_->BlockingCall(
+      [this, &new_sources] { capturer_->GetSourceList(&new_sources); });
 
   typedef std::set<webrtc::DesktopCapturer::SourceId> SourceSet;
   SourceSet new_source_set;
@@ -92,9 +89,8 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload,
     if (new_source_set.find(sources_[i]->source_id()) == new_source_set.end()) {
       if (observer_) {
         auto source = (*(sources_.begin() + i)).get();
-        signaling_thread_->BlockingCall([&, source]() {
-          observer_->OnMediaSourceRemoved(source);
-        });
+        signaling_thread_->BlockingCall(
+            [&, source]() { observer_->OnMediaSourceRemoved(source); });
       }
       sources_.erase(sources_.begin() + i);
       --i;
@@ -113,9 +109,8 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload,
         sources_.insert(sources_.begin() + i, source);
         GetThumbnail(source, true);
         if (observer_) {
-          signaling_thread_->BlockingCall([&, source]() {
-            observer_->OnMediaSourceAdded(source);
-          });
+          signaling_thread_->BlockingCall(
+              [&, source]() { observer_->OnMediaSourceAdded(source); });
         }
       }
     }
@@ -131,8 +126,7 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload,
       // of |sources_|, because entries before |pos| should have been sorted.
       size_t old_pos = pos + 1;
       for (; old_pos < sources_.size(); ++old_pos) {
-        if (sources_[old_pos]->source_id() == new_sources[pos].id)
-          break;
+        if (sources_[old_pos]->source_id() == new_sources[pos].id) break;
       }
       RTC_DCHECK(sources_[old_pos]->source_id() == new_sources[pos].id);
 
@@ -147,9 +141,8 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload,
       sources_[pos]->source.title = new_sources[pos].title;
       if (observer_) {
         auto source = sources_[pos].get();
-        signaling_thread_->BlockingCall([&, source]() {
-          observer_->OnMediaSourceNameChanged(source);
-        });
+        signaling_thread_->BlockingCall(
+            [&, source]() { observer_->OnMediaSourceNameChanged(source); });
       }
     }
     ++pos;
@@ -184,9 +177,7 @@ bool RTCDesktopMediaListImpl::GetThumbnail(scoped_refptr<MediaSource> source,
   return true;
 }
 
-int RTCDesktopMediaListImpl::GetSourceCount() const {
-  return sources_.size();
-}
+int RTCDesktopMediaListImpl::GetSourceCount() const { return sources_.size(); }
 
 scoped_refptr<MediaSource> RTCDesktopMediaListImpl::GetSource(int index) {
   return sources_[index];

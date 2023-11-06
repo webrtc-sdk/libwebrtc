@@ -7,6 +7,7 @@
 
 #include <mutex>
 #include <vector>
+
 #include "base_allocator.h"
 #include "mfxvideo++.h"
 #include "src/win/commontypes.h"

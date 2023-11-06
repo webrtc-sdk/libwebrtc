@@ -64,8 +64,7 @@ struct AudioCodecParameters {
   /// Construct an instance of AudioCodecParameters with codec name/channel
   /// count and clock rate.
   AudioCodecParameters(const AudioCodec& codec_name,
-                       unsigned long channel_count,
-                       unsigned long clock_rate)
+                       unsigned long channel_count, unsigned long clock_rate)
       : name(codec_name),
         channel_count(channel_count),
         clock_rate(clock_rate) {}
@@ -136,8 +135,7 @@ struct VideoEncodingParameters {
       : codec(), max_bitrate(0), hardware_accelerated(false) {}
   /// Construct an instance of VideoEncodingParameters
   VideoEncodingParameters(const VideoCodecParameters& codec_param,
-                          unsigned long bitrate_bps,
-                          bool hw)
+                          unsigned long bitrate_bps, bool hw)
       : codec(codec_param),
         max_bitrate(bitrate_bps),
         hardware_accelerated(hw) {}
@@ -197,8 +195,7 @@ struct StreamSourceInfo {
 #endif
   {
   }
-  StreamSourceInfo(AudioSourceInfo audio_source,
-                   VideoSourceInfo video_source
+  StreamSourceInfo(AudioSourceInfo audio_source, VideoSourceInfo video_source
 #ifdef OWT_ENABLE_QUIC
                    ,
                    DataSourceInfo data_source

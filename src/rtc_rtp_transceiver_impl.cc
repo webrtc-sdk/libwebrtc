@@ -1,4 +1,5 @@
 #include "rtc_rtp_transceiver_impl.h"
+
 #include <src/rtc_rtp_capabilities_impl.h>
 #include <src/rtc_rtp_parameters_impl.h>
 #include <src/rtc_rtp_receiver_impl.h>
@@ -10,8 +11,7 @@ namespace libwebrtc {
 
 LIB_WEBRTC_API scoped_refptr<RTCRtpTransceiverInit>
 RTCRtpTransceiverInit::Create(
-    RTCRtpTransceiverDirection direction,
-    const vector<string> stream_ids,
+    RTCRtpTransceiverDirection direction, const vector<string> stream_ids,
     const vector<scoped_refptr<RTCRtpEncodingParameters>> encodings) {
   auto init = new RefCountedObject<RTCRtpTransceiverInitImpl>();
   init->set_direction(direction);
@@ -136,9 +136,7 @@ const string RTCRtpTransceiverImpl::StopStandard() {
   return val;
 }
 
-void RTCRtpTransceiverImpl::StopInternal() {
-  rtp_transceiver_->StopInternal();
-}
+void RTCRtpTransceiverImpl::StopInternal() { rtp_transceiver_->StopInternal(); }
 
 const string RTCRtpTransceiverImpl::mid() const {
   auto temp = rtp_transceiver_->mid();

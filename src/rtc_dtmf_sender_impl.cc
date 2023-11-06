@@ -11,24 +11,19 @@ RTCDtmfSenderImpl::dtmf_sender() {
   return dtmf_sender_;
 }
 
-bool RTCDtmfSenderImpl::InsertDtmf(const string tones,
-                                   int duration,
+bool RTCDtmfSenderImpl::InsertDtmf(const string tones, int duration,
                                    int inter_tone_gap) {
   return dtmf_sender_->InsertDtmf(to_std_string(tones), duration,
                                   inter_tone_gap);
 }
 
-bool RTCDtmfSenderImpl::InsertDtmf(const string tones,
-                                   int duration,
-                                   int inter_tone_gap,
-                                   int comma_delay) {
+bool RTCDtmfSenderImpl::InsertDtmf(const string tones, int duration,
+                                   int inter_tone_gap, int comma_delay) {
   return dtmf_sender_->InsertDtmf(to_std_string(tones), duration,
                                   inter_tone_gap, comma_delay);
 }
 
-const string RTCDtmfSenderImpl::tones() const {
-  return dtmf_sender_->tones();
-}
+const string RTCDtmfSenderImpl::tones() const { return dtmf_sender_->tones(); }
 
 void RTCDtmfSenderImpl::OnToneChange(const std::string& tone,
                                      const std::string& tone_buffer) {
@@ -57,9 +52,7 @@ bool RTCDtmfSenderImpl::CanInsertDtmf() {
   return dtmf_sender_->CanInsertDtmf();
 }
 
-int RTCDtmfSenderImpl::duration() const {
-  return dtmf_sender_->duration();
-}
+int RTCDtmfSenderImpl::duration() const { return dtmf_sender_->duration(); }
 
 int RTCDtmfSenderImpl::inter_tone_gap() const {
   return dtmf_sender_->inter_tone_gap();

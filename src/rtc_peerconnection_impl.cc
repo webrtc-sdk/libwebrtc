@@ -125,8 +125,7 @@ class SetSessionDescriptionObserverProxy
     : public webrtc::SetSessionDescriptionObserver {
  public:
   static SetSessionDescriptionObserverProxy* Create(
-      OnSetSdpSuccess success_callback,
-      OnSetSdpFailure failure_callback) {
+      OnSetSdpSuccess success_callback, OnSetSdpFailure failure_callback) {
     return new rtc::RefCountedObject<SetSessionDescriptionObserverProxy>(
         success_callback, failure_callback);
   }
@@ -277,8 +276,7 @@ void RTCPeerConnectionImpl::OnDataChannel(
   data_channel_ = scoped_refptr<RTCDataChannelImpl>(
       new RefCountedObject<RTCDataChannelImpl>(rtc_data_channel));
 
-  if (observer_)
-    observer_->OnDataChannel(data_channel_);
+  if (observer_) observer_->OnDataChannel(data_channel_);
 }
 
 void RTCPeerConnectionImpl::OnRenegotiationNeeded() {
@@ -307,24 +305,20 @@ void RTCPeerConnectionImpl::OnIceConnectionChange(
 
 void RTCPeerConnectionImpl::OnSignalingChange(
     webrtc::PeerConnectionInterface::SignalingState new_state) {
-  if (observer_)
-    observer_->OnSignalingState(signaling_state_map[new_state]);
+  if (observer_) observer_->OnSignalingState(signaling_state_map[new_state]);
 }
 
-void RTCPeerConnectionImpl::AddCandidate(const string mid,
-                                         int mid_mline_index,
+void RTCPeerConnectionImpl::AddCandidate(const string mid, int mid_mline_index,
                                          const string cand_sdp) {
   webrtc::SdpParseError error;
   webrtc::IceCandidateInterface* candidate = webrtc::CreateIceCandidate(
       to_std_string(mid), mid_mline_index, to_std_string(cand_sdp), &error);
-  if (candidate != nullptr)
-    rtc_peerconnection_->AddIceCandidate(candidate);
+  if (candidate != nullptr) rtc_peerconnection_->AddIceCandidate(candidate);
 }
 
 void RTCPeerConnectionImpl::OnIceCandidate(
     const webrtc::IceCandidateInterface* candidate) {
-  if (!rtc_peerconnection_)
-    return;
+  if (!rtc_peerconnection_) return;
 
 #if 0
     if (candidate->candidate().protocol() != "tcp")
@@ -404,7 +398,7 @@ bool RTCPeerConnectionImpl::Initialize() {
 
   offer_answer_options_.use_rtp_mux = configuration_.use_rtp_mux;
 
-  //config.disable_ipv6 = configuration_.disable_ipv6;
+  // config.disable_ipv6 = configuration_.disable_ipv6;
   config.disable_ipv6_on_wifi = configuration_.disable_ipv6_on_wifi;
   config.disable_link_local_networks =
       configuration_.disable_link_local_networks;
@@ -440,8 +434,7 @@ bool RTCPeerConnectionImpl::Initialize() {
 }
 
 scoped_refptr<RTCDataChannel> RTCPeerConnectionImpl::CreateDataChannel(
-    const string label,
-    RTCDataChannelInit* dataChannelDict) {
+    const string label, RTCDataChannelInit* dataChannelDict) {
   webrtc::DataChannelInit init;
   init.id = dataChannelDict->id;
   init.maxRetransmits = dataChannelDict->maxRetransmits;
@@ -559,8 +552,7 @@ void RTCPeerConnectionImpl::GetRemoteDescription(OnGetSdpSuccess success,
 }
 
 void RTCPeerConnectionImpl::CreateOffer(
-    OnSdpCreateSuccess success,
-    OnSdpCreateFailure failure,
+    OnSdpCreateSuccess success, OnSdpCreateFailure failure,
     scoped_refptr<RTCMediaConstraints> constraints) {
   if (!rtc_peerconnection_.get() || !rtc_peerconnection_factory_.get()) {
     webrtc::MutexLock cs(callback_crt_sec_.get());
@@ -584,8 +576,7 @@ void RTCPeerConnectionImpl::CreateOffer(
 }
 
 void RTCPeerConnectionImpl::CreateAnswer(
-    OnSdpCreateSuccess success,
-    OnSdpCreateFailure failure,
+    OnSdpCreateSuccess success, OnSdpCreateFailure failure,
     scoped_refptr<RTCMediaConstraints> constraints) {
   if (!rtc_peerconnection_.get() || !rtc_peerconnection_factory_.get()) {
     webrtc::MutexLock cs(callback_crt_sec_.get());
@@ -791,8 +782,7 @@ scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
 }
 
 scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
-    RTCMediaType media_type,
-    scoped_refptr<RTCRtpTransceiverInit> init) {
+    RTCMediaType media_type, scoped_refptr<RTCRtpTransceiverInit> init) {
   RTCRtpTransceiverInitImpl* initImpl =
       static_cast<RTCRtpTransceiverInitImpl*>(init.get());
   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpTransceiverInterface>>
@@ -812,8 +802,7 @@ scoped_refptr<RTCRtpTransceiver> RTCPeerConnectionImpl::AddTransceiver(
 }
 
 scoped_refptr<RTCRtpSender> RTCPeerConnectionImpl::AddTrack(
-    scoped_refptr<RTCMediaTrack> track,
-    vector<string> streamIds) {
+    scoped_refptr<RTCMediaTrack> track, vector<string> streamIds) {
   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpSenderInterface>> errorOr;
 
   std::vector<std::string> stream_ids;
@@ -908,20 +897,12 @@ void WebRTCStatsCollectorCallback::OnStatsDelivered(
 MediaRTCStatsImpl::MediaRTCStatsImpl(std::unique_ptr<webrtc::RTCStats> stats)
     : stats_(std::move(stats)) {}
 
-const string MediaRTCStatsImpl::id() {
-  return stats_->id();
-}
+const string MediaRTCStatsImpl::id() { return stats_->id(); }
 
-const string MediaRTCStatsImpl::type() {
-  return stats_->type();
-}
+const string MediaRTCStatsImpl::type() { return stats_->type(); }
 
-int64_t MediaRTCStatsImpl::timestamp_us() {
-  return stats_->timestamp().us();
-}
+int64_t MediaRTCStatsImpl::timestamp_us() { return stats_->timestamp().us(); }
 
-const string MediaRTCStatsImpl::ToJson() {
-  return stats_->ToJson();
-}
+const string MediaRTCStatsImpl::ToJson() { return stats_->ToJson(); }
 
 }  // namespace libwebrtc

@@ -9,9 +9,11 @@
 #include <d3d11.h>
 #include <dxgi1_2.h>
 #include <dxva2api.h>
+
 #include <memory>
 #include <utility>
 #include <vector>
+
 #include "media/base/codec.h"
 #include "modules/video_coding/include/video_codec_interface.h"
 #include "rtc_base/checks.h"
@@ -57,8 +59,7 @@ class MSDKVideoDecoder : public webrtc::VideoDecoder {
 
   bool Configure(const Settings& settings) override;
 
-  int32_t Decode(const webrtc::EncodedImage& inputImage,
-                 bool missingFrames,
+  int32_t Decode(const webrtc::EncodedImage& inputImage, bool missingFrames,
                  int64_t renderTimeMs = -1) override;
 
   int32_t RegisterDecodeCompleteCallback(
@@ -76,8 +77,7 @@ class MSDKVideoDecoder : public webrtc::VideoDecoder {
 
   mfxStatus ExtendMfxBitstream(mfxBitstream* pBitstream, mfxU32 nSize);
   void WipeMfxBitstream(mfxBitstream* pBitstream);
-  void ReadFromInputStream(mfxBitstream* pBitstream,
-                           const uint8_t* data,
+  void ReadFromInputStream(mfxBitstream* pBitstream, const uint8_t* data,
                            size_t len);
   mfxU16 DecGetFreeSurface(mfxFrameSurface1* pSurfacesPool, mfxU16 nPoolSize);
   mfxU16 DecGetFreeSurfaceIndex(mfxFrameSurface1* pSurfacesPool,

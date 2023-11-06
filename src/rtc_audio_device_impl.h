@@ -21,12 +21,10 @@ class AudioDeviceImpl : public RTCAudioDevice, public webrtc::AudioDeviceSink {
 
   int16_t RecordingDevices() override;
 
-  int32_t PlayoutDeviceName(uint16_t index,
-                            char name[kAdmMaxDeviceNameSize],
+  int32_t PlayoutDeviceName(uint16_t index, char name[kAdmMaxDeviceNameSize],
                             char guid[kAdmMaxGuidSize]) override;
 
-  int32_t RecordingDeviceName(uint16_t index,
-                              char name[kAdmMaxDeviceNameSize],
+  int32_t RecordingDeviceName(uint16_t index, char name[kAdmMaxDeviceNameSize],
                               char guid[kAdmMaxGuidSize]) override;
 
   int32_t SetPlayoutDevice(uint16_t index) override;

@@ -3,7 +3,6 @@
 #include "api/scoped_refptr.h"
 #include "rtc_base/ssl_adapter.h"
 #include "rtc_base/thread.h"
-
 #include "rtc_peerconnection_factory_impl.h"
 
 namespace libwebrtc {

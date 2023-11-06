@@ -6,6 +6,7 @@
 #define OWT_BASE_CODECUTILS_H_
 
 #include <vector>
+
 #include "api/video/video_codec_type.h"
 #include "api/video_codecs/sdp_video_format.h"
 

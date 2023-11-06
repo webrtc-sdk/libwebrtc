@@ -11,6 +11,7 @@
 #include "src/internal/vcm_capturer.h"
 
 #include <stdint.h>
+
 #include <memory>
 
 #include "modules/video_capture/video_capture_factory.h"
@@ -23,9 +24,7 @@ namespace internal {
 VcmCapturer::VcmCapturer(rtc::Thread* worker_thread)
     : vcm_(nullptr), worker_thread_(worker_thread) {}
 
-bool VcmCapturer::Init(size_t width,
-                       size_t height,
-                       size_t target_fps,
+bool VcmCapturer::Init(size_t width, size_t height, size_t target_fps,
                        size_t capture_device_index) {
   std::unique_ptr<VideoCaptureModule::DeviceInfo> device_info(
       VideoCaptureFactory::CreateDeviceInfo());
@@ -59,8 +58,7 @@ bool VcmCapturer::Init(size_t width,
 }
 
 std::shared_ptr<VcmCapturer> VcmCapturer::Create(rtc::Thread* worker_thread,
-                                                 size_t width,
-                                                 size_t height,
+                                                 size_t width, size_t height,
                                                  size_t target_fps,
                                                  size_t capture_device_index) {
   std::shared_ptr<VcmCapturer> vcm_capturer(
@@ -88,9 +86,7 @@ bool VcmCapturer::StartCapture() {
 
 bool VcmCapturer::CaptureStarted() {
   return vcm_ != nullptr &&
-         worker_thread_->BlockingCall([&] {
-    return vcm_->CaptureStarted();
-  });
+         worker_thread_->BlockingCall([&] { return vcm_->CaptureStarted(); });
 }
 
 void VcmCapturer::StopCapture() {
@@ -102,17 +98,14 @@ void VcmCapturer::StopCapture() {
 }
 
 void VcmCapturer::Destroy() {
-  if (!vcm_)
-    return;
+  if (!vcm_) return;
 
   vcm_->DeRegisterCaptureDataCallback();
 
   StopCapture();
 }
 
-VcmCapturer::~VcmCapturer() {
-  Destroy();
-}
+VcmCapturer::~VcmCapturer() { Destroy(); }
 
 void VcmCapturer::OnFrame(const VideoFrame& frame) {
   VideoCapturer::OnFrame(frame);

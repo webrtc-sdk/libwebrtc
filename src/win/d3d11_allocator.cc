@@ -37,15 +37,17 @@ https://software.intel.com/en-us/intel-media-server-studio or
 https://software.intel.com/en-us/media-client-solutions-support.
 \**********************************************************************************/
 
-#include "msdkvideobase.h"
+#include "d3d11_allocator.h"
 
 #include <assert.h>
 #include <initguid.h>
 #include <objbase.h>
+
 #include <algorithm>
 #include <functional>
 #include <iterator>
-#include "d3d11_allocator.h"
+
+#include "msdkvideobase.h"
 
 #define D3DFMT_NV12 (DXGI_FORMAT) MAKEFOURCC('N', 'V', '1', '2')
 #define D3DFMT_YV12 (DXGI_FORMAT) MAKEFOURCC('Y', 'V', '1', '2')
@@ -71,25 +73,19 @@ struct sequence<mfxHDL> {
   }
 };
 
-D3D11FrameAllocator::D3D11FrameAllocator() {
-  m_pDeviceContext = nullptr;
-}
+D3D11FrameAllocator::D3D11FrameAllocator() { m_pDeviceContext = nullptr; }
 
-D3D11FrameAllocator::~D3D11FrameAllocator() {
-  Close();
-}
+D3D11FrameAllocator::~D3D11FrameAllocator() { Close(); }
 
 D3D11FrameAllocator::TextureSubResource D3D11FrameAllocator::GetResourceFromMid(
     mfxMemId mid) {
   size_t index = (size_t)MFXReadWriteMid(mid).raw() - 1;
 
-  if (m_memIdMap.size() <= index)
-    return TextureSubResource();
+  if (m_memIdMap.size() <= index) return TextureSubResource();
 
   // reverse iterator dereferencing
   TextureResource* p = &(*m_memIdMap[index]);
-  if (!p->bAlloc)
-    return TextureSubResource();
+  if (!p->bAlloc) return TextureSubResource();
 
   return TextureSubResource(p, mid);
 }
@@ -129,8 +125,7 @@ mfxStatus D3D11FrameAllocator::LockFrame(mfxMemId mid, mfxFrameData* ptr) {
 
   // check that texture exists
   TextureSubResource sr = GetResourceFromMid(mid);
-  if (!sr.GetTexture())
-    return MFX_ERR_LOCK_MEMORY;
+  if (!sr.GetTexture()) return MFX_ERR_LOCK_MEMORY;
 
   D3D11_MAP mapType = D3D11_MAP_READ;
   UINT mapFlags = D3D11_MAP_FLAG_DO_NOT_WAIT;
@@ -183,8 +178,7 @@ mfxStatus D3D11FrameAllocator::LockFrame(mfxMemId mid, mfxFrameData* ptr) {
     }
   }
 
-  if (FAILED(hRes))
-    return MFX_ERR_LOCK_MEMORY;
+  if (FAILED(hRes)) return MFX_ERR_LOCK_MEMORY;
 
   switch (desc.Format) {
     case DXGI_FORMAT_P010:
@@ -293,8 +287,7 @@ mfxStatus D3D11FrameAllocator::LockFrame(mfxMemId mid, mfxFrameData* ptr) {
 mfxStatus D3D11FrameAllocator::UnlockFrame(mfxMemId mid, mfxFrameData* ptr) {
   // check that texture exists
   TextureSubResource sr = GetResourceFromMid(mid);
-  if (!sr.GetTexture())
-    return MFX_ERR_LOCK_MEMORY;
+  if (!sr.GetTexture()) return MFX_ERR_LOCK_MEMORY;
 
   if (NULL == sr.GetStaging()) {
     m_pDeviceContext->Unmap(sr.GetTexture(), sr.GetSubResource());
@@ -318,13 +311,11 @@ mfxStatus D3D11FrameAllocator::UnlockFrame(mfxMemId mid, mfxFrameData* ptr) {
 }
 
 mfxStatus D3D11FrameAllocator::GetFrameHDL(mfxMemId mid, mfxHDL* handle) {
-  if (NULL == handle)
-    return MFX_ERR_INVALID_HANDLE;
+  if (NULL == handle) return MFX_ERR_INVALID_HANDLE;
 
   TextureSubResource sr = GetResourceFromMid(mid);
 
-  if (!sr.GetTexture())
-    return MFX_ERR_INVALID_HANDLE;
+  if (!sr.GetTexture()) return MFX_ERR_INVALID_HANDLE;
 
   mfxHDLPair* pPair = (mfxHDLPair*)handle;
 
@@ -336,8 +327,7 @@ mfxStatus D3D11FrameAllocator::GetFrameHDL(mfxMemId mid, mfxHDL* handle) {
 
 mfxStatus D3D11FrameAllocator::CheckRequestType(mfxFrameAllocRequest* request) {
   mfxStatus sts = BaseFrameAllocator::CheckRequestType(request);
-  if (MFX_ERR_NONE != sts)
-    return sts;
+  if (MFX_ERR_NONE != sts) return sts;
 
   if ((request->Type & (MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET |
                         MFX_MEMTYPE_VIDEO_MEMORY_PROCESSOR_TARGET)) != 0)
@@ -348,15 +338,13 @@ mfxStatus D3D11FrameAllocator::CheckRequestType(mfxFrameAllocRequest* request) {
 
 mfxStatus D3D11FrameAllocator::ReleaseResponse(
     mfxFrameAllocResponse* response) {
-  if (NULL == response)
-    return MFX_ERR_NULL_PTR;
+  if (NULL == response) return MFX_ERR_NULL_PTR;
 
   if (response->mids && 0 != response->NumFrameActual) {
     // check whether texture exsist
     TextureSubResource sr = GetResourceFromMid(response->mids[0]);
 
-    if (!sr.GetTexture())
-      return MFX_ERR_NULL_PTR;
+    if (!sr.GetTexture()) return MFX_ERR_NULL_PTR;
 
     sr.Release();
 
@@ -400,8 +388,7 @@ mfxStatus D3D11FrameAllocator::AllocImpl(mfxFrameAllocRequest* request,
 
     ID3D11Buffer* buffer = 0;
     hRes = m_initParams.pDevice->CreateBuffer(&desc, 0, &buffer);
-    if (FAILED(hRes))
-      return MFX_ERR_MEMORY_ALLOC;
+    if (FAILED(hRes)) return MFX_ERR_MEMORY_ALLOC;
 
     newTexture.textures.push_back(reinterpret_cast<ID3D11Texture2D*>(buffer));
   } else {
@@ -434,15 +421,13 @@ mfxStatus D3D11FrameAllocator::AllocImpl(mfxFrameAllocRequest* request,
          (DXGI_FORMAT_R10G10B10A2_UNORM == desc.Format) ||
          (DXGI_FORMAT_R16G16B16A16_UNORM == desc.Format))) {
       desc.BindFlags = D3D11_BIND_RENDER_TARGET;
-      if (desc.ArraySize > 2)
-        return MFX_ERR_MEMORY_ALLOC;
+      if (desc.ArraySize > 2) return MFX_ERR_MEMORY_ALLOC;
     }
 
     if ((MFX_MEMTYPE_FROM_VPPOUT & request->Type) ||
         (MFX_MEMTYPE_VIDEO_MEMORY_PROCESSOR_TARGET & request->Type)) {
       desc.BindFlags = D3D11_BIND_RENDER_TARGET;
-      if (desc.ArraySize > 2)
-        return MFX_ERR_MEMORY_ALLOC;
+      if (desc.ArraySize > 2) return MFX_ERR_MEMORY_ALLOC;
     }
 
     if (request->Type & MFX_MEMTYPE_SHARED_RESOURCE) {

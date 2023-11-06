@@ -10,6 +10,7 @@
 #include <dxgi1_2.h>
 #include <mfapi.h>
 #include <mfobjects.h>
+
 #include "rtc_base/logging.h"
 #include "rtc_base/ref_count.h"
 

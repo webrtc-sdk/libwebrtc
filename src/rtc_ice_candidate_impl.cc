@@ -31,9 +31,7 @@ const string RTCIceCandidateImpl::candidate() const {
   return sdp_;
 }
 
-const string RTCIceCandidateImpl::sdp_mid() const {
-  return sdp_mid_;
-}
+const string RTCIceCandidateImpl::sdp_mid() const { return sdp_mid_; }
 
 int RTCIceCandidateImpl::sdp_mline_index() const {
   return candidate_->sdp_mline_index();

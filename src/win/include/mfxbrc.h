@@ -118,15 +118,13 @@ typedef struct {
 
   // Obtain from BRC controls required for frame encoding.
   // Will be invoked BEFORE encoding of each frame. In - pthis, par; Out - ctrl.
-  mfxStatus(MFX_CDECL* GetFrameCtrl)(mfxHDL pthis,
-                                     mfxBRCFrameParam* par,
+  mfxStatus(MFX_CDECL* GetFrameCtrl)(mfxHDL pthis, mfxBRCFrameParam* par,
                                      mfxBRCFrameCtrl* ctrl);
 
   // Update BRC state and return command to continue/recode frame/do
   // padding/skip frame. Will be invoked AFTER encoding of each frame. In -
   // pthis, par, ctrl; Out - status.
-  mfxStatus(MFX_CDECL* Update)(mfxHDL pthis,
-                               mfxBRCFrameParam* par,
+  mfxStatus(MFX_CDECL* Update)(mfxHDL pthis, mfxBRCFrameParam* par,
                                mfxBRCFrameCtrl* ctrl,
                                mfxBRCFrameStatus* status);
 
@@ -135,7 +133,7 @@ typedef struct {
 MFX_PACK_END()
 
 #ifdef __cplusplus
-}  // extern "C"
+}      // extern "C"
 #endif /* __cplusplus */
 
 #endif

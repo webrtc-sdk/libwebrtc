@@ -38,7 +38,9 @@ https://software.intel.com/en-us/media-client-solutions-support.
 // SPDX-License-Identifier: Apache-2.0
 
 #include "base_allocator.h"
+
 #include <assert.h>
+
 #include <algorithm>
 
 namespace owt {
@@ -55,33 +57,27 @@ MFXFrameAllocator::MFXFrameAllocator() {
 
 MFXFrameAllocator::~MFXFrameAllocator() {}
 
-mfxStatus MFXFrameAllocator::Alloc_(mfxHDL pthis,
-                                    mfxFrameAllocRequest* request,
+mfxStatus MFXFrameAllocator::Alloc_(mfxHDL pthis, mfxFrameAllocRequest* request,
                                     mfxFrameAllocResponse* response) {
-  if (0 == pthis)
-    return MFX_ERR_MEMORY_ALLOC;
+  if (0 == pthis) return MFX_ERR_MEMORY_ALLOC;
 
   MFXFrameAllocator& self = *(MFXFrameAllocator*)pthis;
 
   return self.AllocFrames(request, response);
 }
 
-mfxStatus MFXFrameAllocator::Lock_(mfxHDL pthis,
-                                   mfxMemId mid,
+mfxStatus MFXFrameAllocator::Lock_(mfxHDL pthis, mfxMemId mid,
                                    mfxFrameData* ptr) {
-  if (0 == pthis)
-    return MFX_ERR_MEMORY_ALLOC;
+  if (0 == pthis) return MFX_ERR_MEMORY_ALLOC;
 
   MFXFrameAllocator& self = *(MFXFrameAllocator*)pthis;
 
   return self.LockFrame(mid, ptr);
 }
 
-mfxStatus MFXFrameAllocator::Unlock_(mfxHDL pthis,
-                                     mfxMemId mid,
+mfxStatus MFXFrameAllocator::Unlock_(mfxHDL pthis, mfxMemId mid,
                                      mfxFrameData* ptr) {
-  if (0 == pthis)
-    return MFX_ERR_MEMORY_ALLOC;
+  if (0 == pthis) return MFX_ERR_MEMORY_ALLOC;
 
   MFXFrameAllocator& self = *(MFXFrameAllocator*)pthis;
 
@@ -90,19 +86,16 @@ mfxStatus MFXFrameAllocator::Unlock_(mfxHDL pthis,
 
 mfxStatus MFXFrameAllocator::Free_(mfxHDL pthis,
                                    mfxFrameAllocResponse* response) {
-  if (0 == pthis)
-    return MFX_ERR_MEMORY_ALLOC;
+  if (0 == pthis) return MFX_ERR_MEMORY_ALLOC;
 
   MFXFrameAllocator& self = *(MFXFrameAllocator*)pthis;
 
   return self.FreeFrames(response);
 }
 
-mfxStatus MFXFrameAllocator::GetHDL_(mfxHDL pthis,
-                                     mfxMemId mid,
+mfxStatus MFXFrameAllocator::GetHDL_(mfxHDL pthis, mfxMemId mid,
                                      mfxHDL* handle) {
-  if (0 == pthis)
-    return MFX_ERR_MEMORY_ALLOC;
+  if (0 == pthis) return MFX_ERR_MEMORY_ALLOC;
 
   MFXFrameAllocator& self = *(MFXFrameAllocator*)pthis;
 
@@ -114,8 +107,7 @@ BaseFrameAllocator::BaseFrameAllocator() {}
 BaseFrameAllocator::~BaseFrameAllocator() {}
 
 mfxStatus BaseFrameAllocator::CheckRequestType(mfxFrameAllocRequest* request) {
-  if (0 == request)
-    return MFX_ERR_NULL_PTR;
+  if (0 == request) return MFX_ERR_NULL_PTR;
 
   // check that Media SDK component is specified in request
   if ((request->Type & MEMTYPE_FROM_MASK) != 0)
@@ -129,8 +121,7 @@ mfxStatus BaseFrameAllocator::AllocFrames(mfxFrameAllocRequest* request,
   if (0 == request || 0 == response || 0 == request->NumFrameSuggested)
     return MFX_ERR_MEMORY_ALLOC;
 
-  if (MFX_ERR_NONE != CheckRequestType(request))
-    return MFX_ERR_UNSUPPORTED;
+  if (MFX_ERR_NONE != CheckRequestType(request)) return MFX_ERR_UNSUPPORTED;
 
   mfxStatus sts = MFX_ERR_NONE;
 
@@ -190,8 +181,7 @@ mfxStatus BaseFrameAllocator::AllocFrames(mfxFrameAllocRequest* request,
 mfxStatus BaseFrameAllocator::FreeFrames(mfxFrameAllocResponse* response) {
   std::lock_guard<std::mutex> lock(mtx);
 
-  if (response == 0)
-    return MFX_ERR_INVALID_HANDLE;
+  if (response == 0) return MFX_ERR_INVALID_HANDLE;
 
   mfxStatus sts = MFX_ERR_NONE;
 
@@ -249,12 +239,9 @@ MFXBufferAllocator::MFXBufferAllocator() {
 
 MFXBufferAllocator::~MFXBufferAllocator() {}
 
-mfxStatus MFXBufferAllocator::Alloc_(mfxHDL pthis,
-                                     mfxU32 nbytes,
-                                     mfxU16 type,
+mfxStatus MFXBufferAllocator::Alloc_(mfxHDL pthis, mfxU32 nbytes, mfxU16 type,
                                      mfxMemId* mid) {
-  if (0 == pthis)
-    return MFX_ERR_MEMORY_ALLOC;
+  if (0 == pthis) return MFX_ERR_MEMORY_ALLOC;
 
   MFXBufferAllocator& self = *(MFXBufferAllocator*)pthis;
 
@@ -262,8 +249,7 @@ mfxStatus MFXBufferAllocator::Alloc_(mfxHDL pthis,
 }
 
 mfxStatus MFXBufferAllocator::Lock_(mfxHDL pthis, mfxMemId mid, mfxU8** ptr) {
-  if (0 == pthis)
-    return MFX_ERR_MEMORY_ALLOC;
+  if (0 == pthis) return MFX_ERR_MEMORY_ALLOC;
 
   MFXBufferAllocator& self = *(MFXBufferAllocator*)pthis;
 
@@ -271,8 +257,7 @@ mfxStatus MFXBufferAllocator::Lock_(mfxHDL pthis, mfxMemId mid, mfxU8** ptr) {
 }
 
 mfxStatus MFXBufferAllocator::Unlock_(mfxHDL pthis, mfxMemId mid) {
-  if (0 == pthis)
-    return MFX_ERR_MEMORY_ALLOC;
+  if (0 == pthis) return MFX_ERR_MEMORY_ALLOC;
 
   MFXBufferAllocator& self = *(MFXBufferAllocator*)pthis;
 
@@ -280,8 +265,7 @@ mfxStatus MFXBufferAllocator::Unlock_(mfxHDL pthis, mfxMemId mid) {
 }
 
 mfxStatus MFXBufferAllocator::Free_(mfxHDL pthis, mfxMemId mid) {
-  if (0 == pthis)
-    return MFX_ERR_MEMORY_ALLOC;
+  if (0 == pthis) return MFX_ERR_MEMORY_ALLOC;
 
   MFXBufferAllocator& self = *(MFXBufferAllocator*)pthis;
 

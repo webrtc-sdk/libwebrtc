@@ -1,4 +1,5 @@
 #include "helper.h"
+
 #include "rtc_base/helpers.h"
 
 namespace libwebrtc {
@@ -8,8 +9,6 @@ namespace libwebrtc {
  *
  * @return A string representation of a random UUID.
  */
-string Helper::CreateRandomUuid() {
-  return rtc::CreateRandomUuid();
-}
+string Helper::CreateRandomUuid() { return rtc::CreateRandomUuid(); }
 
 }  // namespace libwebrtc
