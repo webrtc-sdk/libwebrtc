@@ -12,10 +12,12 @@ scoped_refptr<RTCIceCandidate> RTCIceCandidate::Create(const string sdp,
                                  to_std_string(sdp), &sdp_error));
   error->description = sdp_error.description;
   error->line = sdp_error.line;
-  scoped_refptr<RTCIceCandidate> candidate = scoped_refptr<RTCIceCandidateImpl>(
-      new RefCountedObject<RTCIceCandidateImpl>(std::move(rtc_candidate)));
+  if (rtc_candidate) {
+    return scoped_refptr<RTCIceCandidateImpl>(
+        new RefCountedObject<RTCIceCandidateImpl>(std::move(rtc_candidate)));
+  }
 
-  return candidate;
+  return nullptr;
 }
 
 RTCIceCandidateImpl::RTCIceCandidateImpl(
