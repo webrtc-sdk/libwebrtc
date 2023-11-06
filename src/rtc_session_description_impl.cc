@@ -12,11 +12,13 @@ scoped_refptr<RTCSessionDescription> RTCSessionDescription::Create(
                                        &sdp_error));
   error->description = sdp_error.description;
   error->line = sdp_error.line;
-  scoped_refptr<RTCSessionDescriptionImpl> session_description =
-      scoped_refptr<RTCSessionDescriptionImpl>(
-          new RefCountedObject<RTCSessionDescriptionImpl>(
-              std::move(rtc_description)));
-  return session_description;
+  if (rtc_description) {
+    return scoped_refptr<RTCSessionDescriptionImpl>(
+        new RefCountedObject<RTCSessionDescriptionImpl>(
+            std::move(rtc_description)));
+  }
+
+  return nullptr;
 }
 
 RTCSessionDescriptionImpl::RTCSessionDescriptionImpl(
