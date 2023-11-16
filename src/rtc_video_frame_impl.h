@@ -1,12 +1,11 @@
 #ifndef LIB_WEBRTC_VIDEO_FRAME_IMPL_HXX
 #define LIB_WEBRTC_VIDEO_FRAME_IMPL_HXX
 
-#include "rtc_video_frame.h"
-
 #include "api/video/i420_buffer.h"
 #include "api/video/video_frame_buffer.h"
 #include "api/video/video_rotation.h"
 #include "common_video/include/video_frame_buffer.h"
+#include "rtc_video_frame.h"
 
 namespace libwebrtc {
 
@@ -37,11 +36,8 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
 
   int StrideV() const override;
 
-  int ConvertToARGB(Type type,
-                    uint8_t* dst_argb,
-                    int dst_stride_argb,
-                    int dest_width,
-                    int dest_height) override;
+  int ConvertToARGB(Type type, uint8_t* dst_argb, int dst_stride_argb,
+                    int dest_width, int dest_height) override;
 
   rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer() { return buffer_; }
 

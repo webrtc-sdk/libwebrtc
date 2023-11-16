@@ -14,8 +14,7 @@ class RTCDataChannelImpl : public RTCDataChannel,
   RTCDataChannelImpl(
       rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel);
 
-  virtual void Send(const uint8_t* data,
-                    uint32_t size,
+  virtual void Send(const uint8_t* data, uint32_t size,
                     bool binary = false) override;
 
   virtual void Close() override;

@@ -1,14 +1,13 @@
 #ifndef LIB_WEBRTC_VIDEO_SOURCE_IMPL_HXX
 #define LIB_WEBRTC_VIDEO_SOURCE_IMPL_HXX
 
+#include "api/media_stream_interface.h"
+#include "media/base/video_broadcaster.h"
+#include "media/base/video_source_base.h"
 #include "rtc_peerconnection_factory_impl.h"
 #include "rtc_video_frame.h"
 #include "rtc_video_source.h"
 #include "rtc_video_track.h"
-
-#include "api/media_stream_interface.h"
-#include "media/base/video_broadcaster.h"
-#include "media/base/video_source_base.h"
 
 namespace libwebrtc {
 

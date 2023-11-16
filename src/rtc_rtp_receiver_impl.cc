@@ -69,9 +69,7 @@ RTCMediaType RTCRtpReceiverImpl::media_type() const {
   return static_cast<RTCMediaType>(rtp_receiver_->media_type());
 }
 
-const string RTCRtpReceiverImpl::id() const {
-  return rtp_receiver_->id();
-}
+const string RTCRtpReceiverImpl::id() const { return rtp_receiver_->id(); }
 scoped_refptr<RTCRtpParameters> RTCRtpReceiverImpl::parameters() const {
   return new RefCountedObject<RTCRtpParametersImpl>(
       rtp_receiver_->GetParameters());

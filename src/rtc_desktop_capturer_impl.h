@@ -17,11 +17,10 @@
 #ifndef LIBWEBRTC_RTC_DESKTOP_CAPTURER_IMPL_HXX
 #define LIBWEBRTC_RTC_DESKTOP_CAPTURER_IMPL_HXX
 
-#include "include/rtc_desktop_capturer.h"
-#include "include/rtc_types.h"
-
 #include "api/video/i420_buffer.h"
 #include "api/video/video_frame.h"
+#include "include/rtc_desktop_capturer.h"
+#include "include/rtc_types.h"
 #include "modules/desktop_capture/desktop_and_cursor_composer.h"
 #include "modules/desktop_capture/desktop_capture_options.h"
 #include "modules/desktop_capture/desktop_capturer.h"
@@ -50,10 +49,7 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   void DeRegisterDesktopCapturerObserver() override { observer_ = nullptr; }
   CaptureState Start(uint32_t fps) override;
 
-  CaptureState Start(uint32_t fps,
-                     uint32_t x,
-                     uint32_t y,
-                     uint32_t w,
+  CaptureState Start(uint32_t fps, uint32_t x, uint32_t y, uint32_t w,
                      uint32_t h) override;
 
   void Stop() override;

@@ -16,8 +16,7 @@ class WebRTCStatsCollectorCallback : public webrtc::RTCStatsCollectorCallback {
   ~WebRTCStatsCollectorCallback() {}
 
   static rtc::scoped_refptr<WebRTCStatsCollectorCallback> Create(
-      OnStatsCollectorSuccess success,
-      OnStatsCollectorFailure failure) {
+      OnStatsCollectorSuccess success, OnStatsCollectorFailure failure) {
     rtc::scoped_refptr<WebRTCStatsCollectorCallback> rtc_stats_observer =
         rtc::scoped_refptr<WebRTCStatsCollectorCallback>(
             new rtc::RefCountedObject<WebRTCStatsCollectorCallback>(success,

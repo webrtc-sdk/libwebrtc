@@ -46,7 +46,9 @@ https://software.intel.com/en-us/media-client-solutions-support.
 #include <d3d9.h>
 #include <dxva2api.h>
 #include <initguid.h>
+
 #include <vector>
+
 #include "base_allocator.h"
 
 namespace owt {

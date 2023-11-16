@@ -46,9 +46,11 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 
 #include <d3d11.h>
 #include <windows.h>
+
 #include <limits>
 #include <map>
 #include <vector>
+
 #include "base_allocator.h"
 
 struct ID3D11VideoDevice;
@@ -167,15 +169,13 @@ class D3D11FrameAllocator : public BaseFrameAllocator {
 
     static bool isAllocated(TextureResource& that) { return that.bAlloc; }
     ID3D11Texture2D* GetTexture(mfxMemId id) {
-      if (outerMids.empty())
-        return NULL;
+      if (outerMids.empty()) return NULL;
 
       return textures[((uintptr_t)id - (uintptr_t)outerMids.front()) %
                       textures.size()];
     }
     UINT GetSubResource(mfxMemId id) {
-      if (outerMids.empty())
-        return NULL;
+      if (outerMids.empty()) return NULL;
 
       return (UINT)(((uintptr_t)id - (uintptr_t)outerMids.front()) /
                     textures.size());
@@ -219,8 +219,7 @@ class D3D11FrameAllocator : public BaseFrameAllocator {
     ID3D11Texture2D* GetTexture() const { return m_pTexture; }
     UINT GetSubResource() const { return m_subResource; }
     void Release() {
-      if (NULL != m_pTarget)
-        m_pTarget->Release();
+      if (NULL != m_pTarget) m_pTarget->Release();
     }
   };
 

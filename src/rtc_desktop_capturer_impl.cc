@@ -28,10 +28,8 @@ namespace libwebrtc {
 enum { kCaptureDelay = 33, kCaptureMessageId = 1000 };
 
 RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
-    DesktopType type,
-    webrtc::DesktopCapturer::SourceId source_id,
-    rtc::Thread* signaling_thread,
-    scoped_refptr<MediaSource> source)
+    DesktopType type, webrtc::DesktopCapturer::SourceId source_id,
+    rtc::Thread* signaling_thread, scoped_refptr<MediaSource> source)
     : thread_(rtc::Thread::Create()),
       source_id_(source_id),
       signaling_thread_(signaling_thread),
@@ -49,7 +47,7 @@ RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
     options_.set_allow_pipewire(true);
   }
 #endif
- thread_->BlockingCall([this, type] {
+  thread_->BlockingCall([this, type] {
     if (type == kScreen) {
       capturer_ = std::make_unique<webrtc::DesktopAndCursorComposer>(
           webrtc::DesktopCapturer::CreateScreenCapturer(options_), options_);
@@ -65,11 +63,8 @@ RTCDesktopCapturerImpl::~RTCDesktopCapturerImpl() {
   capturer_.reset();
 }
 
-RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(uint32_t fps,
-                                                                   uint32_t x,
-                                                                   uint32_t y,
-                                                                   uint32_t w,
-                                                                   uint32_t h) {
+RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
+    uint32_t fps, uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
   x_ = x;
   y_ = y;
   w_ = w;
@@ -83,7 +78,7 @@ RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(uint32_t fps,
 
 RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
     uint32_t fps) {
-  if(capture_state_  == CS_RUNNING) {
+  if (capture_state_ == CS_RUNNING) {
     return capture_state_;
   }
 
@@ -147,7 +142,8 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
   if (result != result_) {
     if (result == webrtc::DesktopCapturer::Result::ERROR_PERMANENT) {
       if (observer_) {
-        signaling_thread_->BlockingCall([&, this]() { observer_->OnError(this); });
+        signaling_thread_->BlockingCall(
+            [&, this]() { observer_->OnError(this); });
       }
       capture_state_ = CS_FAILED;
       return;
@@ -156,7 +152,8 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
     if (result == webrtc::DesktopCapturer::Result::ERROR_TEMPORARY) {
       result_ = result;
       if (observer_) {
-        signaling_thread_->BlockingCall([&, this]() { observer_->OnPaused(this); });
+        signaling_thread_->BlockingCall(
+            [&, this]() { observer_->OnPaused(this); });
       }
       return;
     }
@@ -164,7 +161,8 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
     if (result == webrtc::DesktopCapturer::Result::SUCCESS) {
       result_ = result;
       if (observer_) {
-        signaling_thread_->BlockingCall([&, this]() { observer_->OnStart(this); });
+        signaling_thread_->BlockingCall(
+            [&, this]() { observer_->OnStart(this); });
       }
     }
   }
@@ -212,16 +210,13 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
 #endif
 }
 
-
 void RTCDesktopCapturerImpl::CaptureFrame() {
   RTC_DCHECK_RUN_ON(thread_.get());
   if (capture_state_ == CS_RUNNING) {
     capturer_->CaptureFrame();
     thread_->PostDelayedHighPrecisionTask(
-      [this]() {
-        CaptureFrame();
-      },
-      webrtc::TimeDelta::Millis(capture_delay_));
+        [this]() { CaptureFrame(); },
+        webrtc::TimeDelta::Millis(capture_delay_));
   }
 }
 

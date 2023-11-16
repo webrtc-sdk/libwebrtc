@@ -8,25 +8,23 @@
 #ifdef WEBRTC_WIN
 #include "modules/desktop_capture/win/window_capture_utils.h"
 #endif
-#include "modules/video_capture/video_capture.h"
-#include "modules/video_capture/video_capture_factory.h"
-
 #include "api/scoped_refptr.h"
 #include "api/video/i420_buffer.h"
 #include "api/video/video_frame.h"
 #include "api/video/video_source_interface.h"
+#include "include/base/refcount.h"
 #include "media/base/video_adapter.h"
 #include "media/base/video_broadcaster.h"
+#include "modules/video_capture/video_capture.h"
+#include "modules/video_capture/video_capture_factory.h"
 #include "pc/video_track_source.h"
 #include "rtc_base/thread.h"
 #include "rtc_desktop_device.h"
+#include "rtc_types.h"
 #include "src/internal/vcm_capturer.h"
 #include "src/internal/video_capturer.h"
-#include "third_party/libyuv/include/libyuv.h"
-
-#include "include/base/refcount.h"
-#include "rtc_types.h"
 #include "src/rtc_desktop_capturer_impl.h"
+#include "third_party/libyuv/include/libyuv.h"
 
 namespace libwebrtc {
 

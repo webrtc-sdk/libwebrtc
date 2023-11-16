@@ -25,13 +25,9 @@ scoped_refptr<RTCVideoFrame> VideoFrameBufferImpl::Copy() {
   return frame;
 }
 
-int VideoFrameBufferImpl::width() const {
-  return buffer_->width();
-}
+int VideoFrameBufferImpl::width() const { return buffer_->width(); }
 
-int VideoFrameBufferImpl::height() const {
-  return buffer_->height();
-}
+int VideoFrameBufferImpl::height() const { return buffer_->height(); }
 
 const uint8_t* VideoFrameBufferImpl::DataY() const {
   return buffer_->GetI420()->DataY();
@@ -57,10 +53,8 @@ int VideoFrameBufferImpl::StrideV() const {
   return buffer_->GetI420()->StrideV();
 }
 
-int VideoFrameBufferImpl::ConvertToARGB(Type type,
-                                        uint8_t* dst_buffer,
-                                        int dst_stride,
-                                        int dest_width,
+int VideoFrameBufferImpl::ConvertToARGB(Type type, uint8_t* dst_buffer,
+                                        int dst_stride, int dest_width,
                                         int dest_height) {
   rtc::scoped_refptr<webrtc::I420Buffer> i420 =
       webrtc::I420Buffer::Rotate(*buffer_.get(), rotation_);
@@ -117,8 +111,7 @@ libwebrtc::RTCVideoFrame::VideoRotation VideoFrameBufferImpl::rotation() {
   return RTCVideoFrame::kVideoRotation_0;
 }
 
-scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width,
-                                                   int height,
+scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width, int height,
                                                    const uint8_t* buffer,
                                                    int length) {
   int stride_y = width;
@@ -143,14 +136,9 @@ scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width,
   return frame;
 }
 
-scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width,
-                                                   int height,
-                                                   const uint8_t* data_y,
-                                                   int stride_y,
-                                                   const uint8_t* data_u,
-                                                   int stride_u,
-                                                   const uint8_t* data_v,
-                                                   int stride_v) {
+scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(
+    int width, int height, const uint8_t* data_y, int stride_y,
+    const uint8_t* data_u, int stride_u, const uint8_t* data_v, int stride_v) {
   rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Copy(
       width, height, data_y, stride_y, data_u, stride_u, data_v, stride_v);
 

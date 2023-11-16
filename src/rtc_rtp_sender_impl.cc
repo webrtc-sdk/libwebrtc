@@ -56,17 +56,13 @@ scoped_refptr<RTCDtlsTransport> RTCRtpSenderImpl::dtls_transport() const {
       rtp_sender_->dtls_transport());
 }
 
-uint32_t RTCRtpSenderImpl::ssrc() const {
-  return rtp_sender_->ssrc();
-}
+uint32_t RTCRtpSenderImpl::ssrc() const { return rtp_sender_->ssrc(); }
 
 RTCMediaType RTCRtpSenderImpl::media_type() const {
   return static_cast<RTCMediaType>(rtp_sender_->media_type());
 }
 
-const string RTCRtpSenderImpl::id() const {
-  return rtp_sender_->id();
-}
+const string RTCRtpSenderImpl::id() const { return rtp_sender_->id(); }
 
 const vector<string> RTCRtpSenderImpl::stream_ids() const {
   std::vector<string> vec;

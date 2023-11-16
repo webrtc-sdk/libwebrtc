@@ -297,7 +297,7 @@ MFX_DEPRECATED_ENUM_FIELD_OUTSIDE(MFX_EXTBUFF_HEVCFEI_ENC_DIST);
 #endif  // MFX_VERSION
 
 #ifdef __cplusplus
-} /* extern "C" */
+}      /* extern "C" */
 #endif /* __cplusplus */
 
 #endif  // __MFXFEIHEVC_H__

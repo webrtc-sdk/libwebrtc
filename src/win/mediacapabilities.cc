@@ -3,8 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "src/win/mediacapabilities.h"
+
 #include <string>
 #include <vector>
+
 #include "mfxcommon.h"
 #include "mfxstructures.h"
 #include "rtc_base/logging.h"
@@ -54,8 +56,7 @@ MediaCapabilities::SupportedCapabilitiesForVideoEncoder(
     unsigned short platform_code = mfx_platform_.CodeName;
     if (platform_code >= MFX_PLATFORM_HASWELL) {
       support_h264 = true;
-      if (platform_code > MFX_PLATFORM_BROADWELL)
-        h264_lp = true;
+      if (platform_code > MFX_PLATFORM_BROADWELL) h264_lp = true;
       if (platform_code >= MFX_PLATFORM_KABYLAKE) {
         // Spec says KBL/CFL/ICL/TGL. Apply to all after KBL.
         h264_argb = true;
@@ -81,15 +82,13 @@ MediaCapabilities::SupportedCapabilitiesForVideoEncoder(
           video_param.mfx.CodecId = MFX_CODEC_VP9;
           video_param.mfx.CodecProfile = MFX_PROFILE_VP9_0;
           sts = mfx_encoder_->Query(nullptr, &video_param);
-          if (sts != MFX_ERR_NONE)
-            support_vp9_8 &= false;
+          if (sts != MFX_ERR_NONE) support_vp9_8 &= false;
 
           memset(&video_param, 0, sizeof(video_param));
           video_param.mfx.CodecId = MFX_CODEC_VP9;
           video_param.mfx.CodecProfile = MFX_PROFILE_VP9_2;
           sts = mfx_encoder_->Query(nullptr, &video_param);
-          if (sts != MFX_ERR_NONE)
-            support_vp9_10 &= false;
+          if (sts != MFX_ERR_NONE) support_vp9_10 &= false;
 
           // VP9 will always be low power. And for MSDK, temporal scalability
           // and tiles don't work togehter. Also be noted we only support
@@ -134,8 +133,7 @@ MediaCapabilities::SupportedCapabilitiesForVideoEncoder(
           video_param.mfx.CodecId = MFX_CODEC_AVC;
           // Don't check profiles. We know we can support from CB up to High.
           sts = mfx_encoder_->Query(nullptr, &video_param);
-          if (sts != MFX_ERR_NONE)
-            support_h264 &= false;
+          if (sts != MFX_ERR_NONE) support_h264 &= false;
 
           if (support_h264) {
             VideoEncoderCapability avc_cap;
@@ -170,8 +168,7 @@ MediaCapabilities::SupportedCapabilitiesForVideoDecoder(
     unsigned short platform_code = mfx_platform_.CodeName;
     for (auto& codec : codec_types) {
       if (codec == owt::base::VideoCodec::kVp9) {
-        if (platform_code < MFX_PLATFORM_KABYLAKE)
-          continue;
+        if (platform_code < MFX_PLATFORM_KABYLAKE) continue;
 
         memset(&video_param, 0, sizeof(video_param));
         video_param.mfx.CodecId = MFX_CODEC_VP9;
@@ -277,26 +274,21 @@ MediaCapabilities::~MediaCapabilities() {
 bool MediaCapabilities::Init() {
   bool res = false;
   msdk_factory_ = owt::base::MSDKFactory::Get();
-  if (!msdk_factory_)
-    goto failed;
+  if (!msdk_factory_) goto failed;
 
   mfx_session_ = msdk_factory_->CreateSession();
-  if (!mfx_session_)
-    goto failed;
+  if (!mfx_session_) goto failed;
 
   // Create the underlying MFXVideoDECODE and MFXVideoENCODE
   // instances.
   mfx_encoder_.reset(new MFXVideoENCODE(*mfx_session_));
-  if (!mfx_encoder_)
-    goto failed;
+  if (!mfx_encoder_) goto failed;
 
   mfx_decoder_.reset(new MFXVideoDECODE(*mfx_session_));
-  if (!mfx_decoder_)
-    goto failed;
+  if (!mfx_decoder_) goto failed;
 
   res = msdk_factory_->QueryPlatform(mfx_session_, &mfx_platform_);
-  if (res)
-    inited_ = true;
+  if (res) inited_ = true;
 failed:
   return res;
 }

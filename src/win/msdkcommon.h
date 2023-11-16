@@ -5,12 +5,12 @@
 #ifndef OWT_BASE_WIN_MSDKCOMMON_H_
 #define OWT_BASE_WIN_MSDKCOMMON_H_
 
-#include <mutex>
-
 #include <mfxcommon.h>
 #include <mfxdefs.h>
 #include <mfxplugin++.h>
 #include <mfxvideo++.h>
+
+#include <mutex>
 
 #ifdef WEBRTC_WIN
 #include <tchar.h>

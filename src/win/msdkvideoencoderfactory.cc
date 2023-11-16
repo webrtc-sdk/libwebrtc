@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "src/win/msdkvideoencoderfactory.h"
+
 #include <string>
+
 #include "absl/strings/match.h"
 #include "modules/video_coding/codecs/av1/libaom_av1_encoder.h"
 #include "modules/video_coding/codecs/h264/include/h264.h"

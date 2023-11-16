@@ -118,8 +118,7 @@ D3DFrameAllocator::~D3DFrameAllocator() {
 mfxStatus D3DFrameAllocator::Init(mfxAllocatorParams* pParams) {
   D3DAllocatorParams* pd3dParams = 0;
   pd3dParams = static_cast<D3DAllocatorParams*>(pParams);
-  if (!pd3dParams)
-    return MFX_ERR_NOT_INITIALIZED;
+  if (!pd3dParams) return MFX_ERR_NOT_INITIALIZED;
 
   m_manager = pd3dParams->pManager;
   m_surfaceUsage = pd3dParams->surfaceUsage;
@@ -144,18 +143,15 @@ mfxStatus D3DFrameAllocator::Close() {
 }
 
 mfxStatus D3DFrameAllocator::LockFrame(mfxMemId mid, mfxFrameData* ptr) {
-  if (!ptr || !mid)
-    return MFX_ERR_NULL_PTR;
+  if (!ptr || !mid) return MFX_ERR_NULL_PTR;
 
   mfxHDLPair* dxmid = (mfxHDLPair*)mid;
   IDirect3DSurface9* pSurface = static_cast<IDirect3DSurface9*>(dxmid->first);
-  if (pSurface == 0)
-    return MFX_ERR_INVALID_HANDLE;
+  if (pSurface == 0) return MFX_ERR_INVALID_HANDLE;
 
   D3DSURFACE_DESC desc;
   HRESULT hr = pSurface->GetDesc(&desc);
-  if (FAILED(hr))
-    return MFX_ERR_LOCK_MEMORY;
+  if (FAILED(hr)) return MFX_ERR_LOCK_MEMORY;
 
   if (desc.Format != D3DFMT_NV12 && desc.Format != D3DFMT_YV12 &&
       desc.Format != D3DFMT_YUY2 && desc.Format != D3DFMT_R8G8B8 &&
@@ -168,8 +164,7 @@ mfxStatus D3DFrameAllocator::LockFrame(mfxMemId mid, mfxFrameData* ptr) {
   D3DLOCKED_RECT locked;
 
   hr = pSurface->LockRect(&locked, 0, D3DLOCK_NOSYSLOCK);
-  if (FAILED(hr))
-    return MFX_ERR_LOCK_MEMORY;
+  if (FAILED(hr)) return MFX_ERR_LOCK_MEMORY;
 
   switch ((DWORD)desc.Format) {
     case D3DFMT_NV12:
@@ -238,13 +233,11 @@ mfxStatus D3DFrameAllocator::LockFrame(mfxMemId mid, mfxFrameData* ptr) {
 }
 
 mfxStatus D3DFrameAllocator::UnlockFrame(mfxMemId mid, mfxFrameData* ptr) {
-  if (!mid)
-    return MFX_ERR_NULL_PTR;
+  if (!mid) return MFX_ERR_NULL_PTR;
 
   mfxHDLPair* dxmid = (mfxHDLPair*)mid;
   IDirect3DSurface9* pSurface = static_cast<IDirect3DSurface9*>(dxmid->first);
-  if (pSurface == 0)
-    return MFX_ERR_INVALID_HANDLE;
+  if (pSurface == 0) return MFX_ERR_INVALID_HANDLE;
 
   pSurface->UnlockRect();
 
@@ -259,8 +252,7 @@ mfxStatus D3DFrameAllocator::UnlockFrame(mfxMemId mid, mfxFrameData* ptr) {
 }
 
 mfxStatus D3DFrameAllocator::GetFrameHDL(mfxMemId mid, mfxHDL* handle) {
-  if (!mid || !handle)
-    return MFX_ERR_NULL_PTR;
+  if (!mid || !handle) return MFX_ERR_NULL_PTR;
 
   mfxHDLPair* dxMid = (mfxHDLPair*)mid;
   *handle = dxMid->first;
@@ -269,8 +261,7 @@ mfxStatus D3DFrameAllocator::GetFrameHDL(mfxMemId mid, mfxHDL* handle) {
 
 mfxStatus D3DFrameAllocator::CheckRequestType(mfxFrameAllocRequest* request) {
   mfxStatus sts = BaseFrameAllocator::CheckRequestType(request);
-  if (MFX_ERR_NONE != sts)
-    return sts;
+  if (MFX_ERR_NONE != sts) return sts;
 
   if ((request->Type & (MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET |
                         MFX_MEMTYPE_VIDEO_MEMORY_PROCESSOR_TARGET)) != 0)
@@ -280,8 +271,7 @@ mfxStatus D3DFrameAllocator::CheckRequestType(mfxFrameAllocRequest* request) {
 }
 
 mfxStatus D3DFrameAllocator::ReleaseResponse(mfxFrameAllocResponse* response) {
-  if (!response)
-    return MFX_ERR_NULL_PTR;
+  if (!response) return MFX_ERR_NULL_PTR;
 
   mfxStatus sts = MFX_ERR_NONE;
 
@@ -304,8 +294,7 @@ mfxStatus D3DFrameAllocator::AllocImpl(mfxFrameAllocRequest* request,
                                        mfxFrameAllocResponse* response) {
   HRESULT hr;
 
-  if (request->NumFrameSuggested == 0)
-    return MFX_ERR_UNKNOWN;
+  if (request->NumFrameSuggested == 0) return MFX_ERR_UNKNOWN;
 
   D3DFORMAT format = ConvertMfxFourccToD3dFormat(request->Info.FourCC);
 
@@ -327,35 +316,30 @@ mfxStatus D3DFrameAllocator::AllocImpl(mfxFrameAllocRequest* request,
   if (target == DXVA2_VideoProcessorRenderTarget) {
     if (!m_hProcessor) {
       hr = m_manager->OpenDeviceHandle(&m_hProcessor);
-      if (FAILED(hr))
-        return MFX_ERR_MEMORY_ALLOC;
+      if (FAILED(hr)) return MFX_ERR_MEMORY_ALLOC;
 
       hr = m_manager->GetVideoService(m_hProcessor,
                                       IID_IDirectXVideoProcessorService,
                                       (void**)&m_processorService);
-      if (FAILED(hr))
-        return MFX_ERR_MEMORY_ALLOC;
+      if (FAILED(hr)) return MFX_ERR_MEMORY_ALLOC;
     }
     videoService = m_processorService;
   } else {
     if (!m_hDecoder) {
       hr = m_manager->OpenDeviceHandle(&m_hDecoder);
-      if (FAILED(hr))
-        return MFX_ERR_MEMORY_ALLOC;
+      if (FAILED(hr)) return MFX_ERR_MEMORY_ALLOC;
 
       hr = m_manager->GetVideoService(m_hDecoder,
                                       IID_IDirectXVideoDecoderService,
                                       (void**)&m_decoderService);
-      if (FAILED(hr))
-        return MFX_ERR_MEMORY_ALLOC;
+      if (FAILED(hr)) return MFX_ERR_MEMORY_ALLOC;
     }
     videoService = m_decoderService;
   }
 
   mfxHDLPair** dxMidPtrs =
       (mfxHDLPair**)calloc(request->NumFrameSuggested, sizeof(mfxHDLPair*));
-  if (!dxMidPtrs)
-    return MFX_ERR_MEMORY_ALLOC;
+  if (!dxMidPtrs) return MFX_ERR_MEMORY_ALLOC;
 
   for (int i = 0; i < request->NumFrameSuggested; i++) {
     dxMidPtrs[i] = (mfxHDLPair*)calloc(1, sizeof(mfxHDLPair));

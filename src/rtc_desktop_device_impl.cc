@@ -1,4 +1,5 @@
 #include "rtc_desktop_device_impl.h"
+
 #include "rtc_base/thread.h"
 #include "rtc_desktop_capturer.h"
 #include "rtc_desktop_media_list.h"

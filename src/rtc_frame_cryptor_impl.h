@@ -1,13 +1,12 @@
 #ifndef LIB_RTC_FRAME_CYRPTOR_IMPL_H_
 #define LIB_RTC_FRAME_CYRPTOR_IMPL_H_
 
-#include "rtc_frame_cryptor.h"
-#include "rtc_rtp_receiver_impl.h"
-#include "rtc_rtp_sender_impl.h"
-
 #include "api/crypto/frame_crypto_transformer.h"
 #include "api/rtp_receiver_interface.h"
 #include "api/rtp_sender_interface.h"
+#include "rtc_frame_cryptor.h"
+#include "rtc_rtp_receiver_impl.h"
+#include "rtc_rtp_sender_impl.h"
 
 namespace libwebrtc {
 class DefaultKeyProviderImpl : public KeyProvider {
@@ -38,8 +37,7 @@ class DefaultKeyProviderImpl : public KeyProvider {
   }
 
   /// Set the key at the given index.
-  bool SetKey(const string participant_id,
-              int index,
+  bool SetKey(const string participant_id, int index,
               vector<uint8_t> key) override {
     return impl_->SetKey(participant_id.std_string(), index, key.std_vector());
   }
@@ -64,9 +62,9 @@ class DefaultKeyProviderImpl : public KeyProvider {
   rtc::scoped_refptr<webrtc::DefaultKeyProviderImpl> impl_;
 };
 
-
-class RTCFrameCryptorObserverAdapter : public webrtc::FrameCryptorTransformerObserver {
-  public:
+class RTCFrameCryptorObserverAdapter
+    : public webrtc::FrameCryptorTransformerObserver {
+ public:
   RTCFrameCryptorObserverAdapter() = default;
   void OnFrameCryptionStateChanged(const std::string participant_id,
                                    webrtc::FrameCryptionState error) override;
@@ -81,22 +79,20 @@ class RTCFrameCryptorObserverAdapter : public webrtc::FrameCryptorTransformerObs
     observer_ = nullptr;
   }
 
-  private:
-    mutable webrtc::Mutex mutex_;
-    scoped_refptr<RTCFrameCryptorObserver> observer_;
+ private:
+  mutable webrtc::Mutex mutex_;
+  scoped_refptr<RTCFrameCryptorObserver> observer_;
 };
 
 class RTCFrameCryptorImpl : public RTCFrameCryptor {
  public:
   RTCFrameCryptorImpl(scoped_refptr<RTCPeerConnectionFactory> factory,
-                     const string participant_id,
-                      Algorithm algorithm,
+                      const string participant_id, Algorithm algorithm,
                       scoped_refptr<KeyProvider> key_provider,
                       scoped_refptr<RTCRtpSender> sender);
 
-  RTCFrameCryptorImpl(scoped_refptr<RTCPeerConnectionFactory> factory, 
-                      const string participant_id,
-                      Algorithm algorithm,
+  RTCFrameCryptorImpl(scoped_refptr<RTCPeerConnectionFactory> factory,
+                      const string participant_id, Algorithm algorithm,
                       scoped_refptr<KeyProvider> key_provider,
                       scoped_refptr<RTCRtpReceiver> receiver);
   ~RTCFrameCryptorImpl();

@@ -41,7 +41,7 @@ typedef struct {
 MFX_PACK_END()
 
 #ifdef __cplusplus
-}  // extern "C"
+}      // extern "C"
 #endif /* __cplusplus */
 
 #endif

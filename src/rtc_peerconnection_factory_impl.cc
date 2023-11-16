@@ -1,11 +1,4 @@
 #include "rtc_peerconnection_factory_impl.h"
-#include "rtc_audio_source_impl.h"
-#include "rtc_media_stream_impl.h"
-#include "rtc_mediaconstraints_impl.h"
-#include "rtc_peerconnection_impl.h"
-#include "rtc_rtp_capabilities_impl.h"
-#include "rtc_video_device_impl.h"
-#include "rtc_video_source_impl.h"
 
 #include "api/audio_codecs/builtin_audio_decoder_factory.h"
 #include "api/audio_codecs/builtin_audio_encoder_factory.h"
@@ -14,6 +7,13 @@
 #include "api/video_codecs/builtin_video_decoder_factory.h"
 #include "api/video_codecs/builtin_video_encoder_factory.h"
 #include "modules/audio_device/audio_device_impl.h"
+#include "rtc_audio_source_impl.h"
+#include "rtc_media_stream_impl.h"
+#include "rtc_mediaconstraints_impl.h"
+#include "rtc_peerconnection_impl.h"
+#include "rtc_rtp_capabilities_impl.h"
+#include "rtc_video_device_impl.h"
+#include "rtc_video_source_impl.h"
 #if defined(USE_INTEL_MEDIA_SDK)
 #include "src/win/mediacapabilities.h"
 #include "src/win/msdkvideodecoderfactory.h"
@@ -106,8 +106,7 @@ void RTCPeerConnectionFactoryImpl::CreateAudioDeviceModule_w() {
 }
 
 void RTCPeerConnectionFactoryImpl::DestroyAudioDeviceModule_w() {
-  if (audio_device_module_)
-    audio_device_module_ = nullptr;
+  if (audio_device_module_) audio_device_module_ = nullptr;
 }
 
 scoped_refptr<RTCPeerConnection> RTCPeerConnectionFactoryImpl::Create(
@@ -176,16 +175,14 @@ RTCPeerConnectionFactoryImpl::GetDesktopDevice() {
 #endif
 
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource(
-    scoped_refptr<RTCVideoCapturer> capturer,
-    const string video_source_label,
+    scoped_refptr<RTCVideoCapturer> capturer, const string video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
   if (rtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCVideoSource> source = signaling_thread_->BlockingCall(
         [this, capturer, video_source_label, constraints] {
-              return CreateVideoSource_s(
-                  capturer, to_std_string(video_source_label).c_str(),
-                  constraints);
-         });
+          return CreateVideoSource_s(
+              capturer, to_std_string(video_source_label).c_str(), constraints);
+        });
     return source;
   }
 
@@ -194,8 +191,7 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource(
 }
 
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
-    scoped_refptr<RTCVideoCapturer> capturer,
-    const char* video_source_label,
+    scoped_refptr<RTCVideoCapturer> capturer, const char* video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
   RTCVideoCapturerImpl* capturer_impl =
       static_cast<RTCVideoCapturerImpl*>(capturer.get());
@@ -212,16 +208,14 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
 
 #ifdef RTC_DESKTOP_DEVICE
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource(
-    scoped_refptr<RTCDesktopCapturer> capturer,
-    const string video_source_label,
+    scoped_refptr<RTCDesktopCapturer> capturer, const string video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
   if (rtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCVideoSource> source = signaling_thread_->BlockingCall(
         [this, capturer, video_source_label, constraints] {
-              return CreateDesktopSource_d(
-                  capturer, to_std_string(video_source_label).c_str(),
-                  constraints);
-            });
+          return CreateDesktopSource_d(
+              capturer, to_std_string(video_source_label).c_str(), constraints);
+        });
     return source;
   }
 
@@ -231,8 +225,7 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource(
 
 scoped_refptr<RTCVideoSource>
 RTCPeerConnectionFactoryImpl::CreateDesktopSource_d(
-    scoped_refptr<RTCDesktopCapturer> capturer,
-    const char* video_source_label,
+    scoped_refptr<RTCDesktopCapturer> capturer, const char* video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
   rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
       rtc::scoped_refptr<webrtc::VideoTrackSourceInterface>(
@@ -258,8 +251,7 @@ scoped_refptr<RTCMediaStream> RTCPeerConnectionFactoryImpl::CreateStream(
 }
 
 scoped_refptr<RTCVideoTrack> RTCPeerConnectionFactoryImpl::CreateVideoTrack(
-    scoped_refptr<RTCVideoSource> source,
-    const string track_id) {
+    scoped_refptr<RTCVideoSource> source, const string track_id) {
   scoped_refptr<RTCVideoSourceImpl> source_adapter(
       static_cast<RTCVideoSourceImpl*>(source.get()));
   rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_video_track =
@@ -282,8 +274,7 @@ scoped_refptr<RTCVideoTrack> RTCPeerConnectionFactoryImpl::CreateVideoTrack(
 }
 
 scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
-    scoped_refptr<RTCAudioSource> source,
-    const string track_id) {
+    scoped_refptr<RTCAudioSource> source, const string track_id) {
   RTCAudioSourceImpl* source_impl =
       static_cast<RTCAudioSourceImpl*>(source.get());
 
@@ -302,8 +293,8 @@ RTCPeerConnectionFactoryImpl::GetRtpSenderCapabilities(
   if (rtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCRtpCapabilities> capabilities =
         signaling_thread_->BlockingCall([this, media_type] {
-              return GetRtpSenderCapabilities(media_type);
-            });
+          return GetRtpSenderCapabilities(media_type);
+        });
     return capabilities;
   }
 
@@ -330,8 +321,8 @@ RTCPeerConnectionFactoryImpl::GetRtpReceiverCapabilities(
   if (rtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCRtpCapabilities> capabilities =
         signaling_thread_->BlockingCall([this, media_type] {
-              return GetRtpSenderCapabilities(media_type);
-            });
+          return GetRtpSenderCapabilities(media_type);
+        });
     return capabilities;
   }
   cricket::MediaType type = cricket::MediaType::MEDIA_TYPE_AUDIO;

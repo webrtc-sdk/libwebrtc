@@ -1,4 +1,5 @@
 #include "rtc_audio_device_impl.h"
+
 #include "rtc_base/logging.h"
 
 namespace libwebrtc {
@@ -106,8 +107,7 @@ int32_t AudioDeviceImpl::OnDeviceChange(OnDeviceChangeCallback listener) {
 }
 
 void AudioDeviceImpl::OnDevicesUpdated() {
-  if (listener_)
-    listener_();
+  if (listener_) listener_();
 }
 
 }  // namespace libwebrtc

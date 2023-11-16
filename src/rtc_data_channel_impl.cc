@@ -13,8 +13,7 @@ RTCDataChannelImpl::~RTCDataChannelImpl() {
   rtc_data_channel_->UnregisterObserver();
 }
 
-void RTCDataChannelImpl::Send(const uint8_t* data,
-                              uint32_t size,
+void RTCDataChannelImpl::Send(const uint8_t* data, uint32_t size,
                               bool binary /*= false*/) {
   rtc::CopyOnWriteBuffer copyOnWriteBuffer(data, size);
   webrtc::DataBuffer buffer(copyOnWriteBuffer, binary);
@@ -36,13 +35,9 @@ void RTCDataChannelImpl::UnregisterObserver() {
   observer_ = nullptr;
 }
 
-const string RTCDataChannelImpl::label() const {
-  return label_;
-}
+const string RTCDataChannelImpl::label() const { return label_; }
 
-int RTCDataChannelImpl::id() const {
-  return rtc_data_channel_->id();
-}
+int RTCDataChannelImpl::id() const { return rtc_data_channel_->id(); }
 
 void RTCDataChannelImpl::OnStateChange() {
   webrtc::DataChannelInterface::DataState state = rtc_data_channel_->state();
@@ -63,13 +58,10 @@ void RTCDataChannelImpl::OnStateChange() {
       break;
   }
   webrtc::MutexLock(crit_sect_.get());
-  if (observer_)
-    observer_->OnStateChange(state_);
+  if (observer_) observer_->OnStateChange(state_);
 }
 
-RTCDataChannelState RTCDataChannelImpl::state() {
-  return state_;
-}
+RTCDataChannelState RTCDataChannelImpl::state() { return state_; }
 
 void RTCDataChannelImpl::OnMessage(const webrtc::DataBuffer& buffer) {
   if (observer_)

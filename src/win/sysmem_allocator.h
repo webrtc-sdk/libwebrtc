@@ -41,6 +41,7 @@ https://software.intel.com/en-us/media-client-solutions-support.
 #define __SYSMEM_ALLOCATOR_H__
 
 #include <stdlib.h>
+
 #include "base_allocator.h"
 
 namespace owt {

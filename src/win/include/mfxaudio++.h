@@ -93,8 +93,7 @@ class MFXAudioDECODE {
   virtual mfxStatus GetAudioParam(mfxAudioParam* par) {
     return MFXAudioDECODE_GetAudioParam(m_session, par);
   }
-  virtual mfxStatus DecodeFrameAsync(mfxBitstream* bs,
-                                     mfxAudioFrame* frame,
+  virtual mfxStatus DecodeFrameAsync(mfxBitstream* bs, mfxAudioFrame* frame,
                                      mfxSyncPoint* syncp) {
     return MFXAudioDECODE_DecodeFrameAsync(m_session, bs, frame, syncp);
   }

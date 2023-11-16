@@ -3,8 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "src/win/msdkvideoencoder.h"
+
 #include <string>
 #include <vector>
+
 #include "absl/algorithm/container.h"
 #include "common_video/h264/h264_common.h"
 #include "libyuv/convert_from.h"
@@ -82,8 +84,7 @@ MSDKVideoEncoder::~MSDKVideoEncoder() {
 }
 
 int MSDKVideoEncoder::InitEncode(const webrtc::VideoCodec* codec_settings,
-                                 int number_of_cores,
-                                 size_t max_payload_size) {
+                                 int number_of_cores, size_t max_payload_size) {
   RTC_DCHECK(codec_settings);
 
   width_ = codec_settings->width;
@@ -102,8 +103,7 @@ int MSDKVideoEncoder::InitEncode(const webrtc::VideoCodec* codec_settings,
       });
 }
 
-mfxStatus MSDKConvertFrameRate(mfxF64 dFrameRate,
-                               mfxU32* pnFrameRateExtN,
+mfxStatus MSDKConvertFrameRate(mfxF64 dFrameRate, mfxU32* pnFrameRateExtN,
                                mfxU32* pnFrameRateExtD) {
   mfxU32 fr;
   fr = (mfxU32)(dFrameRate + 0.5);
@@ -129,8 +129,7 @@ mfxStatus MSDKConvertFrameRate(mfxF64 dFrameRate,
 }
 
 int MSDKVideoEncoder::InitEncodeOnEncoderThread(
-    const webrtc::VideoCodec* codec_settings,
-    int number_of_cores,
+    const webrtc::VideoCodec* codec_settings, int number_of_cores,
     size_t max_payload_size) {
   mfxStatus sts;
   RTC_LOG(LS_INFO) << "InitEncodeOnEncoderThread: maxBitrate:"
@@ -269,8 +268,7 @@ int MSDKVideoEncoder::InitEncodeOnEncoderThread(
       std::min(static_cast<int>(
                    codec_settings->simulcastStream[0].numberOfTemporalLayers),
                3);
-  if (num_temporal_layers_ == 0)
-    num_temporal_layers_ = 1;
+  if (num_temporal_layers_ == 0) num_temporal_layers_ = 1;
 
   if (!m_enc_ext_params_.empty()) {
     m_mfx_enc_params_.ExtParam =
@@ -353,8 +351,7 @@ mfxU16 MSDKVideoEncoder::MSDKGetFreeSurface(mfxFrameSurface1* pSurfacesPool,
 }
 
 mfxU16 MSDKVideoEncoder::MSDKGetFreeSurfaceIndex(
-    mfxFrameSurface1* pSurfacesPool,
-    mfxU16 nPoolSize) {
+    mfxFrameSurface1* pSurfacesPool, mfxU16 nPoolSize) {
   if (pSurfacesPool) {
     for (mfxU16 i = 0; i < nPoolSize; i++) {
       if (0 == pSurfacesPool[i].Data.Locked) {
@@ -652,8 +649,7 @@ int MSDKVideoEncoder::Release() {
     }
     m_mfx_session_ = nullptr;
   }
-  if (m_pmfx_allocator_)
-    m_pmfx_allocator_->Close();
+  if (m_pmfx_allocator_) m_pmfx_allocator_->Close();
   m_pmfx_allocator_.reset();
 
   inited_ = false;
@@ -662,8 +658,7 @@ int MSDKVideoEncoder::Release() {
   return WEBRTC_VIDEO_CODEC_OK;
 }
 
-int32_t MSDKVideoEncoder::NextNaluPosition(uint8_t* buffer,
-                                           size_t buffer_size,
+int32_t MSDKVideoEncoder::NextNaluPosition(uint8_t* buffer, size_t buffer_size,
                                            uint8_t* sc_length) {
   if (buffer_size < NAL_SC_LENGTH) {
     return -1;

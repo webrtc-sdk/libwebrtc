@@ -10,7 +10,6 @@
 #endif
 #include "rtc_base/thread.h"
 #include "rtc_desktop_device.h"
-
 #include "rtc_desktop_media_list_impl.h"
 
 namespace libwebrtc {

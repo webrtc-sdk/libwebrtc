@@ -18,11 +18,8 @@ uint32_t RTCVideoDeviceImpl::NumberOfDevices() {
 }
 
 int32_t RTCVideoDeviceImpl::GetDeviceName(
-    uint32_t deviceNumber,
-    char* deviceNameUTF8,
-    uint32_t deviceNameLength,
-    char* deviceUniqueIdUTF8,
-    uint32_t deviceUniqueIdUTF8Length,
+    uint32_t deviceNumber, char* deviceNameUTF8, uint32_t deviceNameLength,
+    char* deviceUniqueIdUTF8, uint32_t deviceUniqueIdUTF8Length,
     char* productUniqueIdUTF8 /*= 0*/,
     uint32_t productUniqueIdUTF8Length /*= 0*/) {
   if (!device_info_) {
@@ -50,9 +47,9 @@ scoped_refptr<RTCVideoCapturer> RTCVideoDeviceImpl::Create(const char* name,
   }
 
   return signaling_thread_->BlockingCall([vcm] {
-        return scoped_refptr<RTCVideoCapturerImpl>(
-            new RefCountedObject<RTCVideoCapturerImpl>(vcm));
-      });
+    return scoped_refptr<RTCVideoCapturerImpl>(
+        new RefCountedObject<RTCVideoCapturerImpl>(vcm));
+  });
 }
 
 }  // namespace libwebrtc

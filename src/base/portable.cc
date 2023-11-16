@@ -2,14 +2,10 @@
 
 namespace portable {
 
-static int strncpy_safe(char* dest,
-                        size_t numberOfElements,
-                        const char* src,
+static int strncpy_safe(char* dest, size_t numberOfElements, const char* src,
                         size_t count) {
-  if (!count)
-    return 0;
-  if (!dest || !src || !numberOfElements)
-    return -1;
+  if (!count) return 0;
+  if (!dest || !src || !numberOfElements) return -1;
   size_t end = count != _TRUNCATE && count < numberOfElements
                    ? count
                    : numberOfElements - 1;
@@ -25,9 +21,7 @@ static int strncpy_safe(char* dest,
   return -1;
 }
 
-string::string() : m_dynamic(0), m_length(0) {
-  m_buf[0] = 0;
-}
+string::string() : m_dynamic(0), m_length(0) { m_buf[0] = 0; }
 
 void string::init(const char* str, size_t len) {
   m_length = len;
@@ -41,12 +35,10 @@ void string::init(const char* str, size_t len) {
 }
 
 void string::destroy() {
-  if (m_dynamic != 0)
-    delete[] m_dynamic;
+  if (m_dynamic != 0) delete[] m_dynamic;
 }
 
 string ::~string() {
-  if (m_dynamic != 0)
-    delete[] m_dynamic;
+  if (m_dynamic != 0) delete[] m_dynamic;
 }
 }  // namespace portable

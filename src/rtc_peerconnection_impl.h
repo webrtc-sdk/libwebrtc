@@ -37,22 +37,18 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   virtual bool Initialize();
 
   virtual void CreateOffer(
-      OnSdpCreateSuccess success,
-      OnSdpCreateFailure failure,
+      OnSdpCreateSuccess success, OnSdpCreateFailure failure,
       scoped_refptr<RTCMediaConstraints> constraints) override;
 
   virtual void CreateAnswer(
-      OnSdpCreateSuccess success,
-      OnSdpCreateFailure failure,
+      OnSdpCreateSuccess success, OnSdpCreateFailure failure,
       scoped_refptr<RTCMediaConstraints> constraints) override;
 
-  virtual void SetLocalDescription(const string sdp,
-                                   const string type,
+  virtual void SetLocalDescription(const string sdp, const string type,
                                    OnSetSdpSuccess success,
                                    OnSetSdpFailure failure) override;
 
-  virtual void SetRemoteDescription(const string sdp,
-                                    const string type,
+  virtual void SetRemoteDescription(const string sdp, const string type,
                                     OnSetSdpSuccess success,
                                     OnSetSdpFailure failure) override;
 
@@ -62,8 +58,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   virtual void GetRemoteDescription(OnGetSdpSuccess success,
                                     OnGetSdpFailure failure) override;
 
-  virtual void AddCandidate(const string mid,
-                            int midx,
+  virtual void AddCandidate(const string mid, int midx,
                             const string candiate) override;
 
   virtual void RestartIce() override;
@@ -90,8 +85,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
       scoped_refptr<RTCRtpTransceiverInit> init) override;
 
   virtual scoped_refptr<RTCRtpSender> AddTrack(
-      scoped_refptr<RTCMediaTrack> track,
-      vector<string> streamIds) override;
+      scoped_refptr<RTCMediaTrack> track, vector<string> streamIds) override;
 
   virtual bool RemoveTrack(scoped_refptr<RTCRtpSender> render) override;
 
@@ -128,8 +122,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   virtual RTCIceGatheringState ice_gathering_state() override;
 
   virtual scoped_refptr<RTCDataChannel> CreateDataChannel(
-      const string label,
-      RTCDataChannelInit* dataChannelDict) override;
+      const string label, RTCDataChannelInit* dataChannelDict) override;
 
   virtual bool GetStats(scoped_refptr<RTCRtpSender> sender,
                         OnStatsCollectorSuccess success,

@@ -23,7 +23,6 @@
 #include "modules/desktop_capture/desktop_capturer.h"
 #include "modules/desktop_capture/desktop_frame.h"
 #include "rtc_base/thread.h"
-
 #include "rtc_desktop_capturer_impl.h"
 #include "rtc_desktop_media_list.h"
 
@@ -34,8 +33,7 @@ class RTCDesktopMediaListImpl;
 class MediaSourceImpl : public MediaSource {
  public:
   MediaSourceImpl(RTCDesktopMediaListImpl* mediaList,
-                  webrtc::DesktopCapturer::Source src,
-                  DesktopType type)
+                  webrtc::DesktopCapturer::Source src, DesktopType type)
       : source(src), mediaList_(mediaList), type_(type) {}
   virtual ~MediaSourceImpl() {}
 
@@ -96,6 +94,7 @@ class RTCDesktopMediaListImpl : public RTCDesktopMediaList {
 
   bool GetThumbnail(scoped_refptr<MediaSource> source,
                     bool notify = false) override;
+
  private:
   class CallbackProxy : public webrtc::DesktopCapturer::Callback {
    public:
@@ -110,8 +109,7 @@ class RTCDesktopMediaListImpl : public RTCDesktopMediaList {
    private:
     void OnCaptureResult(webrtc::DesktopCapturer::Result result,
                          std::unique_ptr<webrtc::DesktopFrame> frame) override {
-      if (on_capture_result_)
-        on_capture_result_(result, std::move(frame));
+      if (on_capture_result_) on_capture_result_(result, std::move(frame));
     }
     std::function<void(webrtc::DesktopCapturer::Result result,
                        std::unique_ptr<webrtc::DesktopFrame> frame)>

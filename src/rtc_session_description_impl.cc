@@ -3,20 +3,20 @@
 namespace libwebrtc {
 
 scoped_refptr<RTCSessionDescription> RTCSessionDescription::Create(
-    const string type,
-    const string sdp,
-    SdpParseError* error) {
+    const string type, const string sdp, SdpParseError* error) {
   webrtc::SdpParseError sdp_error;
   std::unique_ptr<webrtc::SessionDescriptionInterface> rtc_description(
       webrtc::CreateSessionDescription(to_std_string(type), to_std_string(sdp),
                                        &sdp_error));
   error->description = sdp_error.description;
   error->line = sdp_error.line;
-  scoped_refptr<RTCSessionDescriptionImpl> session_description =
-      scoped_refptr<RTCSessionDescriptionImpl>(
-          new RefCountedObject<RTCSessionDescriptionImpl>(
-              std::move(rtc_description)));
-  return session_description;
+  if (rtc_description) {
+    return scoped_refptr<RTCSessionDescriptionImpl>(
+        new RefCountedObject<RTCSessionDescriptionImpl>(
+            std::move(rtc_description)));
+  }
+
+  return nullptr;
 }
 
 RTCSessionDescriptionImpl::RTCSessionDescriptionImpl(

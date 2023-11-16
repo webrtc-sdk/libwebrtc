@@ -143,9 +143,7 @@ void RTCRtpParametersImpl::set_transaction_id(const string id) {
   rtp_parameters_.transaction_id = to_std_string(id);
 }
 
-const string RTCRtpParametersImpl::mid() {
-  return rtp_parameters_.mid;
-}
+const string RTCRtpParametersImpl::mid() { return rtp_parameters_.mid; }
 void RTCRtpParametersImpl::set_mid(const string mid) {
   rtp_parameters_.mid = to_std_string(mid);
 }
@@ -276,9 +274,7 @@ void RTCRtcpParametersImpl::set_ssrc(uint32_t value) {
   rtcp_parameters_.ssrc = value;
 }
 
-const string RTCRtcpParametersImpl::cname() {
-  return rtcp_parameters_.cname;
-}
+const string RTCRtcpParametersImpl::cname() { return rtcp_parameters_.cname; }
 void RTCRtcpParametersImpl::set_cname(const string cname) {
   rtcp_parameters_.cname = to_std_string(cname);
 }
@@ -291,9 +287,7 @@ void RTCRtcpParametersImpl::set_reduced_size(bool value) {
   rtcp_parameters_.reduced_size = value;
 }
 
-bool RTCRtcpParametersImpl::mux() {
-  return rtcp_parameters_.mux;
-}
+bool RTCRtcpParametersImpl::mux() { return rtcp_parameters_.mux; }
 void RTCRtcpParametersImpl::set_mux(bool value) {}
 bool RTCRtcpParametersImpl::operator==(
     scoped_refptr<RTCRtcpParameters> o) const {
@@ -317,25 +311,17 @@ bool RTCRtpExtensionImpl::operator==(scoped_refptr<RTCRtpExtension> o) const {
          static_cast<RTCRtpExtensionImpl*>(o.get())->rtp_extension();
 }
 
-const string RTCRtpExtensionImpl::uri() {
-  return rtp_extension_.uri;
-}
+const string RTCRtpExtensionImpl::uri() { return rtp_extension_.uri; }
 
 void RTCRtpExtensionImpl::set_uri(const string uri) {
   rtp_extension_.uri = to_std_string(uri);
 }
 
-int RTCRtpExtensionImpl::id() {
-  return rtp_extension_.id;
-}
+int RTCRtpExtensionImpl::id() { return rtp_extension_.id; }
 
-void RTCRtpExtensionImpl::set_id(int value) {
-  rtp_extension_.id = value;
-}
+void RTCRtpExtensionImpl::set_id(int value) { rtp_extension_.id = value; }
 
-bool RTCRtpExtensionImpl::encrypt() {
-  return rtp_extension_.encrypt;
-}
+bool RTCRtpExtensionImpl::encrypt() { return rtp_extension_.encrypt; }
 
 void RTCRtpExtensionImpl::set_encrypt(bool value) {
   rtp_extension_.encrypt = value;
@@ -398,21 +384,21 @@ void RTCRtpCodecParametersImpl::set_num_channels(int value) {
 }
 
 int RTCRtpCodecParametersImpl::max_ptime() {
-  //return rtp_codec_parameters_.max_ptime.value_or(0);
+  // return rtp_codec_parameters_.max_ptime.value_or(0);
   return 0;
 }
 
 void RTCRtpCodecParametersImpl::set_max_ptime(int value) {
-  //rtp_codec_parameters_.max_ptime = value;
+  // rtp_codec_parameters_.max_ptime = value;
 }
 
 int RTCRtpCodecParametersImpl::ptime() {
-  //return rtp_codec_parameters_.ptime.value_or(0);
+  // return rtp_codec_parameters_.ptime.value_or(0);
   return 0;
 }
 
 void RTCRtpCodecParametersImpl::set_ptime(int value) {
-  //rtp_codec_parameters_.ptime = value;
+  // rtp_codec_parameters_.ptime = value;
 }
 
 const vector<scoped_refptr<RTCRtcpFeedback>>

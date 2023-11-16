@@ -22,12 +22,9 @@ class RTCDtmfSenderImpl : public RTCDtmfSender,
   virtual int duration() const override;
   virtual int inter_tone_gap() const override;
   virtual int comma_delay() const override;
-  virtual bool InsertDtmf(const string tones,
-                          int duration,
+  virtual bool InsertDtmf(const string tones, int duration,
                           int inter_tone_gap) override;
-  virtual bool InsertDtmf(const string tones,
-                          int duration,
-                          int inter_tone_gap,
+  virtual bool InsertDtmf(const string tones, int duration, int inter_tone_gap,
                           int comma_delay) override;
   virtual const string tones() const override;
 

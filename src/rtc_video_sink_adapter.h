@@ -1,12 +1,11 @@
 #ifndef LIB_WEBRTC_VIDEO_SINK_ADPTER_HXX
 #define LIB_WEBRTC_VIDEO_SINK_ADPTER_HXX
 
-#include "rtc_peerconnection.h"
-#include "rtc_video_frame.h"
-
 #include "api/media_stream_interface.h"
 #include "api/peer_connection_interface.h"
 #include "rtc_base/synchronization/mutex.h"
+#include "rtc_peerconnection.h"
+#include "rtc_video_frame.h"
 
 namespace libwebrtc {
 

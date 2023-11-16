@@ -6,6 +6,7 @@
 #define OWT_BASE_MEDIAUTILS_H_
 
 #include <string>
+
 #include "absl/types/optional.h"
 #include "api/video_codecs/sdp_video_format.h"
 #include "src/win/commontypes.h"
@@ -168,10 +169,8 @@ class MediaUtils {
   static AudioCodec GetAudioCodecFromString(const std::string& codec_name);
   static VideoCodec GetVideoCodecFromString(const std::string& codec_name);
   static absl::optional<unsigned int> GetH264TemporalLayers();
-  static bool GetH264TemporalInfo(uint8_t* buffer,
-                                  size_t buffer_length,
-                                  int& temporal_id,
-                                  int& priority_id,
+  static bool GetH264TemporalInfo(uint8_t* buffer, size_t buffer_length,
+                                  int& temporal_id, int& priority_id,
                                   bool& is_idr);
   static absl::optional<AV1Profile> ParseSdpForAV1Profile(
       const webrtc::SdpVideoFormat::Parameters& params);

@@ -15,10 +15,8 @@ extern "C" {
 namespace libwebrtc {
 
 std::vector<unsigned char> EncodeRGBToJpeg(const unsigned char* rgb_buf,
-                                           int width,
-                                           int height,
-                                           int color_planes,
-                                           int quality) {
+                                           int width, int height,
+                                           int color_planes, int quality) {
   std::vector<unsigned char> result;
   unsigned char* out_buffer = NULL;
   unsigned long out_size = 0;

@@ -125,8 +125,7 @@ class MFXVideoENCODE {
 
   virtual mfxStatus EncodeFrameAsync(mfxEncodeCtrl* ctrl,
                                      mfxFrameSurface1* surface,
-                                     mfxBitstream* bs,
-                                     mfxSyncPoint* syncp) {
+                                     mfxBitstream* bs, mfxSyncPoint* syncp) {
     return MFXVideoENCODE_EncodeFrameAsync(m_session, ctrl, surface, bs, syncp);
   }
 
@@ -248,8 +247,7 @@ class MFXVideoENC {
   virtual mfxStatus GetVideoParam(mfxVideoParam* par) {
     return MFXVideoENC_GetVideoParam(m_session, par);
   }
-  virtual mfxStatus ProcessFrameAsync(mfxENCInput* in,
-                                      mfxENCOutput* out,
+  virtual mfxStatus ProcessFrameAsync(mfxENCInput* in, mfxENCOutput* out,
                                       mfxSyncPoint* syncp) {
     return MFXVideoENC_ProcessFrameAsync(m_session, in, out, syncp);
   }
@@ -284,8 +282,7 @@ class MFXVideoPAK {
   // virtual mfxStatus GetEncodeStat(mfxEncodeStat *stat) { return
   // MFXVideoENCODE_GetEncodeStat(m_session, stat); }
 
-  virtual mfxStatus ProcessFrameAsync(mfxPAKInput* in,
-                                      mfxPAKOutput* out,
+  virtual mfxStatus ProcessFrameAsync(mfxPAKInput* in, mfxPAKOutput* out,
                                       mfxSyncPoint* syncp) {
     return MFXVideoPAK_ProcessFrameAsync(m_session, in, out, syncp);
   }
