@@ -19,6 +19,9 @@ class DefaultKeyProviderImpl : public KeyProvider {
         options->uncrypted_magic_bytes.std_vector();
     rtc_options.ratchet_window_size = options->ratchet_window_size;
     rtc_options.failure_tolerance = options->failure_tolerance;
+    rtc_options.key_ring_size = options->key_ring_size;
+    rtc_options.discard_frame_when_cryptor_not_ready =
+        options->discard_frame_when_cryptor_not_ready;
     impl_ =
         new rtc::RefCountedObject<webrtc::DefaultKeyProviderImpl>(rtc_options);
   }
