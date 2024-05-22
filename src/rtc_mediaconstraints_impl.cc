@@ -40,8 +40,8 @@ const char* RTCMediaConstraints::kEnableDscp =
 const char* RTCMediaConstraints::kEnableIPv6 = "enable_ipv6";
 const char* RTCMediaConstraints::kEnableVideoSuspendBelowMinBitrate =
     webrtc::MediaConstraints::kEnableVideoSuspendBelowMinBitrate;
-const char* RTCMediaConstraints::kCombinedAudioVideoBwe =
-    webrtc::MediaConstraints::kCombinedAudioVideoBwe;
+//const char* RTCMediaConstraints::kCombinedAudioVideoBwe =
+//    webrtc::MediaConstraints::kCombinedAudioVideoBwe;
 const char* RTCMediaConstraints::kScreencastMinBitrate =
     webrtc::MediaConstraints::kScreencastMinBitrate;
 const char* RTCMediaConstraints::kCpuOveruseDetection =
