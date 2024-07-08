@@ -1,11 +1,13 @@
 #ifndef LIB_WEBRTC_MEDIA_STREAM_IMPL_HXX
 #define LIB_WEBRTC_MEDIA_STREAM_IMPL_HXX
 
+#include "api/media_stream_interface.h"
+#include "api/peer_connection_interface.h"
+
 #include "rtc_media_stream.h"
 #include "rtc_peerconnection.h"
 
-#include "api/media_stream_interface.h"
-#include "api/peer_connection_interface.h"
+
 
 namespace libwebrtc {
 
@@ -36,40 +38,40 @@ class WebRTCStatsCollectorCallback : public webrtc::RTCStatsCollectorCallback {
 
 class RTCStatsMemberImpl : public RTCStatsMember {
  public:
-  RTCStatsMemberImpl(const webrtc::Attribute* member)
+  RTCStatsMemberImpl(const webrtc::Attribute member)
       : attr_(member) {}
   ~RTCStatsMemberImpl() {}
 
-  string GetName() const override { return string(attr_->name()); }
+  string GetName() const override { return std::string(attr_.name()); }
 
   Type GetType() const override {
-    if (attr_->holds_alternative<bool>()) {
+    if (attr_.holds_alternative<bool>()) {
       return Type::kBool;
-    } else if (attr_->holds_alternative<int32_t>()) {
+    } else if (attr_.holds_alternative<int32_t>()) {
        return Type::kInt32;
-    } else if (attr_->holds_alternative<uint32_t>()) {
+    } else if (attr_.holds_alternative<uint32_t>()) {
        return Type::kUint32;
-    } else if (attr_->holds_alternative<int64_t>()) {
+    } else if (attr_.holds_alternative<int64_t>()) {
         return Type::kInt64;
-    } else if (attr_->holds_alternative<uint64_t>()) {
+    } else if (attr_.holds_alternative<uint64_t>()) {
         return Type::kUint64;
-    } else if (attr_->holds_alternative<double>()) {
+    } else if (attr_.holds_alternative<double>()) {
         return Type::kDouble;
-    } else if (attr_->holds_alternative<std::string>()) {
+    } else if (attr_.holds_alternative<std::string>()) {
         return Type::kString;
-    } else if (attr_->holds_alternative<std::vector<bool>>()) {
+    } else if (attr_.holds_alternative<std::vector<bool>>()) {
         return Type::kSequenceBool;
-    } else if (attr_->holds_alternative<std::vector<int32_t>>()) {
+    } else if (attr_.holds_alternative<std::vector<int32_t>>()) {
         return Type::kSequenceInt32;
-    } else if (attr_->holds_alternative<std::vector<uint32_t>>()) { 
+    } else if (attr_.holds_alternative<std::vector<uint32_t>>()) {
         return Type::kSequenceUint32;
-    } else if (attr_->holds_alternative<std::vector<int64_t>>()) {
+    } else if (attr_.holds_alternative<std::vector<int64_t>>()) {
         return Type::kSequenceInt64;
-    } else if (attr_->holds_alternative<std::vector<uint64_t>>()) {
+    } else if (attr_.holds_alternative<std::vector<uint64_t>>()) {
         return Type::kSequenceUint64;
-    } else if (attr_->holds_alternative<std::vector<double>>()) {
+    } else if (attr_.holds_alternative<std::vector<double>>()) {
         return Type::kSequenceDouble;
-    } else if (attr_->holds_alternative<std::vector<std::string>>()) {
+    } else if (attr_.holds_alternative<std::vector<std::string>>()) {
         return Type::kSequenceString;
     }
     
@@ -77,63 +79,63 @@ class RTCStatsMemberImpl : public RTCStatsMember {
   }
 
   bool IsDefined() const override { 
-      return attr_->has_value();
+    return attr_.has_value();
   }
 
   bool ValueBool() const override {
-    return attr_->get<bool>();
+    return attr_.get<bool>();
   }
 
   int32_t ValueInt32() const override {
-    return attr_->get<int32_t>();
+    return attr_.get<int32_t>();
   }
 
   uint32_t ValueUint32() const override {
-    return attr_->get<uint32_t>();
+    return attr_.get<uint32_t>();
   }
 
   int64_t ValueInt64() const override {
-    return attr_->get<int64_t>();
+    return attr_.get<int64_t>();
   }
 
   uint64_t ValueUint64() const override { 
-    return attr_->get<uint64_t>();
+    return attr_.get<uint64_t>();
   }
 
   double ValueDouble() const override { 
-    return attr_->get<double>();
+    return attr_.get<double>();
   }
 
   string ValueString() const override { 
-      return attr_->get<std::string>();
+      return attr_.holds_alternative<std::string>() ? attr_.get<std::string>() : "";
   }
 
   vector<bool> ValueSequenceBool() const override {
-    return attr_->get<std::vector<bool>>();
+    return attr_.get<std::vector<bool>>();
   }
 
   vector<int32_t> ValueSequenceInt32() const override {
-    return attr_->get<std::vector<int32_t>>();
+    return attr_.get<std::vector<int32_t>>();
   }
 
   vector<uint32_t> ValueSequenceUint32() const override {
-    return attr_->get<std::vector<uint32_t>>();
+    return attr_.get<std::vector<uint32_t>>();
   }
 
   vector<int64_t> ValueSequenceInt64() const override {
-    return attr_->get<std::vector<int64_t>>();
+    return attr_.get<std::vector<int64_t>>();
   }
 
   vector<uint64_t> ValueSequenceUint64() const override {
-    return attr_->get<std::vector<uint64_t>>();
+    return attr_.get<std::vector<uint64_t>>();
   }
 
   vector<double> ValueSequenceDouble() const override {
-    return attr_->get<std::vector<double>>();
+    return attr_.get<std::vector<double>>();
   }
 
   vector<string> ValueSequenceString() const override {
-    return attr_->get<std::vector<std::string>>();
+    return attr_.get<std::vector<std::string>>();
   }
 
   map<string, uint64_t> ValueMapStringUint64() const override {
@@ -151,7 +153,7 @@ class RTCStatsMemberImpl : public RTCStatsMember {
   }
 
  private:
-  const webrtc::Attribute* attr_;
+  const webrtc::Attribute attr_;
 };
 
 class MediaRTCStatsImpl : public MediaRTCStats {
@@ -169,7 +171,8 @@ class MediaRTCStatsImpl : public MediaRTCStats {
   virtual const vector<scoped_refptr<RTCStatsMember>> Members() override {
     members_.clear();
     for (const webrtc::Attribute attr : stats_->Attributes()) {
-      members_.push_back(new RefCountedObject<RTCStatsMemberImpl>(&attr));
+      if (!attr.has_value()) continue;
+      members_.push_back(new RefCountedObject<RTCStatsMemberImpl>(attr));
     }
     return members_;
   }
