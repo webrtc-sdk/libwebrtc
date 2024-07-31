@@ -10,7 +10,7 @@ possible supported platforms
 
 ## Note
 
-Use the https://github.com/webrtc-sdk/webrtc.git branch m114_release to compile.
+Use the https://github.com/webrtc-sdk/webrtc.git branch m125_release to compile.
 
 ## Usage
 
@@ -27,7 +27,7 @@ cd libwebrtc_build
 solutions = [
   {
     "name"        : 'src',
-    "url"         : 'https://github.com/webrtc-sdk/webrtc.git@m114_release',
+    "url"         : 'https://github.com/webrtc-sdk/webrtc.git@m124_release',
     "deps_file"   : 'DEPS',
     "managed"     : False,
     "custom_deps" : {
