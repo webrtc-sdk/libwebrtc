@@ -38,8 +38,7 @@ bool VcmCapturer::Init(size_t width, size_t height, size_t target_fps,
     return false;
   }
 
-  vcm_ = worker_thread_->BlockingCall(
-      [&] { return webrtc::VideoCaptureFactory::Create(unique_name); });
+  vcm_ = webrtc::VideoCaptureFactory::Create(unique_name);
 
   if (!vcm_) {
     return false;

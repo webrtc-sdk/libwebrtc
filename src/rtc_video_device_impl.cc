@@ -4,10 +4,8 @@
 
 namespace libwebrtc {
 
-RTCVideoDeviceImpl::RTCVideoDeviceImpl(rtc::Thread* signaling_thread,
-                                       rtc::Thread* worker_thread)
+RTCVideoDeviceImpl::RTCVideoDeviceImpl(rtc::Thread* worker_thread)
     : device_info_(webrtc::VideoCaptureFactory::CreateDeviceInfo()),
-      signaling_thread_(signaling_thread),
       worker_thread_(worker_thread) {}
 
 uint32_t RTCVideoDeviceImpl::NumberOfDevices() {
@@ -39,14 +37,16 @@ scoped_refptr<RTCVideoCapturer> RTCVideoDeviceImpl::Create(const char* name,
                                                            size_t width,
                                                            size_t height,
                                                            size_t target_fps) {
-  auto vcm = webrtc::internal::VcmCapturer::Create(worker_thread_, width,
-                                                   height, target_fps, index);
+  auto vcm = worker_thread_->BlockingCall([&, width, height, target_fps]{
+    return webrtc::internal::VcmCapturer::Create(worker_thread_, width, height,
+                                                 target_fps, index);
+   });
 
   if (vcm == nullptr) {
     return nullptr;
   }
 
-  return signaling_thread_->BlockingCall([vcm] {
+  return worker_thread_->BlockingCall([vcm] {
     return scoped_refptr<RTCVideoCapturerImpl>(
         new RefCountedObject<RTCVideoCapturerImpl>(vcm));
   });
