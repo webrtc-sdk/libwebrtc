@@ -2,7 +2,9 @@ import("../webrtc.gni")
 
 declare_args() {
   libwebrtc_intel_media_sdk = false
-  libwebrtc_desktop_capture = true
+  libwebrtc_desktop_capture = false
+  libwebrtc_video_capture = false
+  libwebrtc_dummy_audio_device = true
 }
 
 if (is_android) {
@@ -41,8 +43,13 @@ rtc_shared_library("libwebrtc") {
 
   defines = [
     "USE_LIBYUV",
-    "WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE",
   ]
+
+  if(libwebrtc_dummy_audio_device) {
+    defines += [ "LIB_WEBRTC_USE_DUMMY_AUDIO_DEVICE" ]
+  } else {
+    defines += [ "WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE" ]
+  }
 
   if (is_win) {
     defines += [
@@ -69,6 +76,7 @@ rtc_shared_library("libwebrtc") {
     "include/base/scoped_ref_ptr.h",
     "include/libwebrtc.h",
     "include/rtc_audio_device.h",
+    "include/rtc_audio_frame.h",
     "include/rtc_audio_source.h",
     "include/rtc_audio_track.h",
     "include/rtc_data_channel.h",
@@ -88,7 +96,6 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_rtp_transceiver.h",
     "include/rtc_session_description.h",
     "include/rtc_types.h",
-    "include/rtc_video_device.h",
     "include/rtc_video_frame.h",
     "include/rtc_video_renderer.h",
     "include/rtc_video_source.h",
@@ -96,13 +103,11 @@ rtc_shared_library("libwebrtc") {
     "include/helper.h",
     "src/helper.cc",
     "src/base/portable.cc",
-    "src/internal/vcm_capturer.cc",
-    "src/internal/vcm_capturer.h",
-    "src/internal/video_capturer.cc",
-    "src/internal/video_capturer.h",
     "src/libwebrtc.cc",
     "src/rtc_audio_device_impl.cc",
     "src/rtc_audio_device_impl.h",
+    "src/rtc_audio_frame_impl.cc",
+    "src/rtc_audio_frame_impl.h",
     "src/rtc_audio_source_impl.cc",
     "src/rtc_audio_source_impl.h",
     "src/rtc_audio_track_impl.cc",
@@ -137,8 +142,6 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_rtp_transceiver_impl.h",
     "src/rtc_session_description_impl.cc",
     "src/rtc_session_description_impl.h",
-    "src/rtc_video_device_impl.cc",
-    "src/rtc_video_device_impl.h",
     "src/rtc_video_frame_impl.cc",
     "src/rtc_video_frame_impl.h",
     "src/rtc_video_sink_adapter.cc",
@@ -149,6 +152,28 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_video_track_impl.h",
   ]
 
+  if(libwebrtc_dummy_audio_device) {
+    sources += [
+      "src/audio_device_dummy.cc",
+      "src/audio_device_dummy.h",
+    ]
+  }
+
+
+  # video capture device
+  if (libwebrtc_video_capture) {
+    defines += [ "RTC_VIDEO_CAPTURE_DEVICE" ]
+    sources += [
+      "include/rtc_video_capturer.h",
+      "src/internal/video_capturer.h",
+      "src/internal/video_capturer.cc",
+      "src/internal/vcm_capturer.cc",
+      "src/internal/vcm_capturer.h",
+      "src/rtc_video_device_impl.cc",
+      "src/rtc_video_device_impl.h",
+    ]
+  }
+  
   # intel media sdk
   if (is_win && libwebrtc_intel_media_sdk) {
     sources += [
@@ -235,7 +260,7 @@ rtc_shared_library("libwebrtc") {
 
   # screen capture device
   if (libwebrtc_desktop_capture) {
-    defines += [ "RTC_DESKTOP_DEVICE" ]
+    defines += [ "RTC_DESKTOP_CAPTURE_DEVICE" ]
     sources += [
       "include/rtc_desktop_capturer.h",
       "include/rtc_desktop_device.h",

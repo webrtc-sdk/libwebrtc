@@ -4,7 +4,7 @@
 #include "rtc_audio_source.h"
 #include "rtc_audio_track.h"
 #include "rtc_types.h"
-#ifdef RTC_DESKTOP_DEVICE
+#ifdef RTC_DESKTOP_CAPTURE_DEVICE
 #include "rtc_desktop_device.h"
 #endif
 #include "rtc_media_stream.h"
@@ -31,24 +31,28 @@ class RTCPeerConnectionFactory : public RefCountInterface {
 
   virtual void Delete(scoped_refptr<RTCPeerConnection> peerconnection) = 0;
 
+#if !defined(LIB_WEBRTC_USE_DUMMY_AUDIO_DEVICE)
   virtual scoped_refptr<RTCAudioDevice> GetAudioDevice() = 0;
-
-  virtual scoped_refptr<RTCVideoDevice> GetVideoDevice() = 0;
-#ifdef RTC_DESKTOP_DEVICE
-  virtual scoped_refptr<RTCDesktopDevice> GetDesktopDevice() = 0;
 #endif
-  virtual scoped_refptr<RTCAudioSource> CreateAudioSource(
-      const string audio_source_label) = 0;
 
+#ifdef RTC_VIDEO_CAPTURE_DEVICE
+  virtual scoped_refptr<RTCVideoDevice> GetVideoDevice() = 0;
   virtual scoped_refptr<RTCVideoSource> CreateVideoSource(
       scoped_refptr<RTCVideoCapturer> capturer, const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) = 0;
-#ifdef RTC_DESKTOP_DEVICE
+#endif
+
+#ifdef RTC_DESKTOP_CAPTURE_DEVICE
+  virtual scoped_refptr<RTCDesktopDevice> GetDesktopDevice() = 0;
   virtual scoped_refptr<RTCVideoSource> CreateDesktopSource(
       scoped_refptr<RTCDesktopCapturer> capturer,
       const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) = 0;
 #endif
+
+  virtual scoped_refptr<RTCAudioSource> CreateAudioSource(
+      const string audio_source_label) = 0;
+
   virtual scoped_refptr<RTCAudioTrack> CreateAudioTrack(
       scoped_refptr<RTCAudioSource> source, const string track_id) = 0;
 

@@ -2,6 +2,7 @@
 #define LIB_WEBRTC_VIDEO_SOURCE_IMPL_HXX
 
 #include "api/media_stream_interface.h"
+#include "media/base/adapted_video_track_source.h"
 #include "media/base/video_broadcaster.h"
 #include "media/base/video_source_base.h"
 #include "rtc_peerconnection_factory_impl.h"

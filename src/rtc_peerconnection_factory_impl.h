@@ -10,9 +10,12 @@
 #include "rtc_base/thread.h"
 #include "rtc_peerconnection.h"
 #include "rtc_peerconnection_factory.h"
-#include "rtc_video_device_impl.h"
 
-#ifdef RTC_DESKTOP_DEVICE
+#ifdef RTC_VIDEO_CAPTURE_DEVICE
+#include "rtc_video_device_impl.h"
+#endif
+
+#ifdef RTC_DESKTOP_CAPTURE_DEVICE
 #include "rtc_desktop_capturer_impl.h"
 #include "rtc_desktop_device_impl.h"
 #include "src/internal/desktop_capturer.h"
@@ -36,28 +39,36 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
 
   void Delete(scoped_refptr<RTCPeerConnection> peerconnection) override;
 
+#if !defined(LIB_WEBRTC_USE_DUMMY_AUDIO_DEVICE)
   scoped_refptr<RTCAudioDevice> GetAudioDevice() override;
+#endif
 
+#ifdef RTC_VIDEO_CAPTURE_DEVICE
   scoped_refptr<RTCVideoDevice> GetVideoDevice() override;
+#endif
 
   virtual scoped_refptr<RTCAudioSource> CreateAudioSource(
       const string audio_source_label) override;
 
+  virtual scoped_refptr<RTCAudioTrack> CreateAudioTrack(
+      scoped_refptr<RTCAudioSource> source, const string track_id) override;
+
+  virtual scoped_refptr<RTCVideoTrack> CreateVideoTrack(
+      scoped_refptr<RTCVideoSource> source, const string track_id) override;
+
+#ifdef RTC_VIDEO_CAPTURE_DEVICE
   virtual scoped_refptr<RTCVideoSource> CreateVideoSource(
       scoped_refptr<RTCVideoCapturer> capturer, const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) override;
-#ifdef RTC_DESKTOP_DEVICE
+#endif
+
+#ifdef RTC_DESKTOP_CAPTURE_DEVICE
   virtual scoped_refptr<RTCDesktopDevice> GetDesktopDevice() override;
   virtual scoped_refptr<RTCVideoSource> CreateDesktopSource(
       scoped_refptr<RTCDesktopCapturer> capturer,
       const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) override;
 #endif
-  virtual scoped_refptr<RTCAudioTrack> CreateAudioTrack(
-      scoped_refptr<RTCAudioSource> source, const string track_id) override;
-
-  virtual scoped_refptr<RTCVideoTrack> CreateVideoTrack(
-      scoped_refptr<RTCVideoSource> source, const string track_id) override;
 
   virtual scoped_refptr<RTCMediaStream> CreateStream(
       const string stream_id) override;
@@ -83,7 +94,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<RTCVideoSource> CreateVideoSource_s(
       scoped_refptr<RTCVideoCapturer> capturer, const char* video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints);
-#ifdef RTC_DESKTOP_DEVICE
+#ifdef RTC_DESKTOP_CAPTURE_DEVICE
   scoped_refptr<RTCVideoSource> CreateDesktopSource_d(
       scoped_refptr<RTCDesktopCapturer> capturer,
       const char* video_source_label,
@@ -95,10 +106,15 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   std::unique_ptr<rtc::Thread> network_thread_;
   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
       rtc_peerconnection_factory_;
+
   rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
+#if !defined(LIB_WEBRTC_USE_DUMMY_AUDIO_DEVICE)
   scoped_refptr<AudioDeviceImpl> audio_device_impl_;
+#endif
+#ifdef RTC_VIDEO_CAPTURE_DEVICE
   scoped_refptr<RTCVideoDeviceImpl> video_device_impl_;
-#ifdef RTC_DESKTOP_DEVICE
+#endif
+#ifdef RTC_DESKTOP_CAPTURE_DEVICE
   scoped_refptr<RTCDesktopDeviceImpl> desktop_device_impl_;
 #endif
   std::list<scoped_refptr<RTCPeerConnection>> peerconnections_;
