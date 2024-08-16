@@ -13,7 +13,7 @@ class RTCVideoSource : public RefCountInterface {
 
 class VirtualVideoCapturer : public RefCountInterface {
  public:
-  LIB_WEBRTC_API static scoped_refptr<VirtualVideoCapturer> Create();
+ LIB_WEBRTC_API static scoped_refptr<VirtualVideoCapturer> Create();
 
   virtual void OnFrameCaptured(scoped_refptr<RTCVideoFrame> frame) = 0; 
 

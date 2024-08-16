@@ -7,9 +7,9 @@ namespace libwebrtc {
 
 class RTCAudioFrame : public RefCountInterface {
  public:
-  LIB_WEBRTC_API static scoped_refptr<RTCAudioFrame> Create();
+ LIB_WEBRTC_API static scoped_refptr<RTCAudioFrame> Create();
 
-  LIB_WEBRTC_API static scoped_refptr<RTCAudioFrame> Create(
+ LIB_WEBRTC_API static scoped_refptr<RTCAudioFrame> Create(
       uint32_t timestamp, const int16_t* data, size_t samples_per_channel,
       int sample_rate_hz, size_t num_channels = 1);
 

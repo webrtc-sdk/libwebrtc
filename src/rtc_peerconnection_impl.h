@@ -137,7 +137,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
 
  public:
   RTCPeerConnectionImpl(
-      const RTCConfiguration& configuration,
+      const RTCConfiguration* configuration,
       scoped_refptr<RTCMediaConstraints> constraints,
       rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
           peer_connection_factory);
@@ -186,8 +186,8 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
       rtc_peerconnection_factory_;
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> rtc_peerconnection_;
-  const RTCConfiguration& configuration_;
-  scoped_refptr<RTCMediaConstraints> constraints_;
+  RTCConfiguration configuration_ = RTCConfiguration();
+  scoped_refptr<RTCMediaConstraints> constraints_ = RTCMediaConstraints::Create();
   webrtc::PeerConnectionInterface::RTCOfferAnswerOptions offer_answer_options_;
   RTCPeerConnectionObserver* observer_ = nullptr;
   std::unique_ptr<webrtc::Mutex> callback_crt_sec_;

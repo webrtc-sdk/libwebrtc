@@ -36,6 +36,11 @@ config("external_config") {
 
 rtc_shared_library("libwebrtc") {
   libs = []
+  visibility = [
+      "//:default",
+  ]
+  #complete_static_lib = true
+  #suppressed_configs += [ "//build/config/compiler:thin_archive" ]
   include_dirs = [
     ".",
     "include",
@@ -43,11 +48,12 @@ rtc_shared_library("libwebrtc") {
 
   defines = [
     "USE_LIBYUV",
+    "SHARED_BUILD",
+    #"USE_PORTABLE_TYPES",
   ]
 
-  if(libwebrtc_dummy_audio_device) {
-    defines += [ "LIB_WEBRTC_USE_DUMMY_AUDIO_DEVICE" ]
-  } else {
+  if(!libwebrtc_dummy_audio_device) {
+    defines += [ "RTC_AUDIO_DEVICE" ]
     defines += [ "WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE" ]
   }
 

@@ -52,7 +52,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
           : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
   e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
       new webrtc::FrameCryptorTransformer(
-          factoryImpl->signaling_thread(), participant_id_.std_string(),
+          factoryImpl->signaling_thread(), to_std_string(participant_id_),
           mediaType, AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_provider()));
   e2ee_transformer_->RegisterFrameCryptorTransformerObserver(observer_);
@@ -82,7 +82,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
           : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
   e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
       new webrtc::FrameCryptorTransformer(
-          factoryImpl->signaling_thread(), participant_id_.std_string(),
+          factoryImpl->signaling_thread(), to_std_string(participant_id_),
           mediaType, AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_provider()));
   e2ee_transformer_->RegisterFrameCryptorTransformerObserver(observer_);

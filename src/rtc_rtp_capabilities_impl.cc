@@ -51,7 +51,7 @@ RTCRtpCapabilitiesImpl::codecs() {
 void RTCRtpCapabilitiesImpl::set_codecs(
     vector<scoped_refptr<RTCRtpCodecCapability>> codecs) {
   rtp_capabilities_.codecs.clear();
-  for (auto& codec : codecs.std_vector()) {
+  for (auto& codec : to_std_vector(codecs)) {
     auto impl = static_cast<RTCRtpCodecCapabilityImpl*>(codec.get());
     rtp_capabilities_.codecs.push_back(impl->rtp_codec_capability());
   }
@@ -71,7 +71,7 @@ RTCRtpCapabilitiesImpl::header_extensions() {
 void RTCRtpCapabilitiesImpl::set_header_extensions(
     vector<scoped_refptr<RTCRtpHeaderExtensionCapability>> header_extensions) {
   rtp_capabilities_.header_extensions.clear();
-  for (auto& header_extension : header_extensions.std_vector()) {
+  for (auto& header_extension : to_std_vector(header_extensions)) {
     auto impl = static_cast<RTCRtpHeaderExtensionCapabilityImpl*>(
         header_extension.get());
     rtp_capabilities_.header_extensions.push_back(
@@ -92,7 +92,7 @@ string RTCRtpCodecCapabilityImpl::mime_type() const {
 }
 
 void RTCRtpCodecCapabilityImpl::set_mime_type(const string& mime_type) {
-  std::vector<std::string> mime_type_split = split(mime_type.std_string(), "/");
+  std::vector<std::string> mime_type_split = split(to_std_string(mime_type), "/");
   rtp_codec_capability_.name = mime_type_split[1];
   cricket::MediaType kind = cricket::MEDIA_TYPE_AUDIO;
   if (mime_type_split[0] == "audio") {
@@ -134,7 +134,7 @@ string RTCRtpCodecCapabilityImpl::sdp_fmtp_line() const {
 }
 
 void RTCRtpCodecCapabilityImpl::set_sdp_fmtp_line(const string& sdp_fmtp_line) {
-  std::vector<std::string> parameters = split(sdp_fmtp_line.std_string(), ";");
+  std::vector<std::string> parameters = split(to_std_string(sdp_fmtp_line), ";");
   for (auto parameter : parameters) {
     if (parameter.find("=") != std::string::npos) {
       std::vector<std::string> parameter_split = split(parameter, "=");
@@ -158,7 +158,7 @@ const string RTCRtpHeaderExtensionCapabilityImpl::uri() {
 }
 
 void RTCRtpHeaderExtensionCapabilityImpl::set_uri(const string uri) {
-  rtp_header_extension_capability_.uri = uri.c_string();
+  rtp_header_extension_capability_.uri = uri.c_str();
 }
 
 webrtc::RtpHeaderExtensionCapability

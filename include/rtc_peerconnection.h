@@ -118,25 +118,25 @@ class MediaRTCStats : public RefCountInterface {
   virtual const vector<scoped_refptr<RTCStatsMember>> Members() = 0;
 };
 
-typedef fixed_size_function<void(
+typedef callback_function_t<void(
     const vector<scoped_refptr<MediaRTCStats>> reports)>
     OnStatsCollectorSuccess;
 
-typedef fixed_size_function<void(const char* error)> OnStatsCollectorFailure;
+typedef callback_function_t<void(const char* error)> OnStatsCollectorFailure;
 
-typedef fixed_size_function<void(const string sdp, const string type)>
+typedef callback_function_t<void(const string sdp, const string type)>
     OnSdpCreateSuccess;
 
-typedef fixed_size_function<void(const char* erro)> OnSdpCreateFailure;
+typedef callback_function_t<void(const char* erro)> OnSdpCreateFailure;
 
-typedef fixed_size_function<void()> OnSetSdpSuccess;
+typedef callback_function_t<void()> OnSetSdpSuccess;
 
-typedef fixed_size_function<void(const char* error)> OnSetSdpFailure;
+typedef callback_function_t<void(const char* error)> OnSetSdpFailure;
 
-typedef fixed_size_function<void(const char* sdp, const char* type)>
+typedef callback_function_t<void(const char* sdp, const char* type)>
     OnGetSdpSuccess;
 
-typedef fixed_size_function<void(const char* error)> OnGetSdpFailure;
+typedef callback_function_t<void(const char* error)> OnGetSdpFailure;
 
 class RTCPeerConnectionObserver {
  public:

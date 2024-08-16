@@ -14,9 +14,9 @@ class DefaultKeyProviderImpl : public KeyProvider {
   DefaultKeyProviderImpl(KeyProviderOptions* options) {
     webrtc::KeyProviderOptions rtc_options;
     rtc_options.shared_key = options->shared_key;
-    rtc_options.ratchet_salt = options->ratchet_salt.std_vector();
+    rtc_options.ratchet_salt = to_std_vector(options->ratchet_salt);
     rtc_options.uncrypted_magic_bytes =
-        options->uncrypted_magic_bytes.std_vector();
+        to_std_vector(options->uncrypted_magic_bytes);
     rtc_options.ratchet_window_size = options->ratchet_window_size;
     rtc_options.failure_tolerance = options->failure_tolerance;
     rtc_options.key_ring_size = options->key_ring_size;
@@ -28,7 +28,7 @@ class DefaultKeyProviderImpl : public KeyProvider {
   ~DefaultKeyProviderImpl() {}
 
   bool SetSharedKey(int index, vector<uint8_t> key) override {
-    return impl_->SetSharedKey(index, key.std_vector());
+    return impl_->SetSharedKey(index, to_std_vector(key));
   }
 
   vector<uint8_t> RatchetSharedKey(int key_index) override {
@@ -42,21 +42,21 @@ class DefaultKeyProviderImpl : public KeyProvider {
   /// Set the key at the given index.
   bool SetKey(const string participant_id, int index,
               vector<uint8_t> key) override {
-    return impl_->SetKey(participant_id.std_string(), index, key.std_vector());
+    return impl_->SetKey(to_std_string(participant_id), index, to_std_vector(key));
   }
 
   vector<uint8_t> RatchetKey(const string participant_id,
                              int key_index) override {
-    return impl_->RatchetKey(participant_id.std_string(), key_index);
+    return impl_->RatchetKey(to_std_string(participant_id), key_index);
   }
 
   vector<uint8_t> ExportKey(const string participant_id,
                             int key_index) override {
-    return impl_->ExportKey(participant_id.std_string(), key_index);
+    return impl_->ExportKey(to_std_string(participant_id), key_index);
   }
 
   void SetSifTrailer(vector<uint8_t> trailer) override {
-    impl_->SetSifTrailer(trailer.std_vector());
+    impl_->SetSifTrailer(to_std_vector(trailer));
   }
 
   rtc::scoped_refptr<webrtc::KeyProvider> rtc_key_provider() { return impl_; }

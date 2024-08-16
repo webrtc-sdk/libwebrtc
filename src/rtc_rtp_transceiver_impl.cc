@@ -9,10 +9,10 @@
 
 namespace libwebrtc {
 
-LIB_WEBRTC_API scoped_refptr<RTCRtpTransceiverInit>
+scoped_refptr<RTCRtpTransceiverInit>
 RTCRtpTransceiverInit::Create(
-    RTCRtpTransceiverDirection direction, const vector<string> stream_ids,
-    const vector<scoped_refptr<RTCRtpEncodingParameters>> encodings) {
+      RTCRtpTransceiverDirection direction, const vector<string> stream_ids,
+      const vector<scoped_refptr<RTCRtpEncodingParameters>> encodings) {
   auto init = new RefCountedObject<RTCRtpTransceiverInitImpl>();
   init->set_direction(direction);
   init->set_stream_ids(stream_ids);
@@ -43,7 +43,7 @@ const vector<string> RTCRtpTransceiverInitImpl::stream_ids() {
 
 void RTCRtpTransceiverInitImpl::set_stream_ids(const vector<string> ids) {
   std::vector<std::string> list;
-  for (auto id : ids.std_vector()) {
+  for (auto id : to_std_vector(ids)) {
     list.push_back(to_std_string(id));
   }
   rtp_transceiver_init_.stream_ids = list;
@@ -61,7 +61,7 @@ RTCRtpTransceiverInitImpl::send_encodings() {
 void RTCRtpTransceiverInitImpl::set_send_encodings(
     const vector<scoped_refptr<RTCRtpEncodingParameters>> send_encodings) {
   std::vector<webrtc::RtpEncodingParameters> list;
-  for (auto param : send_encodings.std_vector()) {
+  for (auto param : to_std_vector(send_encodings)) {
     auto impl = static_cast<RTCRtpEncodingParametersImpl*>(param.get());
     list.push_back(impl->rtp_parameters());
   }
@@ -153,7 +153,7 @@ RTCMediaType RTCRtpTransceiverImpl::media_type() const {
 void RTCRtpTransceiverImpl::SetCodecPreferences(
     vector<scoped_refptr<RTCRtpCodecCapability>> codecs) {
   std::vector<webrtc::RtpCodecCapability> list;
-  for (auto codec : codecs.std_vector()) {
+  for (auto codec : to_std_vector(codecs)) {
     auto impl = static_cast<RTCRtpCodecCapabilityImpl*>(codec.get());
     list.push_back(impl->rtp_codec_capability());
   }

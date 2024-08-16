@@ -27,7 +27,7 @@ class RTCDtlsTransportInformation : public RefCountInterface {
 
 class RTCDtlsTransportObserver {
  public:
-  virtual void OnStateChange(RTCDtlsTransportInformation info) = 0;
+  virtual void OnStateChange(scoped_refptr<RTCDtlsTransportInformation> info) = 0;
 
   virtual void OnError(const int type, const char* message) = 0;
 
@@ -36,7 +36,7 @@ class RTCDtlsTransportObserver {
 };
 
 class RTCDtlsTransport : public RefCountInterface {
-  LIB_WEBRTC_API static scoped_refptr<RTCDtlsTransport> Create();
+ LIB_WEBRTC_API static scoped_refptr<RTCDtlsTransport> Create();
 
  public:
   virtual scoped_refptr<RTCDtlsTransportInformation> GetInformation() = 0;

@@ -9,14 +9,20 @@
 #endif
 #include "rtc_media_stream.h"
 #include "rtc_mediaconstraints.h"
+#ifdef RTC_VIDEO_CAPTURE_DEVICE
 #include "rtc_video_device.h"
+#endif
 #include "rtc_video_source.h"
 
 namespace libwebrtc {
 
 class RTCPeerConnection;
+#ifdef RTC_AUDIO_DEVICE
 class RTCAudioDevice;
+#endif
+#ifdef RTC_VIDEO_CAPTURE_DEVICE
 class RTCVideoDevice;
+#endif
 class RTCRtpCapabilities;
 
 class RTCPeerConnectionFactory : public RefCountInterface {
@@ -26,12 +32,12 @@ class RTCPeerConnectionFactory : public RefCountInterface {
   virtual bool Terminate() = 0;
 
   virtual scoped_refptr<RTCPeerConnection> Create(
-      const RTCConfiguration& configuration,
-      scoped_refptr<RTCMediaConstraints> constraints) = 0;
+      const RTCConfiguration* configuration = nullptr,
+      scoped_refptr<RTCMediaConstraints> constraints = nullptr) = 0;
 
   virtual void Delete(scoped_refptr<RTCPeerConnection> peerconnection) = 0;
 
-#if !defined(LIB_WEBRTC_USE_DUMMY_AUDIO_DEVICE)
+#ifdef RTC_AUDIO_DEVICE
   virtual scoped_refptr<RTCAudioDevice> GetAudioDevice() = 0;
 #endif
 

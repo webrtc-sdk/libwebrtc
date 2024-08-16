@@ -94,7 +94,7 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
 
 bool RTCPeerConnectionFactoryImpl::Terminate() {
   worker_thread_->BlockingCall([&] {
-#if !defined(LIB_WEBRTC_USE_DUMMY_AUDIO_DEVICE)
+#ifdef RTC_AUDIO_DEVICE
     audio_device_impl_ = nullptr;
 #endif
   #ifdef RTC_VIDEO_CAPTURE_DEVICE
@@ -127,7 +127,7 @@ void RTCPeerConnectionFactoryImpl::DestroyAudioDeviceModule_w() {
 }
 
 scoped_refptr<RTCPeerConnection> RTCPeerConnectionFactoryImpl::Create(
-    const RTCConfiguration& configuration,
+    const RTCConfiguration* configuration,
     scoped_refptr<RTCMediaConstraints> constraints) {
   scoped_refptr<RTCPeerConnection> peerconnection =
       scoped_refptr<RTCPeerConnectionImpl>(
@@ -148,7 +148,7 @@ void RTCPeerConnectionFactoryImpl::Delete(
       peerconnections_.end());
 }
 
-#if !defined(LIB_WEBRTC_USE_DUMMY_AUDIO_DEVICE)
+#ifdef RTC_AUDIO_DEVICE
 scoped_refptr<RTCAudioDevice> RTCPeerConnectionFactoryImpl::GetAudioDevice() {
   if (!audio_device_module_) {
     worker_thread_->BlockingCall([this] { CreateAudioDeviceModule_w(); });
@@ -282,7 +282,7 @@ scoped_refptr<RTCVideoTrack> RTCPeerConnectionFactoryImpl::CreateVideoTrack(
       static_cast<RTCVideoSourceImpl*>(source.get()));
   rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_video_track =
       rtc_peerconnection_factory_->CreateVideoTrack(
-          source_adapter->rtc_source_track(), track_id.std_string());
+          source_adapter->rtc_source_track(), to_std_string(track_id));
 
   scoped_refptr<VideoTrackImpl> video_track = scoped_refptr<VideoTrackImpl>(
       new RefCountedObject<VideoTrackImpl>(rtc_video_track));

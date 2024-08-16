@@ -34,12 +34,12 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   bool Terminate() override;
 
   scoped_refptr<RTCPeerConnection> Create(
-      const RTCConfiguration& configuration,
-      scoped_refptr<RTCMediaConstraints> constraints) override;
+      const RTCConfiguration* configuration = nullptr,
+      scoped_refptr<RTCMediaConstraints> constraints = nullptr) override;
 
   void Delete(scoped_refptr<RTCPeerConnection> peerconnection) override;
 
-#if !defined(LIB_WEBRTC_USE_DUMMY_AUDIO_DEVICE)
+#ifdef RTC_AUDIO_DEVICE
   scoped_refptr<RTCAudioDevice> GetAudioDevice() override;
 #endif
 
@@ -90,11 +90,12 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   void CreateAudioDeviceModule_w();
 
   void DestroyAudioDeviceModule_w();
-
+  
+#ifdef RTC_DESKTOP_CAPTURE_DEVICE
   scoped_refptr<RTCVideoSource> CreateVideoSource_s(
       scoped_refptr<RTCVideoCapturer> capturer, const char* video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints);
-#ifdef RTC_DESKTOP_CAPTURE_DEVICE
+
   scoped_refptr<RTCVideoSource> CreateDesktopSource_d(
       scoped_refptr<RTCDesktopCapturer> capturer,
       const char* video_source_label,
@@ -108,7 +109,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
       rtc_peerconnection_factory_;
 
   rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
-#if !defined(LIB_WEBRTC_USE_DUMMY_AUDIO_DEVICE)
+#ifdef RTC_AUDIO_DEVICE
   scoped_refptr<AudioDeviceImpl> audio_device_impl_;
 #endif
 #ifdef RTC_VIDEO_CAPTURE_DEVICE
