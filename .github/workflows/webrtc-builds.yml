@@ -30,15 +30,15 @@ jobs:
         shell: bash
         working-directory: build
         
-      - name: Build WebRTC
-        run: chmod +x ./xcframework_dynamic_build.sh && ./xcframework_dynamic_build.sh release
-        working-directory: build
+      #- name: Build WebRTC
+      #  run: chmod +x ./xcframework_dynamic_build.sh && ./xcframework_dynamic_build.sh release
+      #  working-directory: build
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: webrtc-builds
-          path: ${{ steps.setup.outputs.ZIP }}
+          path: ./xcframework_dynamic_build.sh
 
   release:
     name: Release to GH (Draft)
@@ -56,4 +56,4 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: webrtc-builds
-          path: ${{ github.workspace }}/webrtc-builds
+          path: ${{ github.workspace }}/xcframework_dynamic_build.sh
