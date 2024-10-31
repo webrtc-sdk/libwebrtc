@@ -1,0 +1,59 @@
+name: WebRTC xcframework builds
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+    name: Build webrtc xcframework
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@v4
+      - run: pip3 install setuptools
+
+      - name: Install macos dependencies
+        run: brew install ninja
+
+      - name: Print ninja version
+        run: ninja --version
+
+      - name: Target OS
+        run: echo -e "\ntarget_os = [\"mac\",\"ios\",]" >> .gclient
+        shell: bash
+        working-directory: webrtc-builds
+        
+      - name: Build WebRTC
+        run: ./xcframework_dynamic_build.sh release
+        working-directory: webrtc-sys/libwebrtc
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: webrtc-builds
+          path: ${{ steps.setup.outputs.ZIP }}
+
+  release:
+    name: Release to GH (Draft)
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+    if: startsWith(github.ref, 'refs/tags')
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: webrtc-builds
+          path: ${{ github.workspace }}/webrtc-builds
