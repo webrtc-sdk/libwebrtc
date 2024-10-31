@@ -34,11 +34,15 @@ jobs:
       #  run: chmod +x ./xcframework_dynamic_build.sh && ./xcframework_dynamic_build.sh release
       #  working-directory: build
 
+      - name: Build WebRTC
+        run: zip --symlinks -9 -r WebRTC.xcframework.zip xcframework_dynamic_build.sh
+        working-directory: build
+      
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: webrtc-builds
-          path: ./xcframework_dynamic_build.sh
+          path: WebRTC.xcframework.zip
 
   release:
     name: Release to GH (Draft)
