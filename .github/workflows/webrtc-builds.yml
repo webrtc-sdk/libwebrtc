@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: webrtc-builds
-          path: WebRTC.xcframework.zip
+          path: buil/WebRTC.xcframework.zip
 
   release:
     name: Release to GH (Draft)
