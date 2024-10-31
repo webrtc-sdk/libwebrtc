@@ -11,6 +11,19 @@ if [ "$MODE" == "debug" ]; then
   DEBUG="true"
 fi
 
+
+if [ ! -e "$(pwd)/depot_tools" ]
+then
+  git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
+fi
+
+export PATH="$(pwd)/depot_tools:$PATH"
+
+if [ ! -e "$(pwd)/src" ]
+then
+  gclient sync -D --no-history
+fi
+
 echo "xcframework_dynamic_build.sh: MODE=$MODE, DEBUG=$DEBUG"
 
 gn gen $OUT_DIR/catalyst-arm64 --root="src" --args="
