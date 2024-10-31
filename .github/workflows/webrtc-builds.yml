@@ -28,7 +28,7 @@ jobs:
       - name: Target OS
         run: echo -e "\ntarget_os = [\"mac\",\"ios\",]" >> .gclient
         shell: bash
-        working-directory: webrtc-builds
+        working-directory: build
         
       - name: Build WebRTC
         run: ./xcframework_dynamic_build.sh release
