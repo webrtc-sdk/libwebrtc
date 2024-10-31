@@ -37,8 +37,8 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: webrtc-builds
-          path: build/WebRTC.xcframework.zip*
+          name: webrtc-xcframework
+          path: build/out-release/WebRTC.xcframework.zip*
 
   release:
     name: Release to GH (Draft)
@@ -55,5 +55,10 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: webrtc-builds
-          path: ${{ github.workspace }}/xcframework_dynamic_build.sh
+          name: webrtc-xcframework
+          path: ${{ github.workspace }}/webrtc-xcframework
+    
+      - name: Create draft release
+        run: |
+          gh release create ${{ github.ref_name }} --draft --title "${{ github.ref_name }}"
+          gh release upload ${{ github.ref_name }} ${{ github.workspace }}/webrtc-xcframework/*
