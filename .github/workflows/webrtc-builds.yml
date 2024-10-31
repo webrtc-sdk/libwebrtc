@@ -31,7 +31,7 @@ jobs:
         working-directory: build
         
       - name: Build WebRTC
-        run: ./xcframework_dynamic_build.sh release
+        run: chmod +x ./xcframework_dynamic_build.sh && ./xcframework_dynamic_build.sh release
         working-directory: build
 
       - name: Upload artifacts
