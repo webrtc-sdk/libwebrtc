@@ -30,19 +30,15 @@ jobs:
         shell: bash
         working-directory: build
         
-      #- name: Build WebRTC
-      #  run: chmod +x ./xcframework_dynamic_build.sh && ./xcframework_dynamic_build.sh release
-      #  working-directory: build
-
       - name: Build WebRTC
-        run: zip --symlinks -9 -r WebRTC.xcframework.zip xcframework_dynamic_build.sh
+        run: chmod +x ./xcframework_dynamic_build.sh && ./xcframework_dynamic_build.sh release
         working-directory: build
       
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: webrtc-builds
-          path: build/WebRTC.xcframework.zip
+          path: build/WebRTC.xcframework.zip*
 
   release:
     name: Release to GH (Draft)
@@ -50,7 +46,7 @@ jobs:
     needs: build
     permissions:
       contents: write
-    #if: startsWith(github.ref, 'refs/tags')
+    if: startsWith(github.ref, 'refs/tags')
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
