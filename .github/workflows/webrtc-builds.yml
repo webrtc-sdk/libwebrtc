@@ -32,7 +32,7 @@ jobs:
         
       - name: Build WebRTC
         run: ./xcframework_dynamic_build.sh release
-        working-directory: webrtc-sys/libwebrtc
+        working-directory: build
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
