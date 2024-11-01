@@ -160,7 +160,7 @@ RTCRtpParametersImpl::codecs() {
 void RTCRtpParametersImpl::set_codecs(
     const vector<scoped_refptr<RTCRtpCodecParameters>> codecs) {
   std::vector<webrtc::RtpCodecParameters> list;
-  for (auto item : codecs.std_vector()) {
+  for (auto item : to_std_vector(codecs)) {
     auto impl = static_cast<RTCRtpCodecParametersImpl*>(item.get());
     list.push_back(impl->rtp_codec_parameters());
   }
@@ -179,7 +179,7 @@ RTCRtpParametersImpl::header_extensions() {
 void RTCRtpParametersImpl::set_header_extensions(
     vector<scoped_refptr<RTCRtpExtension>> header_extensions) {
   std::vector<webrtc::RtpExtension> list;
-  for (auto item : header_extensions.std_vector()) {
+  for (auto item : to_std_vector(header_extensions)) {
     auto impl = static_cast<RTCRtpExtensionImpl*>(item.get());
     list.push_back(impl->rtp_extension());
   }
@@ -198,7 +198,7 @@ RTCRtpParametersImpl::encodings() {
 void RTCRtpParametersImpl::set_encodings(
     vector<scoped_refptr<RTCRtpEncodingParameters>> encodings) {
   std::vector<webrtc::RtpEncodingParameters> list;
-  for (auto item : encodings.std_vector()) {
+  for (auto item : to_std_vector(encodings)) {
     auto impl = static_cast<RTCRtpEncodingParametersImpl*>(item.get());
     list.push_back(impl->rtp_parameters());
   }
@@ -413,7 +413,7 @@ RTCRtpCodecParametersImpl::rtcp_feedback() {
 void RTCRtpCodecParametersImpl::set_rtcp_feedback(
     const vector<scoped_refptr<RTCRtcpFeedback>> rtcp_feedbacks) {
   std::vector<webrtc::RtcpFeedback> rtcp_feedback;
-  for (scoped_refptr<RTCRtcpFeedback> item : rtcp_feedbacks.std_vector()) {
+  for (scoped_refptr<RTCRtcpFeedback> item : to_std_vector(rtcp_feedbacks)) {
     auto impl = static_cast<RTCRtcpFeedbackImpl*>(item.get());
     rtcp_feedback.push_back(impl->rtcp_feedback());
   }

@@ -9,44 +9,46 @@ scoped_refptr<RTCMediaConstraints> RTCMediaConstraints::Create() {
   return constraints;
 }
 
-const char* RTCMediaConstraints::kGoogEchoCancellation =
+string RTCMediaConstraints::kDAEchoCancellation = "googDAEchoCancellation";
+
+string RTCMediaConstraints::kGoogEchoCancellation =
     webrtc::MediaConstraints::kGoogEchoCancellation;
-const char* RTCMediaConstraints::kAutoGainControl =
+string RTCMediaConstraints::kAutoGainControl =
     webrtc::MediaConstraints::kAutoGainControl;
-const char* RTCMediaConstraints::kNoiseSuppression =
+string RTCMediaConstraints::kNoiseSuppression =
     webrtc::MediaConstraints::kNoiseSuppression;
-const char* RTCMediaConstraints::kHighpassFilter =
+string RTCMediaConstraints::kHighpassFilter =
     webrtc::MediaConstraints::kHighpassFilter;
-const char* RTCMediaConstraints::kAudioMirroring =
+string RTCMediaConstraints::kAudioMirroring =
     webrtc::MediaConstraints::kAudioMirroring;
-const char* RTCMediaConstraints::kAudioNetworkAdaptorConfig =
+string RTCMediaConstraints::kAudioNetworkAdaptorConfig =
     webrtc::MediaConstraints::kAudioNetworkAdaptorConfig;
-const char* RTCMediaConstraints::kOfferToReceiveVideo =
+string RTCMediaConstraints::kOfferToReceiveVideo =
     webrtc::MediaConstraints::kOfferToReceiveVideo;
-const char* RTCMediaConstraints::kOfferToReceiveAudio =
+string RTCMediaConstraints::kOfferToReceiveAudio =
     webrtc::MediaConstraints::kOfferToReceiveAudio;
-const char* RTCMediaConstraints::kVoiceActivityDetection =
+string RTCMediaConstraints::kVoiceActivityDetection =
     webrtc::MediaConstraints::kVoiceActivityDetection;
-const char* RTCMediaConstraints::kIceRestart =
+string RTCMediaConstraints::kIceRestart =
     webrtc::MediaConstraints::kIceRestart;
-const char* RTCMediaConstraints::kUseRtpMux =
+string RTCMediaConstraints::kUseRtpMux =
     webrtc::MediaConstraints::kUseRtpMux;
-const char* RTCMediaConstraints::kValueTrue =
+string RTCMediaConstraints::kValueTrue =
     webrtc::MediaConstraints::kValueTrue;
-const char* RTCMediaConstraints::kValueFalse =
+string RTCMediaConstraints::kValueFalse =
     webrtc::MediaConstraints::kValueFalse;
-const char* RTCMediaConstraints::kEnableDscp =
+string RTCMediaConstraints::kEnableDscp =
     webrtc::MediaConstraints::kEnableDscp;
-const char* RTCMediaConstraints::kEnableIPv6 = "enable_ipv6";
-const char* RTCMediaConstraints::kEnableVideoSuspendBelowMinBitrate =
+string RTCMediaConstraints::kEnableIPv6 = "enable_ipv6";
+string RTCMediaConstraints::kEnableVideoSuspendBelowMinBitrate =
     webrtc::MediaConstraints::kEnableVideoSuspendBelowMinBitrate;
-//const char* RTCMediaConstraints::kCombinedAudioVideoBwe =
+//string RTCMediaConstraints::kCombinedAudioVideoBwe =
 //    webrtc::MediaConstraints::kCombinedAudioVideoBwe;
-const char* RTCMediaConstraints::kScreencastMinBitrate =
+string RTCMediaConstraints::kScreencastMinBitrate =
     webrtc::MediaConstraints::kScreencastMinBitrate;
-const char* RTCMediaConstraints::kCpuOveruseDetection =
+string RTCMediaConstraints::kCpuOveruseDetection =
     webrtc::MediaConstraints::kCpuOveruseDetection;
-const char* RTCMediaConstraints::kNumSimulcastLayers =
+string RTCMediaConstraints::kNumSimulcastLayers =
     webrtc::MediaConstraints::kNumSimulcastLayers;
 
 void RTCMediaConstraintsImpl::AddMandatoryConstraint(const string key,

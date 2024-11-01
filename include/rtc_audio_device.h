@@ -12,7 +12,7 @@ namespace libwebrtc {
  */
 class RTCAudioDevice : public RefCountInterface {
  public:
-  typedef fixed_size_function<void()> OnDeviceChangeCallback;
+  typedef callback_function_t<void()> OnDeviceChangeCallback;
 
  public:
   static const int kAdmMaxDeviceNameSize = 128;

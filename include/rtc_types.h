@@ -1,42 +1,62 @@
 #ifndef LIB_WEBRTC_RTC_TYPES_HXX
 #define LIB_WEBRTC_RTC_TYPES_HXX
 
-#ifdef LIB_WEBRTC_API_EXPORTS
-#define LIB_WEBRTC_API __declspec(dllexport)
-#elif defined(LIB_WEBRTC_API_DLL)
-#define LIB_WEBRTC_API __declspec(dllimport)
-#elif !defined(WIN32)
-#define LIB_WEBRTC_API __attribute__((visibility("default")))
+#include "rtc_config.h"
+
+#include <map>
+
+#ifdef USE_PORTABLE_TYPES
+#include "base/portable.h"
+#include "base/fixed_size_function.h"
 #else
-#define LIB_WEBRTC_API
+#include <string>
+#include <vector>
+#include <functional>
 #endif
 
-#include "base/fixed_size_function.h"
-#include "base/portable.h"
 #include "base/refcount.h"
 #include "base/scoped_ref_ptr.h"
 
 namespace libwebrtc {
 
-enum { kMaxIceServerSize = 8 };
+#ifdef USE_PORTABLE_TYPES
+using string = portable::string;
 
-// template <typename T>
-// using vector = bsp::inlined_vector<T, 16, true>;
+inline std::string to_std_string(const string& str) { return str.std_string(); }
 
 template <typename Key, typename T>
 using map = std::map<Key, T>;
 
+template <typename T>
+using vector = portable::vector<T>;
+
+template <typename T>
+inline std::vector<T> to_std_vector(const vector<T>& vec) {
+  return vec.std_vector();
+}
+
+#define callback_function_t fixed_size_function
+
+#else
+using string = std::string;
+#define to_std_string(str) str
+
+template <typename T>
+using vector = std::vector<T>;
+#define to_std_vector(vec) vec
+
+template <typename Key, typename T>
+using map = std::map<Key, T>;
+
+#define callback_function_t std::function
+
+#endif
+
+enum { kMaxIceServerSize = 8 };
+
 enum class MediaSecurityType { kSRTP_None = 0, kSDES_SRTP, kDTLS_SRTP };
 
 enum class RTCMediaType { AUDIO, VIDEO, DATA, UNSUPPORTED };
-
-using string = portable::string;
-
-// template <typename Key, typename T>
-// using map = portable::map<Key, T>;
-
-template <typename T>
-using vector = portable::vector<T>;
 
 struct IceServer {
   string uri;
@@ -96,6 +116,41 @@ struct RTCConfiguration {
   bool use_rtp_mux = true;
   uint32_t local_audio_bandwidth = 128;
   uint32_t local_video_bandwidth = 512;
+  public:
+  RTCConfiguration() {
+    for (int i = 0; i < kMaxIceServerSize; i++) {
+      ice_servers[i].uri = "";
+      ice_servers[i].username = "";
+      ice_servers[i].password = "";
+    }
+  }
+
+  RTCConfiguration& operator=(const RTCConfiguration& other) {
+    for (int i = 0; i < kMaxIceServerSize; i++) {
+      ice_servers[i].uri = other.ice_servers[i].uri;
+      ice_servers[i].username = other.ice_servers[i].username;
+      ice_servers[i].password = other.ice_servers[i].password;
+    }
+    type = other.type;
+    bundle_policy = other.bundle_policy;
+    rtcp_mux_policy = other.rtcp_mux_policy;
+    candidate_network_policy = other.candidate_network_policy;
+    tcp_candidate_policy = other.tcp_candidate_policy;
+    ice_candidate_pool_size = other.ice_candidate_pool_size;
+    srtp_type = other.srtp_type;
+    sdp_semantics = other.sdp_semantics;
+    offer_to_receive_audio = other.offer_to_receive_audio;
+    offer_to_receive_video = other.offer_to_receive_video;
+    disable_ipv6 = other.disable_ipv6;
+    disable_ipv6_on_wifi = other.disable_ipv6_on_wifi;
+    max_ipv6_networks = other.max_ipv6_networks;
+    disable_link_local_networks = other.disable_link_local_networks;
+    screencast_min_bitrate = other.screencast_min_bitrate;
+    use_rtp_mux = other.use_rtp_mux;
+    local_audio_bandwidth = other.local_audio_bandwidth;
+    local_video_bandwidth = other.local_video_bandwidth;
+    return *this;
+  }
 };
 
 struct SdpParseError {
