@@ -26,6 +26,100 @@ fi
 
 echo "xcframework_dynamic_build.sh: MODE=$MODE, DEBUG=$DEBUG"
 
+gn gen $OUT_DIR/tvOS-arm64-device --root="src" --args="    
+      target_os = \"ios\"
+      ios_enable_code_signing = false
+      is_component_build = false
+      target_environment = \"appletv\"
+      target_cpu = \"arm64\"
+      ios_deployment_target = \"17.0\"
+      use_goma = false
+      rtc_enable_symbol_export = true
+      rtc_libvpx_build_vp9 = true
+      rtc_include_tests = false
+      rtc_build_examples = false
+      rtc_use_h264 = false
+      rtc_enable_protobuf = false
+      enable_libaom = true
+      rtc_include_dav1d_in_internal_decoder_factory = true
+      use_rtti = true
+      is_debug = $DEBUG
+      enable_dsyms = $DEBUG
+      enable_stripping = true" --ide=xcode
+
+ninja -C $OUT_DIR/tvOS-arm64-device ios_framework_bundle -j 10
+
+gn gen $OUT_DIR/tvOS-arm64-simulator --root="src" --args="    
+      target_os = \"ios\"
+      ios_enable_code_signing = false
+      is_component_build = false
+      target_environment = \"appletvsimulator\"
+      target_cpu = \"arm64\"
+      ios_deployment_target = \"17.0\"
+      use_goma = false
+      rtc_enable_symbol_export = true
+      rtc_libvpx_build_vp9 = true
+      rtc_include_tests = false
+      rtc_build_examples = false
+      rtc_use_h264 = false
+      rtc_enable_protobuf = false
+      enable_libaom = true
+      rtc_include_dav1d_in_internal_decoder_factory = true
+      use_rtti = true
+      is_debug = $DEBUG
+      enable_dsyms = $DEBUG
+      enable_stripping = true" --ide=xcode
+
+ninja -C $OUT_DIR/tvOS-arm64-simulator ios_framework_bundle -j 10
+
+gn gen $OUT_DIR/xrOS-arm64-device --root="src" --args="
+      treat_warnings_as_errors = false 
+      target_os = \"ios\"
+      ios_enable_code_signing = false
+      is_component_build = false
+      target_environment = \"xrdevice\"
+      target_cpu = \"arm64\"
+      ios_deployment_target = \"1.1.0\"
+      use_goma = false
+      rtc_enable_symbol_export = true
+      rtc_libvpx_build_vp9 = true
+      rtc_include_tests = false
+      rtc_build_examples = false
+      rtc_use_h264 = false
+      rtc_enable_protobuf = false
+      enable_libaom = true
+      rtc_include_dav1d_in_internal_decoder_factory = true
+      use_rtti = true
+      is_debug = $DEBUG
+      enable_dsyms = $DEBUG
+      enable_stripping = true" --ide=xcode
+
+ninja -C $OUT_DIR/xrOS-arm64-device ios_framework_bundle -j 10
+
+gn gen $OUT_DIR/xrOS-arm64-simulator --root="src" --args="
+      treat_warnings_as_errors = false
+      target_os = \"ios\"
+      ios_enable_code_signing = false
+      is_component_build = false
+      target_environment = \"xrsimulator\"
+      target_cpu = \"arm64\"
+      ios_deployment_target = \"1.1.0\"
+      use_goma = false
+      rtc_enable_symbol_export = true
+      rtc_libvpx_build_vp9 = true
+      rtc_include_tests = false
+      rtc_build_examples = false
+      rtc_use_h264 = false
+      rtc_enable_protobuf = false
+      enable_libaom = true
+      rtc_include_dav1d_in_internal_decoder_factory = true
+      use_rtti = true
+      is_debug = $DEBUG
+      enable_dsyms = $DEBUG
+      enable_stripping = true" --ide=xcode
+
+ninja -C $OUT_DIR/xrOS-arm64-simulator ios_framework_bundle -j 10
+
 gn gen $OUT_DIR/catalyst-arm64 --root="src" --args="
       treat_warnings_as_errors = false
       target_os = \"ios\"
@@ -150,7 +244,7 @@ gn gen $OUT_DIR/macOS-x64 --root="src" --args="
       treat_warnings_as_errors = false
       target_os=\"mac\"
       target_cpu=\"x64\"
-      mac_deployment_target=\"10.15\"
+      mac_deployment_target=\"10.14\"
       is_component_build = false
       target_cpu = \"x64\"
       use_goma = false
@@ -172,7 +266,7 @@ gn gen $OUT_DIR/macOS-arm64 --root="src" --args="
       treat_warnings_as_errors = false
       target_os=\"mac\"
       target_cpu=\"x64\"
-      mac_deployment_target=\"10.15\"
+      mac_deployment_target=\"10.14\"
       is_component_build = false
       target_cpu = \"arm64\"
       use_goma = false
@@ -213,6 +307,10 @@ xcodebuild -create-xcframework \
   -framework $OUT_DIR/iOS-simulator-lib/WebRTC.framework \
   -framework $OUT_DIR/catalyst-lib/WebRTC.framework \
   -framework $OUT_DIR/macOS-lib/WebRTC.framework \
+  -framework $OUT_DIR/xrOS-arm64-device/WebRTC.framework \
+  -framework $OUT_DIR/xrOS-arm64-simulator/WebRTC.framework \
+  -framework $OUT_DIR/tvOS-arm64-device/WebRTC.framework \
+  -framework $OUT_DIR/tvOS-arm64-simulator/WebRTC.framework \
   -output $OUT_DIR/WebRTC.xcframework
 
 cp ./src/LICENSE $OUT_DIR/WebRTC.xcframework/
@@ -229,5 +327,5 @@ cd ../../../
 zip --symlinks -9 -r WebRTC.xcframework.zip WebRTC.xcframework
 
 # hash
-shasum -a 256 WebRTC.xcframework.zip >WebRTC.xcframework.zip.shasum
+shasum -a 256 WebRTC.xcframework.zip > WebRTC.xcframework.zip.shasum
 cat WebRTC.xcframework.zip.shasum
