@@ -94,13 +94,13 @@ ninja -C out-debug/Windows-x64 libwebrtc
 ## for Linux
 ```bash
 export ARCH=x64 # x86, x64, arm, arm64
-gn gen out/Linux-$ARCH --args="target_os=\"linux\" target_cpu=\"$ARCH\" is_debug=false rtc_include_tests=false rtc_use_h264=true ffmpeg_branding=\"Chrome\" is_component_build=false use_rtti=true use_custom_libcxx=false rtc_enable_protobuf=false"
+gn gen out-debug/Linux-$ARCH --args="target_os=\"linux\" target_cpu=\"$ARCH\" is_debug=true rtc_include_tests=false rtc_use_h264=true ffmpeg_branding=\"Chrome\" is_component_build=false use_rtti=true use_custom_libcxx=false rtc_enable_protobuf=false"
 ```
 
 ### Compile for Linux
 
 ```bash
-ninja -C out-debug/Windows-x64 libwebrtc
+ninja -C out-debug/Linux-x64 libwebrtc
 ```
 
 
