@@ -3,12 +3,16 @@
 
 #ifdef LIB_WEBRTC_API_EXPORTS
 #define LIB_WEBRTC_API __declspec(dllexport)
+#define LIB_WEBAPI_CALL __stdcall
 #elif defined(LIB_WEBRTC_API_DLL)
 #define LIB_WEBRTC_API __declspec(dllimport)
+#define LIB_WEBAPI_CALL
 #elif !defined(WIN32)
 #define LIB_WEBRTC_API __attribute__((visibility("default")))
+#define LIB_WEBAPI_CALL
 #else
 #define LIB_WEBRTC_API
+#define LIB_WEBAPI_CALL
 #endif
 
 #include "base/fixed_size_function.h"
