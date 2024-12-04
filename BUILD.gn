@@ -1,6 +1,7 @@
 import("../webrtc.gni")
 
 declare_args() {
+  libwebrtc_interop = true
   libwebrtc_intel_media_sdk = false
   libwebrtc_desktop_capture = true
 }
@@ -148,6 +149,14 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_video_track_impl.cc",
     "src/rtc_video_track_impl.h",
   ]
+  
+  # for interop methods
+  if (is_win && libwebrtc_interop) {
+    sources += [
+      "include/interop_api.h",
+      "src/libwebrtc_interop.cc",
+    ]
+  }
 
   # intel media sdk
   if (is_win && libwebrtc_intel_media_sdk) {
