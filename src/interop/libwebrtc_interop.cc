@@ -22,12 +22,3 @@ void LIB_WEBRTC_CALL LibWebRTC_Terminate() noexcept
 {
     LibWebRTC::Terminate();
 }
-
-int LIB_WEBRTC_CALL LibWebRTC_Release(rtcRefCountedObjectHandle handle) noexcept
-{
-    if (handle == NULL) {
-        return -1;
-    }
-    scoped_refptr<RefCountInterface> p = static_cast<RefCountInterface*>(handle);
-    return p->Release();
-}
