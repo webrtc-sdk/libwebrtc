@@ -63,10 +63,16 @@ LIB_WEBRTC_API void LIB_WEBRTC_CALL
 LibWebRTC_Terminate() noexcept;
 
 /**
+ * Add ref a pointer.
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RefCountedObject_AddRef(rtcRefCountedObjectHandle handle) noexcept;
+
+/**
  * Release a pointer.
  */
 LIB_WEBRTC_API int LIB_WEBRTC_CALL
-LibWebRTC_Release(rtcRefCountedObjectHandle handle) noexcept;
+RefCountedObject_Release(rtcRefCountedObjectHandle handle) noexcept;
 
 } // extern "C"
 

@@ -154,7 +154,8 @@ rtc_shared_library("libwebrtc") {
   if (is_win && libwebrtc_interop) {
     sources += [
       "include/interop_api.h",
-      "src/libwebrtc_interop.cc",
+      "src/interop/ref_counted_object_interop.cc",
+      "src/interop/libwebrtc_interop.cc",
     ]
   }
 
