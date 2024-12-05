@@ -14,8 +14,7 @@ rtcBool32 LIB_WEBRTC_CALL LibWebRTC_Initialize() noexcept
 rtcPeerConnectionFactoryHandle LIB_WEBRTC_CALL LibWebRTC_CreateRTCPeerConnectionFactory() noexcept
 {
     scoped_refptr<RTCPeerConnectionFactory> p = LibWebRTC::CreateRTCPeerConnectionFactory();
-    p->AddRef();
-    return static_cast<rtcPeerConnectionFactoryHandle>(p.get());
+    return static_cast<rtcPeerConnectionFactoryHandle>(p.release());
 }
 
 void LIB_WEBRTC_CALL LibWebRTC_Terminate() noexcept

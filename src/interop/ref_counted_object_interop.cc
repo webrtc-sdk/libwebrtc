@@ -7,7 +7,7 @@ int LIB_WEBRTC_CALL RefCountedObject_AddRef(rtcRefCountedObjectHandle handle) no
     if (handle == NULL) {
         return -1;
     }
-    scoped_refptr<RefCountInterface> p = static_cast<RefCountInterface*>(handle);
+    RefCountInterface* p = static_cast<RefCountInterface*>(handle);
     return p->AddRef();
 }
 
@@ -16,6 +16,6 @@ int LIB_WEBRTC_CALL RefCountedObject_Release(rtcRefCountedObjectHandle handle) n
     if (handle == NULL) {
         return -1;
     }
-    scoped_refptr<RefCountInterface> p = static_cast<RefCountInterface*>(handle);
+    RefCountInterface* p = static_cast<RefCountInterface*>(handle);
     return p->Release();
 }
