@@ -156,6 +156,7 @@ rtc_shared_library("libwebrtc") {
       "include/interop_api.h",
       "src/interop/ref_counted_object_interop.cc",
       "src/interop/libwebrtc_interop.cc",
+      "src/interop/rtc_peerconnection_factory_interop.cc",
     ]
   }
 

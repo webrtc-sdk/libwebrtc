@@ -4,7 +4,7 @@ using namespace libwebrtc;
 
 int LIB_WEBRTC_CALL RefCountedObject_AddRef(rtcRefCountedObjectHandle handle) noexcept
 {
-    if (handle == NULL) {
+    if (handle == nullptr) {
         return -1;
     }
     RefCountInterface* p = static_cast<RefCountInterface*>(handle);
@@ -13,7 +13,7 @@ int LIB_WEBRTC_CALL RefCountedObject_AddRef(rtcRefCountedObjectHandle handle) no
 
 int LIB_WEBRTC_CALL RefCountedObject_Release(rtcRefCountedObjectHandle handle) noexcept
 {
-    if (handle == NULL) {
+    if (handle == nullptr) {
         return -1;
     }
     RefCountInterface* p = static_cast<RefCountInterface*>(handle);
