@@ -258,6 +258,18 @@ RefCountedObject_Release(rtcRefCountedObjectHandle handle) noexcept;
 LIB_WEBRTC_API rtcMediaConstraintsHandle LIB_WEBRTC_CALL
 MediaConstraints_Create() noexcept;
 
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+MediaConstraints_AddMandatoryConstraint(
+    rtcMediaConstraintsHandle handle,
+    const char* key,
+    const char* value) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+MediaConstraints_AddOptionalConstraint(
+    rtcMediaConstraintsHandle handle,
+    const char* key,
+    const char* value) noexcept;
+
 /**
  * Creates a new instance of the RTCPeerConnectionFactor object.
  */

@@ -49,7 +49,11 @@ class string {
   LIB_PORTABLE_API void init(const char* str, size_t len);
   LIB_PORTABLE_API void destroy();
 
-  inline string(const char* str) { init(str, strlen(str)); }
+  inline string(const char* str)
+  {
+    const char* strTemp = str ? str : "\0";
+    init(strTemp, strlen(strTemp));
+  }
 
   inline string(const std::string& str) { init(str.c_str(), str.length()); }
 

@@ -5,11 +5,6 @@
 
 using namespace libwebrtc;
 
-string string_from_cstr(const char* source)
-{
-    return (source) ? string(source) : string();
-}
-
 RTCConfiguration CreateRtcConfiguration(const rtcPeerConnectionConfiguration* configuration)
 {
     RTCConfiguration result;
@@ -18,9 +13,9 @@ RTCConfiguration CreateRtcConfiguration(const rtcPeerConnectionConfiguration* co
     }
 
     for (int i = 0; i < kMaxIceServerSize; i++) {
-        result.ice_servers[i].uri = string_from_cstr(configuration->ice_servers[i].uri);
-        result.ice_servers[i].username = string_from_cstr(configuration->ice_servers[i].username);
-        result.ice_servers[i].password = string_from_cstr(configuration->ice_servers[i].password);
+        result.ice_servers[i].uri = string(configuration->ice_servers[i].uri);
+        result.ice_servers[i].username = string(configuration->ice_servers[i].username);
+        result.ice_servers[i].password = string(configuration->ice_servers[i].password);
     }
     result.type = configuration->type;
     result.bundle_policy = configuration->bundle_policy;
@@ -183,7 +178,7 @@ RTCPeerConnectionFactory_CreateAudioSource(
     CHECK_NATIVE_HANDLE(factory);
 
     scoped_refptr<RTCPeerConnectionFactory> pFactory = static_cast<RTCPeerConnectionFactory*>(factory);
-    scoped_refptr<RTCAudioSource> audio_source = pFactory->CreateAudioSource(string_from_cstr(audio_source_label));
+    scoped_refptr<RTCAudioSource> audio_source = pFactory->CreateAudioSource(string(audio_source_label));
 
     *pRetVal = static_cast<rtcAudioSourceHandle>(audio_source.release());
     return rtcResultU4::kSuccess;
@@ -206,7 +201,7 @@ RTCPeerConnectionFactory_CreateVideoSource(
     scoped_refptr<RTCVideoCapturer> video_capturer = static_cast<RTCVideoCapturer*>(capturer);
     /// A null value is accepted for 'constraints'.
     scoped_refptr<RTCMediaConstraints> media_constraints = static_cast<RTCMediaConstraints*>(constraints);
-    scoped_refptr<RTCVideoSource> video_source = pFactory->CreateVideoSource(video_capturer, string_from_cstr(video_source_label), media_constraints);
+    scoped_refptr<RTCVideoSource> video_source = pFactory->CreateVideoSource(video_capturer, string(video_source_label), media_constraints);
 
     *pRetVal = static_cast<rtcVideoSourceHandle>(video_source.release());
     return rtcResultU4::kSuccess;
@@ -230,7 +225,7 @@ RTCPeerConnectionFactory_CreateDesktopSource(
     scoped_refptr<RTCDesktopCapturer> desktop_capturer = static_cast<RTCDesktopCapturer*>(capturer);
     /// A null value is accepted for 'constraints'.
     scoped_refptr<RTCMediaConstraints> media_constraints = static_cast<RTCMediaConstraints*>(constraints);
-    scoped_refptr<RTCVideoSource> video_source = pFactory->CreateDesktopSource(desktop_capturer, string_from_cstr(video_source_label), media_constraints);
+    scoped_refptr<RTCVideoSource> video_source = pFactory->CreateDesktopSource(desktop_capturer, string(video_source_label), media_constraints);
     
     *pRetVal = static_cast<rtcVideoSourceHandle>(video_source.release());
     return rtcResultU4::kSuccess;
@@ -251,7 +246,7 @@ RTCPeerConnectionFactory_CreateAudioTrack(
 
     scoped_refptr<RTCPeerConnectionFactory> pFactory = static_cast<RTCPeerConnectionFactory*>(factory);
     scoped_refptr<RTCAudioSource> audio_source = static_cast<RTCAudioSource*>(source);
-    scoped_refptr<RTCAudioTrack> audio_track = pFactory->CreateAudioTrack(audio_source, string_from_cstr(track_id));
+    scoped_refptr<RTCAudioTrack> audio_track = pFactory->CreateAudioTrack(audio_source, string(track_id));
 
     *pRetVal = static_cast<rtcAudioTrackHandle>(audio_track.release());
     return rtcResultU4::kSuccess;
@@ -271,7 +266,7 @@ RTCPeerConnectionFactory_CreateVideoTrack(
 
     scoped_refptr<RTCPeerConnectionFactory> pFactory = static_cast<RTCPeerConnectionFactory*>(factory);
     scoped_refptr<RTCVideoSource> video_source = static_cast<RTCVideoSource*>(source);
-    scoped_refptr<RTCVideoTrack> video_track = pFactory->CreateVideoTrack(video_source, string_from_cstr(track_id));
+    scoped_refptr<RTCVideoTrack> video_track = pFactory->CreateVideoTrack(video_source, string(track_id));
 
     *pRetVal = static_cast<rtcVideoTrackHandle>(video_track.release());
     return rtcResultU4::kSuccess;
@@ -288,7 +283,7 @@ RTCPeerConnectionFactory_CreateStream(
     CHECK_NATIVE_HANDLE(factory);
 
     scoped_refptr<RTCPeerConnectionFactory> pFactory = static_cast<RTCPeerConnectionFactory*>(factory);
-    scoped_refptr<RTCMediaStream> media_stream = pFactory->CreateStream(string_from_cstr(stream_id));
+    scoped_refptr<RTCMediaStream> media_stream = pFactory->CreateStream(string(stream_id));
 
     *pRetVal = static_cast<rtcMediaStreamHandle>(media_stream.release());
     return rtcResultU4::kSuccess;
