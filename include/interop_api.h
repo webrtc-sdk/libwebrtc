@@ -253,6 +253,12 @@ LIB_WEBRTC_API int LIB_WEBRTC_CALL
 RefCountedObject_Release(rtcRefCountedObjectHandle handle) noexcept;
 
 /**
+ * Creates a new instance of the RTCMediaConstraints object.
+ */
+LIB_WEBRTC_API rtcMediaConstraintsHandle LIB_WEBRTC_CALL
+MediaConstraints_Create() noexcept;
+
+/**
  * Creates a new instance of the RTCPeerConnectionFactor object.
  */
 LIB_WEBRTC_API rtcPeerConnectionFactoryHandle LIB_WEBRTC_CALL
