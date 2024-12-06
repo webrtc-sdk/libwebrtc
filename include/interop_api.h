@@ -253,6 +253,12 @@ LIB_WEBRTC_API int LIB_WEBRTC_CALL
 RefCountedObject_Release(rtcRefCountedObjectHandle handle) noexcept;
 
 /**
+ * Creates a new instance of the RTCPeerConnectionFactor object.
+ */
+LIB_WEBRTC_API rtcPeerConnectionFactoryHandle LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_Create() noexcept;
+
+/**
  * Initializes the RTCPeerConnectionFactor object.
  * If the LibWebRTC_Initialize method has been called;
  * do not use this method.
@@ -274,7 +280,7 @@ RTCPeerConnectionFactory_Terminate(
  * Creates a new instance of the RTCPeerConnection object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCPeerConnectionFactory_Create(
+RTCPeerConnectionFactory_CreatePeerConnection(
     rtcPeerConnectionFactoryHandle factory,
     const rtcPeerConnectionConfiguration* configuration,
     rtcMediaConstraintsHandle constraints,
@@ -284,7 +290,7 @@ RTCPeerConnectionFactory_Create(
  * Removes the RTCPeerConnection object from the factory.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCPeerConnectionFactory_Delete(
+RTCPeerConnectionFactory_DeletePeerConnection(
     rtcPeerConnectionFactoryHandle factory,
     rtcPeerConnectionHandle handle
 ) noexcept;

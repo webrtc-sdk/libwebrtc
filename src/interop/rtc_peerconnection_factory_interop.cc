@@ -44,6 +44,15 @@ RTCConfiguration CreateRtcConfiguration(const rtcPeerConnectionConfiguration* co
     return result;
 }
 
+rtcPeerConnectionFactoryHandle LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_Create() noexcept
+{
+    scoped_refptr<RTCPeerConnectionFactory> rtc_peerconnection_factory =
+      scoped_refptr<RTCPeerConnectionFactory>(
+          new RefCountedObject<RTCPeerConnectionFactoryImpl>());
+    return static_cast<rtcPeerConnectionFactoryHandle>(rtc_peerconnection_factory.release());
+} // end RTCPeerConnectionFactory_Create
+
 rtcBool32 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_Initialize(
     rtcPeerConnectionFactoryHandle factory
@@ -75,7 +84,7 @@ RTCPeerConnectionFactory_Terminate(
 } // end RTCPeerConnectionFactory_Terminate
 
 rtcResultU4 LIB_WEBRTC_CALL
-RTCPeerConnectionFactory_Create(
+RTCPeerConnectionFactory_CreatePeerConnection(
     rtcPeerConnectionFactoryHandle factory,
     const rtcPeerConnectionConfiguration* configuration,
     rtcMediaConstraintsHandle constraints,
@@ -94,10 +103,10 @@ RTCPeerConnectionFactory_Create(
     /// The 'release' operation preserves the pointer.
     *pRetVal = static_cast<rtcPeerConnectionHandle>(peer_connection.release());
     return rtcResultU4::kSuccess;
-} // end RTCPeerConnectionFactory_Create
+} // end RTCPeerConnectionFactory_CreatePeerConnection
 
 rtcResultU4 LIB_WEBRTC_CALL
-RTCPeerConnectionFactory_Delete(
+RTCPeerConnectionFactory_DeletePeerConnection(
     rtcPeerConnectionFactoryHandle factory,
     rtcPeerConnectionHandle handle
 ) noexcept
@@ -110,7 +119,7 @@ RTCPeerConnectionFactory_Delete(
     pFactory->Delete(peer_connection);
 
     return rtcResultU4::kSuccess;
-} // end RTCPeerConnectionFactory_Delete
+} // end RTCPeerConnectionFactory_DeletePeerConnection
 
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetAudioDevice(
