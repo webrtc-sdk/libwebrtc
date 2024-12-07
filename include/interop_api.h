@@ -244,7 +244,11 @@ LibWebRTC_Terminate() noexcept;
  * @brief Returns the error message text for the specified 'code' value.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-LibWebRTC_GetErrorMessage(rtcResultU4 code, char** pRetVal) noexcept;
+LibWebRTC_GetErrorMessage(
+    rtcResultU4 code,
+    char** pBuffer,
+    unsigned int cchBuffer
+) noexcept;
 
 /**
  * @brief Add ref a pointer.
