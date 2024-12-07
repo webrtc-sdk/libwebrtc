@@ -241,19 +241,25 @@ LIB_WEBRTC_API void LIB_WEBRTC_CALL
 LibWebRTC_Terminate() noexcept;
 
 /**
- * Add ref a pointer.
+ * @brief Returns the error message text for the specified 'code' value.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+LibWebRTC_GetErrorMessage(rtcResultU4 code, char** pRetVal) noexcept;
+
+/**
+ * @brief Add ref a pointer.
  */
 LIB_WEBRTC_API int LIB_WEBRTC_CALL
 RefCountedObject_AddRef(rtcRefCountedObjectHandle handle) noexcept;
 
 /**
- * Release a pointer.
+ * @brief Release a pointer.
  */
 LIB_WEBRTC_API int LIB_WEBRTC_CALL
 RefCountedObject_Release(rtcRefCountedObjectHandle handle) noexcept;
 
 /**
- * Creates a new instance of the RTCMediaConstraints object.
+ * @brief Creates a new instance of the RTCMediaConstraints object.
  */
 LIB_WEBRTC_API rtcMediaConstraintsHandle LIB_WEBRTC_CALL
 MediaConstraints_Create() noexcept;
@@ -271,13 +277,13 @@ MediaConstraints_AddOptionalConstraint(
     const char* value) noexcept;
 
 /**
- * Creates a new instance of the RTCPeerConnectionFactor object.
+ * @brief Creates a new instance of the RTCPeerConnectionFactor object.
  */
 LIB_WEBRTC_API rtcPeerConnectionFactoryHandle LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_Create() noexcept;
 
 /**
- * Initializes the RTCPeerConnectionFactor object.
+ * @brief Initializes the RTCPeerConnectionFactor object.
  * If the LibWebRTC_Initialize method has been called;
  * do not use this method.
  */
@@ -287,7 +293,7 @@ RTCPeerConnectionFactory_Initialize(
 ) noexcept;
 
 /**
- * Terminates the RTCPeerConnectionFactor object.
+ * @brief Terminates the RTCPeerConnectionFactor object.
  */
 LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_Terminate(
@@ -295,7 +301,7 @@ RTCPeerConnectionFactory_Terminate(
 ) noexcept;
 
 /**
- * Creates a new instance of the RTCPeerConnection object.
+ * @brief Creates a new instance of the RTCPeerConnection object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreatePeerConnection(
@@ -305,7 +311,7 @@ RTCPeerConnectionFactory_CreatePeerConnection(
     rtcPeerConnectionHandle* pRetVal) noexcept;
 
 /**
- * Removes the RTCPeerConnection object from the factory.
+ * @brief Removes the RTCPeerConnection object from the factory.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_DeletePeerConnection(
@@ -314,7 +320,7 @@ RTCPeerConnectionFactory_DeletePeerConnection(
 ) noexcept;
 
 /**
- * Provides RTCAudioDevice object for list audio devices.
+ * @brief Provides RTCAudioDevice object for list audio devices.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetAudioDevice(
@@ -323,7 +329,7 @@ RTCPeerConnectionFactory_GetAudioDevice(
 ) noexcept;
 
 /**
- * Provides RTCVideoDevice object for list video devices.
+ * @brief Provides RTCVideoDevice object for list video devices.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetVideoDevice(
@@ -340,7 +346,7 @@ RTCPeerConnectionFactory_GetDesktopDevice(
 #endif // RTC_DESKTOP_DEVICE
 
 /**
- * Creates a new instance of the RTCAudioSource object.
+ * @brief Creates a new instance of the RTCAudioSource object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateAudioSource(
@@ -350,7 +356,7 @@ RTCPeerConnectionFactory_CreateAudioSource(
 ) noexcept;
 
 /**
- * Creates a new instance of the RTCVideoSource object.
+ * @brief Creates a new instance of the RTCVideoSource object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateVideoSource(
@@ -363,7 +369,7 @@ RTCPeerConnectionFactory_CreateVideoSource(
 
 #ifdef RTC_DESKTOP_DEVICE
 /**
- * Creates a new instance of the RTCVideoSource object.
+ * @brief Creates a new instance of the RTCVideoSource object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateDesktopSource(
@@ -376,7 +382,7 @@ RTCPeerConnectionFactory_CreateDesktopSource(
 #endif // RTC_DESKTOP_DEVICE
 
 /**
- * Creates a new instance of the RTCAudioTrack object.
+ * @brief Creates a new instance of the RTCAudioTrack object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateAudioTrack(
@@ -387,7 +393,7 @@ RTCPeerConnectionFactory_CreateAudioTrack(
 ) noexcept;
 
 /**
- * Creates a new instance of the RTCVideoTrack object.
+ * @brief Creates a new instance of the RTCVideoTrack object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateVideoTrack(
@@ -398,7 +404,7 @@ RTCPeerConnectionFactory_CreateVideoTrack(
 ) noexcept;
 
 /**
- * Creates a new instance of the RTCMediaStream object.
+ * @brief Creates a new instance of the RTCMediaStream object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateStream(
