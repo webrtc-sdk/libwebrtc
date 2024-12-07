@@ -246,7 +246,7 @@ LibWebRTC_Terminate() noexcept;
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 LibWebRTC_GetErrorMessage(
     rtcResultU4 code,
-    char** pBuffer,
+    char* pBuffer,
     unsigned int cchBuffer
 ) noexcept;
 

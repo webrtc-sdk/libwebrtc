@@ -25,7 +25,7 @@ void LIB_WEBRTC_CALL LibWebRTC_Terminate() noexcept
 rtcResultU4 LIB_WEBRTC_CALL
 LibWebRTC_GetErrorMessage(
     rtcResultU4 code,
-    char** pBuffer,
+    char* pBuffer,
     unsigned int cchBuffer
 ) noexcept
 {
@@ -100,7 +100,7 @@ LibWebRTC_GetErrorMessage(
     unsigned int cchLen = cchMessage < cchBuffer
         ? cchMessage
         : cchBuffer;
-    strncpy(*pBuffer, message, cchLen);
+    strncpy(pBuffer, message, cchLen);
 
     return cchMessage > cchBuffer
         ? rtcResultU4::kBufferTooSmall
