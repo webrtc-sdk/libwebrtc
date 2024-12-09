@@ -158,6 +158,7 @@ rtc_shared_library("libwebrtc") {
       "src/interop/libwebrtc_interop.cc",
       "src/interop/rtc_mediaconstraints_interop.cc",
       "src/interop/rtc_peerconnection_factory_interop.cc",
+      "src/interop/rtc_audio_device_interop.cc",
     ]
   }
 

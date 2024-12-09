@@ -96,11 +96,9 @@ LibWebRTC_GetErrorMessage(
             break;
     }
 
-    unsigned int cchMessage = (unsigned int)strlen(message) + 1;
-    unsigned int cchLen = cchMessage < cchBuffer
-        ? cchMessage
-        : cchBuffer;
-    strncpy(pBuffer, message, cchLen);
+    unsigned int cchMessage = (unsigned int)strlen(message);
+    unsigned int cchLen = std::min(cchMessage, cchBuffer);
+    strncpy(pBuffer, (const char*)message, (size_t)cchLen);
 
     return cchMessage > cchBuffer
         ? rtcResultU4::kBufferTooSmall

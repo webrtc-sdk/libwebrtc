@@ -11,10 +11,11 @@
 
 #include "rtc_types.h"
 
-#define CHECK_POINTER_EX(p, r)      if ((p) == nullptr) { return (r); }
-#define CHECK_POINTER(p)            CHECK_POINTER_EX((p), rtcResultU4::kInvalidPointer)
-#define CHECK_OUT_POINTER(p)        if ((p) != nullptr) { *(p) = nullptr; } else { return rtcResultU4::kInvalidPointer; }
-#define CHECK_NATIVE_HANDLE(h)      CHECK_POINTER_EX((h), rtcResultU4::kInvalidNativeHandle)
+#define CHECK_POINTER_EX(p, r)          if ((p) == nullptr) { return (r); }
+#define CHECK_POINTER(p)                CHECK_POINTER_EX(p, rtcResultU4::kInvalidPointer)
+#define CHECK_OUT_POINTER(p)            if ((p) != nullptr) { *(p) = nullptr; } else { return rtcResultU4::kInvalidPointer; }
+#define CHECK_NATIVE_HANDLE(h)          CHECK_POINTER_EX(h, rtcResultU4::kInvalidNativeHandle)
+#define ZERO_MEMORY(p,sz)               if ((sz) > 0) { memset((void*)(p), 0, (size_t)(sz)); }
 
 extern "C" {
 
@@ -203,6 +204,13 @@ using rtcAudioTrackHandle = rtcMediaTrackHandle;
 /// Opaque handle to a native RTCVideoTrack interop object.
 using rtcVideoTrackHandle = rtcMediaTrackHandle;
 
+
+/*
+ * ---------------------------------------------------------------------- 
+ * LibWebRTC interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
 /**
  * @brief Initializes the WebRTC PeerConnectionFactory and threads.
  *
@@ -250,6 +258,13 @@ LibWebRTC_GetErrorMessage(
     unsigned int cchBuffer
 ) noexcept;
 
+
+/*
+ * ---------------------------------------------------------------------- 
+ * RefCountedObject interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
 /**
  * @brief Add ref a pointer.
  */
@@ -261,6 +276,13 @@ RefCountedObject_AddRef(rtcRefCountedObjectHandle handle) noexcept;
  */
 LIB_WEBRTC_API int LIB_WEBRTC_CALL
 RefCountedObject_Release(rtcRefCountedObjectHandle handle) noexcept;
+
+
+/*
+ * ---------------------------------------------------------------------- 
+ * MediaConstraints interop methods
+ * ---------------------------------------------------------------------- 
+ */
 
 /**
  * @brief Creates a new instance of the RTCMediaConstraints object.
@@ -279,6 +301,13 @@ MediaConstraints_AddOptionalConstraint(
     rtcMediaConstraintsHandle handle,
     const char* key,
     const char* value) noexcept;
+
+
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCPeerConnectionFactory interop methods
+ * ---------------------------------------------------------------------- 
+ */
 
 /**
  * @brief Creates a new instance of the RTCPeerConnectionFactor object.
@@ -437,6 +466,172 @@ RTCPeerConnectionFactory_GetRtpReceiverCapabilities(
     rtcPeerConnectionFactoryHandle factory,
     RTCMediaType media_type,
     rtcRtpCapabilitiesHandle* pRetVal
+) noexcept;
+
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCAudioDevice interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
+/**
+ * Audio device change callback delegate
+ */
+using rtcRTCAudioDeviceChangeCallback = void(LIB_WEBRTC_CALL*)();
+
+/**
+ * Returns the number of playout devices available.
+ *
+ * @param audiDevice - Audio device handle
+ * @return int - The number of playout devices available.
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCAudioDevice_PlayoutDevices(
+    rtcAudioDeviceHandle audiDevice
+) noexcept;
+
+/**
+ * Returns the number of recording devices available.
+ *
+ * @param audiDevice - Audio device handle
+ * @return int - The number of recording devices available.
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCAudioDevice_RecordingDevices(
+    rtcAudioDeviceHandle audiDevice
+) noexcept;
+
+/**
+ * Retrieves the name and GUID of the specified playout device.
+ *
+ * @param audiDevice - Audio device handle
+ * @param index - The index of the device.
+ * @param pOutName - The device name.
+ * @param cchOutName - The size of the name.
+ * @param pOutGuid - The device GUID.
+ * @param cchOutGuid - The size of the guid.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioDevice_PlayoutDeviceName(
+    rtcAudioDeviceHandle audiDevice,
+    int index,
+    char* pOutName,
+    int cchOutName,
+    char* pOutGuid,
+    int cchOutGuid
+) noexcept;
+
+/**
+ * Retrieves the name and GUID of the specified recording device.
+ *
+ * @param audiDevice - Audio device handle
+ * @param index - The index of the device.
+ * @param pOutName - The device name.
+ * @param cchOutName - The size of the name.
+ * @param pOutGuid - The device GUID.
+ * @param cchOutGuid - The size of the guid.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioDevice_RecordingDeviceName(
+    rtcAudioDeviceHandle audiDevice,
+    int index,
+    char* pOutName,
+    int cchOutName,
+    char* pOutGuid,
+    int cchOutGuid
+) noexcept;
+
+/**
+ * Sets the playout device to use.
+ *
+ * @param audiDevice - Audio device handle
+ * @param index - The index of the device.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioDevice_SetPlayoutDevice(
+    rtcAudioDeviceHandle audiDevice,
+    int index
+) noexcept;
+
+/**
+ * Sets the recording device to use.
+ *
+ * @param audiDevice - Audio device handle
+ * @param index - The index of the device.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioDevice_SetRecordingDevice(
+    rtcAudioDeviceHandle audiDevice,
+    int index
+) noexcept;
+
+/**
+ * The callback was invoked when the audio device changed.
+ * 
+ * @param audiDevice - Audio device handle
+ * @param deviceChangeCallback - Callback delegate
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioDevice_RegisterDeviceChangeCallback(
+    rtcAudioDeviceHandle audiDevice,
+    rtcRTCAudioDeviceChangeCallback deviceChangeCallback
+) noexcept;
+
+/**
+ * Sets the microphone volume level.
+ * 
+ * @param audiDevice - Audio device handle
+ * @param volume - Volume level
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioDevice_SetMicrophoneVolume(
+    rtcAudioDeviceHandle audiDevice,
+    unsigned int volume
+) noexcept;
+
+/**
+ * Gets the microphone volume level.
+ * 
+ * @param audiDevice - Audio device handle
+ * @param volume - Volume level
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioDevice_GetMicrophoneVolume(
+    rtcAudioDeviceHandle audiDevice,
+    unsigned int* volume
+) noexcept;
+
+/**
+ * Sets the speaker volume level.
+ * 
+ * @param audiDevice - Audio device handle
+ * @param volume - Volume level
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioDevice_SetSpeakerVolume(
+    rtcAudioDeviceHandle audiDevice,
+    unsigned int volume
+) noexcept;
+
+/**
+ * Gets the speaker volume level.
+ * 
+ * @param audiDevice - Audio device handle
+ * @param volume - Volume level
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioDevice_GetSpeakerVolume(
+    rtcAudioDeviceHandle audiDevice,
+    unsigned int* volume
 ) noexcept;
 
 } // extern "C"
