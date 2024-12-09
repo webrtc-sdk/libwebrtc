@@ -181,12 +181,12 @@ using rtcVideoCapturerHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCMediaConstraints interop object.
 using rtcMediaConstraintsHandle = rtcRefCountedObjectHandle;
 
-#ifdef RTC_DESKTOP_DEVICE
+#if defined(WEBRTC_WIN) && defined(RTC_DESKTOP_DEVICE)
 /// Opaque handle to a native RTCDesktopDevice interop object.
 using rtcDesktopDeviceHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCDesktopCapturer interop object.
 using rtcDesktopCapturerHandle = rtcRefCountedObjectHandle;
-#endif
+#endif // defined(WEBRTC_WIN) && defined(RTC_DESKTOP_DEVICE)
 
 /// Opaque handle to a native RTCMediaStream interop object.
 using rtcMediaStreamHandle = rtcRefCountedObjectHandle;
@@ -341,13 +341,13 @@ RTCPeerConnectionFactory_GetVideoDevice(
     rtcVideoDeviceHandle* pRetVal
 ) noexcept;
 
-#ifdef RTC_DESKTOP_DEVICE
+#if defined(WEBRTC_WIN) && defined(RTC_DESKTOP_DEVICE)
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetDesktopDevice(
     rtcPeerConnectionFactoryHandle factory,
     rtcDesktopDeviceHandle* pRetVal
 ) noexcept;
-#endif // RTC_DESKTOP_DEVICE
+#endif // defined(WEBRTC_WIN) && defined(RTC_DESKTOP_DEVICE)
 
 /**
  * @brief Creates a new instance of the RTCAudioSource object.
@@ -371,7 +371,7 @@ RTCPeerConnectionFactory_CreateVideoSource(
     rtcVideoSourceHandle* pRetVal
 ) noexcept;
 
-#ifdef RTC_DESKTOP_DEVICE
+#if defined(WEBRTC_WIN) && defined(RTC_DESKTOP_DEVICE)
 /**
  * @brief Creates a new instance of the RTCVideoSource object.
  */
@@ -383,7 +383,7 @@ RTCPeerConnectionFactory_CreateDesktopSource(
     rtcMediaConstraintsHandle constraints,
     rtcVideoSourceHandle* pRetVal
 ) noexcept;
-#endif // RTC_DESKTOP_DEVICE
+#endif // defined(WEBRTC_WIN) && defined(RTC_DESKTOP_DEVICE)
 
 /**
  * @brief Creates a new instance of the RTCAudioTrack object.

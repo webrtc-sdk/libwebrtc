@@ -149,7 +149,7 @@ RTCPeerConnectionFactory_GetVideoDevice(
     return rtcResultU4::kSuccess;
 } // end RTCPeerConnectionFactory_GetVideoDevice
 
-#ifdef RTC_DESKTOP_DEVICE
+#if defined(WEBRTC_WIN) && defined(RTC_DESKTOP_DEVICE)
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetDesktopDevice(
     rtcPeerConnectionFactoryHandle factory,
@@ -165,7 +165,7 @@ RTCPeerConnectionFactory_GetDesktopDevice(
     *pRetVal = static_cast<rtcDesktopDeviceHandle>(desktop_device.release());
     return rtcResultU4::kSuccess;
 } // end RTCPeerConnectionFactory_GetDesktopDevice
-#endif // RTC_DESKTOP_DEVICE
+#endif // defined(WEBRTC_WIN) && defined(RTC_DESKTOP_DEVICE)
 
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateAudioSource(
@@ -207,7 +207,7 @@ RTCPeerConnectionFactory_CreateVideoSource(
     return rtcResultU4::kSuccess;
 } // end RTCPeerConnectionFactory_CreateVideoSource
 
-#ifdef RTC_DESKTOP_DEVICE
+#if defined(WEBRTC_WIN) && defined(RTC_DESKTOP_DEVICE)
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateDesktopSource(
     rtcPeerConnectionFactoryHandle factory,
@@ -230,7 +230,7 @@ RTCPeerConnectionFactory_CreateDesktopSource(
     *pRetVal = static_cast<rtcVideoSourceHandle>(video_source.release());
     return rtcResultU4::kSuccess;
 } // end RTCPeerConnectionFactory_CreateDesktopSource
-#endif // RTC_DESKTOP_DEVICE
+#endif // defined(WEBRTC_WIN) && defined(RTC_DESKTOP_DEVICE)
 
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateAudioTrack(
