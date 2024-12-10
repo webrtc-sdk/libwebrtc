@@ -67,3 +67,38 @@ RTCVideoDevice_CreateVideoCapturer(
     *pOutRetVal = static_cast<rtcVideoCapturerHandle>(pVideoCapturer.release());
     return rtcResultU4::kSuccess;
 }
+
+rtcBool32 LIB_WEBRTC_CALL
+RTCVideoCapturer_StartCapture(
+    rtcVideoCapturerHandle videoCapturer
+) noexcept
+{
+    CHECK_POINTER_EX(videoCapturer, rtcBool32::kFalse);
+    scoped_refptr<RTCVideoCapturer> pVideoCapturer = static_cast<RTCVideoCapturer*>(videoCapturer);
+    return pVideoCapturer->StartCapture()
+        ? rtcBool32::kTrue
+        : rtcBool32::kFalse;
+}
+
+rtcBool32 LIB_WEBRTC_CALL
+RTCVideoCapturer_CaptureStarted(
+    rtcVideoCapturerHandle videoCapturer
+) noexcept
+{
+    CHECK_POINTER_EX(videoCapturer, rtcBool32::kFalse);
+    scoped_refptr<RTCVideoCapturer> pVideoCapturer = static_cast<RTCVideoCapturer*>(videoCapturer);
+    return pVideoCapturer->CaptureStarted()
+        ? rtcBool32::kTrue
+        : rtcBool32::kFalse;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoCapturer_StopCapture(
+    rtcVideoCapturerHandle videoCapturer
+) noexcept
+{
+    CHECK_NATIVE_HANDLE(videoCapturer);
+    scoped_refptr<RTCVideoCapturer> pVideoCapturer = static_cast<RTCVideoCapturer*>(videoCapturer);
+    pVideoCapturer->StopCapture();
+    return rtcResultU4::kSuccess;
+}

@@ -699,6 +699,45 @@ RTCVideoDevice_CreateVideoCapturer(
     rtcVideoCapturerHandle* pOutRetVal
 ) noexcept;
 
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCVideoCapturer interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
+/**
+ * Starts video capturing.
+ * 
+ * @param videoCapturer - Video capturer handle
+ * @return rtcBool32 - rtcBool32::kTrue if successful, otherwise rtcBool32::kFalse
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+RTCVideoCapturer_StartCapture(
+    rtcVideoCapturerHandle videoCapturer
+) noexcept;
+
+/**
+ * Returns whether the capture state has been initialized.
+ * 
+ * @param videoCapturer - Video capturer handle
+ * @return rtcBool32 - rtcBool32::kTrue if started, otherwise rtcBool32::kFalse
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+RTCVideoCapturer_CaptureStarted(
+    rtcVideoCapturerHandle videoCapturer
+) noexcept;
+
+/**
+ * Stops video capture.
+ * 
+ * @param videoCapturer - Video capturer handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoCapturer_StopCapture(
+    rtcVideoCapturerHandle videoCapturer
+) noexcept;
+
 } // extern "C"
 
 #endif  // LIB_WEBRTC_INTROP_API_HXX
