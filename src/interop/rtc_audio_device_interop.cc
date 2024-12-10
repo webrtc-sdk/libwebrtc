@@ -1,5 +1,4 @@
 #include "rtc_audio_device.h"
-//#include "src/rtc_audio_device_impl.h"
 #include "interop_api.h"
 
 using namespace libwebrtc;

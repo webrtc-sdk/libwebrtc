@@ -634,6 +634,71 @@ RTCAudioDevice_GetSpeakerVolume(
     unsigned int* volume
 ) noexcept;
 
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCVideoDevice interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
+/**
+ * Returns the number of video devices available.
+ *
+ * @param videoDevice - Video device handle
+ * @return int - The number of video devices available.
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCVideoDevice_NumberOfDevices(
+    rtcVideoDeviceHandle videoDevice
+) noexcept;
+
+/**
+ * Returns information about video device with the specified index.
+ * 
+ * @param videoDevice - Video device handle
+ * @param index - The index of the device.
+ * @param pOutDeviceNameUTF8 - Device name
+ * @param cchOutDeviceNameUTF8 - The size of the name.
+ * @param pOutDeviceUniqueIdUTF8 - Device id
+ * @param cchOutDeviceUniqueIdUTF8 - The size of the id.
+ * @param pOutProductUniqueIdUTF8 - Device product id
+ * @param cchOutProductUniqueIdUTF8 - The size of the product id.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoDevice_GetDeviceName(
+    rtcVideoDeviceHandle videoDevice,
+    int index,
+    char* pOutDeviceNameUTF8,
+    int cchOutDeviceNameUTF8,
+    char* pOutDeviceUniqueIdUTF8,
+    int cchOutDeviceUniqueIdUTF8,
+    char* pOutProductUniqueIdUTF8 = 0,
+    int cchOutProductUniqueIdUTF8 = 0
+) noexcept;
+
+/**
+ * Creates a new instance of the RTCVideoCapturer object.
+ * 
+ * @param videoDevice - Video device handle
+ * @param name - Video capturer name (for logs)
+ * @param index - The index of the video device.
+ * @param width - Video frame width
+ * @param height - Video frame height
+ * @param target_fps - Target frame per second
+ * @param pOutRetVal - Handle for the RTCVideoCapturer object to be created.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoDevice_CreateVideoCapturer(
+    rtcVideoDeviceHandle videoDevice,
+    const char* name,
+    int index,
+    int width,
+    int height,
+    int target_fps,
+    rtcVideoCapturerHandle* pOutRetVal
+) noexcept;
+
 } // extern "C"
 
 #endif  // LIB_WEBRTC_INTROP_API_HXX
