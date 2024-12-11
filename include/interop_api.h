@@ -28,6 +28,7 @@ using TcpCandidatePolicy = libwebrtc::TcpCandidatePolicy;
 using MediaSecurityType = libwebrtc::MediaSecurityType;
 using SdpSemantics = libwebrtc::SdpSemantics;
 using RTCMediaType = libwebrtc::RTCMediaType;
+using DesktopType = libwebrtc::DesktopType;
 
 /// 32-bit boolean for interop API.
 enum class rtcBool32 : int { kTrue = -1, kFalse = 0 };
@@ -187,6 +188,10 @@ using rtcMediaConstraintsHandle = rtcRefCountedObjectHandle;
 using rtcDesktopDeviceHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCDesktopCapturer interop object.
 using rtcDesktopCapturerHandle = rtcRefCountedObjectHandle;
+/// Opaque handle to a native MediaSource interop object.
+using rtcDesktopMediaSourceHandle = rtcRefCountedObjectHandle;
+/// Opaque handle to a native RTCDesktopMediaList interop object.
+using rtcDesktopMediaListHandle = rtcRefCountedObjectHandle;
 #endif // RTC_DESKTOP_DEVICE
 
 /// Opaque handle to a native RTCMediaStream interop object.
@@ -737,6 +742,44 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCVideoCapturer_StopCapture(
     rtcVideoCapturerHandle videoCapturer
 ) noexcept;
+
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCDesktopDevice interop methods
+ * ---------------------------------------------------------------------- 
+ */
+#ifdef RTC_DESKTOP_DEVICE
+/**
+ * Create desktop capturer
+ * 
+ * @param desktopDevice - Desktop device handle
+ * @param source - Media source handle
+ * @param pOutRetVal - Returns the created desktop capture handle.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopDevice_CreateDesktopCapturer(
+    rtcDesktopDeviceHandle desktopDevice,
+    rtcDesktopMediaSourceHandle source,
+    rtcDesktopCapturerHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Returns the desktop media list.
+ * 
+ * @param desktopDevice - Desktop device handle
+ * @param type - Desktop type
+ * @param pOutRetVal - Returns the created desktop media list handle.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopDevice_GetDesktopMediaList(
+    rtcDesktopDeviceHandle desktopDevice,
+    DesktopType type,
+    rtcDesktopMediaListHandle* pOutRetVal
+) noexcept;
+
+#endif // RTC_DESKTOP_DEVICE
 
 } // extern "C"
 
