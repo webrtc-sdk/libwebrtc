@@ -743,12 +743,20 @@ RTCVideoCapturer_StopCapture(
     rtcVideoCapturerHandle videoCapturer
 ) noexcept;
 
+#ifdef RTC_DESKTOP_DEVICE
+
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCDesktopMediaList interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
 /*
  * ---------------------------------------------------------------------- 
  * RTCDesktopDevice interop methods
  * ---------------------------------------------------------------------- 
  */
-#ifdef RTC_DESKTOP_DEVICE
+
 /**
  * Create desktop capturer
  * 
