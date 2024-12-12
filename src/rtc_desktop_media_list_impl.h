@@ -68,6 +68,24 @@ class MediaSourceImpl : public MediaSource {
   DesktopType type_;
 };
 
+class MediaListObserverImpl : public MediaListObserver
+{
+ public:
+   MediaListObserverImpl(void* callbacks /* rtcMediaListObserverCallbacks* */);
+   ~MediaListObserverImpl();
+
+   void OnMediaSourceAdded(scoped_refptr<MediaSource> source) override;
+
+   void OnMediaSourceRemoved(scoped_refptr<MediaSource> source) override;
+
+   void OnMediaSourceNameChanged(scoped_refptr<MediaSource> source) override;
+
+   void OnMediaSourceThumbnailChanged(scoped_refptr<MediaSource> source) override;
+
+ private:
+   void* callbacks_;
+};
+
 class RTCDesktopMediaListImpl : public RTCDesktopMediaList {
  public:
   enum CaptureState { CS_RUNNING, CS_STOPPED, CS_FAILED };
@@ -94,6 +112,8 @@ class RTCDesktopMediaListImpl : public RTCDesktopMediaList {
 
   bool GetThumbnail(scoped_refptr<MediaSource> source,
                     bool notify = false) override;
+
+  MediaListObserver* GetObserver() { return observer_; }
 
  private:
   class CallbackProxy : public webrtc::DesktopCapturer::Callback {

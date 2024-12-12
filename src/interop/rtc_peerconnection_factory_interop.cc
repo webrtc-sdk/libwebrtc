@@ -292,7 +292,7 @@ RTCPeerConnectionFactory_CreateStream(
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetRtpSenderCapabilities(
     rtcPeerConnectionFactoryHandle factory,
-    RTCMediaType media_type,
+    rtcMediaType media_type,
     rtcRtpCapabilitiesHandle* pRetVal
 ) noexcept
 {
@@ -309,7 +309,7 @@ RTCPeerConnectionFactory_GetRtpSenderCapabilities(
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetRtpReceiverCapabilities(
     rtcPeerConnectionFactoryHandle factory,
-    RTCMediaType media_type,
+    rtcMediaType media_type,
     rtcRtpCapabilitiesHandle* pRetVal
 ) noexcept
 {

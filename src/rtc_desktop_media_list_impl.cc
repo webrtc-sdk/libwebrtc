@@ -15,6 +15,7 @@
  */
 
 #include "rtc_desktop_media_list_impl.h"
+#include "interop_api.h"
 
 #include "internal/jpeg_util.h"
 #include "rtc_base/checks.h"
@@ -66,7 +67,7 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload,
       if (observer_) {
         auto source_ptr = source.get();
         signaling_thread_->BlockingCall(
-            [&, source_ptr]() { observer_->OnMediaSourceRemoved(source_ptr); });
+            [&, source_ptr]() { if (observer_) { observer_->OnMediaSourceRemoved(source_ptr); } });
       }
     }
     sources_.clear();
@@ -90,7 +91,7 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload,
       if (observer_) {
         auto source = (*(sources_.begin() + i)).get();
         signaling_thread_->BlockingCall(
-            [&, source]() { observer_->OnMediaSourceRemoved(source); });
+            [&, source]() { if (observer_) { observer_->OnMediaSourceRemoved(source); } });
       }
       sources_.erase(sources_.begin() + i);
       --i;
@@ -110,7 +111,7 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload,
         GetThumbnail(source, true);
         if (observer_) {
           signaling_thread_->BlockingCall(
-              [&, source]() { observer_->OnMediaSourceAdded(source); });
+              [&, source]() { if (observer_) { observer_->OnMediaSourceAdded(source); }});
         }
       }
     }
@@ -142,7 +143,7 @@ int32_t RTCDesktopMediaListImpl::UpdateSourceList(bool force_reload,
       if (observer_) {
         auto source = sources_[pos].get();
         signaling_thread_->BlockingCall(
-            [&, source]() { observer_->OnMediaSourceNameChanged(source); });
+            [&, source]() { if (observer_) { observer_->OnMediaSourceNameChanged(source); }});
       }
     }
     ++pos;
@@ -166,9 +167,7 @@ bool RTCDesktopMediaListImpl::GetThumbnail(scoped_refptr<MediaSource> source,
         auto old_thumbnail = source_impl->thumbnail();
         source_impl->SaveCaptureResult(result, std::move(frame));
         if (observer_ && notify) {
-          signaling_thread_->BlockingCall([&, source_impl]() {
-            observer_->OnMediaSourceThumbnailChanged(source_impl);
-          });
+          signaling_thread_->BlockingCall([&, source_impl]() { if (observer_) { observer_->OnMediaSourceThumbnailChanged(source_impl); }});
         }
       });
       capturer_->CaptureFrame();
@@ -250,6 +249,64 @@ void MediaSourceImpl::SaveCaptureResult(
   __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
   }
 #endif
+}
+
+/**
+ * MediaListObserverImpl
+ */
+
+MediaListObserverImpl::MediaListObserverImpl(void* callbacks /* rtcMediaListObserverCallbacks* */)
+  : callbacks_(callbacks)
+{
+  if (callbacks) {
+    size_t nSize = sizeof(rtcMediaListObserverCallbacks);
+    callbacks_ = malloc(nSize);
+    memcpy(callbacks_, (const void*)callbacks, nSize);
+  }
+}
+
+MediaListObserverImpl::~MediaListObserverImpl()
+{
+  if (callbacks_) {
+    free(callbacks_);
+  }
+  callbacks_ = nullptr;
+}
+
+void MediaListObserverImpl::OnMediaSourceAdded(scoped_refptr<MediaSource> source)
+{
+  if (callbacks_) {
+    rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
+    rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
+    pCallbacks->MediaSourceAdded(pCallbacks->user_data_added, pSource);
+  }
+}
+
+void MediaListObserverImpl::OnMediaSourceRemoved(scoped_refptr<MediaSource> source)
+{
+  if (callbacks_) {
+    rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
+    rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
+    pCallbacks->MediaSourceRemoved(pCallbacks->user_data_removed, pSource);
+  }
+}
+
+void MediaListObserverImpl::OnMediaSourceNameChanged(scoped_refptr<MediaSource> source)
+{
+  if (callbacks_) {
+    rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
+    rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
+    pCallbacks->MediaSourceNameChanged(pCallbacks->user_data_name_changed, pSource);
+  }
+}
+
+void MediaListObserverImpl::OnMediaSourceThumbnailChanged(scoped_refptr<MediaSource> source)
+{
+  if (callbacks_) {
+    rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
+    rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
+    pCallbacks->MediaSourceThumbnailChanged(pCallbacks->user_data_thumbnail_changed, pSource);
+  }
 }
 
 }  // namespace libwebrtc

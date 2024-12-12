@@ -162,7 +162,7 @@ RTCAudioDevice_SetRecordingDevice(
 rtcResultU4 LIB_WEBRTC_CALL
 RTCAudioDevice_RegisterDeviceChangeCallback(
     rtcAudioDeviceHandle audiDevice,
-    rtcRTCAudioDeviceChangeCallback deviceChangeCallback
+    rtcAudioDeviceChangeDelegate deviceChangeCallback
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(audiDevice);

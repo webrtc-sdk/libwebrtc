@@ -20,15 +20,15 @@
 extern "C" {
 
 /// Types used from libwebrtc.
-using IceTransportsType = libwebrtc::IceTransportsType;
-using BundlePolicy = libwebrtc::BundlePolicy;
-using RtcpMuxPolicy = libwebrtc::RtcpMuxPolicy;
-using CandidateNetworkPolicy = libwebrtc::CandidateNetworkPolicy;
-using TcpCandidatePolicy = libwebrtc::TcpCandidatePolicy;
-using MediaSecurityType = libwebrtc::MediaSecurityType;
-using SdpSemantics = libwebrtc::SdpSemantics;
-using RTCMediaType = libwebrtc::RTCMediaType;
-using DesktopType = libwebrtc::DesktopType;
+using rtcIceTransportsType = libwebrtc::IceTransportsType;
+using rtcBundlePolicy = libwebrtc::BundlePolicy;
+using rtcRtcpMuxPolicy = libwebrtc::RtcpMuxPolicy;
+using rtcCandidateNetworkPolicy = libwebrtc::CandidateNetworkPolicy;
+using rtcTcpCandidatePolicy = libwebrtc::TcpCandidatePolicy;
+using rtcMediaSecurityType = libwebrtc::MediaSecurityType;
+using rtcSdpSemantics = libwebrtc::SdpSemantics;
+using rtcMediaType = libwebrtc::RTCMediaType;
+using rtcDesktopType = libwebrtc::DesktopType;
 
 /// 32-bit boolean for interop API.
 enum class rtcBool32 : int { kTrue = -1, kFalse = 0 };
@@ -126,18 +126,18 @@ struct rtcIceServer {
 
 struct rtcPeerConnectionConfiguration {
     rtcIceServer ice_servers[libwebrtc::kMaxIceServerSize];
-    IceTransportsType type = IceTransportsType::kAll;
-    BundlePolicy bundle_policy = BundlePolicy::kBundlePolicyBalanced;
-    RtcpMuxPolicy rtcp_mux_policy = RtcpMuxPolicy::kRtcpMuxPolicyRequire;
-    CandidateNetworkPolicy candidate_network_policy =
-        CandidateNetworkPolicy::kCandidateNetworkPolicyAll;
-    TcpCandidatePolicy tcp_candidate_policy =
-        TcpCandidatePolicy::kTcpCandidatePolicyEnabled;
+    rtcIceTransportsType type = rtcIceTransportsType::kAll;
+    rtcBundlePolicy bundle_policy = rtcBundlePolicy::kBundlePolicyBalanced;
+    rtcRtcpMuxPolicy rtcp_mux_policy = rtcRtcpMuxPolicy::kRtcpMuxPolicyRequire;
+    rtcCandidateNetworkPolicy candidate_network_policy =
+        rtcCandidateNetworkPolicy::kCandidateNetworkPolicyAll;
+    rtcTcpCandidatePolicy tcp_candidate_policy =
+        rtcTcpCandidatePolicy::kTcpCandidatePolicyEnabled;
 
     int ice_candidate_pool_size = 0;
 
-    MediaSecurityType srtp_type = MediaSecurityType::kDTLS_SRTP;
-    SdpSemantics sdp_semantics = SdpSemantics::kUnifiedPlan;
+    rtcMediaSecurityType srtp_type = rtcMediaSecurityType::kDTLS_SRTP;
+    rtcSdpSemantics sdp_semantics = rtcSdpSemantics::kUnifiedPlan;
     rtcBool32 offer_to_receive_audio = rtcBool32::kTrue;
     rtcBool32 offer_to_receive_video = rtcBool32::kTrue;
 
@@ -183,16 +183,20 @@ using rtcVideoCapturerHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCMediaConstraints interop object.
 using rtcMediaConstraintsHandle = rtcRefCountedObjectHandle;
 
-#ifdef RTC_DESKTOP_DEVICE
 /// Opaque handle to a native RTCDesktopDevice interop object.
 using rtcDesktopDeviceHandle = rtcRefCountedObjectHandle;
+
 /// Opaque handle to a native RTCDesktopCapturer interop object.
 using rtcDesktopCapturerHandle = rtcRefCountedObjectHandle;
+
 /// Opaque handle to a native MediaSource interop object.
 using rtcDesktopMediaSourceHandle = rtcRefCountedObjectHandle;
+
 /// Opaque handle to a native RTCDesktopMediaList interop object.
 using rtcDesktopMediaListHandle = rtcRefCountedObjectHandle;
-#endif // RTC_DESKTOP_DEVICE
+
+/// Opaque handle to a native MediaListObserver interop object.
+using rtcDesktopMediaListObserverHandle = rtcObjectHandle;
 
 /// Opaque handle to a native RTCMediaStream interop object.
 using rtcMediaStreamHandle = rtcRefCountedObjectHandle;
@@ -209,6 +213,34 @@ using rtcAudioTrackHandle = rtcMediaTrackHandle;
 /// Opaque handle to a native RTCVideoTrack interop object.
 using rtcVideoTrackHandle = rtcMediaTrackHandle;
 
+/* ---------------------------------------------------------------- */
+
+/**
+ * Audio device change callback delegate
+ */
+using rtcAudioDeviceChangeDelegate = void(LIB_WEBRTC_CALL*)();
+
+/**
+ * Callback delegate for MediaListObserve.
+ */
+using rtcMediaListObserverDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data,
+    rtcDesktopMediaSourceHandle source
+);
+
+/**
+ * Callback delegate structure for MediaListObserve.
+ */
+struct rtcMediaListObserverCallbacks {
+    rtcMediaListObserverDelegate MediaSourceAdded{};
+    rtcObjectHandle user_data_added{};
+    rtcMediaListObserverDelegate MediaSourceRemoved{};
+    rtcObjectHandle user_data_removed{};
+    rtcMediaListObserverDelegate MediaSourceNameChanged{};
+    rtcObjectHandle user_data_name_changed{};
+    rtcMediaListObserverDelegate MediaSourceThumbnailChanged{};
+    rtcObjectHandle user_data_thumbnail_changed{};
+};
 
 /*
  * ---------------------------------------------------------------------- 
@@ -458,7 +490,7 @@ RTCPeerConnectionFactory_CreateStream(
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetRtpSenderCapabilities(
     rtcPeerConnectionFactoryHandle factory,
-    RTCMediaType media_type,
+    rtcMediaType media_type,
     rtcRtpCapabilitiesHandle* pRetVal
 ) noexcept;
 
@@ -469,7 +501,7 @@ RTCPeerConnectionFactory_GetRtpSenderCapabilities(
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetRtpReceiverCapabilities(
     rtcPeerConnectionFactoryHandle factory,
-    RTCMediaType media_type,
+    rtcMediaType media_type,
     rtcRtpCapabilitiesHandle* pRetVal
 ) noexcept;
 
@@ -478,11 +510,6 @@ RTCPeerConnectionFactory_GetRtpReceiverCapabilities(
  * RTCAudioDevice interop methods
  * ---------------------------------------------------------------------- 
  */
-
-/**
- * Audio device change callback delegate
- */
-using rtcRTCAudioDeviceChangeCallback = void(LIB_WEBRTC_CALL*)();
 
 /**
  * Returns the number of playout devices available.
@@ -584,7 +611,7 @@ RTCAudioDevice_SetRecordingDevice(
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCAudioDevice_RegisterDeviceChangeCallback(
     rtcAudioDeviceHandle audiDevice,
-    rtcRTCAudioDeviceChangeCallback deviceChangeCallback
+    rtcAudioDeviceChangeDelegate deviceChangeCallback
 ) noexcept;
 
 /**
@@ -751,6 +778,98 @@ RTCVideoCapturer_StopCapture(
  * ---------------------------------------------------------------------- 
  */
 
+/**
+ * Registers callback delegates for MediaListObserve.
+ * 
+ * @param hMediaList - Desktop media list handle
+ * @param rtcMediaListObserverCallbacks - Callback delegate structure for MediaListObserve.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopMediaList_RegisterMediaListObserver(
+    rtcDesktopMediaListHandle hMediaList,
+    rtcMediaListObserverCallbacks* callbacks
+) noexcept;
+
+/**
+ * Unregisters callback delegates for MediaListObserve.
+ * 
+ * @param hMediaList - Desktop media list handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopMediaList_DeRegisterMediaListObserver
+(
+    rtcDesktopMediaListHandle hMediaList
+) noexcept;
+
+/**
+ * Returns the desktop type for the MediaListObserve.
+ * 
+ * @param hMediaList - Desktop media list handle
+ * @return rtcDesktopType - 0 if successful, otherwise an -1
+ */
+LIB_WEBRTC_API rtcDesktopType LIB_WEBRTC_CALL
+RTCDesktopMediaList_GetType(
+    rtcDesktopMediaListHandle hMediaList
+) noexcept;
+
+/**
+ * Updates media sources.
+ * 
+ * @param hMediaList - Desktop media list handle
+ * @param force_reload - Force reloads media sources.
+ * @param get_thumbnail - Enables thumbnail get.
+ * @return int - Returns the number of sources.
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCDesktopMediaList_UpdateSourceList(
+    rtcDesktopMediaListHandle hMediaList,
+    rtcBool32 force_reload = rtcBool32::kFalse,
+    rtcBool32 get_thumbnail = rtcBool32::kTrue
+) noexcept;
+
+/**
+ * Returns the current number of media sources.
+ * 
+ * @param hMediaList - Desktop media list handle
+ * @return int - Returns the number of sources.
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCDesktopMediaList_GetSourceCount(
+    rtcDesktopMediaListHandle hMediaList
+) noexcept;
+
+/**
+ * Returns the media source whose index is specified.
+ * 
+ * @param hMediaList - Desktop media list handle
+ * @param index - Media source index
+ * @param pOutRetVal - Returns the media source handle.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopMediaList_GetSource(
+    rtcDesktopMediaListHandle hMediaList,
+    int index,
+    rtcDesktopMediaSourceHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Gets the thumbnail.
+ * 
+ * @param hMediaList - Desktop media list handle
+ * @param source - Media source handle
+ * @param notify - Triggers the callback method.
+ * @return rtcBool32 - kTrue if successful, otherwise an kFalse.
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+RTCDesktopMediaList_GetThumbnail(
+    rtcDesktopMediaListHandle hMediaList,
+    rtcDesktopMediaSourceHandle hSource,
+    rtcBool32 notify = rtcBool32::kFalse
+) noexcept;
+
 /*
  * ---------------------------------------------------------------------- 
  * RTCDesktopDevice interop methods
@@ -783,7 +902,7 @@ RTCDesktopDevice_CreateDesktopCapturer(
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCDesktopDevice_GetDesktopMediaList(
     rtcDesktopDeviceHandle desktopDevice,
-    DesktopType type,
+    rtcDesktopType type,
     rtcDesktopMediaListHandle* pOutRetVal
 ) noexcept;
 
