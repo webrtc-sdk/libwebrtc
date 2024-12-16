@@ -3,6 +3,12 @@
 
 using namespace libwebrtc;
 
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCAudioDevice interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
 int LIB_WEBRTC_CALL
 RTCAudioDevice_PlayoutDevices(
     rtcAudioDeviceHandle audiDevice

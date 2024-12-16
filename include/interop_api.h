@@ -35,6 +35,8 @@ using rtcDesktopType = libwebrtc::DesktopType;
 /// 32-bit boolean for interop API.
 enum class rtcBool32 : int { kTrue = -1, kFalse = 0 };
 
+enum class rtcTrackState : int { kUnknown = -1, kLive = 0, kEnded = 1 };
+
 /// 32-bit result enumerator
 enum class rtcResultU4 : unsigned int {
     /// The operation was successful.
@@ -667,6 +669,97 @@ RTCAudioDevice_GetSpeakerVolume(
     rtcAudioDeviceHandle audiDevice,
     unsigned int* volume
 ) noexcept;
+
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCMediaTrack interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
+/**
+ * Returns the track state.
+ * 
+ * @param mediaTrack - Media track handle
+ * @return rtcTrackState - Track state enum
+ */
+LIB_WEBRTC_API rtcTrackState LIB_WEBRTC_CALL
+RTCMediaTrack_GetState(
+    rtcMediaTrackHandle mediaTrack
+) noexcept;
+
+/**
+ * Returns the track kind. (video, audio, vs.)
+ * 
+ * @param mediaTrack - Media track handle
+ * @param pOutKind - Media track kind
+ * @param cchOutKind - The size of the kind
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCMediaTrack_GetKind(
+    rtcMediaTrackHandle mediaTrack,
+    char* pOutKind,
+    int cchOutKind
+) noexcept;
+
+/**
+ * Returns the track id.
+ * 
+ * @param mediaTrack - Media track handle
+ * @param pOutId - Media track id
+ * @param cchOutId - The size of the id
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCMediaTrack_GetId(
+    rtcMediaTrackHandle mediaTrack,
+    char* pOutId,
+    int cchOutId
+) noexcept;
+
+/**
+ * Returns the enable/disable status of the track.
+ * 
+ * @param mediaTrack - Media track handle
+ * @return rtcBool32 - kTrue if enabled, otherwise disabled
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+RTCMediaTrack_GetEnabled(
+    rtcMediaTrackHandle mediaTrack
+) noexcept;
+
+/**
+ * Sets the enable/disable of the track.
+ * 
+ * @param mediaTrack - Media track handle
+ * @param enabled - Media track enable/disable value
+ * @return rtcBool32 - kTrue if the property has changed, otherwise kFalse
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+RTCMediaTrack_SetEnabled(
+    rtcMediaTrackHandle mediaTrack,
+    rtcBool32 enabled
+) noexcept;
+
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCAudioTrack interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
+/**
+ * Sets the volume of the audio track.
+ * 
+ * @param audioTrack - Audio track handle
+ * @param volume - volume in [0-10]
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioTrack_SetVolume(
+    rtcAudioTrackHandle audioTrack,
+    double volume
+) noexcept;
+
 
 /*
  * ---------------------------------------------------------------------- 

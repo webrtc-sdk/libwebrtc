@@ -3,6 +3,12 @@
 
 using namespace libwebrtc;
 
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCVideoDevice interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
 int LIB_WEBRTC_CALL
 RTCVideoDevice_NumberOfDevices(
     rtcVideoDeviceHandle videoDevice
@@ -67,6 +73,12 @@ RTCVideoDevice_CreateVideoCapturer(
     *pOutRetVal = static_cast<rtcVideoCapturerHandle>(pVideoCapturer.release());
     return rtcResultU4::kSuccess;
 }
+
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCVideoCapturer interop methods
+ * ---------------------------------------------------------------------- 
+ */
 
 rtcBool32 LIB_WEBRTC_CALL
 RTCVideoCapturer_StartCapture(
