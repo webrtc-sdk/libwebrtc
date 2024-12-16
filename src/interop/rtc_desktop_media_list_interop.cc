@@ -6,6 +6,12 @@ using namespace libwebrtc;
 
 #ifdef RTC_DESKTOP_DEVICE
 
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCDesktopMediaList interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
 rtcResultU4 LIB_WEBRTC_CALL
 RTCDesktopMediaList_RegisterMediaListObserver(
     rtcDesktopMediaListHandle hMediaList,
@@ -108,6 +114,95 @@ RTCDesktopMediaList_GetThumbnail(
     return pMediaList->GetThumbnail(pSource, notify != rtcBool32::kFalse)
         ? rtcBool32::kTrue
         : rtcBool32::kFalse;
+}
+
+/*
+ * ---------------------------------------------------------------------- 
+ * MediaSource interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
+rtcResultU4 LIB_WEBRTC_CALL
+MediaSource_GetInfo(
+    rtcDesktopMediaSourceHandle mediaSource,
+    char* pOutId, int cchOutId,
+    char* pOutName, int cchOutName,
+    rtcDesktopType* pOutType
+) noexcept
+{
+    CHECK_NATIVE_HANDLE(mediaSource);
+    RESET_OUT_POINTER_EX(pOutId, '\0');
+    RESET_OUT_POINTER_EX(pOutName, '\0');
+    RESET_OUT_POINTER_EX(pOutType, static_cast<rtcDesktopType>(-1));
+    
+    rtcResultU4 result = rtcResultU4::kSuccess;
+    size_t cchLen;
+    string szTmp;
+    scoped_refptr<MediaSource> pMediaSource = static_cast<MediaSource*>(mediaSource);
+
+    if (pOutId && cchOutId > 0) {
+        ZERO_MEMORY(pOutId, cchOutId);
+        szTmp = pMediaSource->id();
+        if (szTmp.size() > (size_t)cchOutId) {
+            result = rtcResultU4::kBufferTooSmall;
+        }
+        cchLen = std::min(szTmp.size(), (size_t)cchOutId);
+        strncpy(pOutId, szTmp.c_string(), cchLen);
+    }
+
+    if (pOutName && cchOutName > 0) {
+        ZERO_MEMORY(pOutName, cchOutName);
+        szTmp = pMediaSource->name();
+        if (szTmp.size() > (size_t)cchOutName) {
+            result = rtcResultU4::kBufferTooSmall;
+        }
+        cchLen = std::min(szTmp.size(), (size_t)cchOutName);
+        strncpy(pOutName, szTmp.c_string(), cchLen);
+    }
+
+    if (pOutType) {
+        *pOutType = static_cast<rtcDesktopType>(pMediaSource->type());
+    }
+
+    return result;
+}
+
+rtcBool32 LIB_WEBRTC_CALL
+MediaSource_UpdateThumbnail(
+    rtcDesktopMediaSourceHandle mediaSource
+) noexcept
+{
+    CHECK_POINTER_EX(mediaSource, rtcBool32::kFalse);
+    scoped_refptr<MediaSource> pMediaSource = static_cast<MediaSource*>(mediaSource);
+    return pMediaSource->UpdateThumbnail()
+        ? rtcBool32::kTrue
+        : rtcBool32::kFalse;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+MediaSource_GetThumbnail(
+    rtcDesktopMediaSourceHandle mediaSource,
+    unsigned char* pBuffer,
+    int* refSizeOfBuffer
+) noexcept
+{
+    CHECK_NATIVE_HANDLE(mediaSource);
+    size_t szDstBuffer = static_cast<size_t>(*refSizeOfBuffer);
+    RESET_OUT_POINTER_EX(refSizeOfBuffer, 0);
+
+    scoped_refptr<MediaSource> pMediaSource = static_cast<MediaSource*>(mediaSource);
+    portable::vector<unsigned char> buffer = pMediaSource->thumbnail();
+
+    size_t szSrcSize = buffer.size();
+    *refSizeOfBuffer = static_cast<int>(szSrcSize);
+    if (pBuffer) {
+        if (szSrcSize > szDstBuffer) {
+            return rtcResultU4::kBufferTooSmall;
+        }
+        memcpy((void*)pBuffer, (const void*)buffer.data(), szSrcSize);
+    }
+
+    return rtcResultU4::kSuccess;
 }
 
 #endif // RTC_DESKTOP_DEVICE

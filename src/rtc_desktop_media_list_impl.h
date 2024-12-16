@@ -83,7 +83,7 @@ class MediaListObserverImpl : public MediaListObserver
    void OnMediaSourceThumbnailChanged(scoped_refptr<MediaSource> source) override;
 
  private:
-   void* callbacks_;
+   void* callbacks_ /* rtcMediaListObserverCallbacks* */;
 };
 
 class RTCDesktopMediaListImpl : public RTCDesktopMediaList {

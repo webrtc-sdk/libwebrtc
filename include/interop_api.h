@@ -13,6 +13,8 @@
 
 #define CHECK_POINTER_EX(p, r)          if ((p) == nullptr) { return (r); }
 #define CHECK_POINTER(p)                CHECK_POINTER_EX(p, rtcResultU4::kInvalidPointer)
+#define RESET_OUT_POINTER_EX(p,v)       if ((p) != nullptr) { *(p) = (v); }
+#define RESET_OUT_POINTER(p)            RESET_OUT_POINTER_EX(p, nullptr)
 #define CHECK_OUT_POINTER(p)            if ((p) != nullptr) { *(p) = nullptr; } else { return rtcResultU4::kInvalidPointer; }
 #define CHECK_NATIVE_HANDLE(h)          CHECK_POINTER_EX(h, rtcResultU4::kInvalidNativeHandle)
 #define ZERO_MEMORY(p,sz)               if ((sz) > 0) { memset((void*)(p), 0, (size_t)(sz)); }
@@ -868,6 +870,59 @@ RTCDesktopMediaList_GetThumbnail(
     rtcDesktopMediaListHandle hMediaList,
     rtcDesktopMediaSourceHandle hSource,
     rtcBool32 notify = rtcBool32::kFalse
+) noexcept;
+
+/*
+ * ---------------------------------------------------------------------- 
+ * MediaSource interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
+/**
+ * Provides id, name and type information about the media source.
+ * 
+ * @param mediaSource - Media source handle
+ * @param pOutId - Media source id
+ * @param cchOutId - The size of the id.
+ * @param pOutName - Media source name
+ * @param cchOutName - The size of the name.
+ * @param pOutType - The desktop type of media source
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+MediaSource_GetInfo(
+    rtcDesktopMediaSourceHandle mediaSource,
+    char* pOutId, int cchOutId,
+    char* pOutName, int cchOutName,
+    rtcDesktopType* pOutType
+) noexcept;
+
+/**
+ * Updates the media source thumbnail.
+ * 
+ * @param mediaSource - Media source handle
+ * @return rtcBool32 - kTrue if successful, otherwise kFalse
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+MediaSource_UpdateThumbnail(
+    rtcDesktopMediaSourceHandle mediaSource
+) noexcept;
+
+/**
+ * Returns the thumbnail of the media source, jpeg format.
+ * At the end of the process, the 'refSizeOfBuffer' value
+ * gives the actual size of the buffer area.
+ * 
+ * @param mediaSource - Media source handle
+ * @param pBuffer - Address of the buffer area for the thumbnail.
+ * @param refSizeOfBuffer - The size of the thumbnail buffer.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+MediaSource_GetThumbnail(
+    rtcDesktopMediaSourceHandle mediaSource,
+    unsigned char* pBuffer,
+    int* refSizeOfBuffer
 ) noexcept;
 
 /*
