@@ -33,9 +33,31 @@ using rtcMediaType = libwebrtc::RTCMediaType;
 using rtcDesktopType = libwebrtc::DesktopType;
 
 /// 32-bit boolean for interop API.
-enum class rtcBool32 : int { kTrue = -1, kFalse = 0 };
+enum class rtcBool32 : int {
+    kTrue = -1,
+    kFalse = 0
+};
 
-enum class rtcTrackState : int { kUnknown = -1, kLive = 0, kEnded = 1 };
+enum class rtcTrackState : int {
+    kUnknown = -1,
+    kLive = 0,
+    kEnded = 1
+};
+
+enum class rtcVideoFrameType : int {
+    kUnknown = -1,
+    kARGB = 0,
+    kBGRA = 1,
+    kABGR = 2,
+    kRGBA = 3
+};
+
+enum class rtcVideoRotation : int {
+    kVideoRotation_0 = 0,
+    kVideoRotation_90 = 90,
+    kVideoRotation_180 = 180,
+    kVideoRotation_270 = 270
+};
 
 /// 32-bit result enumerator
 enum class rtcResultU4 : unsigned int {
@@ -126,7 +148,7 @@ struct rtcIceServer {
     const char* uri = nullptr;
     const char* username = nullptr;
     const char* password = nullptr;
-};
+}; // end struct rtcIceServer
 
 struct rtcPeerConnectionConfiguration {
     rtcIceServer ice_servers[libwebrtc::kMaxIceServerSize];
@@ -155,7 +177,22 @@ struct rtcPeerConnectionConfiguration {
     rtcBool32 use_rtp_mux = rtcBool32::kTrue;
     uint32_t local_audio_bandwidth = 128;
     uint32_t local_video_bandwidth = 512;
-};
+}; // end struct rtcPeerConnectionConfiguration
+
+struct rtcVideoFrameDatas {
+    // frame width in pixel
+    int width = 0;
+    // frame height in pixel
+    int height = 0;
+    // The YUV starting address of the frame buffer.
+    const unsigned char* data_y = nullptr;
+    const unsigned char* data_u = nullptr;
+    const unsigned char* data_v = nullptr;
+    // The stride of the YUV
+    int stride_y = 0;
+    int stride_u = 0;
+    int stride_v = 0;
+}; // end struct rtcVideoFrameDatas
 
 /// Opaque handle to a native interop object.
 using rtcObjectHandle = void*;
@@ -216,6 +253,12 @@ using rtcAudioTrackHandle = rtcMediaTrackHandle;
 
 /// Opaque handle to a native RTCVideoTrack interop object.
 using rtcVideoTrackHandle = rtcMediaTrackHandle;
+
+/// Opaque handle to a native RTCVideoFrame interop object.
+using rtcVideoFrameHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCVideoRenderer interop object.
+using rtcVideoRendererHandle = rtcRefCountedObjectHandle; // ???
 
 /* ---------------------------------------------------------------- */
 
@@ -863,6 +906,81 @@ RTCVideoCapturer_CaptureStarted(
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCVideoCapturer_StopCapture(
     rtcVideoCapturerHandle videoCapturer
+) noexcept;
+
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCVideoFrame interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
+/**
+ * Creates a new instance of the video frame. (i420)
+ * 
+ * @param width - Frame width
+ * @param height - Frame height
+ * @param buffer - Frame buffer
+ * @param length - The size of the frame buffer
+ * @param pOutRetVal - Handle for the created video frame class.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_Create1(
+    int width, int height,
+    const unsigned char* buffer, int length,
+    rtcVideoFrameHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Creates a new instance of the video frame. (i420)
+ * 
+ * @param frameDatas - Frame datas
+ * @param pOutRetVal - Handle for the created video frame handle.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_Create2(
+    const rtcVideoFrameDatas* frameDatas,
+    rtcVideoFrameHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Creates a copy of the video frame.
+ * 
+ * @param videoFrame - Source video frame handle
+ * @param pOutRetVal - Handle for the created video frame handle.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_Copy(
+    rtcVideoFrameHandle videoFrame,
+    rtcVideoFrameHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Returns the datas of the video frame.
+ * 
+ * @param videoFrame - Source video frame handle
+ * @param refFrameDatas - The frame datas.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_GetFrameDatas(
+    rtcVideoFrameHandle videoFrame,
+    rtcVideoFrameDatas* refFrameDatas
+) noexcept;
+
+/**
+ * Returns the rotation of the video frame. (See: rtcVideoRotation)
+ * 
+ * @param videoFrame - Source video frame handle
+ * @param pRotation - The frame rotation value.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_GetRotation(
+    rtcVideoFrameHandle videoFrame,
+    rtcVideoRotation* pOutRetVal
 ) noexcept;
 
 #ifdef RTC_DESKTOP_DEVICE
