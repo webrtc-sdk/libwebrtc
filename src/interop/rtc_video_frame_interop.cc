@@ -125,3 +125,32 @@ RTCVideoFrame_GetRotation(
     *pOutRetVal = static_cast<rtcVideoRotation>(pvf->rotation());
     return rtcResultU4::kSuccess;
 }
+
+int LIB_WEBRTC_CALL
+RTCVideoFrame_ConvertToARGB(
+    rtcVideoFrameHandle videoFrame,
+    rtcVideoFrameType type,
+    unsigned char* dst_argb,
+    int dst_stride_argb,
+    int dest_width,
+    int dest_height
+) noexcept
+{
+    CHECK_POINTER_EX(videoFrame, 0);
+    if (dst_argb == nullptr
+        || dest_width < 2
+        || dest_height < 2
+        || dst_stride_argb < 12)
+    {
+        return 0;
+    }
+
+    scoped_refptr<RTCVideoFrame> pvf = static_cast<RTCVideoFrame*>(videoFrame);
+    return pvf->ConvertToARGB(
+        static_cast<RTCVideoFrame::Type>(type),
+        static_cast<uint8_t*>(dst_argb),
+        dst_stride_argb,
+        dest_width,
+        dest_height
+    );
+}

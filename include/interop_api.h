@@ -983,6 +983,27 @@ RTCVideoFrame_GetRotation(
     rtcVideoRotation* pOutRetVal
 ) noexcept;
 
+/**
+ * Converts the video frame to RGB colorspace.
+ * 
+ * @param videoFrame - Source video frame handle
+ * @param type - Type of destination video frame buffer.
+ * @param dst_argb - Destination video frame buffer.
+ * @param dst_stride_argb - Stride of destination video frame buffer.
+ * @param dest_width - Width of destination video frame buffer.
+ * @param dest_height - Height of destination video frame buffer.
+ * @return int - Size of destination
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCVideoFrame_ConvertToARGB(
+    rtcVideoFrameHandle videoFrame,
+    rtcVideoFrameType type,
+    unsigned char* dst_argb,
+    int dst_stride_argb,
+    int dest_width,
+    int dest_height
+) noexcept;
+
 #ifdef RTC_DESKTOP_DEVICE
 
 /*
