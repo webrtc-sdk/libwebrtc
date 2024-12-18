@@ -6,11 +6,17 @@
 namespace libwebrtc {
 
 template <typename VideoFrameT>
-class RTCVideoRenderer {
+class RTCVideoRenderer : public RefCountInterface {
  public:
   virtual ~RTCVideoRenderer() {}
 
   virtual void OnFrame(VideoFrameT frame) = 0;
+
+  virtual void RegisterFrameCallback(void* user_data /* rtcObjectHandle */, void* callback /* rtcVideoRendererFrameDelegate */) = 0;
+  virtual void UnRegisterFrameCallback() = 0;
+
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCVideoRenderer<VideoFrameT>> Create();
 };
 
 }  // namespace libwebrtc

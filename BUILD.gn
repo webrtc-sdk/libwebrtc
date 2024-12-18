@@ -142,6 +142,8 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_video_device_impl.h",
     "src/rtc_video_frame_impl.cc",
     "src/rtc_video_frame_impl.h",
+    "src/rtc_video_renderer_impl.cc",
+    "src/rtc_video_renderer_impl.h",
     "src/rtc_video_sink_adapter.cc",
     "src/rtc_video_sink_adapter.h",
     "src/rtc_video_source_impl.cc",

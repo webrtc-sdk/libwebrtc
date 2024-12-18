@@ -289,6 +289,14 @@ struct rtcMediaListObserverCallbacks {
     rtcObjectHandle user_data_thumbnail_changed{};
 };
 
+/**
+ * Callback OnFrame delegate for RTCVideoRenderer.
+ */
+using rtcVideoRendererFrameDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data,
+    rtcVideoFrameHandle frame
+);
+
 /*
  * ---------------------------------------------------------------------- 
  * LibWebRTC interop methods
@@ -1003,6 +1011,65 @@ RTCVideoFrame_ConvertToARGB(
     int dest_width,
     int dest_height
 ) noexcept;
+
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCVideoRenderer interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
+/**
+ * Creates a new instance of the video renderer.
+ * 
+ * @param pOutRetVal - Video renderer handle.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoRenderer_Create(
+    rtcVideoRendererHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Registers the callback method for the video renderer.
+ * 
+ * @param videoRenderer - Video renderer handle.
+ * @param userData - User data handle
+ * @param callback - Callback method for OnFrame
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoRenderer_RegisterFrameCallback(
+    rtcVideoRendererHandle videoRenderer,
+    rtcObjectHandle userData,
+    rtcVideoRendererFrameDelegate callback
+) noexcept;
+
+/**
+ * UnRegisters the callback method for the video renderer.
+ * 
+ * @param videoRenderer - Video renderer handle.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoRenderer_UnRegisterFrameCallback(
+    rtcVideoRendererHandle videoRenderer
+) noexcept;
+
+#if defined(DEBUG) || defined(_DEBUG)
+/**
+ * It is used for testing purposes to trigger
+ * the OnRender callback method.
+ * 
+ * @param videoRenderer - Video renderer handle.
+ * @param videoFrame - Video frame handle.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoRenderer_FireOnFrame(
+    rtcVideoRendererHandle videoRenderer,
+    rtcVideoFrameHandle videoFrame
+) noexcept;
+#endif // DEBUG or _DEBUG
 
 #ifdef RTC_DESKTOP_DEVICE
 
