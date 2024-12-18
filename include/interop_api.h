@@ -1071,6 +1071,39 @@ RTCVideoRenderer_FireOnFrame(
 ) noexcept;
 #endif // DEBUG or _DEBUG
 
+/*
+ * ---------------------------------------------------------------------- 
+ * RTCVideoTrack interop methods
+ * ---------------------------------------------------------------------- 
+ */
+
+/**
+ * Adds a video renderer to the video track for frame callback operations.
+ * 
+ * @param videoTrack - Video track handle.
+ * @param videoRenderer - Video renderer handle.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoTrack_AddRenderer(
+    rtcVideoTrackHandle videoTrack,
+    rtcVideoRendererHandle videoRenderer
+) noexcept;
+
+/**
+ * Removes the video renderer that is already attached to
+ * the video track for frame callback operations.
+ * 
+ * @param videoTrack - Video track handle.
+ * @param videoRenderer - Video renderer handle.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoTrack_RemoveRenderer(
+    rtcVideoTrackHandle videoTrack,
+    rtcVideoRendererHandle videoRenderer
+) noexcept;
+
 #ifdef RTC_DESKTOP_DEVICE
 
 /*
