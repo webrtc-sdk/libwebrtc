@@ -111,6 +111,19 @@ libwebrtc::RTCVideoFrame::VideoRotation VideoFrameBufferImpl::rotation() {
   return RTCVideoFrame::kVideoRotation_0;
 }
 
+scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width, int height) {
+  RTC_DCHECK(width > 1);
+  RTC_DCHECK(height > 1);
+
+  rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Create(
+      width, height);
+  
+  scoped_refptr<VideoFrameBufferImpl> frame =
+      scoped_refptr<VideoFrameBufferImpl>(
+          new RefCountedObject<VideoFrameBufferImpl>(i420_buffer));
+  return frame;
+}
+
 scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width, int height,
                                                    const uint8_t* buffer,
                                                    int length) {

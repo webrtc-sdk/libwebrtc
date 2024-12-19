@@ -42,8 +42,8 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
   rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer() { return buffer_; }
 
   // System monotonic clock, same timebase as rtc::TimeMicros().
-  int64_t timestamp_us() const { return timestamp_us_; }
-  void set_timestamp_us(int64_t timestamp_us) { timestamp_us_ = timestamp_us; }
+  int64_t timestamp_us() const override{ return timestamp_us_; }
+  void set_timestamp_us(int64_t timestamp_us) override { timestamp_us_ = timestamp_us; }
 
   virtual RTCVideoFrame::VideoRotation rotation() override;
 

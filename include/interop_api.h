@@ -32,6 +32,9 @@ using rtcSdpSemantics = libwebrtc::SdpSemantics;
 using rtcMediaType = libwebrtc::RTCMediaType;
 using rtcDesktopType = libwebrtc::DesktopType;
 
+/// 64-bit timestamp for interop API. 
+using rtcTimestamp = long long;
+
 /// 32-bit boolean for interop API.
 enum class rtcBool32 : int {
     kTrue = -1,
@@ -923,7 +926,22 @@ RTCVideoCapturer_StopCapture(
  */
 
 /**
- * Creates a new instance of the video frame. (i420)
+ * Creates a new instance of an empty video frame. (i420)
+ * 
+ * @param width - Frame width
+ * @param height - Frame height
+ * @param pOutRetVal - Handle for the created video frame class.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_Create0(
+    int width, int height,
+    rtcVideoFrameHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Creates a new instance of the video frame
+ * from the specified source buffer. (i420)
  * 
  * @param width - Frame width
  * @param height - Frame height
@@ -940,7 +958,8 @@ RTCVideoFrame_Create1(
 ) noexcept;
 
 /**
- * Creates a new instance of the video frame. (i420)
+ * Creates a new instance of the video frame
+ * from the specified frame datas. (i420)
  * 
  * @param frameDatas - Frame datas
  * @param pOutRetVal - Handle for the created video frame handle.
@@ -989,6 +1008,30 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCVideoFrame_GetRotation(
     rtcVideoFrameHandle videoFrame,
     rtcVideoRotation* pOutRetVal
+) noexcept;
+
+/**
+ * Returns a timestamp in microseconds.
+ * 
+ * @param videoFrame - Source video frame handle
+ * @return rtcTimestamp - Timestamp in microseconds.
+ */
+LIB_WEBRTC_API rtcTimestamp LIB_WEBRTC_CALL
+RTCVideoFrame_GetTimestampInMicroseconds(
+    rtcVideoFrameHandle videoFrame
+) noexcept;
+
+/**
+ * Sets the timestamp in microseconds.
+ * 
+ * @param videoFrame - Source video frame handle
+ * @param timestampInMicroseconds - Timestamp in microseconds.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_SetTimestampInMicroseconds(
+    rtcVideoFrameHandle videoFrame,
+    rtcTimestamp timestampInMicroseconds
 ) noexcept;
 
 /**

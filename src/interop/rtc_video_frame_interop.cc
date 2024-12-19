@@ -10,6 +10,29 @@ using namespace libwebrtc;
  */
 
 rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_Create0(
+    int width, int height,
+    rtcVideoFrameHandle* pOutRetVal
+) noexcept
+{
+    CHECK_OUT_POINTER(pOutRetVal);
+
+    if (width < 2 
+        || (width % 4) != 0
+        || height < 2)
+    {
+        return rtcResultU4::kInvalidParameter;
+    }
+
+    scoped_refptr<RTCVideoFrame> pvf = RTCVideoFrame::Create(
+        width, height
+    );
+    CHECK_POINTER_EX(pvf, rtcResultU4::kUnknownError);
+    *pOutRetVal = static_cast<rtcVideoFrameHandle>(pvf.release());
+    return rtcResultU4::kSuccess;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
 RTCVideoFrame_Create1(
     int width, int height,
     const unsigned char* buffer, int length,
@@ -26,8 +49,8 @@ RTCVideoFrame_Create1(
     {
         return rtcResultU4::kInvalidParameter;
     }
-
-    int nCalcLen = width * height + (((width >> 1) * (height >> 1)) << 1);
+    
+    int nCalcLen = (width * height * 3) / 2;
     if (nCalcLen != length) {
         return rtcResultU4::kOutOfRange;
     }
@@ -123,6 +146,31 @@ RTCVideoFrame_GetRotation(
 
     scoped_refptr<RTCVideoFrame> pvf = static_cast<RTCVideoFrame*>(videoFrame);
     *pOutRetVal = static_cast<rtcVideoRotation>(pvf->rotation());
+    return rtcResultU4::kSuccess;
+}
+
+rtcTimestamp LIB_WEBRTC_CALL
+RTCVideoFrame_GetTimestampInMicroseconds(
+    rtcVideoFrameHandle videoFrame
+) noexcept
+{
+    CHECK_POINTER_EX(videoFrame, static_cast<rtcTimestamp>(0LL));
+
+    scoped_refptr<RTCVideoFrame> pvf = static_cast<RTCVideoFrame*>(videoFrame);
+    rtcTimestamp retVal = static_cast<rtcTimestamp>(pvf->timestamp_us());
+    return retVal;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_SetTimestampInMicroseconds(
+    rtcVideoFrameHandle videoFrame,
+    rtcTimestamp timestampInMicroseconds
+) noexcept
+{
+    CHECK_NATIVE_HANDLE(videoFrame);
+
+    scoped_refptr<RTCVideoFrame> pvf = static_cast<RTCVideoFrame*>(videoFrame);
+    pvf->set_timestamp_us(static_cast<int64_t>(timestampInMicroseconds));
     return rtcResultU4::kSuccess;
 }
 

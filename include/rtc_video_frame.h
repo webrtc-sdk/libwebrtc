@@ -18,6 +18,9 @@ class RTCVideoFrame : public RefCountInterface {
 
  public:
   LIB_WEBRTC_API static scoped_refptr<RTCVideoFrame> Create(
+      int width, int height);
+
+  LIB_WEBRTC_API static scoped_refptr<RTCVideoFrame> Create(
       int width, int height, const uint8_t* buffer, int length);
 
   LIB_WEBRTC_API static scoped_refptr<RTCVideoFrame> Create(
@@ -43,6 +46,10 @@ class RTCVideoFrame : public RefCountInterface {
   virtual int StrideY() const = 0;
   virtual int StrideU() const = 0;
   virtual int StrideV() const = 0;
+
+  // System monotonic clock, same timebase as rtc::TimeMicros().
+  virtual int64_t timestamp_us() const = 0;
+  virtual void set_timestamp_us(int64_t timestamp_us) = 0;
 
   virtual int ConvertToARGB(Type type, uint8_t* dst_argb, int dst_stride_argb,
                             int dest_width, int dest_height) = 0;
