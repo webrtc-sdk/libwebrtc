@@ -167,8 +167,14 @@ rtc_shared_library("libwebrtc") {
       "src/interop/rtc_video_track_interop.cc",
       "src/interop/rtc_video_frame_interop.cc",
       "src/interop/rtc_video_renderer_interop.cc",
-      "src/interop/rtc_desktop_device_interop.cc",
     ]
+
+    if (libwebrtc_desktop_capture) {
+      sources += [
+        "src/interop/rtc_desktop_media_list_interop.cc",
+        "src/interop/rtc_desktop_device_interop.cc",
+      ]
+    }
   }
 
   # intel media sdk
