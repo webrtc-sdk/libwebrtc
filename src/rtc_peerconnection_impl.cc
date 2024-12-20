@@ -8,6 +8,7 @@
 #include "pc/media_session.h"
 #include "rtc_base/logging.h"
 #include "rtc_data_channel_impl.h"
+#include "rtc_sdp_parse_error_impl.h"
 #include "rtc_ice_candidate_impl.h"
 #include "rtc_media_stream_impl.h"
 #include "rtc_mediaconstraints_impl.h"
@@ -336,10 +337,10 @@ void RTCPeerConnectionImpl::OnIceCandidate(
 
   std::string cand_sdp;
   if (observer_ && candidate->ToString(&cand_sdp)) {
-    SdpParseError error;
+    scoped_refptr<RTCSdpParseError> error = RTCSdpParseError::Create();
     scoped_refptr<RTCIceCandidate> cand =
         RTCIceCandidate::Create(cand_sdp.c_str(), candidate->sdp_mid().c_str(),
-                                candidate->sdp_mline_index(), &error);
+                                candidate->sdp_mline_index(), error);
     observer_->OnIceCandidate(cand);
   }
 

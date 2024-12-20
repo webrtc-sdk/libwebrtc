@@ -3,6 +3,7 @@
 
 #include "rtc_audio_track.h"
 #include "rtc_data_channel.h"
+#include "rtc_sdp_parse_error.h"
 #include "rtc_ice_candidate.h"
 #include "rtc_media_stream.h"
 #include "rtc_mediaconstraints.h"

@@ -11,13 +11,28 @@
 
 #include "rtc_types.h"
 
-#define CHECK_POINTER_EX(p, r)          if ((p) == nullptr) { return (r); }
-#define CHECK_POINTER(p)                CHECK_POINTER_EX(p, rtcResultU4::kInvalidPointer)
-#define RESET_OUT_POINTER_EX(p,v)       if ((p) != nullptr) { *(p) = (v); }
-#define RESET_OUT_POINTER(p)            RESET_OUT_POINTER_EX(p, nullptr)
-#define CHECK_OUT_POINTER(p)            if ((p) != nullptr) { *(p) = nullptr; } else { return rtcResultU4::kInvalidPointer; }
-#define CHECK_NATIVE_HANDLE(h)          CHECK_POINTER_EX(h, rtcResultU4::kInvalidNativeHandle)
-#define ZERO_MEMORY(p,sz)               if ((sz) > 0) { memset((void*)(p), 0, (size_t)(sz)); }
+#define CHECK_POINTER_EX(p, r) \
+  if ((p) == nullptr) {        \
+    return (r);                \
+  }
+#define CHECK_POINTER(p) CHECK_POINTER_EX(p, rtcResultU4::kInvalidPointer)
+#define RESET_OUT_POINTER_EX(p, v) \
+  if ((p) != nullptr) {            \
+    *(p) = (v);                    \
+  }
+#define RESET_OUT_POINTER(p) RESET_OUT_POINTER_EX(p, nullptr)
+#define CHECK_OUT_POINTER(p)             \
+  if ((p) != nullptr) {                  \
+    *(p) = nullptr;                      \
+  } else {                               \
+    return rtcResultU4::kInvalidPointer; \
+  }
+#define CHECK_NATIVE_HANDLE(h) \
+  CHECK_POINTER_EX(h, rtcResultU4::kInvalidNativeHandle)
+#define ZERO_MEMORY(p, sz)               \
+  if ((sz) > 0) {                        \
+    memset((void*)(p), 0, (size_t)(sz)); \
+  }
 
 extern "C" {
 
@@ -32,20 +47,15 @@ using rtcSdpSemantics = libwebrtc::SdpSemantics;
 using rtcMediaType = libwebrtc::RTCMediaType;
 using rtcDesktopType = libwebrtc::DesktopType;
 
-/// 64-bit timestamp for interop API. 
+/// 64-bit timestamp for interop API.
 using rtcTimestamp = long long;
 
 /// 32-bit boolean for interop API.
-enum class rtcBool32 : int {
-    kTrue = -1,
-    kFalse = 0
-};
+enum class rtcBool32 : int { kTrue = -1, kFalse = 0 };
 
-enum class rtcTrackState : int {
-    kUnknown = -1,
-    kLive = 0,
-    kEnded = 1
-};
+enum class rtcKeyRing : int { kMinSize = 1, kDefaultSize = 16, kMaxSize = 256 };
+
+enum class rtcTrackState : int { kUnknown = -1, kLive = 0, kEnded = 1 };
 
 enum class rtcVideoFrameType : int {
     kUnknown = -1,
@@ -62,140 +72,304 @@ enum class rtcVideoRotation : int {
     kVideoRotation_270 = 270
 };
 
+enum class rtcDataChannelState : int {
+    kConnecting = 0,
+    kOpen = 1,
+    kClosing = 2,
+    kClosed = 3
+};
+
+enum class rtcDataChannelProtocol : int { kSCTP = 0, kQUIC = 1 };
+
+enum class rtcDtlsTransportState : int {
+    kNew = 0,         // Has not started negotiating yet.
+    kConnecting = 1,  // In the process of negotiating a secure connection.
+    kConnected = 2,   // Completed negotiation and verified fingerprints.
+    kClosed = 3,      // Intentionally closed.
+    kFailed = 4,      // Failure due to an error or failing to verify a remote
+    // fingerprint.
+    kNumValues = 5
+};
+
+enum class rtcFrameCryptionAlgorithm : int { kAesGcm = 0, kAesCbc = 1 };
+
+enum class rtcFrameCryptionState : int {
+    kNew = 0,
+    kOk = 1,
+    kEncryptionFailed = 2,
+    kDecryptionFailed = 3,
+    kMissingKey = 4,
+    kKeyRatcheted = 5,
+    kInternalError = 6
+};
+
+enum class rtcSessionDescriptionErrorType : int {
+    kPeerConnectionInitFailed = 0,
+    kCreatePeerConnectionFailed = 1,
+    kSDPParseFailed = 2
+};
+
+enum class rtcPeerConnectionState : int {
+    kNew = 0,
+    kConnecting = 1,
+    kConnected = 2,
+    kDisconnected = 3,
+    kFailed = 4,
+    kClosed = 5
+};
+
+enum class rtcSignalingState : int {
+    kStable = 0,
+    kHaveLocalOffer = 1,
+    kHaveRemoteOffer = 2,
+    kHaveLocalPrAnswer = 3,
+    kHaveRemotePrAnswer = 4,
+    kClosed = 5
+};
+
+enum class rtcIceGatheringState : int {
+    kNew = 0,
+    kGathering = 1,
+    kComplete = 2
+};
+
+enum class rtcIceConnectionState : int {
+    kNew = 0,
+    kChecking = 1,
+    kCompleted = 2,
+    kConnected = 3,
+    kFailed = 4,
+    kDisconnected = 5,
+    kClosed = 6,
+    kMax = 7
+};
+
+enum class rtcStatsMemberType : int {
+    kBool = 0,    // bool
+    kInt32 = 1,   // int32_t
+    kUint32 = 2,  // uint32_t
+    kInt64 = 3,   // int64_t
+    kUint64 = 4,  // uint64_t
+    kDouble = 5,  // double
+    kString = 6,  // std::string
+
+    kSequenceBool = 7,    // std::vector<bool>
+    kSequenceInt32 = 8,   // std::vector<int32_t>
+    kSequenceUint32 = 9,  // std::vector<uint32_t>
+    kSequenceInt64 = 10,   // std::vector<int64_t>
+    kSequenceUint64 = 11,  // std::vector<uint64_t>
+    kSequenceDouble = 12,  // std::vector<double>
+    kSequenceString = 13,  // std::vector<std::string>
+
+    kMapStringUint64 = 14,  // std::map<std::string, uint64_t>
+    kMapStringDouble = 15   // std::map<std::string, double>
+};
+
+enum class rtcRtpTransceiverDirection : int {
+    kSendRecv = 0,
+    kSendOnly = 1,
+    kRecvOnly = 2,
+    kInactive = 3,
+    kStopped = 4
+};
+
+enum class rtcFecMechanism : int {
+    kRED = 0,
+    kRED_AND_ULPFEC = 1,
+    kFLEXFEC = 2
+};
+
+enum class rtcRtcpFeedbackType : int {
+    kCCM = 0,
+    kLNTF = 1,
+    kNACK = 2,
+    kREMB = 3,
+    kTRANSPORT_CC = 4
+};
+
+enum class rtcRtcpFeedbackMessageType : int {
+    kGENERIC_NACK = 0,
+    kPLI = 1,
+    kFIR = 2
+};
+
+enum class rtcDtxStatus : int {
+    kDISABLED = 0,
+    kENABLED = 1
+};
+
+enum class rtcDegradationPreference : int {
+    kDISABLED = 0,
+    kMAINTAIN_FRAMERATE = 1,
+    kMAINTAIN_RESOLUTION = 2,
+    kBALANCED = 3
+};
+
+enum class rtcNetworkPriority : int {
+    kVeryLow = 0,
+    kLow = 1,
+    kMedium = 2,
+    kHigh = 3
+};
+
 /// 32-bit result enumerator
 enum class rtcResultU4 : unsigned int {
-    /// The operation was successful.
-    kSuccess = 0,
+  /// The operation was successful.
+  kSuccess = 0,
 
-    //
-    // Generic errors
-    //
+  //
+  // Generic errors
+  //
 
-    /// Unknown internal error.
-    /// This is generally the fallback value when no other error code applies.
-    kUnknownError = 0x80000000,
+  /// Unknown internal error.
+  /// This is generally the fallback value when no other error code applies.
+  kUnknownError = 0x80000000,
 
-    /// A parameter passed to the API function was invalid.
-    kInvalidParameter = 0x80000001,
+  /// A parameter passed to the API function was invalid.
+  kInvalidParameter = 0x80000001,
 
-    /// The operation cannot be performed in the current state.
-    kInvalidOperation = 0x80000002,
+  /// The operation cannot be performed in the current state.
+  kInvalidOperation = 0x80000002,
 
-    /// A call was made to an API function on the wrong thread.
-    /// This is generally related to platforms with thread affinity like UWP.
-    kWrongThread = 0x80000003,
+  /// A call was made to an API function on the wrong thread.
+  /// This is generally related to platforms with thread affinity like UWP.
+  kWrongThread = 0x80000003,
 
-    /// An object was not found.
-    kNotFound = 0x80000004,
+  /// An object was not found.
+  kNotFound = 0x80000004,
 
-    /// An interop handle referencing a native object instance is invalid,
-    /// although the API function was expecting a valid object.
-    kInvalidNativeHandle = 0x80000005,
+  /// An interop handle referencing a native object instance is invalid,
+  /// although the API function was expecting a valid object.
+  kInvalidNativeHandle = 0x80000005,
 
-    /// The API object is not initialized, and cannot as a result perform the
-    /// given operation.
-    kNotInitialized = 0x80000006,
+  /// The API object is not initialized, and cannot as a result perform the
+  /// given operation.
+  kNotInitialized = 0x80000006,
 
-    /// The current operation is not supported by the implementation.
-    kUnsupported = 0x80000007,
+  /// The current operation is not supported by the implementation.
+  kUnsupported = 0x80000007,
 
-    /// An argument was passed to the API function with a value out of the
-    /// expected range.
-    kOutOfRange = 0x80000008,
+  /// An argument was passed to the API function with a value out of the
+  /// expected range.
+  kOutOfRange = 0x80000008,
 
-    /// The buffer provided by the caller was too small for the operation to
-    /// complete successfully.
-    kBufferTooSmall = 0x80000009,
+  /// The buffer provided by the caller was too small for the operation to
+  /// complete successfully.
+  kBufferTooSmall = 0x80000009,
 
-    //
-    // Peer connection (0x1xx)
-    //
+  //
+  // Peer connection (0x1xx)
+  //
 
-    /// The peer connection is closed, but the current operation requires an open
-    /// peer connection.
-    kPeerConnectionClosed = 0x80000101,
+  /// The peer connection is closed, but the current operation requires an open
+  /// peer connection.
+  kPeerConnectionClosed = 0x80000101,
 
-    //
-    // Data (0x3xx)
-    //
+  //
+  // Data (0x3xx)
+  //
 
-    /// The SCTP handshake for data channels encryption was not performed, because
-    /// the connection was established before any data channel was added to it.
-    /// Due to limitations in the implementation, without SCTP handshake data
-    /// channels cannot be used, and therefor applications expecting to use data
-    /// channels must open at least a single channel before establishing a peer
-    /// connection (calling |CreateOffer()|).
-    kSctpNotNegotiated = 0x80000301,
+  /// The SCTP handshake for data channels encryption was not performed, because
+  /// the connection was established before any data channel was added to it.
+  /// Due to limitations in the implementation, without SCTP handshake data
+  /// channels cannot be used, and therefor applications expecting to use data
+  /// channels must open at least a single channel before establishing a peer
+  /// connection (calling |CreateOffer()|).
+  kSctpNotNegotiated = 0x80000301,
 
-    /// The specified data channel ID is invalid.
-    kInvalidDataChannelId = 0x80000302,
+  /// The specified data channel ID is invalid.
+  kInvalidDataChannelId = 0x80000302,
 
-    //
-    // Media (0x4xx)
-    //
+  //
+  // Media (0x4xx)
+  //
 
-    /// Some audio-only function was called on a video-only object or vice-versa.
-    /// For example, trying to get the local audio track of a video transceiver.
-    kInvalidMediaKind = 0x80000401,
+  /// Some audio-only function was called on a video-only object or vice-versa.
+  /// For example, trying to get the local audio track of a video transceiver.
+  kInvalidMediaKind = 0x80000401,
 
-    /// The internal audio resampler used in the audio track read buffer doesn't
-    /// support the specified input/output frequency ratio. Use a different output
-    /// frequency for the current audio source to solve the issue.
-    kAudioResamplingNotSupported = 0x80000402,
+  /// The internal audio resampler used in the audio track read buffer doesn't
+  /// support the specified input/output frequency ratio. Use a different output
+  /// frequency for the current audio source to solve the issue.
+  kAudioResamplingNotSupported = 0x80000402,
 
-    /// Error rtcResultU4 for a null or invalid pointer.
-    kInvalidPointer = 0x80004003,
-}; // end enum class rtcResultU4
+  /// Error rtcResultU4 for a null or invalid pointer.
+  kInvalidPointer = 0x80004003,
+};  // end enum class rtcResultU4
 
 struct rtcIceServer {
-    const char* uri = nullptr;
-    const char* username = nullptr;
-    const char* password = nullptr;
-}; // end struct rtcIceServer
+  const char* uri = nullptr;
+  const char* username = nullptr;
+  const char* password = nullptr;
+};  // end struct rtcIceServer
 
 struct rtcPeerConnectionConfiguration {
-    rtcIceServer ice_servers[libwebrtc::kMaxIceServerSize];
-    rtcIceTransportsType type = rtcIceTransportsType::kAll;
-    rtcBundlePolicy bundle_policy = rtcBundlePolicy::kBundlePolicyBalanced;
-    rtcRtcpMuxPolicy rtcp_mux_policy = rtcRtcpMuxPolicy::kRtcpMuxPolicyRequire;
-    rtcCandidateNetworkPolicy candidate_network_policy =
-        rtcCandidateNetworkPolicy::kCandidateNetworkPolicyAll;
-    rtcTcpCandidatePolicy tcp_candidate_policy =
-        rtcTcpCandidatePolicy::kTcpCandidatePolicyEnabled;
+  rtcIceServer ice_servers[libwebrtc::kMaxIceServerSize];
+  rtcIceTransportsType type = rtcIceTransportsType::kAll;
+  rtcBundlePolicy bundle_policy = rtcBundlePolicy::kBundlePolicyBalanced;
+  rtcRtcpMuxPolicy rtcp_mux_policy = rtcRtcpMuxPolicy::kRtcpMuxPolicyRequire;
+  rtcCandidateNetworkPolicy candidate_network_policy =
+      rtcCandidateNetworkPolicy::kCandidateNetworkPolicyAll;
+  rtcTcpCandidatePolicy tcp_candidate_policy =
+      rtcTcpCandidatePolicy::kTcpCandidatePolicyEnabled;
 
-    int ice_candidate_pool_size = 0;
+  int ice_candidate_pool_size = 0;
 
-    rtcMediaSecurityType srtp_type = rtcMediaSecurityType::kDTLS_SRTP;
-    rtcSdpSemantics sdp_semantics = rtcSdpSemantics::kUnifiedPlan;
-    rtcBool32 offer_to_receive_audio = rtcBool32::kTrue;
-    rtcBool32 offer_to_receive_video = rtcBool32::kTrue;
+  rtcMediaSecurityType srtp_type = rtcMediaSecurityType::kDTLS_SRTP;
+  rtcSdpSemantics sdp_semantics = rtcSdpSemantics::kUnifiedPlan;
+  rtcBool32 offer_to_receive_audio = rtcBool32::kTrue;
+  rtcBool32 offer_to_receive_video = rtcBool32::kTrue;
 
-    rtcBool32 disable_ipv6 = rtcBool32::kFalse;
-    rtcBool32 disable_ipv6_on_wifi = rtcBool32::kFalse;
-    int max_ipv6_networks = 5;
-    rtcBool32 disable_link_local_networks = rtcBool32::kFalse;
-    int screencast_min_bitrate = -1;
+  rtcBool32 disable_ipv6 = rtcBool32::kFalse;
+  rtcBool32 disable_ipv6_on_wifi = rtcBool32::kFalse;
+  int max_ipv6_networks = 5;
+  rtcBool32 disable_link_local_networks = rtcBool32::kFalse;
+  int screencast_min_bitrate = -1;
 
-    // private
-    rtcBool32 use_rtp_mux = rtcBool32::kTrue;
-    uint32_t local_audio_bandwidth = 128;
-    uint32_t local_video_bandwidth = 512;
-}; // end struct rtcPeerConnectionConfiguration
+  // private
+  rtcBool32 use_rtp_mux = rtcBool32::kTrue;
+  uint32_t local_audio_bandwidth = 128;
+  uint32_t local_video_bandwidth = 512;
+};  // end struct rtcPeerConnectionConfiguration
 
 struct rtcVideoFrameDatas {
-    // frame width in pixel
-    int width = 0;
-    // frame height in pixel
-    int height = 0;
-    // The YUV starting address of the frame buffer.
-    const unsigned char* data_y = nullptr;
-    const unsigned char* data_u = nullptr;
-    const unsigned char* data_v = nullptr;
-    // The stride of the YUV
-    int stride_y = 0;
-    int stride_u = 0;
-    int stride_v = 0;
-}; // end struct rtcVideoFrameDatas
+  // frame width in pixel
+  int width = 0;
+  // frame height in pixel
+  int height = 0;
+  // The YUV starting address of the frame buffer.
+  const unsigned char* data_y = nullptr;
+  const unsigned char* data_u = nullptr;
+  const unsigned char* data_v = nullptr;
+  // The stride of the YUV
+  int stride_y = 0;
+  int stride_u = 0;
+  int stride_v = 0;
+};  // end struct rtcVideoFrameDatas
+
+struct rtcDataChannelInit {
+  rtcBool32 ordered = rtcBool32::kTrue;
+  rtcBool32 reliable = rtcBool32::kTrue;
+  int maxRetransmitTime = -1;
+  int maxRetransmits = -1;
+  rtcDataChannelProtocol protocol =
+      rtcDataChannelProtocol::kSCTP;  // kSCTP | kQUIC
+  rtcBool32 negotiated = rtcBool32::kFalse;
+  int id = 0;
+};  // end struct rtcDataChannelInit
+
+struct rtcKeyProviderOptions {
+  rtcBool32 shared_key = rtcBool32::kFalse;
+  unsigned char* ratchet_salt = nullptr;
+  int ratchet_salt_len = 0;
+  unsigned char* uncrypted_magic_bytes = nullptr;
+  int uncrypted_magic_bytes_len = 0;
+  int ratchet_window_size = 0;
+  int failure_tolerance = -1;
+  // The size of the key ring. between 1 and 255.
+  int key_ring_size = static_cast<int>(rtcKeyRing::kDefaultSize);
+  rtcBool32 discard_frame_when_cryptor_not_ready = rtcBool32::kFalse;
+};  // end struct rtcKeyProviderOptions
 
 /// Opaque handle to a native interop object.
 using rtcObjectHandle = void*;
@@ -205,6 +379,9 @@ using rtcRefCountedObjectHandle = rtcObjectHandle;
 
 /// Opaque handle to a native RTCPeerConnectionFactory interop object.
 using rtcPeerConnectionFactoryHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCPeerConnectionObserver interop object.
+using rtcPeerConnectionObserverHandle = rtcObjectHandle;
 
 /// Opaque handle to a native RTCPeerConnection interop object.
 using rtcPeerConnectionHandle = rtcRefCountedObjectHandle;
@@ -245,9 +422,6 @@ using rtcDesktopMediaListObserverHandle = rtcObjectHandle;
 /// Opaque handle to a native RTCMediaStream interop object.
 using rtcMediaStreamHandle = rtcRefCountedObjectHandle;
 
-/// Opaque handle to a native RTCRtpCapabilities interop object.
-using rtcRtpCapabilitiesHandle = rtcRefCountedObjectHandle;
-
 /// Opaque handle to a native RTCMediaTrack interop object.
 using rtcMediaTrackHandle = rtcRefCountedObjectHandle;
 
@@ -261,7 +435,100 @@ using rtcVideoTrackHandle = rtcMediaTrackHandle;
 using rtcVideoFrameHandle = rtcRefCountedObjectHandle;
 
 /// Opaque handle to a native RTCVideoRenderer interop object.
-using rtcVideoRendererHandle = rtcRefCountedObjectHandle; // ???
+using rtcVideoRendererHandle = rtcRefCountedObjectHandle;  // ???
+
+/// Opaque handle to a native RTCDataChannel interop object.
+using rtcDataChannelHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCDataChannelObserver interop object.
+using rtcDataChannelObserverHandle = rtcObjectHandle;
+
+/// Opaque handle to a native RTCDtlsTransportInformation interop object.
+using rtcDtlsTransportInformationHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCDtlsTransportObserver interop object.
+using rtcDtlsTransportObserverHandle = rtcObjectHandle;
+
+/// Opaque handle to a native RTCDtlsTransport interop object.
+using rtcDtlsTransportHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCDtmfSenderObserver interop object.
+using rtcDtmfSenderObserverHandle = rtcObjectHandle;
+
+/// Opaque handle to a native RTCDtmfSender interop object.
+using rtcDtmfSenderHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native KeyProvider interop object.
+using rtcKeyProviderHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCFrameCryptorObserver interop object.
+using rtcFrameCryptorObserverHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCFrameCryptor interop object.
+using rtcFrameCryptorHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCSdpParseError interop object.
+using rtcSdpParseErrorHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCIceCandidate interop object.
+using rtcIceCandidateHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native IceTransport interop object.
+using rtcIceTransportHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCStatsMember interop object.
+using rtcStatsMemberHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native MediaRTCStats interop object.
+using rtcMediaRTCStatsHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpCodecCapability interop object.
+using rtcRtpCodecCapabilityHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpHeaderExtensionCapability interop object.
+using rtcRtpHeaderExtensionCapabilityHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpCapabilities interop object.
+using rtcRtpCapabilitiesHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtcpFeedback interop object.
+using rtcRtcpFeedbackHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpExtension interop object.
+using rtcRtpExtensionHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RtpFecParameters interop object.
+using rtcRtpFecParametersHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpCodecParameters interop object.
+using rtcRtpCodecParametersHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtcpParameters interop object.
+using rtcRtcpParametersHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpEncodingParameters interop object.
+using rtcRtpEncodingParametersHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpParameters interop object.
+using rtcRtpParametersHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpReceiverObserver interop object.
+using rtcRtpReceiverObserverHandle = rtcObjectHandle;
+
+/// Opaque handle to a native RTCRtpReceiver interop object.
+using rtcRtpReceiverHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpSender interop object.
+using rtcRtpSenderHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpTransceiverInit interop object.
+using rtcRtpTransceiverInitHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpTransceiver interop object.
+using rtcRtpTransceiverHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCSessionDescription interop object.
+using rtcSessionDescriptionHandle = rtcRefCountedObjectHandle;
 
 /* ---------------------------------------------------------------- */
 
@@ -271,39 +538,35 @@ using rtcVideoRendererHandle = rtcRefCountedObjectHandle; // ???
 using rtcAudioDeviceChangeDelegate = void(LIB_WEBRTC_CALL*)();
 
 /**
- * Callback delegate for MediaListObserve.
+ * Callback delegate for MediaListObserver.
  */
 using rtcMediaListObserverDelegate = void(LIB_WEBRTC_CALL*)(
-    rtcObjectHandle user_data,
-    rtcDesktopMediaSourceHandle source
-);
+    rtcObjectHandle user_data, rtcDesktopMediaSourceHandle source);
 
 /**
- * Callback delegate structure for MediaListObserve.
+ * Callback delegate structure for MediaListObserver.
  */
 struct rtcMediaListObserverCallbacks {
-    rtcMediaListObserverDelegate MediaSourceAdded{};
-    rtcObjectHandle user_data_added{};
-    rtcMediaListObserverDelegate MediaSourceRemoved{};
-    rtcObjectHandle user_data_removed{};
-    rtcMediaListObserverDelegate MediaSourceNameChanged{};
-    rtcObjectHandle user_data_name_changed{};
-    rtcMediaListObserverDelegate MediaSourceThumbnailChanged{};
-    rtcObjectHandle user_data_thumbnail_changed{};
+  rtcMediaListObserverDelegate MediaSourceAdded{};
+  rtcObjectHandle user_data_added{};
+  rtcMediaListObserverDelegate MediaSourceRemoved{};
+  rtcObjectHandle user_data_removed{};
+  rtcMediaListObserverDelegate MediaSourceNameChanged{};
+  rtcObjectHandle user_data_name_changed{};
+  rtcMediaListObserverDelegate MediaSourceThumbnailChanged{};
+  rtcObjectHandle user_data_thumbnail_changed{};
 };
 
 /**
  * Callback OnFrame delegate for RTCVideoRenderer.
  */
 using rtcVideoRendererFrameDelegate = void(LIB_WEBRTC_CALL*)(
-    rtcObjectHandle user_data,
-    rtcVideoFrameHandle frame
-);
+    rtcObjectHandle user_data, rtcVideoFrameHandle frame);
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * LibWebRTC interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
@@ -315,8 +578,7 @@ using rtcVideoRendererFrameDelegate = void(LIB_WEBRTC_CALL*)(
  *
  * @return kTrue if initialization is successful, kFalse otherwise.
  */
-LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
-LibWebRTC_Initialize() noexcept;
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL LibWebRTC_Initialize() noexcept;
 
 /**
  * @brief Creates a new WebRTC PeerConnectionFactory.
@@ -340,24 +602,18 @@ LibWebRTC_CreateRTCPeerConnectionFactory() noexcept;
  * network_thread.
  *
  */
-LIB_WEBRTC_API void LIB_WEBRTC_CALL
-LibWebRTC_Terminate() noexcept;
+LIB_WEBRTC_API void LIB_WEBRTC_CALL LibWebRTC_Terminate() noexcept;
 
 /**
  * @brief Returns the error message text for the specified 'code' value.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-LibWebRTC_GetErrorMessage(
-    rtcResultU4 code,
-    char* pBuffer,
-    unsigned int cchBuffer
-) noexcept;
-
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL LibWebRTC_GetErrorMessage(
+    rtcResultU4 code, char* pBuffer, unsigned int cchBuffer) noexcept;
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RefCountedObject interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
@@ -372,11 +628,10 @@ RefCountedObject_AddRef(rtcRefCountedObjectHandle handle) noexcept;
 LIB_WEBRTC_API int LIB_WEBRTC_CALL
 RefCountedObject_Release(rtcRefCountedObjectHandle handle) noexcept;
 
-
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * MediaConstraints interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
@@ -386,22 +641,19 @@ LIB_WEBRTC_API rtcMediaConstraintsHandle LIB_WEBRTC_CALL
 MediaConstraints_Create() noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-MediaConstraints_AddMandatoryConstraint(
-    rtcMediaConstraintsHandle handle,
-    const char* key,
-    const char* value) noexcept;
+MediaConstraints_AddMandatoryConstraint(rtcMediaConstraintsHandle handle,
+                                        const char* key,
+                                        const char* value) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-MediaConstraints_AddOptionalConstraint(
-    rtcMediaConstraintsHandle handle,
-    const char* key,
-    const char* value) noexcept;
-
+MediaConstraints_AddOptionalConstraint(rtcMediaConstraintsHandle handle,
+                                       const char* key,
+                                       const char* value) noexcept;
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RTCPeerConnectionFactory interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
@@ -415,18 +667,14 @@ RTCPeerConnectionFactory_Create() noexcept;
  * If the LibWebRTC_Initialize method has been called;
  * do not use this method.
  */
-LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
-RTCPeerConnectionFactory_Initialize(
-    rtcPeerConnectionFactoryHandle factory
-) noexcept;
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL RTCPeerConnectionFactory_Initialize(
+    rtcPeerConnectionFactoryHandle factory) noexcept;
 
 /**
  * @brief Terminates the RTCPeerConnectionFactor object.
  */
-LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
-RTCPeerConnectionFactory_Terminate(
-    rtcPeerConnectionFactoryHandle factory
-) noexcept;
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL RTCPeerConnectionFactory_Terminate(
+    rtcPeerConnectionFactoryHandle factory) noexcept;
 
 /**
  * @brief Creates a new instance of the RTCPeerConnection object.
@@ -444,56 +692,45 @@ RTCPeerConnectionFactory_CreatePeerConnection(
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_DeletePeerConnection(
     rtcPeerConnectionFactoryHandle factory,
-    rtcPeerConnectionHandle handle
-) noexcept;
+    rtcPeerConnectionHandle handle) noexcept;
 
 /**
  * @brief Provides RTCAudioDevice object for list audio devices.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCPeerConnectionFactory_GetAudioDevice(
-    rtcPeerConnectionFactoryHandle factory,
-    rtcAudioDeviceHandle* pRetVal
-) noexcept;
+RTCPeerConnectionFactory_GetAudioDevice(rtcPeerConnectionFactoryHandle factory,
+                                        rtcAudioDeviceHandle* pRetVal) noexcept;
 
 /**
  * @brief Provides RTCVideoDevice object for list video devices.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCPeerConnectionFactory_GetVideoDevice(
-    rtcPeerConnectionFactoryHandle factory,
-    rtcVideoDeviceHandle* pRetVal
-) noexcept;
+RTCPeerConnectionFactory_GetVideoDevice(rtcPeerConnectionFactoryHandle factory,
+                                        rtcVideoDeviceHandle* pRetVal) noexcept;
 
 #ifdef RTC_DESKTOP_DEVICE
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetDesktopDevice(
     rtcPeerConnectionFactoryHandle factory,
-    rtcDesktopDeviceHandle* pRetVal
-) noexcept;
-#endif // RTC_DESKTOP_DEVICE
+    rtcDesktopDeviceHandle* pRetVal) noexcept;
+#endif  // RTC_DESKTOP_DEVICE
 
 /**
  * @brief Creates a new instance of the RTCAudioSource object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateAudioSource(
-    rtcPeerConnectionFactoryHandle factory,
-    const char* audio_source_label,
-    rtcAudioSourceHandle* pRetVal
-) noexcept;
+    rtcPeerConnectionFactoryHandle factory, const char* audio_source_label,
+    rtcAudioSourceHandle* pRetVal) noexcept;
 
 /**
  * @brief Creates a new instance of the RTCVideoSource object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateVideoSource(
-    rtcPeerConnectionFactoryHandle factory,
-    rtcVideoCapturerHandle capturer,
-    const char* video_source_label,
-    rtcMediaConstraintsHandle constraints,
-    rtcVideoSourceHandle* pRetVal
-) noexcept;
+    rtcPeerConnectionFactoryHandle factory, rtcVideoCapturerHandle capturer,
+    const char* video_source_label, rtcMediaConstraintsHandle constraints,
+    rtcVideoSourceHandle* pRetVal) noexcept;
 
 #ifdef RTC_DESKTOP_DEVICE
 /**
@@ -501,45 +738,34 @@ RTCPeerConnectionFactory_CreateVideoSource(
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateDesktopSource(
-    rtcPeerConnectionFactoryHandle factory,
-    rtcDesktopCapturerHandle capturer,
-    const char* video_source_label,
-    rtcMediaConstraintsHandle constraints,
-    rtcVideoSourceHandle* pRetVal
-) noexcept;
-#endif // RTC_DESKTOP_DEVICE
+    rtcPeerConnectionFactoryHandle factory, rtcDesktopCapturerHandle capturer,
+    const char* video_source_label, rtcMediaConstraintsHandle constraints,
+    rtcVideoSourceHandle* pRetVal) noexcept;
+#endif  // RTC_DESKTOP_DEVICE
 
 /**
  * @brief Creates a new instance of the RTCAudioTrack object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateAudioTrack(
-    rtcPeerConnectionFactoryHandle factory,
-    rtcAudioSourceHandle source,
-    const char* track_id,
-    rtcAudioTrackHandle* pRetVal
-) noexcept;
+    rtcPeerConnectionFactoryHandle factory, rtcAudioSourceHandle source,
+    const char* track_id, rtcAudioTrackHandle* pRetVal) noexcept;
 
 /**
  * @brief Creates a new instance of the RTCVideoTrack object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateVideoTrack(
-    rtcPeerConnectionFactoryHandle factory,
-    rtcVideoSourceHandle source,
-    const char* track_id,
-    rtcVideoTrackHandle* pRetVal
-) noexcept;
+    rtcPeerConnectionFactoryHandle factory, rtcVideoSourceHandle source,
+    const char* track_id, rtcVideoTrackHandle* pRetVal) noexcept;
 
 /**
  * @brief Creates a new instance of the RTCMediaStream object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCPeerConnectionFactory_CreateStream(
-    rtcPeerConnectionFactoryHandle factory,
-    const char* stream_id,
-    rtcMediaStreamHandle* pRetVal
-) noexcept;
+RTCPeerConnectionFactory_CreateStream(rtcPeerConnectionFactoryHandle factory,
+                                      const char* stream_id,
+                                      rtcMediaStreamHandle* pRetVal) noexcept;
 
 /**
  * Returns an RTCRtpCapabilities object containing the
@@ -547,10 +773,8 @@ RTCPeerConnectionFactory_CreateStream(
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetRtpSenderCapabilities(
-    rtcPeerConnectionFactoryHandle factory,
-    rtcMediaType media_type,
-    rtcRtpCapabilitiesHandle* pRetVal
-) noexcept;
+    rtcPeerConnectionFactoryHandle factory, rtcMediaType media_type,
+    rtcRtpCapabilitiesHandle* pRetVal) noexcept;
 
 /**
  * Returns an RTCRtpCapabilities object containing the
@@ -558,15 +782,13 @@ RTCPeerConnectionFactory_GetRtpSenderCapabilities(
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetRtpReceiverCapabilities(
-    rtcPeerConnectionFactoryHandle factory,
-    rtcMediaType media_type,
-    rtcRtpCapabilitiesHandle* pRetVal
-) noexcept;
+    rtcPeerConnectionFactoryHandle factory, rtcMediaType media_type,
+    rtcRtpCapabilitiesHandle* pRetVal) noexcept;
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RTCAudioDevice interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
@@ -576,9 +798,7 @@ RTCPeerConnectionFactory_GetRtpReceiverCapabilities(
  * @return int - The number of playout devices available.
  */
 LIB_WEBRTC_API int LIB_WEBRTC_CALL
-RTCAudioDevice_PlayoutDevices(
-    rtcAudioDeviceHandle audiDevice
-) noexcept;
+RTCAudioDevice_PlayoutDevices(rtcAudioDeviceHandle audiDevice) noexcept;
 
 /**
  * Returns the number of recording devices available.
@@ -587,9 +807,7 @@ RTCAudioDevice_PlayoutDevices(
  * @return int - The number of recording devices available.
  */
 LIB_WEBRTC_API int LIB_WEBRTC_CALL
-RTCAudioDevice_RecordingDevices(
-    rtcAudioDeviceHandle audiDevice
-) noexcept;
+RTCAudioDevice_RecordingDevices(rtcAudioDeviceHandle audiDevice) noexcept;
 
 /**
  * Retrieves the name and GUID of the specified playout device.
@@ -602,15 +820,9 @@ RTCAudioDevice_RecordingDevices(
  * @param cchOutGuid - The size of the guid.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCAudioDevice_PlayoutDeviceName(
-    rtcAudioDeviceHandle audiDevice,
-    int index,
-    char* pOutName,
-    int cchOutName,
-    char* pOutGuid,
-    int cchOutGuid
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCAudioDevice_PlayoutDeviceName(
+    rtcAudioDeviceHandle audiDevice, int index, char* pOutName, int cchOutName,
+    char* pOutGuid, int cchOutGuid) noexcept;
 
 /**
  * Retrieves the name and GUID of the specified recording device.
@@ -623,15 +835,9 @@ RTCAudioDevice_PlayoutDeviceName(
  * @param cchOutGuid - The size of the guid.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCAudioDevice_RecordingDeviceName(
-    rtcAudioDeviceHandle audiDevice,
-    int index,
-    char* pOutName,
-    int cchOutName,
-    char* pOutGuid,
-    int cchOutGuid
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCAudioDevice_RecordingDeviceName(
+    rtcAudioDeviceHandle audiDevice, int index, char* pOutName, int cchOutName,
+    char* pOutGuid, int cchOutGuid) noexcept;
 
 /**
  * Sets the playout device to use.
@@ -640,11 +846,8 @@ RTCAudioDevice_RecordingDeviceName(
  * @param index - The index of the device.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCAudioDevice_SetPlayoutDevice(
-    rtcAudioDeviceHandle audiDevice,
-    int index
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCAudioDevice_SetPlayoutDevice(
+    rtcAudioDeviceHandle audiDevice, int index) noexcept;
 
 /**
  * Sets the recording device to use.
@@ -653,15 +856,12 @@ RTCAudioDevice_SetPlayoutDevice(
  * @param index - The index of the device.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCAudioDevice_SetRecordingDevice(
-    rtcAudioDeviceHandle audiDevice,
-    int index
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCAudioDevice_SetRecordingDevice(
+    rtcAudioDeviceHandle audiDevice, int index) noexcept;
 
 /**
  * The callback was invoked when the audio device changed.
- * 
+ *
  * @param audiDevice - Audio device handle
  * @param deviceChangeCallback - Callback delegate
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
@@ -669,156 +869,124 @@ RTCAudioDevice_SetRecordingDevice(
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCAudioDevice_RegisterDeviceChangeCallback(
     rtcAudioDeviceHandle audiDevice,
-    rtcAudioDeviceChangeDelegate deviceChangeCallback
-) noexcept;
+    rtcAudioDeviceChangeDelegate deviceChangeCallback) noexcept;
 
 /**
  * Sets the microphone volume level.
- * 
+ *
  * @param audiDevice - Audio device handle
  * @param volume - Volume level
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCAudioDevice_SetMicrophoneVolume(
-    rtcAudioDeviceHandle audiDevice,
-    unsigned int volume
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCAudioDevice_SetMicrophoneVolume(
+    rtcAudioDeviceHandle audiDevice, unsigned int volume) noexcept;
 
 /**
  * Gets the microphone volume level.
- * 
+ *
  * @param audiDevice - Audio device handle
  * @param volume - Volume level
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCAudioDevice_GetMicrophoneVolume(
-    rtcAudioDeviceHandle audiDevice,
-    unsigned int* volume
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCAudioDevice_GetMicrophoneVolume(
+    rtcAudioDeviceHandle audiDevice, unsigned int* volume) noexcept;
 
 /**
  * Sets the speaker volume level.
- * 
+ *
  * @param audiDevice - Audio device handle
  * @param volume - Volume level
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCAudioDevice_SetSpeakerVolume(
-    rtcAudioDeviceHandle audiDevice,
-    unsigned int volume
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCAudioDevice_SetSpeakerVolume(
+    rtcAudioDeviceHandle audiDevice, unsigned int volume) noexcept;
 
 /**
  * Gets the speaker volume level.
- * 
+ *
  * @param audiDevice - Audio device handle
  * @param volume - Volume level
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCAudioDevice_GetSpeakerVolume(
-    rtcAudioDeviceHandle audiDevice,
-    unsigned int* volume
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCAudioDevice_GetSpeakerVolume(
+    rtcAudioDeviceHandle audiDevice, unsigned int* volume) noexcept;
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RTCMediaTrack interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
  * Returns the track state.
- * 
+ *
  * @param mediaTrack - Media track handle
  * @return rtcTrackState - Track state enum
  */
 LIB_WEBRTC_API rtcTrackState LIB_WEBRTC_CALL
-RTCMediaTrack_GetState(
-    rtcMediaTrackHandle mediaTrack
-) noexcept;
+RTCMediaTrack_GetState(rtcMediaTrackHandle mediaTrack) noexcept;
 
 /**
  * Returns the track kind. (video, audio, vs.)
- * 
+ *
  * @param mediaTrack - Media track handle
  * @param pOutKind - Media track kind
  * @param cchOutKind - The size of the kind
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCMediaTrack_GetKind(
-    rtcMediaTrackHandle mediaTrack,
-    char* pOutKind,
-    int cchOutKind
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCMediaTrack_GetKind(
+    rtcMediaTrackHandle mediaTrack, char* pOutKind, int cchOutKind) noexcept;
 
 /**
  * Returns the track id.
- * 
+ *
  * @param mediaTrack - Media track handle
  * @param pOutId - Media track id
  * @param cchOutId - The size of the id
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCMediaTrack_GetId(
-    rtcMediaTrackHandle mediaTrack,
-    char* pOutId,
-    int cchOutId
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCMediaTrack_GetId(
+    rtcMediaTrackHandle mediaTrack, char* pOutId, int cchOutId) noexcept;
 
 /**
  * Returns the enable/disable status of the track.
- * 
+ *
  * @param mediaTrack - Media track handle
  * @return rtcBool32 - kTrue if enabled, otherwise disabled
  */
 LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
-RTCMediaTrack_GetEnabled(
-    rtcMediaTrackHandle mediaTrack
-) noexcept;
+RTCMediaTrack_GetEnabled(rtcMediaTrackHandle mediaTrack) noexcept;
 
 /**
  * Sets the enable/disable of the track.
- * 
+ *
  * @param mediaTrack - Media track handle
  * @param enabled - Media track enable/disable value
  * @return rtcBool32 - kTrue if the property has changed, otherwise kFalse
  */
-LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
-RTCMediaTrack_SetEnabled(
-    rtcMediaTrackHandle mediaTrack,
-    rtcBool32 enabled
-) noexcept;
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL RTCMediaTrack_SetEnabled(
+    rtcMediaTrackHandle mediaTrack, rtcBool32 enabled) noexcept;
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RTCAudioTrack interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
  * Sets the volume of the audio track.
- * 
+ *
  * @param audioTrack - Audio track handle
  * @param volume - volume in [0-10]
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCAudioTrack_SetVolume(
-    rtcAudioTrackHandle audioTrack,
-    double volume
-) noexcept;
-
+RTCAudioTrack_SetVolume(rtcAudioTrackHandle audioTrack, double volume) noexcept;
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RTCVideoDevice interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
@@ -828,13 +996,11 @@ RTCAudioTrack_SetVolume(
  * @return int - The number of video devices available.
  */
 LIB_WEBRTC_API int LIB_WEBRTC_CALL
-RTCVideoDevice_NumberOfDevices(
-    rtcVideoDeviceHandle videoDevice
-) noexcept;
+RTCVideoDevice_NumberOfDevices(rtcVideoDeviceHandle videoDevice) noexcept;
 
 /**
  * Returns information about video device with the specified index.
- * 
+ *
  * @param videoDevice - Video device handle
  * @param index - The index of the device.
  * @param pOutDeviceNameUTF8 - Device name
@@ -845,21 +1011,15 @@ RTCVideoDevice_NumberOfDevices(
  * @param cchOutProductUniqueIdUTF8 - The size of the product id.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoDevice_GetDeviceName(
-    rtcVideoDeviceHandle videoDevice,
-    int index,
-    char* pOutDeviceNameUTF8,
-    int cchOutDeviceNameUTF8,
-    char* pOutDeviceUniqueIdUTF8,
-    int cchOutDeviceUniqueIdUTF8,
-    char* pOutProductUniqueIdUTF8 = 0,
-    int cchOutProductUniqueIdUTF8 = 0
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCVideoDevice_GetDeviceName(
+    rtcVideoDeviceHandle videoDevice, int index, char* pOutDeviceNameUTF8,
+    int cchOutDeviceNameUTF8, char* pOutDeviceUniqueIdUTF8,
+    int cchOutDeviceUniqueIdUTF8, char* pOutProductUniqueIdUTF8 = 0,
+    int cchOutProductUniqueIdUTF8 = 0) noexcept;
 
 /**
  * Creates a new instance of the RTCVideoCapturer object.
- * 
+ *
  * @param videoDevice - Video device handle
  * @param name - Video capturer name (for logs)
  * @param index - The index of the video device.
@@ -869,80 +1029,65 @@ RTCVideoDevice_GetDeviceName(
  * @param pOutRetVal - Handle for the RTCVideoCapturer object to be created.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoDevice_CreateVideoCapturer(
-    rtcVideoDeviceHandle videoDevice,
-    const char* name,
-    int index,
-    int width,
-    int height,
-    int target_fps,
-    rtcVideoCapturerHandle* pOutRetVal
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCVideoDevice_CreateVideoCapturer(
+    rtcVideoDeviceHandle videoDevice, const char* name, int index, int width,
+    int height, int target_fps, rtcVideoCapturerHandle* pOutRetVal) noexcept;
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RTCVideoCapturer interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
  * Starts video capturing.
- * 
+ *
  * @param videoCapturer - Video capturer handle
- * @return rtcBool32 - rtcBool32::kTrue if successful, otherwise rtcBool32::kFalse
+ * @return rtcBool32 - rtcBool32::kTrue if successful, otherwise
+ * rtcBool32::kFalse
  */
 LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
-RTCVideoCapturer_StartCapture(
-    rtcVideoCapturerHandle videoCapturer
-) noexcept;
+RTCVideoCapturer_StartCapture(rtcVideoCapturerHandle videoCapturer) noexcept;
 
 /**
  * Returns whether the capture state has been initialized.
- * 
+ *
  * @param videoCapturer - Video capturer handle
  * @return rtcBool32 - rtcBool32::kTrue if started, otherwise rtcBool32::kFalse
  */
 LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
-RTCVideoCapturer_CaptureStarted(
-    rtcVideoCapturerHandle videoCapturer
-) noexcept;
+RTCVideoCapturer_CaptureStarted(rtcVideoCapturerHandle videoCapturer) noexcept;
 
 /**
  * Stops video capture.
- * 
+ *
  * @param videoCapturer - Video capturer handle
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoCapturer_StopCapture(
-    rtcVideoCapturerHandle videoCapturer
-) noexcept;
+RTCVideoCapturer_StopCapture(rtcVideoCapturerHandle videoCapturer) noexcept;
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RTCVideoFrame interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
  * Creates a new instance of an empty video frame. (i420)
- * 
+ *
  * @param width - Frame width
  * @param height - Frame height
  * @param pOutRetVal - Handle for the created video frame class.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoFrame_Create0(
-    int width, int height,
-    rtcVideoFrameHandle* pOutRetVal
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCVideoFrame_Create0(
+    int width, int height, rtcVideoFrameHandle* pOutRetVal) noexcept;
 
 /**
  * Creates a new instance of the video frame
  * from the specified source buffer. (i420)
- * 
+ *
  * @param width - Frame width
  * @param height - Frame height
  * @param buffer - Frame buffer
@@ -951,79 +1096,64 @@ RTCVideoFrame_Create0(
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoFrame_Create1(
-    int width, int height,
-    const unsigned char* buffer, int length,
-    rtcVideoFrameHandle* pOutRetVal
-) noexcept;
+RTCVideoFrame_Create1(int width, int height, const unsigned char* buffer,
+                      int length, rtcVideoFrameHandle* pOutRetVal) noexcept;
 
 /**
  * Creates a new instance of the video frame
  * from the specified frame datas. (i420)
- * 
+ *
  * @param frameDatas - Frame datas
  * @param pOutRetVal - Handle for the created video frame handle.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoFrame_Create2(
-    const rtcVideoFrameDatas* frameDatas,
-    rtcVideoFrameHandle* pOutRetVal
-) noexcept;
+RTCVideoFrame_Create2(const rtcVideoFrameDatas* frameDatas,
+                      rtcVideoFrameHandle* pOutRetVal) noexcept;
 
 /**
  * Creates a copy of the video frame.
- * 
+ *
  * @param videoFrame - Source video frame handle
  * @param pOutRetVal - Handle for the created video frame handle.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoFrame_Copy(
-    rtcVideoFrameHandle videoFrame,
-    rtcVideoFrameHandle* pOutRetVal
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCVideoFrame_Copy(
+    rtcVideoFrameHandle videoFrame, rtcVideoFrameHandle* pOutRetVal) noexcept;
 
 /**
  * Returns the datas of the video frame.
- * 
+ *
  * @param videoFrame - Source video frame handle
  * @param refFrameDatas - The frame datas.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoFrame_GetFrameDatas(
-    rtcVideoFrameHandle videoFrame,
-    rtcVideoFrameDatas* refFrameDatas
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCVideoFrame_GetFrameDatas(
+    rtcVideoFrameHandle videoFrame, rtcVideoFrameDatas* refFrameDatas) noexcept;
 
 /**
  * Returns the rotation of the video frame. (See: rtcVideoRotation)
- * 
+ *
  * @param videoFrame - Source video frame handle
  * @param pRotation - The frame rotation value.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoFrame_GetRotation(
-    rtcVideoFrameHandle videoFrame,
-    rtcVideoRotation* pOutRetVal
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCVideoFrame_GetRotation(
+    rtcVideoFrameHandle videoFrame, rtcVideoRotation* pOutRetVal) noexcept;
 
 /**
  * Returns a timestamp in microseconds.
- * 
+ *
  * @param videoFrame - Source video frame handle
  * @return rtcTimestamp - Timestamp in microseconds.
  */
 LIB_WEBRTC_API rtcTimestamp LIB_WEBRTC_CALL
 RTCVideoFrame_GetTimestampInMicroseconds(
-    rtcVideoFrameHandle videoFrame
-) noexcept;
+    rtcVideoFrameHandle videoFrame) noexcept;
 
 /**
  * Sets the timestamp in microseconds.
- * 
+ *
  * @param videoFrame - Source video frame handle
  * @param timestampInMicroseconds - Timestamp in microseconds.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
@@ -1031,12 +1161,11 @@ RTCVideoFrame_GetTimestampInMicroseconds(
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCVideoFrame_SetTimestampInMicroseconds(
     rtcVideoFrameHandle videoFrame,
-    rtcTimestamp timestampInMicroseconds
-) noexcept;
+    rtcTimestamp timestampInMicroseconds) noexcept;
 
 /**
  * Converts the video frame to RGB colorspace.
- * 
+ *
  * @param videoFrame - Source video frame handle
  * @param type - Type of destination video frame buffer.
  * @param dst_argb - Destination video frame buffer.
@@ -1045,36 +1174,29 @@ RTCVideoFrame_SetTimestampInMicroseconds(
  * @param dest_height - Height of destination video frame buffer.
  * @return int - Size of destination
  */
-LIB_WEBRTC_API int LIB_WEBRTC_CALL
-RTCVideoFrame_ConvertToARGB(
-    rtcVideoFrameHandle videoFrame,
-    rtcVideoFrameType type,
-    unsigned char* dst_argb,
-    int dst_stride_argb,
-    int dest_width,
-    int dest_height
-) noexcept;
+LIB_WEBRTC_API int LIB_WEBRTC_CALL RTCVideoFrame_ConvertToARGB(
+    rtcVideoFrameHandle videoFrame, rtcVideoFrameType type,
+    unsigned char* dst_argb, int dst_stride_argb, int dest_width,
+    int dest_height) noexcept;
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RTCVideoRenderer interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
  * Creates a new instance of the video renderer.
- * 
+ *
  * @param pOutRetVal - Video renderer handle.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoRenderer_Create(
-    rtcVideoRendererHandle* pOutRetVal
-) noexcept;
+RTCVideoRenderer_Create(rtcVideoRendererHandle* pOutRetVal) noexcept;
 
 /**
  * Registers the callback method for the video renderer.
- * 
+ *
  * @param videoRenderer - Video renderer handle.
  * @param userData - User data handle
  * @param callback - Callback method for OnFrame
@@ -1082,180 +1204,157 @@ RTCVideoRenderer_Create(
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCVideoRenderer_RegisterFrameCallback(
-    rtcVideoRendererHandle videoRenderer,
-    rtcObjectHandle userData,
-    rtcVideoRendererFrameDelegate callback
-) noexcept;
+    rtcVideoRendererHandle videoRenderer, rtcObjectHandle userData,
+    rtcVideoRendererFrameDelegate callback) noexcept;
 
 /**
  * UnRegisters the callback method for the video renderer.
- * 
+ *
  * @param videoRenderer - Video renderer handle.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCVideoRenderer_UnRegisterFrameCallback(
-    rtcVideoRendererHandle videoRenderer
-) noexcept;
+    rtcVideoRendererHandle videoRenderer) noexcept;
 
 #if defined(DEBUG) || defined(_DEBUG)
 /**
  * It is used for testing purposes to trigger
  * the OnRender callback method.
- * 
+ *
  * @param videoRenderer - Video renderer handle.
  * @param videoFrame - Video frame handle.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoRenderer_FireOnFrame(
-    rtcVideoRendererHandle videoRenderer,
-    rtcVideoFrameHandle videoFrame
-) noexcept;
-#endif // DEBUG or _DEBUG
+RTCVideoRenderer_FireOnFrame(rtcVideoRendererHandle videoRenderer,
+                             rtcVideoFrameHandle videoFrame) noexcept;
+#endif  // DEBUG or _DEBUG
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RTCVideoTrack interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
  * Adds a video renderer to the video track for frame callback operations.
- * 
+ *
  * @param videoTrack - Video track handle.
  * @param videoRenderer - Video renderer handle.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoTrack_AddRenderer(
-    rtcVideoTrackHandle videoTrack,
-    rtcVideoRendererHandle videoRenderer
-) noexcept;
+RTCVideoTrack_AddRenderer(rtcVideoTrackHandle videoTrack,
+                          rtcVideoRendererHandle videoRenderer) noexcept;
 
 /**
  * Removes the video renderer that is already attached to
  * the video track for frame callback operations.
- * 
+ *
  * @param videoTrack - Video track handle.
  * @param videoRenderer - Video renderer handle.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoTrack_RemoveRenderer(
-    rtcVideoTrackHandle videoTrack,
-    rtcVideoRendererHandle videoRenderer
-) noexcept;
+RTCVideoTrack_RemoveRenderer(rtcVideoTrackHandle videoTrack,
+                             rtcVideoRendererHandle videoRenderer) noexcept;
 
 #ifdef RTC_DESKTOP_DEVICE
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RTCDesktopMediaList interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
  * Registers callback delegates for MediaListObserve.
- * 
+ *
  * @param hMediaList - Desktop media list handle
- * @param rtcMediaListObserverCallbacks - Callback delegate structure for MediaListObserve.
+ * @param rtcMediaListObserverCallbacks - Callback delegate structure for
+ * MediaListObserve.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCDesktopMediaList_RegisterMediaListObserver(
     rtcDesktopMediaListHandle hMediaList,
-    rtcMediaListObserverCallbacks* callbacks
-) noexcept;
+    rtcMediaListObserverCallbacks* callbacks) noexcept;
 
 /**
  * Unregisters callback delegates for MediaListObserve.
- * 
+ *
  * @param hMediaList - Desktop media list handle
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCDesktopMediaList_DeRegisterMediaListObserver
-(
-    rtcDesktopMediaListHandle hMediaList
-) noexcept;
+RTCDesktopMediaList_DeRegisterMediaListObserver(
+    rtcDesktopMediaListHandle hMediaList) noexcept;
 
 /**
  * Returns the desktop type for the MediaListObserve.
- * 
+ *
  * @param hMediaList - Desktop media list handle
  * @return rtcDesktopType - 0 if successful, otherwise an -1
  */
 LIB_WEBRTC_API rtcDesktopType LIB_WEBRTC_CALL
-RTCDesktopMediaList_GetType(
-    rtcDesktopMediaListHandle hMediaList
-) noexcept;
+RTCDesktopMediaList_GetType(rtcDesktopMediaListHandle hMediaList) noexcept;
 
 /**
  * Updates media sources.
- * 
+ *
  * @param hMediaList - Desktop media list handle
  * @param force_reload - Force reloads media sources.
  * @param get_thumbnail - Enables thumbnail get.
  * @return int - Returns the number of sources.
  */
-LIB_WEBRTC_API int LIB_WEBRTC_CALL
-RTCDesktopMediaList_UpdateSourceList(
+LIB_WEBRTC_API int LIB_WEBRTC_CALL RTCDesktopMediaList_UpdateSourceList(
     rtcDesktopMediaListHandle hMediaList,
     rtcBool32 force_reload = rtcBool32::kFalse,
-    rtcBool32 get_thumbnail = rtcBool32::kTrue
-) noexcept;
+    rtcBool32 get_thumbnail = rtcBool32::kTrue) noexcept;
 
 /**
  * Returns the current number of media sources.
- * 
+ *
  * @param hMediaList - Desktop media list handle
  * @return int - Returns the number of sources.
  */
-LIB_WEBRTC_API int LIB_WEBRTC_CALL
-RTCDesktopMediaList_GetSourceCount(
-    rtcDesktopMediaListHandle hMediaList
-) noexcept;
+LIB_WEBRTC_API int LIB_WEBRTC_CALL RTCDesktopMediaList_GetSourceCount(
+    rtcDesktopMediaListHandle hMediaList) noexcept;
 
 /**
  * Returns the media source whose index is specified.
- * 
+ *
  * @param hMediaList - Desktop media list handle
  * @param index - Media source index
  * @param pOutRetVal - Returns the media source handle.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCDesktopMediaList_GetSource(
-    rtcDesktopMediaListHandle hMediaList,
-    int index,
-    rtcDesktopMediaSourceHandle* pOutRetVal
-) noexcept;
+RTCDesktopMediaList_GetSource(rtcDesktopMediaListHandle hMediaList, int index,
+                              rtcDesktopMediaSourceHandle* pOutRetVal) noexcept;
 
 /**
  * Gets the thumbnail.
- * 
+ *
  * @param hMediaList - Desktop media list handle
  * @param source - Media source handle
  * @param notify - Triggers the callback method.
  * @return rtcBool32 - kTrue if successful, otherwise an kFalse.
  */
-LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
-RTCDesktopMediaList_GetThumbnail(
-    rtcDesktopMediaListHandle hMediaList,
-    rtcDesktopMediaSourceHandle hSource,
-    rtcBool32 notify = rtcBool32::kFalse
-) noexcept;
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL RTCDesktopMediaList_GetThumbnail(
+    rtcDesktopMediaListHandle hMediaList, rtcDesktopMediaSourceHandle hSource,
+    rtcBool32 notify = rtcBool32::kFalse) noexcept;
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * MediaSource interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
  * Provides id, name and type information about the media source.
- * 
+ *
  * @param mediaSource - Media source handle
  * @param pOutId - Media source id
  * @param cchOutId - The size of the id.
@@ -1264,51 +1363,42 @@ RTCDesktopMediaList_GetThumbnail(
  * @param pOutType - The desktop type of media source
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-MediaSource_GetInfo(
-    rtcDesktopMediaSourceHandle mediaSource,
-    char* pOutId, int cchOutId,
-    char* pOutName, int cchOutName,
-    rtcDesktopType* pOutType
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL MediaSource_GetInfo(
+    rtcDesktopMediaSourceHandle mediaSource, char* pOutId, int cchOutId,
+    char* pOutName, int cchOutName, rtcDesktopType* pOutType) noexcept;
 
 /**
  * Updates the media source thumbnail.
- * 
+ *
  * @param mediaSource - Media source handle
  * @return rtcBool32 - kTrue if successful, otherwise kFalse
  */
 LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
-MediaSource_UpdateThumbnail(
-    rtcDesktopMediaSourceHandle mediaSource
-) noexcept;
+MediaSource_UpdateThumbnail(rtcDesktopMediaSourceHandle mediaSource) noexcept;
 
 /**
  * Returns the thumbnail of the media source, jpeg format.
  * At the end of the process, the 'refSizeOfBuffer' value
  * gives the actual size of the buffer area.
- * 
+ *
  * @param mediaSource - Media source handle
  * @param pBuffer - Address of the buffer area for the thumbnail.
  * @param refSizeOfBuffer - The size of the thumbnail buffer.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-MediaSource_GetThumbnail(
-    rtcDesktopMediaSourceHandle mediaSource,
-    unsigned char* pBuffer,
-    int* refSizeOfBuffer
-) noexcept;
+MediaSource_GetThumbnail(rtcDesktopMediaSourceHandle mediaSource,
+                         unsigned char* pBuffer, int* refSizeOfBuffer) noexcept;
 
 /*
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  * RTCDesktopDevice interop methods
- * ---------------------------------------------------------------------- 
+ * ----------------------------------------------------------------------
  */
 
 /**
  * Create desktop capturer
- * 
+ *
  * @param desktopDevice - Desktop device handle
  * @param source - Media source handle
  * @param pOutRetVal - Returns the created desktop capture handle.
@@ -1316,28 +1406,23 @@ MediaSource_GetThumbnail(
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCDesktopDevice_CreateDesktopCapturer(
-    rtcDesktopDeviceHandle desktopDevice,
-    rtcDesktopMediaSourceHandle source,
-    rtcDesktopCapturerHandle* pOutRetVal
-) noexcept;
+    rtcDesktopDeviceHandle desktopDevice, rtcDesktopMediaSourceHandle source,
+    rtcDesktopCapturerHandle* pOutRetVal) noexcept;
 
 /**
  * Returns the desktop media list.
- * 
+ *
  * @param desktopDevice - Desktop device handle
  * @param type - Desktop type
  * @param pOutRetVal - Returns the created desktop media list handle.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCDesktopDevice_GetDesktopMediaList(
-    rtcDesktopDeviceHandle desktopDevice,
-    rtcDesktopType type,
-    rtcDesktopMediaListHandle* pOutRetVal
-) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCDesktopDevice_GetDesktopMediaList(
+    rtcDesktopDeviceHandle desktopDevice, rtcDesktopType type,
+    rtcDesktopMediaListHandle* pOutRetVal) noexcept;
 
-#endif // RTC_DESKTOP_DEVICE
+#endif  // RTC_DESKTOP_DEVICE
 
-} // extern "C"
+}  // extern "C"
 
 #endif  // LIB_WEBRTC_INTROP_API_HXX

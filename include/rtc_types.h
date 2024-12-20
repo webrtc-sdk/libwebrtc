@@ -98,13 +98,13 @@ struct RTCConfiguration {
   uint32_t local_video_bandwidth = 512;
 };
 
-struct SdpParseError {
- public:
-  // The sdp line that causes the error.
-  string line;
-  // Explains the error.
-  string description;
-};
+// struct SdpParseError {
+//  public:
+//   // The sdp line that causes the error.
+//   string line;
+//   // Explains the error.
+//   string description;
+// };
 
 enum DesktopType { kScreen, kWindow };
 
