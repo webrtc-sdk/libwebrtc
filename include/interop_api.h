@@ -58,158 +58,155 @@ enum class rtcKeyRing : int { kMinSize = 1, kDefaultSize = 16, kMaxSize = 256 };
 enum class rtcTrackState : int { kUnknown = -1, kLive = 0, kEnded = 1 };
 
 enum class rtcVideoFrameType : int {
-    kUnknown = -1,
-    kARGB = 0,
-    kBGRA = 1,
-    kABGR = 2,
-    kRGBA = 3
+  kUnknown = -1,
+  kARGB = 0,
+  kBGRA = 1,
+  kABGR = 2,
+  kRGBA = 3
 };
 
 enum class rtcVideoRotation : int {
-    kVideoRotation_0 = 0,
-    kVideoRotation_90 = 90,
-    kVideoRotation_180 = 180,
-    kVideoRotation_270 = 270
+  kVideoRotation_0 = 0,
+  kVideoRotation_90 = 90,
+  kVideoRotation_180 = 180,
+  kVideoRotation_270 = 270
 };
 
 enum class rtcDataChannelState : int {
-    kConnecting = 0,
-    kOpen = 1,
-    kClosing = 2,
-    kClosed = 3
+  kConnecting = 0,
+  kOpen = 1,
+  kClosing = 2,
+  kClosed = 3
 };
 
 enum class rtcDataChannelProtocol : int { kSCTP = 0, kQUIC = 1 };
 
 enum class rtcDtlsTransportState : int {
-    kNew = 0,         // Has not started negotiating yet.
-    kConnecting = 1,  // In the process of negotiating a secure connection.
-    kConnected = 2,   // Completed negotiation and verified fingerprints.
-    kClosed = 3,      // Intentionally closed.
-    kFailed = 4,      // Failure due to an error or failing to verify a remote
-    // fingerprint.
-    kNumValues = 5
+  kNew = 0,         // Has not started negotiating yet.
+  kConnecting = 1,  // In the process of negotiating a secure connection.
+  kConnected = 2,   // Completed negotiation and verified fingerprints.
+  kClosed = 3,      // Intentionally closed.
+  kFailed = 4,      // Failure due to an error or failing to verify a remote
+  // fingerprint.
+  kNumValues = 5
 };
 
 enum class rtcFrameCryptionAlgorithm : int { kAesGcm = 0, kAesCbc = 1 };
 
 enum class rtcFrameCryptionState : int {
-    kNew = 0,
-    kOk = 1,
-    kEncryptionFailed = 2,
-    kDecryptionFailed = 3,
-    kMissingKey = 4,
-    kKeyRatcheted = 5,
-    kInternalError = 6
+  kNew = 0,
+  kOk = 1,
+  kEncryptionFailed = 2,
+  kDecryptionFailed = 3,
+  kMissingKey = 4,
+  kKeyRatcheted = 5,
+  kInternalError = 6
 };
 
 enum class rtcSessionDescriptionErrorType : int {
-    kPeerConnectionInitFailed = 0,
-    kCreatePeerConnectionFailed = 1,
-    kSDPParseFailed = 2
+  kPeerConnectionInitFailed = 0,
+  kCreatePeerConnectionFailed = 1,
+  kSDPParseFailed = 2
 };
 
 enum class rtcPeerConnectionState : int {
-    kNew = 0,
-    kConnecting = 1,
-    kConnected = 2,
-    kDisconnected = 3,
-    kFailed = 4,
-    kClosed = 5
+  kNew = 0,
+  kConnecting = 1,
+  kConnected = 2,
+  kDisconnected = 3,
+  kFailed = 4,
+  kClosed = 5
 };
 
 enum class rtcSignalingState : int {
-    kStable = 0,
-    kHaveLocalOffer = 1,
-    kHaveRemoteOffer = 2,
-    kHaveLocalPrAnswer = 3,
-    kHaveRemotePrAnswer = 4,
-    kClosed = 5
+  kStable = 0,
+  kHaveLocalOffer = 1,
+  kHaveRemoteOffer = 2,
+  kHaveLocalPrAnswer = 3,
+  kHaveRemotePrAnswer = 4,
+  kClosed = 5
 };
 
 enum class rtcIceGatheringState : int {
-    kNew = 0,
-    kGathering = 1,
-    kComplete = 2
+  kNew = 0,
+  kGathering = 1,
+  kComplete = 2
 };
 
 enum class rtcIceConnectionState : int {
-    kNew = 0,
-    kChecking = 1,
-    kCompleted = 2,
-    kConnected = 3,
-    kFailed = 4,
-    kDisconnected = 5,
-    kClosed = 6,
-    kMax = 7
+  kNew = 0,
+  kChecking = 1,
+  kCompleted = 2,
+  kConnected = 3,
+  kFailed = 4,
+  kDisconnected = 5,
+  kClosed = 6,
+  kMax = 7
 };
 
 enum class rtcStatsMemberType : int {
-    kBool = 0,    // bool
-    kInt32 = 1,   // int32_t
-    kUint32 = 2,  // uint32_t
-    kInt64 = 3,   // int64_t
-    kUint64 = 4,  // uint64_t
-    kDouble = 5,  // double
-    kString = 6,  // std::string
+  kBool = 0,    // bool
+  kInt32 = 1,   // int32_t
+  kUint32 = 2,  // uint32_t
+  kInt64 = 3,   // int64_t
+  kUint64 = 4,  // uint64_t
+  kDouble = 5,  // double
+  kString = 6,  // std::string
 
-    kSequenceBool = 7,    // std::vector<bool>
-    kSequenceInt32 = 8,   // std::vector<int32_t>
-    kSequenceUint32 = 9,  // std::vector<uint32_t>
-    kSequenceInt64 = 10,   // std::vector<int64_t>
-    kSequenceUint64 = 11,  // std::vector<uint64_t>
-    kSequenceDouble = 12,  // std::vector<double>
-    kSequenceString = 13,  // std::vector<std::string>
+  kSequenceBool = 7,     // std::vector<bool>
+  kSequenceInt32 = 8,    // std::vector<int32_t>
+  kSequenceUint32 = 9,   // std::vector<uint32_t>
+  kSequenceInt64 = 10,   // std::vector<int64_t>
+  kSequenceUint64 = 11,  // std::vector<uint64_t>
+  kSequenceDouble = 12,  // std::vector<double>
+  kSequenceString = 13,  // std::vector<std::string>
 
-    kMapStringUint64 = 14,  // std::map<std::string, uint64_t>
-    kMapStringDouble = 15   // std::map<std::string, double>
+  kMapStringUint64 = 14,  // std::map<std::string, uint64_t>
+  kMapStringDouble = 15   // std::map<std::string, double>
 };
 
 enum class rtcRtpTransceiverDirection : int {
-    kSendRecv = 0,
-    kSendOnly = 1,
-    kRecvOnly = 2,
-    kInactive = 3,
-    kStopped = 4
+  kSendRecv = 0,
+  kSendOnly = 1,
+  kRecvOnly = 2,
+  kInactive = 3,
+  kStopped = 4
 };
 
 enum class rtcFecMechanism : int {
-    kRED = 0,
-    kRED_AND_ULPFEC = 1,
-    kFLEXFEC = 2
+  kRED = 0,
+  kRED_AND_ULPFEC = 1,
+  kFLEXFEC = 2
 };
 
 enum class rtcRtcpFeedbackType : int {
-    kCCM = 0,
-    kLNTF = 1,
-    kNACK = 2,
-    kREMB = 3,
-    kTRANSPORT_CC = 4
+  kCCM = 0,
+  kLNTF = 1,
+  kNACK = 2,
+  kREMB = 3,
+  kTRANSPORT_CC = 4
 };
 
 enum class rtcRtcpFeedbackMessageType : int {
-    kGENERIC_NACK = 0,
-    kPLI = 1,
-    kFIR = 2
+  kGENERIC_NACK = 0,
+  kPLI = 1,
+  kFIR = 2
 };
 
-enum class rtcDtxStatus : int {
-    kDISABLED = 0,
-    kENABLED = 1
-};
+enum class rtcDtxStatus : int { kDISABLED = 0, kENABLED = 1 };
 
 enum class rtcDegradationPreference : int {
-    kDISABLED = 0,
-    kMAINTAIN_FRAMERATE = 1,
-    kMAINTAIN_RESOLUTION = 2,
-    kBALANCED = 3
+  kDISABLED = 0,
+  kMAINTAIN_FRAMERATE = 1,
+  kMAINTAIN_RESOLUTION = 2,
+  kBALANCED = 3
 };
 
 enum class rtcNetworkPriority : int {
-    kVeryLow = 0,
-    kLow = 1,
-    kMedium = 2,
-    kHigh = 3
+  kVeryLow = 0,
+  kLow = 1,
+  kMedium = 2,
+  kHigh = 3
 };
 
 /// 32-bit result enumerator
