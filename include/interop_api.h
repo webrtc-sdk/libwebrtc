@@ -53,7 +53,7 @@ using rtcTimestamp = long long;
 /// 32-bit boolean for interop API.
 enum class rtcBool32 : int { kTrue = -1, kFalse = 0 };
 
-enum class rtcKeyRing : int { kMinSize = 1, kDefaultSize = 16, kMaxSize = 256 };
+enum class rtcKeyRingSize : int { kMin = 1, kDefault = 16, kMax = 256 };
 
 enum class rtcTrackState : int { kUnknown = -1, kLive = 0, kEnded = 1 };
 
@@ -364,7 +364,7 @@ struct rtcKeyProviderOptions {
   int ratchet_window_size = 0;
   int failure_tolerance = -1;
   // The size of the key ring. between 1 and 255.
-  int key_ring_size = static_cast<int>(rtcKeyRing::kDefaultSize);
+  rtcKeyRingSize key_ring_size = rtcKeyRingSize::kDefault;
   rtcBool32 discard_frame_when_cryptor_not_ready = rtcBool32::kFalse;
 };  // end struct rtcKeyProviderOptions
 
@@ -376,9 +376,6 @@ using rtcRefCountedObjectHandle = rtcObjectHandle;
 
 /// Opaque handle to a native RTCPeerConnectionFactory interop object.
 using rtcPeerConnectionFactoryHandle = rtcRefCountedObjectHandle;
-
-/// Opaque handle to a native RTCPeerConnectionObserver interop object.
-using rtcPeerConnectionObserverHandle = rtcObjectHandle;
 
 /// Opaque handle to a native RTCPeerConnection interop object.
 using rtcPeerConnectionHandle = rtcRefCountedObjectHandle;
@@ -413,9 +410,6 @@ using rtcDesktopMediaSourceHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCDesktopMediaList interop object.
 using rtcDesktopMediaListHandle = rtcRefCountedObjectHandle;
 
-/// Opaque handle to a native MediaListObserver interop object.
-using rtcDesktopMediaListObserverHandle = rtcObjectHandle;
-
 /// Opaque handle to a native RTCMediaStream interop object.
 using rtcMediaStreamHandle = rtcRefCountedObjectHandle;
 
@@ -437,20 +431,11 @@ using rtcVideoRendererHandle = rtcRefCountedObjectHandle;  // ???
 /// Opaque handle to a native RTCDataChannel interop object.
 using rtcDataChannelHandle = rtcRefCountedObjectHandle;
 
-/// Opaque handle to a native RTCDataChannelObserver interop object.
-using rtcDataChannelObserverHandle = rtcObjectHandle;
-
 /// Opaque handle to a native RTCDtlsTransportInformation interop object.
 using rtcDtlsTransportInformationHandle = rtcRefCountedObjectHandle;
 
-/// Opaque handle to a native RTCDtlsTransportObserver interop object.
-using rtcDtlsTransportObserverHandle = rtcObjectHandle;
-
 /// Opaque handle to a native RTCDtlsTransport interop object.
 using rtcDtlsTransportHandle = rtcRefCountedObjectHandle;
-
-/// Opaque handle to a native RTCDtmfSenderObserver interop object.
-using rtcDtmfSenderObserverHandle = rtcObjectHandle;
 
 /// Opaque handle to a native RTCDtmfSender interop object.
 using rtcDtmfSenderHandle = rtcRefCountedObjectHandle;
@@ -509,9 +494,6 @@ using rtcRtpEncodingParametersHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCRtpParameters interop object.
 using rtcRtpParametersHandle = rtcRefCountedObjectHandle;
 
-/// Opaque handle to a native RTCRtpReceiverObserver interop object.
-using rtcRtpReceiverObserverHandle = rtcObjectHandle;
-
 /// Opaque handle to a native RTCRtpReceiver interop object.
 using rtcRtpReceiverHandle = rtcRefCountedObjectHandle;
 
@@ -559,6 +541,28 @@ struct rtcMediaListObserverCallbacks {
  */
 using rtcVideoRendererFrameDelegate = void(LIB_WEBRTC_CALL*)(
     rtcObjectHandle user_data, rtcVideoFrameHandle frame);
+
+/**
+ * Callback OnStateChange delegate for RTCDataChannelObserver.
+ */
+using rtcDataChannelObserverStateChangeDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcDataChannelState state);
+
+/**
+ * Callback OnMessage delegate for RTCDataChannelObserver.
+ */
+using rtcDataChannelObserverMessageDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, const char* buffer, int length, rtcBool32 binary);
+
+/**
+ * Callback delegate structure for RTCDataChannelObserver.
+ */
+struct rtcDataChannelObserverCallbacks {
+  rtcDataChannelObserverStateChangeDelegate StateChange{};
+  rtcObjectHandle user_data_state_change{};
+  rtcDataChannelObserverMessageDelegate Message{};
+  rtcObjectHandle user_data_message{};
+};
 
 /*
  * ----------------------------------------------------------------------
@@ -1419,6 +1423,55 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCDesktopDevice_GetDesktopMediaList(
     rtcDesktopMediaListHandle* pOutRetVal) noexcept;
 
 #endif  // RTC_DESKTOP_DEVICE
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCDataChannel interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDataChannel_Send(
+    rtcDataChannelHandle dataChannel,
+    const unsigned char* data,
+    int data_size,
+    rtcBool32 binary = rtcBool32::kFalse
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDataChannel_Close(
+    rtcDataChannelHandle dataChannel
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDataChannel_RegisterObserver(
+    rtcDataChannelHandle dataChannel,
+    rtcDataChannelObserverCallbacks* callbacks
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDataChannel_UnregisterObserver(
+    rtcDataChannelHandle dataChannel
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDataChannel_GetLabel(
+    rtcDataChannelHandle dataChannel,
+    char* label,
+    int label_size
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDataChannel_GetId(
+    rtcDataChannelHandle dataChannel,
+    int* id
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDataChannel_GetState(
+    rtcDataChannelHandle dataChannel,
+    rtcDataChannelState* state
+) noexcept;
 
 }  // extern "C"
 

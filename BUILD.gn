@@ -170,6 +170,7 @@ rtc_shared_library("libwebrtc") {
       "src/interop/rtc_video_track_interop.cc",
       "src/interop/rtc_video_frame_interop.cc",
       "src/interop/rtc_video_renderer_interop.cc",
+      "src/interop/rtc_data_channel_interop.cc",
     ]
 
     if (libwebrtc_desktop_capture) {

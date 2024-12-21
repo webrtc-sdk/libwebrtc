@@ -256,7 +256,7 @@ void MediaSourceImpl::SaveCaptureResult(
  */
 
 MediaListObserverImpl::MediaListObserverImpl(void* callbacks /* rtcMediaListObserverCallbacks* */)
-  : callbacks_(callbacks)
+  : callbacks_(nullptr)
 {
   if (callbacks) {
     size_t nSize = sizeof(rtcMediaListObserverCallbacks);
