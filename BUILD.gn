@@ -161,6 +161,7 @@ rtc_shared_library("libwebrtc") {
       "include/interop_api.h",
       "src/interop/ref_counted_object_interop.cc",
       "src/interop/libwebrtc_interop.cc",
+      "src/interop/rtc_sdp_parse_error_interop.cc",
       "src/interop/rtc_mediaconstraints_interop.cc",
       "src/interop/rtc_peerconnection_factory_interop.cc",
       "src/interop/rtc_media_track_interop.cc",

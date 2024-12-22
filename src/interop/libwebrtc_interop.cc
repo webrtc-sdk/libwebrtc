@@ -33,7 +33,7 @@ LibWebRTC_GetErrorMessage(
     if (cchBuffer == 0) {
         return rtcResultU4::kBufferTooSmall;
     }
-    memset(pBuffer, 0x0, cchBuffer);
+    ZERO_MEMORY(pBuffer, cchBuffer);
 
     char szBuffer[256] = {0};
     const char* message = "";
@@ -97,10 +97,12 @@ LibWebRTC_GetErrorMessage(
     }
 
     unsigned int cchMessage = (unsigned int)strlen(message);
-    unsigned int cchLen = std::min(cchMessage, cchBuffer);
-    strncpy(pBuffer, (const char*)message, (size_t)cchLen);
+    unsigned int cchLen = std::min(cchMessage, cchBuffer - 1);
+    if (cchLen > 0) {
+        strncpy(pBuffer, message, (size_t)cchLen);
+    }
 
-    return cchMessage > cchBuffer
+    return cchMessage > cchLen
         ? rtcResultU4::kBufferTooSmall
         : rtcResultU4::kSuccess;
 }

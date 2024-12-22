@@ -1473,6 +1473,49 @@ RTCDataChannel_GetState(
     rtcDataChannelState* state
 ) noexcept;
 
+/*
+ * ----------------------------------------------------------------------
+ * RTCSdpParseError interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Creates a new instance of the RTCSdpParseError.
+ * 
+ * @param pOutRetVal - Handle of RTCSdpParseError
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCSdpParseError_Create(
+    rtcSdpParseErrorHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCSdpParseError_GetLine(
+    rtcSdpParseErrorHandle sdpParseError,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCSdpParseError_SetLine(
+    rtcSdpParseErrorHandle sdpParseError,
+    const char* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCSdpParseError_GetDescription(
+    rtcSdpParseErrorHandle sdpParseError,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCSdpParseError_SetDescription(
+    rtcSdpParseErrorHandle sdpParseError,
+    const char* value
+) noexcept;
+
 }  // extern "C"
 
 #endif  // LIB_WEBRTC_INTROP_API_HXX

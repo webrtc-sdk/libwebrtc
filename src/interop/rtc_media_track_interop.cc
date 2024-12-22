@@ -21,10 +21,11 @@ RTCMediaTrack_GetKind(
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(mediaTrack);
-    if (cchOutKind <= 0) {
+    if (cchOutKind < 1) {
         return rtcResultU4::kBufferTooSmall;
     }
     ZERO_MEMORY(pOutKind, cchOutKind);
+    cchOutKind--;
 
     rtcResultU4 result = rtcResultU4::kSuccess;
     scoped_refptr<RTCMediaTrack> pMediaTrack = static_cast<RTCMediaTrack*>(mediaTrack);
@@ -38,6 +39,7 @@ RTCMediaTrack_GetKind(
     size_t len = std::min(dstSize, srcSize);
     if (len > 0) {
         strncpy(pOutKind, kind.c_string(), len);
+        pOutKind[len] = '\0';
     }
 
     return result;
@@ -51,10 +53,11 @@ RTCMediaTrack_GetId(
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(mediaTrack);
-    if (cchOutId <= 0) {
+    if (cchOutId < 1) {
         return rtcResultU4::kBufferTooSmall;
     }
     ZERO_MEMORY(pOutId, cchOutId);
+    cchOutId--;
 
     rtcResultU4 result = rtcResultU4::kSuccess;
     scoped_refptr<RTCMediaTrack> pMediaTrack = static_cast<RTCMediaTrack*>(mediaTrack);

@@ -99,6 +99,8 @@ RTCAudioDevice_RecordingDeviceName(
     }
     ZERO_MEMORY(pOutName, cchOutName);
     ZERO_MEMORY(pOutGuid, cchOutGuid);
+    cchOutName--;
+    cchOutGuid--;
 
     char szName[RTCAudioDevice::kAdmMaxDeviceNameSize] = {0};
     char szGuid[RTCAudioDevice::kAdmMaxGuidSize] = {0};

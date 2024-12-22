@@ -131,9 +131,12 @@ MediaSource_GetInfo(
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(mediaSource);
-    RESET_OUT_POINTER_EX(pOutId, '\0');
-    RESET_OUT_POINTER_EX(pOutName, '\0');
+    ZERO_MEMORY(pOutId, cchOutId);
+    ZERO_MEMORY(pOutName, cchOutName);
     RESET_OUT_POINTER_EX(pOutType, static_cast<rtcDesktopType>(-1));
+
+    cchOutId--;
+    cchOutName--;
     
     rtcResultU4 result = rtcResultU4::kSuccess;
     size_t cchLen;
@@ -148,6 +151,7 @@ MediaSource_GetInfo(
         }
         cchLen = std::min(szTmp.size(), (size_t)cchOutId);
         strncpy(pOutId, szTmp.c_string(), cchLen);
+        pOutId[cchLen] = '\0';
     }
 
     if (pOutName && cchOutName > 0) {
@@ -158,6 +162,7 @@ MediaSource_GetInfo(
         }
         cchLen = std::min(szTmp.size(), (size_t)cchOutName);
         strncpy(pOutName, szTmp.c_string(), cchLen);
+        pOutName[cchLen] = '\0';
     }
 
     if (pOutType) {

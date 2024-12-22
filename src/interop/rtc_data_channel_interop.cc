@@ -88,12 +88,15 @@ RTCDataChannel_GetLabel(
     scoped_refptr<RTCDataChannelImpl> pDataChannel = static_cast<RTCDataChannelImpl*>(dataChannel);
     string sLabel = pDataChannel->label();
     if (sLabel.size() > 0) {
-        size_t dstSize = static_cast<size_t>(label_size);
+        size_t dstSize = static_cast<size_t>(label_size - 1);
         size_t len = std::min(dstSize, sLabel.size());
         if (sLabel.size() > len) {
             result = rtcResultU4::kBufferTooSmall;
         }
-        strncpy(label, sLabel.c_string(), len);
+        if (len > 0) {
+            strncpy(label, sLabel.c_string(), len);
+            label[len] = '\0';
+        }
     }
 
     return result;
