@@ -30,8 +30,8 @@
 #define CHECK_NATIVE_HANDLE(h) \
   CHECK_POINTER_EX(h, rtcResultU4::kInvalidNativeHandle)
 #define ZERO_MEMORY(p, sz)               \
-  if ((sz) > 0) {                        \
-    memset((void*)(p), 0, (size_t)(sz)); \
+  if (static_cast<int>(sz) > 0) {                        \
+    memset((void*)(p), 0, static_cast<size_t>(sz)); \
   }
 
 extern "C" {
@@ -1514,6 +1514,51 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCSdpParseError_SetDescription(
     rtcSdpParseErrorHandle sdpParseError,
     const char* value
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCIceCandidate interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Creates a new instance of the RTCIceCandidate.
+ * 
+ * @param sdp - sdp string
+ * @param sdp_mid - sdp media id
+ * @param sdp_mline_index - sdp media line index
+ * @param pOutSdpParseError - sdp parse error handle (optional)
+ * @param pOutRetVal - Handle of RTCIceCandidate
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCIceCandidate_Create(
+    const char* sdp,
+    const char* sdp_mid,
+    int sdp_mline_index,
+    rtcSdpParseErrorHandle* pOutSdpParseError,
+    rtcIceCandidateHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCIceCandidate_GetCandidate(
+    rtcIceCandidateHandle iceCandidate,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCIceCandidate_GetSdpMid(
+    rtcIceCandidateHandle iceCandidate,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCIceCandidate_GetSdpMlineIndex(
+    rtcIceCandidateHandle iceCandidate,
+    int* pOutRetVal
 ) noexcept;
 
 }  // extern "C"
