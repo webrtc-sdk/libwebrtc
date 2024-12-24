@@ -526,14 +526,11 @@ using rtcMediaListObserverDelegate = void(LIB_WEBRTC_CALL*)(
  * Callback delegate structure for MediaListObserver.
  */
 struct rtcMediaListObserverCallbacks {
+  rtcObjectHandle UserData{};
   rtcMediaListObserverDelegate MediaSourceAdded{};
-  rtcObjectHandle user_data_added{};
   rtcMediaListObserverDelegate MediaSourceRemoved{};
-  rtcObjectHandle user_data_removed{};
   rtcMediaListObserverDelegate MediaSourceNameChanged{};
-  rtcObjectHandle user_data_name_changed{};
   rtcMediaListObserverDelegate MediaSourceThumbnailChanged{};
-  rtcObjectHandle user_data_thumbnail_changed{};
 };
 
 /**
@@ -558,10 +555,9 @@ using rtcDataChannelObserverMessageDelegate = void(LIB_WEBRTC_CALL*)(
  * Callback delegate structure for RTCDataChannelObserver.
  */
 struct rtcDataChannelObserverCallbacks {
-  rtcDataChannelObserverStateChangeDelegate StateChange{};
-  rtcObjectHandle user_data_state_change{};
-  rtcDataChannelObserverMessageDelegate Message{};
-  rtcObjectHandle user_data_message{};
+  rtcObjectHandle UserData{};
+  rtcDataChannelObserverStateChangeDelegate StateChanged{};
+  rtcDataChannelObserverMessageDelegate MessageReceived{};
 };
 
 /*

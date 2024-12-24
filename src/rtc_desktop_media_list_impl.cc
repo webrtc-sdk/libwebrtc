@@ -278,7 +278,7 @@ void MediaListObserverImpl::OnMediaSourceAdded(scoped_refptr<MediaSource> source
   if (callbacks_) {
     rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
     rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
-    pCallbacks->MediaSourceAdded(pCallbacks->user_data_added, pSource);
+    pCallbacks->MediaSourceAdded(pCallbacks->UserData, pSource);
   }
 }
 
@@ -287,7 +287,7 @@ void MediaListObserverImpl::OnMediaSourceRemoved(scoped_refptr<MediaSource> sour
   if (callbacks_) {
     rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
     rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
-    pCallbacks->MediaSourceRemoved(pCallbacks->user_data_removed, pSource);
+    pCallbacks->MediaSourceRemoved(pCallbacks->UserData, pSource);
   }
 }
 
@@ -296,7 +296,7 @@ void MediaListObserverImpl::OnMediaSourceNameChanged(scoped_refptr<MediaSource> 
   if (callbacks_) {
     rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
     rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
-    pCallbacks->MediaSourceNameChanged(pCallbacks->user_data_name_changed, pSource);
+    pCallbacks->MediaSourceNameChanged(pCallbacks->UserData, pSource);
   }
 }
 
@@ -305,7 +305,7 @@ void MediaListObserverImpl::OnMediaSourceThumbnailChanged(scoped_refptr<MediaSou
   if (callbacks_) {
     rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
     rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
-    pCallbacks->MediaSourceThumbnailChanged(pCallbacks->user_data_thumbnail_changed, pSource);
+    pCallbacks->MediaSourceThumbnailChanged(pCallbacks->UserData, pSource);
   }
 }
 
