@@ -1561,6 +1561,176 @@ RTCIceCandidate_GetSdpMlineIndex(
     int* pOutRetVal
 ) noexcept;
 
+/*
+ * ----------------------------------------------------------------------
+ * RTCMediaStream interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Adds an audio track to the media stream.
+ * 
+ * @param mediaStream - Media stream handle
+ * @param audioTrack - Audio track handle
+ * @return rtcBool32 - kTrue if successful, otherwise kFalse.
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+RTCMediaStream_AddAudioTrack(
+    rtcMediaStreamHandle mediaStream,
+    rtcAudioTrackHandle audioTrack
+) noexcept;
+
+/**
+ * Adds a video track to the media stream.
+ * 
+ * @param mediaStream - Media stream handle
+ * @param videoTrack - Video track handle
+ * @return rtcBool32 - kTrue if successful, otherwise kFalse.
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+RTCMediaStream_AddVideoTrack(
+    rtcMediaStreamHandle mediaStream,
+    rtcVideoTrackHandle videoTrack
+) noexcept;
+
+/**
+ * Removes an audio track from the media stream.
+ * 
+ * @param mediaStream - Media stream handle
+ * @param audioTrack - Audio track handle
+ * @return rtcBool32 - kTrue if successful, otherwise kFalse.
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+RTCMediaStream_RemoveAudioTrack(
+    rtcMediaStreamHandle mediaStream,
+    rtcAudioTrackHandle audioTrack
+) noexcept;
+
+/**
+ * Removes a video track from the media stream.
+ * 
+ * @param mediaStream - Media stream handle
+ * @param videoTrack - Video track handle
+ * @return rtcBool32 - kTrue if successful, otherwise kFalse.
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+RTCMediaStream_RemoveVideoTrack(
+    rtcMediaStreamHandle mediaStream,
+    rtcVideoTrackHandle videoTrack
+) noexcept;
+
+/**
+ * Returns the number of audio tracks in the media stream.
+ * 
+ * @param mediaStream - Media stream handle
+ * @return int - Number of audio tracks (if successful), otherwise 0.
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCMediaStream_NumberOfAudioTracks(
+    rtcMediaStreamHandle mediaStream
+) noexcept;
+
+/**
+ * Returns the number of video tracks in the media stream.
+ * 
+ * @param mediaStream - Media stream handle
+ * @return int - Number of video tracks (if successful), otherwise 0.
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCMediaStream_NumberOfVideoTracks(
+    rtcMediaStreamHandle mediaStream
+) noexcept;
+
+/**
+ * Returns the audio track with the specified index.
+ * 
+ * @param mediaStream - Media stream handle
+ * @param index - 0-based index value.
+ * @param pOutRetVal - The audio track handle value to return.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCMediaStream_GetAudioTrack (
+    rtcMediaStreamHandle mediaStream,
+    int index,
+    rtcAudioTrackHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Returns the video track with the specified index.
+ * 
+ * @param mediaStream - Media stream handle
+ * @param index - 0-based index value.
+ * @param pOutRetVal - The video track handle value to return.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCMediaStream_GetVideoTrack (
+    rtcMediaStreamHandle mediaStream,
+    int index,
+    rtcVideoTrackHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Returns the audio track with the specified id.
+ * 
+ * @param mediaStream - Media stream handle
+ * @param track_id - Track identifier
+ * @param pOutRetVal - The audio track handle value to return.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCMediaStream_FindAudioTrack (
+    rtcMediaStreamHandle mediaStream,
+    const char* track_id,
+    rtcAudioTrackHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Returns the video track with the specified id.
+ * 
+ * @param mediaStream - Media stream handle
+ * @param track_id - Track identifier
+ * @param pOutRetVal - The video track handle value to return.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCMediaStream_FindVideoTrack (
+    rtcMediaStreamHandle mediaStream,
+    const char* track_id,
+    rtcVideoTrackHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Returns the label value for the media stream.
+ * 
+ * @param mediaStream - Media stream handle
+ * @param value - Value to be returned
+ * @param sz_value - Size of value
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCMediaStream_GetLabel (
+    rtcMediaStreamHandle mediaStream,
+    char* value,
+    int sz_value
+) noexcept;
+
+/**
+ * Returns the id value for the media stream.
+ * 
+ * @param mediaStream - Media stream handle
+ * @param value - Value to be returned
+ * @param sz_value - Size of value
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCMediaStream_GetId (
+    rtcMediaStreamHandle mediaStream,
+    char* value,
+    int sz_value
+) noexcept;
+
 }  // extern "C"
 
 #endif  // LIB_WEBRTC_INTROP_API_HXX

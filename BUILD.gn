@@ -173,6 +173,7 @@ rtc_shared_library("libwebrtc") {
       "src/interop/rtc_video_renderer_interop.cc",
       "src/interop/rtc_data_channel_interop.cc",
       "src/interop/rtc_ice_candidate_interop.cc",
+      "src/interop/rtc_media_stream_interop.cc",
     ]
 
     if (libwebrtc_desktop_capture) {
