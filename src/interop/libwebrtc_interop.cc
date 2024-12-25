@@ -26,16 +26,16 @@ rtcResultU4 LIB_WEBRTC_CALL
 LibWebRTC_GetErrorMessage(
     rtcResultU4 code,
     char* pBuffer,
-    unsigned int cchBuffer
+    unsigned int sizeOfBuffer
 ) noexcept
 {
     CHECK_POINTER(pBuffer);
-    if (cchBuffer == 0) {
+    if (sizeOfBuffer == 0) {
         return rtcResultU4::kBufferTooSmall;
     }
-    ZERO_MEMORY(pBuffer, cchBuffer);
+    ZERO_MEMORY(pBuffer, sizeOfBuffer);
 
-    char szBuffer[256] = {0};
+    char szTemp[256] = {0};
     const char* message = "";
     switch (code)
     {
@@ -91,18 +91,15 @@ LibWebRTC_GetErrorMessage(
             message = "A null or invalid pointer.";
             break;
         default:
-            snprintf(szBuffer, sizeof(szBuffer), "Undefined error: 0x%X", static_cast<unsigned int>(code));
-            message = (const char*)szBuffer;
+            snprintf(szTemp, sizeof(szTemp), "Undefined error: 0x%X", static_cast<unsigned int>(code));
+            message = szTemp;
             break;
     }
 
-    unsigned int cchMessage = (unsigned int)strlen(message);
-    unsigned int cchLen = std::min(cchMessage, cchBuffer - 1);
-    if (cchLen > 0) {
-        strncpy(pBuffer, message, (size_t)cchLen);
-    }
+    string strMessage(message);
+    size_t len = strMessage.copy_to(pBuffer, static_cast<size_t>(sizeOfBuffer));
 
-    return cchMessage > cchLen
+    return strMessage.size() > len
         ? rtcResultU4::kBufferTooSmall
         : rtcResultU4::kSuccess;
 }

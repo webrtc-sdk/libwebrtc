@@ -43,21 +43,13 @@ RTCIceCandidate_GetCandidate(
     if (sz_value < 1) {
         return rtcResultU4::kBufferTooSmall;
     }
-    sz_value--;
 
-    rtcResultU4 result = rtcResultU4::kSuccess;
     scoped_refptr<RTCIceCandidate> pIceCandidate = static_cast<RTCIceCandidate*>(iceCandidate);
-    size_t dstLen = static_cast<size_t>(sz_value);
-    string src_value = pIceCandidate->candidate();
-    size_t len = std::min(dstLen, src_value.size());
-    if (src_value.size() > len) {
-        result = rtcResultU4::kBufferTooSmall;
-    }
-    if (len > 0) {
-        strncpy(value, src_value.c_string(), len);
-        value[len] = '\0';
-    }
-    return result;
+    string strValue = pIceCandidate->candidate();
+    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
+    return strValue.size() > len
+        ? rtcResultU4::kBufferTooSmall
+        : rtcResultU4::kSuccess;
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -72,21 +64,13 @@ RTCIceCandidate_GetSdpMid(
     if (sz_value < 1) {
         return rtcResultU4::kBufferTooSmall;
     }
-    sz_value--;
 
-    rtcResultU4 result = rtcResultU4::kSuccess;
     scoped_refptr<RTCIceCandidate> pIceCandidate = static_cast<RTCIceCandidate*>(iceCandidate);
-    size_t dstLen = static_cast<size_t>(sz_value);
-    string src_value = pIceCandidate->sdp_mid();
-    size_t len = std::min(dstLen, src_value.size());
-    if (src_value.size() > len) {
-        result = rtcResultU4::kBufferTooSmall;
-    }
-    if (len > 0) {
-        strncpy(value, src_value.c_string(), len);
-        value[len] = '\0';
-    }
-    return result;
+    string strValue = pIceCandidate->sdp_mid();
+    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
+    return strValue.size() > len
+        ? rtcResultU4::kBufferTooSmall
+        : rtcResultU4::kSuccess;
 }
 
 rtcResultU4 LIB_WEBRTC_CALL

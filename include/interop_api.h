@@ -30,8 +30,8 @@
 #define CHECK_NATIVE_HANDLE(h) \
   CHECK_POINTER_EX(h, rtcResultU4::kInvalidNativeHandle)
 #define ZERO_MEMORY(p, sz)               \
-  if (static_cast<int>(sz) > 0) {                        \
-    memset((void*)(p), 0, static_cast<size_t>(sz)); \
+  if (static_cast<void*>(p) && static_cast<int>(sz) > 0) {     \
+    memset(static_cast<void*>(p), 0, static_cast<size_t>(sz)); \
   }
 
 extern "C" {

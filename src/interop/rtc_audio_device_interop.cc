@@ -16,7 +16,7 @@ RTCAudioDevice_PlayoutDevices(
 {
     CHECK_POINTER_EX(audiDevice, 0);    
     scoped_refptr<RTCAudioDevice> pAudioDevice = static_cast<RTCAudioDevice*>(audiDevice);
-    return (int)pAudioDevice->PlayoutDevices();
+    return static_cast<int>(pAudioDevice->PlayoutDevices());
 } // end RTCAudioDevice_PlayoutDevices
 
 int LIB_WEBRTC_CALL
@@ -26,7 +26,7 @@ RTCAudioDevice_RecordingDevices(
 {
     CHECK_POINTER_EX(audiDevice, 0);
     scoped_refptr<RTCAudioDevice> pAudioDevice = static_cast<RTCAudioDevice*>(audiDevice);
-    return (int)pAudioDevice->RecordingDevices();
+    return static_cast<int>(pAudioDevice->RecordingDevices());
 } // end RTCAudioDevice_RecordingDevices
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -57,25 +57,18 @@ RTCAudioDevice_PlayoutDeviceName(
         return result;
     }
 
-    int nSrcNameLen = ((int)strlen(szName));
-    if (nSrcNameLen > cchOutName) {
-        result = rtcResultU4::kBufferTooSmall;
-    }
-    int nSrcGuidLen = ((int)strlen(szGuid));
-    if (nSrcGuidLen > cchOutGuid) {
+    size_t len;
+    string strName(szName);
+    string strGuid(szGuid);
+
+    len = strName.copy_to(pOutName, static_cast<size_t>(cchOutName));
+    if (strName.size() > len) {
         result = rtcResultU4::kBufferTooSmall;
     }
 
-    int nNameLen = std::min(cchOutName, nSrcNameLen);
-    if (nNameLen > 0) {
-        strncpy(pOutName, (const char*)szName, nNameLen);
-        pOutName[nNameLen] = '\0';
-    }
-    
-    int nGuidLen = std::min(cchOutGuid, nSrcGuidLen);
-    if (nGuidLen > 0) {
-        strncpy(pOutGuid, (const char*)szGuid, nGuidLen);
-        pOutGuid[nGuidLen] = '\0';
+    len = strGuid.copy_to(pOutGuid, static_cast<size_t>(cchOutGuid));
+    if (strGuid.size() > len) {
+        result = rtcResultU4::kBufferTooSmall;
     }
 
     return result;
@@ -99,8 +92,6 @@ RTCAudioDevice_RecordingDeviceName(
     }
     ZERO_MEMORY(pOutName, cchOutName);
     ZERO_MEMORY(pOutGuid, cchOutGuid);
-    cchOutName--;
-    cchOutGuid--;
 
     char szName[RTCAudioDevice::kAdmMaxDeviceNameSize] = {0};
     char szGuid[RTCAudioDevice::kAdmMaxGuidSize] = {0};
@@ -111,25 +102,18 @@ RTCAudioDevice_RecordingDeviceName(
         return result;
     }
 
-    int nSrcNameLen = ((int)strlen(szName));
-    if (nSrcNameLen > cchOutName) {
-        result = rtcResultU4::kBufferTooSmall;
-    }
-    int nSrcGuidLen = ((int)strlen(szGuid));
-    if (nSrcGuidLen > cchOutGuid) {
+    size_t len;
+    string strName(szName);
+    string strGuid(szGuid);
+
+    len = strName.copy_to(pOutName, static_cast<size_t>(cchOutName));
+    if (strName.size() > len) {
         result = rtcResultU4::kBufferTooSmall;
     }
 
-    int nNameLen = std::min(cchOutName, nSrcNameLen);
-    if (nNameLen > 0) {
-        strncpy(pOutName, (const char*)szName, nNameLen);
-        pOutName[nNameLen] = '\0';
-    }
-    
-    int nGuidLen = std::min(cchOutGuid, nSrcGuidLen);
-    if (nGuidLen > 0) {
-        strncpy(pOutGuid, (const char*)szGuid, nGuidLen);
-        pOutGuid[nGuidLen] = '\0';
+    len = strGuid.copy_to(pOutGuid, static_cast<size_t>(cchOutGuid));
+    if (strGuid.size() > len) {
+        result = rtcResultU4::kBufferTooSmall;
     }
 
     return result;
@@ -148,7 +132,7 @@ RTCAudioDevice_SetPlayoutDevice(
     if (index < 0 || index >= nCount) {
         return rtcResultU4::kOutOfRange;
     }
-    return (rtcResultU4)pAudioDevice->SetPlayoutDevice((uint16_t)index);
+    return static_cast<rtcResultU4>(pAudioDevice->SetPlayoutDevice((uint16_t)index));
 } // end RTCAudioDevice_SetPlayoutDevice
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -164,7 +148,7 @@ RTCAudioDevice_SetRecordingDevice(
     if (index < 0 || index >= nCount) {
         return rtcResultU4::kOutOfRange;
     }
-    return (rtcResultU4)pAudioDevice->SetRecordingDevice((uint16_t)index);
+    return static_cast<rtcResultU4>(pAudioDevice->SetRecordingDevice((uint16_t)index));
 } // end RTCAudioDevice_SetRecordingDevice
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -187,8 +171,8 @@ RTCAudioDevice_RegisterDeviceChangeCallback(
             }
         };
     }
-    rtcResultU4 result = (rtcResultU4)pAudioDevice->OnDeviceChange(cb);
-    return result;
+
+    return static_cast<rtcResultU4>(pAudioDevice->OnDeviceChange(cb));
 } // end RTCAudioDevice_RegisterDeviceChangeCallback
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -199,8 +183,7 @@ RTCAudioDevice_SetMicrophoneVolume(
 {
     CHECK_NATIVE_HANDLE(audiDevice);
     scoped_refptr<RTCAudioDevice> pAudioDevice = static_cast<RTCAudioDevice*>(audiDevice);
-    rtcResultU4 result = (rtcResultU4)pAudioDevice->SetMicrophoneVolume(volume);
-    return result;
+    return static_cast<rtcResultU4>(pAudioDevice->SetMicrophoneVolume(volume));
 } // end RTCAudioDevice_SetMicrophoneVolume
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -211,8 +194,7 @@ RTCAudioDevice_GetMicrophoneVolume(
 {
     CHECK_NATIVE_HANDLE(audiDevice);
     scoped_refptr<RTCAudioDevice> pAudioDevice = static_cast<RTCAudioDevice*>(audiDevice);
-    rtcResultU4 result = (rtcResultU4)pAudioDevice->MicrophoneVolume(*volume);
-    return result;
+    return static_cast<rtcResultU4>(pAudioDevice->MicrophoneVolume(*volume));
 } // end RTCAudioDevice_GetMicrophoneVolume
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -223,8 +205,7 @@ RTCAudioDevice_SetSpeakerVolume(
 {
     CHECK_NATIVE_HANDLE(audiDevice);
     scoped_refptr<RTCAudioDevice> pAudioDevice = static_cast<RTCAudioDevice*>(audiDevice);
-    rtcResultU4 result = (rtcResultU4)pAudioDevice->SetSpeakerVolume(volume);
-    return result;
+    return static_cast<rtcResultU4>(pAudioDevice->SetSpeakerVolume(volume));
 } // end RTCAudioDevice_SetSpeakerVolume
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -235,6 +216,5 @@ RTCAudioDevice_GetSpeakerVolume(
 {
     CHECK_NATIVE_HANDLE(audiDevice);
     scoped_refptr<RTCAudioDevice> pAudioDevice = static_cast<RTCAudioDevice*>(audiDevice);
-    rtcResultU4 result = (rtcResultU4)pAudioDevice->SpeakerVolume(*volume);
-    return result;
+    return static_cast<rtcResultU4>(pAudioDevice->SpeakerVolume(*volume));
 } // end RTCAudioDevice_GetSpeakerVolume

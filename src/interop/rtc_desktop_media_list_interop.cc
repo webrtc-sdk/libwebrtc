@@ -134,9 +134,6 @@ MediaSource_GetInfo(
     ZERO_MEMORY(pOutId, cchOutId);
     ZERO_MEMORY(pOutName, cchOutName);
     RESET_OUT_POINTER_EX(pOutType, static_cast<rtcDesktopType>(-1));
-
-    cchOutId--;
-    cchOutName--;
     
     rtcResultU4 result = rtcResultU4::kSuccess;
     size_t cchLen;
@@ -144,25 +141,19 @@ MediaSource_GetInfo(
     scoped_refptr<MediaSource> pMediaSource = static_cast<MediaSource*>(mediaSource);
 
     if (pOutId && cchOutId > 0) {
-        ZERO_MEMORY(pOutId, cchOutId);
         szTmp = pMediaSource->id();
-        if (szTmp.size() > (size_t)cchOutId) {
+        cchLen = szTmp.copy_to(pOutId, static_cast<size_t>(cchOutId));
+        if (szTmp.size() > cchLen) {
             result = rtcResultU4::kBufferTooSmall;
         }
-        cchLen = std::min(szTmp.size(), (size_t)cchOutId);
-        strncpy(pOutId, szTmp.c_string(), cchLen);
-        pOutId[cchLen] = '\0';
     }
 
     if (pOutName && cchOutName > 0) {
-        ZERO_MEMORY(pOutName, cchOutName);
         szTmp = pMediaSource->name();
-        if (szTmp.size() > (size_t)cchOutName) {
+        cchLen = szTmp.copy_to(pOutName, static_cast<size_t>(cchOutName));
+        if (szTmp.size() > cchLen) {
             result = rtcResultU4::kBufferTooSmall;
         }
-        cchLen = std::min(szTmp.size(), (size_t)cchOutName);
-        strncpy(pOutName, szTmp.c_string(), cchLen);
-        pOutName[cchLen] = '\0';
     }
 
     if (pOutType) {
@@ -192,7 +183,8 @@ MediaSource_GetThumbnail(
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(mediaSource);
-    size_t szDstBuffer = static_cast<size_t>(*refSizeOfBuffer);
+    CHECK_POINTER(refSizeOfBuffer);
+    size_t sizeOfBuffer = static_cast<size_t>(*refSizeOfBuffer);
     RESET_OUT_POINTER_EX(refSizeOfBuffer, 0);
 
     scoped_refptr<MediaSource> pMediaSource = static_cast<MediaSource*>(mediaSource);
@@ -200,13 +192,12 @@ MediaSource_GetThumbnail(
 
     size_t szSrcSize = buffer.size();
     *refSizeOfBuffer = static_cast<int>(szSrcSize);
-    if (pBuffer) {
-        if (szSrcSize > szDstBuffer) {
+    if (pBuffer && szSrcSize > 0) {
+        if (szSrcSize > sizeOfBuffer) {
             return rtcResultU4::kBufferTooSmall;
         }
         memcpy((void*)pBuffer, (const void*)buffer.data(), szSrcSize);
     }
-
     return rtcResultU4::kSuccess;
 }
 

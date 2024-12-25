@@ -30,21 +30,12 @@ RTCSdpParseError_GetLine(
     }
     ZERO_MEMORY(value, sz_value);
 
-    rtcResultU4 result = rtcResultU4::kSuccess;
     scoped_refptr<RTCSdpParseError> pSdpParseError = static_cast<RTCSdpParseError*>(sdpParseError);
-    string sValue = pSdpParseError->line();
-    if (sValue.size() > 0) {
-        size_t dstLen = static_cast<size_t>(sz_value) - 1;
-        size_t len = std::min(dstLen, sValue.size());
-        if (sValue.size() > len) {
-            result = rtcResultU4::kBufferTooSmall;
-        }
-        if (len > 0) {
-            strncpy(value, sValue.c_string(), len);
-            value[len] = '\0';
-        }
-    }
-    return result;
+    string strValue = pSdpParseError->line();
+    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
+    return strValue.size() > len
+        ? rtcResultU4::kBufferTooSmall
+        : rtcResultU4::kSuccess;
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -74,21 +65,12 @@ RTCSdpParseError_GetDescription(
     }
     ZERO_MEMORY(value, sz_value);
 
-    rtcResultU4 result = rtcResultU4::kSuccess;
     scoped_refptr<RTCSdpParseError> pSdpParseError = static_cast<RTCSdpParseError*>(sdpParseError);
-    string sValue = pSdpParseError->description();
-    if (sValue.size() > 0) {
-        size_t dstLen = static_cast<size_t>(sz_value) - 1;
-        size_t len = std::min(dstLen, sValue.size());
-        if (sValue.size() > len) {
-            result = rtcResultU4::kBufferTooSmall;
-        }
-        if (len > 0) {
-            strncpy(value, sValue.c_string(), len);
-            value[len] = '\0';
-        }
-    }
-    return result;
+    string strValue = pSdpParseError->description();
+    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
+    return strValue.size() > len
+        ? rtcResultU4::kBufferTooSmall
+        : rtcResultU4::kSuccess;
 }
 
 rtcResultU4 LIB_WEBRTC_CALL

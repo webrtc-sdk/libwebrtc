@@ -21,28 +21,18 @@ RTCMediaTrack_GetKind(
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(mediaTrack);
+    ZERO_MEMORY(pOutKind, cchOutKind);
+    CHECK_POINTER(pOutKind);
     if (cchOutKind < 1) {
         return rtcResultU4::kBufferTooSmall;
     }
-    ZERO_MEMORY(pOutKind, cchOutKind);
-    cchOutKind--;
 
-    rtcResultU4 result = rtcResultU4::kSuccess;
     scoped_refptr<RTCMediaTrack> pMediaTrack = static_cast<RTCMediaTrack*>(mediaTrack);
-    string kind = pMediaTrack->kind();
-    size_t dstSize = static_cast<size_t>(cchOutKind);
-    size_t srcSize = kind.size();
-    if (srcSize > dstSize) {
-        result = rtcResultU4::kBufferTooSmall;
-    }
-
-    size_t len = std::min(dstSize, srcSize);
-    if (len > 0) {
-        strncpy(pOutKind, kind.c_string(), len);
-        pOutKind[len] = '\0';
-    }
-
-    return result;
+    string strValue = pMediaTrack->kind();
+    size_t len = strValue.copy_to(pOutKind, static_cast<size_t>(cchOutKind));
+    return strValue.size() > len
+        ? rtcResultU4::kBufferTooSmall
+        : rtcResultU4::kSuccess;
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -53,27 +43,18 @@ RTCMediaTrack_GetId(
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(mediaTrack);
+    ZERO_MEMORY(pOutId, cchOutId);
+    CHECK_POINTER(pOutId);
     if (cchOutId < 1) {
         return rtcResultU4::kBufferTooSmall;
     }
-    ZERO_MEMORY(pOutId, cchOutId);
-    cchOutId--;
 
-    rtcResultU4 result = rtcResultU4::kSuccess;
     scoped_refptr<RTCMediaTrack> pMediaTrack = static_cast<RTCMediaTrack*>(mediaTrack);
-    string id = pMediaTrack->id();
-    size_t dstSize = static_cast<size_t>(cchOutId);
-    size_t srcSize = id.size();
-    if (srcSize > dstSize) {
-        result = rtcResultU4::kBufferTooSmall;
-    }
-
-    size_t len = std::min(dstSize, srcSize);
-    if (len > 0) {
-        strncpy(pOutId, id.c_string(), len);
-    }
-
-    return result;
+    string strValue = pMediaTrack->id();
+    size_t len = strValue.copy_to(pOutId, static_cast<size_t>(cchOutId));
+    return strValue.size() > len
+        ? rtcResultU4::kBufferTooSmall
+        : rtcResultU4::kSuccess;
 }
 
 rtcBool32 LIB_WEBRTC_CALL

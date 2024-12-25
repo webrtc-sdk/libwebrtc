@@ -79,27 +79,17 @@ RTCDataChannel_GetLabel(
 {
     CHECK_NATIVE_HANDLE(dataChannel);
     CHECK_POINTER(label);
+    ZERO_MEMORY(label, label_size);
     if (label_size < 1) {
         return rtcResultU4::kInvalidParameter;
     }
-    ZERO_MEMORY(label, label_size);
 
-    rtcResultU4 result = rtcResultU4::kSuccess;
     scoped_refptr<RTCDataChannelImpl> pDataChannel = static_cast<RTCDataChannelImpl*>(dataChannel);
-    string sLabel = pDataChannel->label();
-    if (sLabel.size() > 0) {
-        size_t dstSize = static_cast<size_t>(label_size - 1);
-        size_t len = std::min(dstSize, sLabel.size());
-        if (sLabel.size() > len) {
-            result = rtcResultU4::kBufferTooSmall;
-        }
-        if (len > 0) {
-            strncpy(label, sLabel.c_string(), len);
-            label[len] = '\0';
-        }
-    }
-
-    return result;
+    string strLabel = pDataChannel->label();
+    size_t len = strLabel.copy_to(label, static_cast<size_t>(label_size));
+    return strLabel.size() > len
+        ? rtcResultU4::kBufferTooSmall
+        : rtcResultU4::kSuccess;
 }
 
 rtcResultU4 LIB_WEBRTC_CALL

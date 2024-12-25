@@ -37,13 +37,12 @@ RTCVideoDevice_GetDeviceName(
     ZERO_MEMORY(pOutProductUniqueIdUTF8, cchOutProductUniqueIdUTF8);
 
     scoped_refptr<RTCVideoDevice> pVideoDevice = static_cast<RTCVideoDevice*>(videoDevice);
-    rtcResultU4 result = (rtcResultU4)pVideoDevice->GetDeviceName(
-        (uint32_t)index,
-        pOutDeviceNameUTF8, (uint32_t)cchOutDeviceNameUTF8,
-        pOutDeviceUniqueIdUTF8, (uint32_t)cchOutDeviceUniqueIdUTF8,
-        pOutProductUniqueIdUTF8, (uint32_t)cchOutProductUniqueIdUTF8
-    );
-
+    rtcResultU4 result = static_cast<rtcResultU4>(pVideoDevice->GetDeviceName(
+        static_cast<uint32_t>(index),
+        pOutDeviceNameUTF8, static_cast<uint32_t>(cchOutDeviceNameUTF8),
+        pOutDeviceUniqueIdUTF8, static_cast<uint32_t>(cchOutDeviceUniqueIdUTF8),
+        pOutProductUniqueIdUTF8, static_cast<uint32_t>(cchOutProductUniqueIdUTF8)
+    ));
     return result;
 }
 
@@ -62,10 +61,10 @@ RTCVideoDevice_CreateVideoCapturer(
     scoped_refptr<RTCVideoDevice> pVideoDevice = static_cast<RTCVideoDevice*>(videoDevice);
     scoped_refptr<RTCVideoCapturer> pVideoCapturer = pVideoDevice->Create(
         name,
-        (uint32_t)index,
-        (size_t)width,
-        (size_t)height,
-        (size_t)target_fps
+        static_cast<uint32_t>(index),
+        static_cast<size_t>(width),
+        static_cast<size_t>(height),
+        static_cast<size_t>(target_fps)
     );
     if (pVideoCapturer == nullptr) {
         return rtcResultU4::kUnknownError;

@@ -179,27 +179,18 @@ RTCMediaStream_GetLabel (
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(mediaStream);
-    CHECK_POINTER(value);
     ZERO_MEMORY(value, sz_value);
+    CHECK_POINTER(value);
     if (sz_value < 1) {
         return rtcResultU4::kBufferTooSmall;
     }
-    sz_value--;
 
-    rtcResultU4 result = rtcResultU4::kSuccess;
     scoped_refptr<RTCMediaStream> pMediaStream = static_cast<RTCMediaStream*>(mediaStream);
-    string srcValue = pMediaStream->label();
-    size_t srcLen = srcValue.size();
-    size_t dstSize = static_cast<size_t>(sz_value);
-    size_t len = std::min(srcLen, dstSize);
-    if (srcLen > len) {
-        result = rtcResultU4::kBufferTooSmall;
-    }
-    if (len > 0) {
-        strncpy(value, srcValue.c_string(), len);
-        value[len] = '\0';
-    }    
-    return result;
+    string strValue = pMediaStream->label();
+    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
+    return strValue.size() > len
+        ? rtcResultU4::kBufferTooSmall
+        : rtcResultU4::kSuccess;
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -210,25 +201,16 @@ RTCMediaStream_GetId (
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(mediaStream);
-    CHECK_POINTER(value);
     ZERO_MEMORY(value, sz_value);
+    CHECK_POINTER(value);
     if (sz_value < 1) {
         return rtcResultU4::kBufferTooSmall;
     }
-    sz_value--;
 
-    rtcResultU4 result = rtcResultU4::kSuccess;
     scoped_refptr<RTCMediaStream> pMediaStream = static_cast<RTCMediaStream*>(mediaStream);
-    string srcValue = pMediaStream->id();
-    size_t srcLen = srcValue.size();
-    size_t dstSize = static_cast<size_t>(sz_value);
-    size_t len = std::min(srcLen, dstSize);
-    if (srcLen > len) {
-        result = rtcResultU4::kBufferTooSmall;
-    }
-    if (len > 0) {
-        strncpy(value, srcValue.c_string(), len);
-        value[len] = '\0';
-    }    
-    return result;
+    string strValue = pMediaStream->id();
+    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
+    return strValue.size() > len
+        ? rtcResultU4::kBufferTooSmall
+        : rtcResultU4::kSuccess;
 }

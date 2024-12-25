@@ -7,10 +7,8 @@ using namespace libwebrtc;
 
 RTCConfiguration CreateRtcConfiguration(const rtcPeerConnectionConfiguration* configuration)
 {
-    RTCConfiguration result;
-    if (configuration == nullptr) {
-        return result;
-    }
+    RTCConfiguration result{};
+    CHECK_POINTER_EX(configuration, result);
 
     for (int i = 0; i < kMaxIceServerSize; i++) {
         result.ice_servers[i].uri = string(configuration->ice_servers[i].uri);
@@ -53,9 +51,7 @@ RTCPeerConnectionFactory_Initialize(
     rtcPeerConnectionFactoryHandle factory
 ) noexcept
 {
-    if (factory == nullptr) {
-        return rtcBool32::kFalse;
-    }
+    CHECK_POINTER_EX(factory, rtcBool32::kFalse);
 
     scoped_refptr<RTCPeerConnectionFactory> pFactory = static_cast<RTCPeerConnectionFactory*>(factory);
     return pFactory->Initialize()
@@ -68,9 +64,7 @@ RTCPeerConnectionFactory_Terminate(
     rtcPeerConnectionFactoryHandle factory
 ) noexcept
 {
-    if (factory == nullptr) {
-        return rtcBool32::kFalse;
-    }
+    CHECK_POINTER_EX(factory, rtcBool32::kFalse);
 
     scoped_refptr<RTCPeerConnectionFactory> pFactory = static_cast<RTCPeerConnectionFactory*>(factory);
     return pFactory->Terminate()

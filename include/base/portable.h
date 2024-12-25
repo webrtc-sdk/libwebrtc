@@ -84,6 +84,24 @@ class string {
   inline std::string std_string() const {
     return std::string(m_dynamic == 0 ? m_buf : m_dynamic, m_length);
   }
+
+  /**
+   * Makes safe copies up to the size of the output buffer.
+   * 
+   * @param dest - Output buffer
+   * @param sz_dest - Size of the output buffer
+   * @return size_t - Number of characters copied. (excluding the ending character '\0')
+   */
+  inline size_t copy_to(char* dest, size_t sz_dest) const {
+    if (dest == 0) { return 0; }
+    *dest = '\0';
+    if (sz_dest == 0 || m_length == 0) { return 0; }
+    size_t cch_len = sz_dest - 1;
+    // safe copy
+    strncpy(dest, c_string(), cch_len);
+    dest[cch_len] = '\0';
+    return cch_len;
+  }
 };
 
 inline std::string to_std_string(const string& str) { return str.std_string(); }
