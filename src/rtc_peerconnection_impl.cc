@@ -191,7 +191,9 @@ RTCPeerConnectionImpl::RTCPeerConnectionImpl(
     : rtc_peerconnection_factory_(peer_connection_factory),
       configuration_(configuration),
       constraints_(constraints),
-      callback_crt_sec_(new webrtc::Mutex()) {
+      callback_crt_sec_(new webrtc::Mutex()),
+      initialize_crt_sec_(new webrtc::Mutex())
+{
   RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor";
   Initialize();
 }
@@ -361,6 +363,12 @@ void RTCPeerConnectionImpl::DeRegisterRTCPeerConnectionObserver() {
 }
 
 bool RTCPeerConnectionImpl::Initialize() {
+  webrtc::MutexLock cs(initialize_crt_sec_.get());
+  if (initialized_) {
+    return true;
+  }
+  initialized_ = true;
+
   RTC_DCHECK(rtc_peerconnection_factory_.get() != nullptr);
   RTC_DCHECK(rtc_peerconnection_.get() == nullptr);
 
@@ -432,6 +440,12 @@ bool RTCPeerConnectionImpl::Initialize() {
 
   rtc_peerconnection_ = result.MoveValue();
   return true;
+}
+
+bool RTCPeerConnectionImpl::IsInitialized() const
+{
+  webrtc::MutexLock cs(initialize_crt_sec_.get());
+  return initialized_;
 }
 
 scoped_refptr<RTCDataChannel> RTCPeerConnectionImpl::CreateDataChannel(
@@ -606,6 +620,12 @@ void RTCPeerConnectionImpl::RestartIce() {
 }
 
 void RTCPeerConnectionImpl::Close() {
+  webrtc::MutexLock cs(initialize_crt_sec_.get());
+  if (!initialized_) {
+    return;
+  }
+  initialized_ = false;
+
   RTC_LOG(LS_INFO) << __FUNCTION__;
   if (rtc_peerconnection_.get()) {
     rtc_peerconnection_ = nullptr;

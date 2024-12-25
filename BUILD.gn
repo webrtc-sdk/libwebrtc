@@ -69,6 +69,7 @@ rtc_shared_library("libwebrtc") {
     "include/base/refcountedobject.h",
     "include/base/scoped_ref_ptr.h",
     "include/libwebrtc.h",
+    "include/rtc_base_list.h",
     "include/rtc_audio_device.h",
     "include/rtc_audio_source.h",
     "include/rtc_audio_track.h",

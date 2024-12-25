@@ -172,6 +172,8 @@ class RTCPeerConnectionObserver {
 
 class RTCPeerConnection : public RefCountInterface {
  public:
+  virtual bool IsInitialized() const = 0;
+
   virtual int AddStream(scoped_refptr<RTCMediaStream> stream) = 0;
 
   virtual int RemoveStream(scoped_refptr<RTCMediaStream> stream) = 0;

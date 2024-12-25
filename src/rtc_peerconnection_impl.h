@@ -35,6 +35,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
                               public webrtc::PeerConnectionObserver {
  public:
   virtual bool Initialize();
+  virtual bool IsInitialized() const override;
 
   virtual void CreateOffer(
       OnSdpCreateSuccess success, OnSdpCreateFailure failure,
@@ -191,7 +192,9 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   webrtc::PeerConnectionInterface::RTCOfferAnswerOptions offer_answer_options_;
   RTCPeerConnectionObserver* observer_ = nullptr;
   std::unique_ptr<webrtc::Mutex> callback_crt_sec_;
+  std::unique_ptr<webrtc::Mutex> initialize_crt_sec_;
   bool initialize_offer_sent = false;
+  bool initialized_ = false;
   std::vector<scoped_refptr<RTCMediaStream>> local_streams_;
   std::vector<scoped_refptr<RTCMediaStream>> remote_streams_;
   scoped_refptr<RTCDataChannel> data_channel_;
