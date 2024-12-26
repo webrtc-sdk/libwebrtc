@@ -80,6 +80,7 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_sdp_parse_error.h",
     "include/rtc_ice_candidate.h",
     "include/rtc_media_stream.h",
+    "include/rtc_media_stream_list.h",
     "include/rtc_media_track.h",
     "include/rtc_mediaconstraints.h",
     "include/rtc_peerconnection.h",
@@ -124,6 +125,8 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_ice_candidate_impl.h",
     "src/rtc_media_stream_impl.cc",
     "src/rtc_media_stream_impl.h",
+    "src/rtc_media_stream_list_impl.cc",
+    "src/rtc_media_stream_list_impl.h",
     "src/rtc_mediaconstraints_impl.cc",
     "src/rtc_mediaconstraints_impl.h",
     "src/rtc_peerconnection_factory_impl.cc",
@@ -175,6 +178,7 @@ rtc_shared_library("libwebrtc") {
       "src/interop/rtc_data_channel_interop.cc",
       "src/interop/rtc_ice_candidate_interop.cc",
       "src/interop/rtc_media_stream_interop.cc",
+      "src/interop/rtc_media_stream_list_interop.cc",
       "src/interop/rtc_peerconnection_interop.cc",
     ]
 

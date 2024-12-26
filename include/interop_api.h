@@ -413,6 +413,9 @@ using rtcDesktopMediaListHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCMediaStream interop object.
 using rtcMediaStreamHandle = rtcRefCountedObjectHandle;
 
+/// Opaque handle to a native RTCMediaStreamList interop object.
+using rtcMediaStreamListHandle = rtcRefCountedObjectHandle;
+
 /// Opaque handle to a native RTCMediaTrack interop object.
 using rtcMediaTrackHandle = rtcRefCountedObjectHandle;
 
@@ -1725,6 +1728,37 @@ RTCMediaStream_GetId (
     rtcMediaStreamHandle mediaStream,
     char* value,
     int sz_value
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCMediaStreamList interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Returns the number of MediaStreams.
+ * 
+ * @param mediaStreamList - Media stream list handle
+ * @return int - The number of streams
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCMediaStreamList_GetCount (
+    rtcMediaStreamListHandle mediaStreamList
+) noexcept;
+
+/**
+ * Returns the media stream whose index is specified.
+ * 
+ * @param mediaStreamList - Media stream list handle
+ * @param index - Media stream index
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCMediaStreamList_GetItem (
+    rtcMediaStreamListHandle mediaStreamList,
+    int index,
+    rtcMediaStreamHandle* pOutRetVal
 ) noexcept;
 
 }  // extern "C"
