@@ -86,6 +86,7 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_peerconnection.h",
     "include/rtc_peerconnection_factory.h",
     "include/rtc_rtp_capabilities.h",
+    "include/rtc_rtp_capabilities_lists.h",
     "include/rtc_rtp_parameters.h",
     "include/rtc_rtp_receiver.h",
     "include/rtc_rtp_sender.h",
@@ -135,6 +136,8 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_peerconnection_impl.h",
     "src/rtc_rtp_capabilities_impl.cc",
     "src/rtc_rtp_capabilities_impl.h",
+    "src/rtc_rtp_capabilities_lists_impl.cc",
+    "src/rtc_rtp_capabilities_lists_impl.h",
     "src/rtc_rtp_parameters_impl.cc",
     "src/rtc_rtp_parameters_impl.h",
     "src/rtc_rtp_receiver_impl.cc",
@@ -179,6 +182,8 @@ rtc_shared_library("libwebrtc") {
       "src/interop/rtc_ice_candidate_interop.cc",
       "src/interop/rtc_media_stream_interop.cc",
       "src/interop/rtc_media_stream_list_interop.cc",
+      "src/interop/rtc_rtp_capabilities_interop.cc",
+      "src/interop/rtc_rtp_transceiver_interop.cc",
       "src/interop/rtc_peerconnection_interop.cc",
     ]
 

@@ -7,7 +7,7 @@ namespace libwebrtc {
 
 class RTCSdpParseError : public RefCountInterface {
  public:
-  static LIB_WEBRTC_API scoped_refptr<RTCSdpParseError> Create();
+  LIB_WEBRTC_API static scoped_refptr<RTCSdpParseError> Create();
 
  public:
   // The sdp line that causes the error.

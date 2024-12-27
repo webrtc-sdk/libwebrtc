@@ -27,7 +27,18 @@ class RTCBaseList : public RefCountInterface {
     }
   }
 
-  vector<T> to_vector() const { return vector<T>(m_items, m_count); }
+  vector<T> to_vector() const { 
+    if (m_count == 0) {
+      return vector<T>();
+    }
+    else {
+      T* items = new T[m_count];
+      for (size_t i = 0; i < m_count; ++i) {
+        items[i] = m_items[i];
+      } 
+      return vector<T>(items, m_count);
+    }
+  }
 
   ~RTCBaseList() { destroy_all(); }
 

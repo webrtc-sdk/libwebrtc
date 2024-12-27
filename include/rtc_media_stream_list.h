@@ -9,14 +9,14 @@ namespace libwebrtc {
 
 class RTCMediaStreamList : public RTCBaseList<scoped_refptr<RTCMediaStream>> {
  public:
-  static LIB_WEBRTC_API scoped_refptr<RTCMediaStreamList> Create(
+  LIB_WEBRTC_API static scoped_refptr<RTCMediaStreamList> Create(
     const vector<scoped_refptr<RTCMediaStream>>& source);
 
  protected:
   RTCMediaStreamList(const vector<scoped_refptr<RTCMediaStream>>& source)
     : RTCBaseList<scoped_refptr<RTCMediaStream>>(source)
   {}
-  
+
   ~RTCMediaStreamList() {}
 };
 
