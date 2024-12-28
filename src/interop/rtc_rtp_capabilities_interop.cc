@@ -1,5 +1,4 @@
 #include "rtc_rtp_capabilities.h"
-#include "rtc_rtp_capabilities_lists.h"
 #include "interop_api.h"
 
 using namespace libwebrtc;
@@ -176,9 +175,12 @@ RTCRtpCodecCapabilityList_GetItem (
 {
     CHECK_OUT_POINTER(pOutRetVal);
     CHECK_NATIVE_HANDLE(handle);
+    if (index < 0) {
+        return rtcResultU4::kOutOfRange;
+    }
     
     scoped_refptr<RTCRtpCodecCapabilityList> pList = static_cast<RTCRtpCodecCapabilityList*>(handle);
-    if (index < 0 || static_cast<size_t>(index) >= pList->count()) {
+    if (static_cast<size_t>(index) >= pList->count()) {
         return rtcResultU4::kOutOfRange;
     }
     scoped_refptr<RTCRtpCodecCapability> pItem = pList->item(static_cast<size_t>(index));
@@ -309,10 +311,13 @@ RTCRtpHeaderExtensionCapabilityList_GetItem (
 {
     CHECK_OUT_POINTER(pOutRetVal);
     CHECK_NATIVE_HANDLE(handle);
+    if (index < 0) {
+        return rtcResultU4::kOutOfRange;
+    }
 
     scoped_refptr<RTCRtpHeaderExtensionCapabilityList> pList =
         static_cast<RTCRtpHeaderExtensionCapabilityList*>(handle);
-    if (index < 0 || static_cast<size_t>(index) >= pList->count()) {
+    if (static_cast<size_t>(index) >= pList->count()) {
         return rtcResultU4::kOutOfRange;
     }
     scoped_refptr<RTCRtpHeaderExtensionCapability> pItem = pList->item(static_cast<size_t>(index));

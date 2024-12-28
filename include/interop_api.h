@@ -1972,6 +1972,28 @@ RTCRtpCapabilities_SetHeaderExtensions(
     rtcRtpHeaderExtensionCapabilityListHandle hHeaderExtensions
 ) noexcept;
 
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpTransceiverInit interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Creates a new instance of the RTCRtpTransceiverInit object.
+ * 
+ * @param pOutRetVal - Object handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+/*
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiverInit_Create(
+    rtcRtpTransceiverDirection direction,
+    const char** stream_ids,
+    rtcRtpEncodingParametersHandle hEncodings,
+    rtcRtpTransceiverInitHandle* pOutRetVal
+) noexcept;
+*/
+
 }  // extern "C"
 
 #endif  // LIB_WEBRTC_INTROP_API_HXX
