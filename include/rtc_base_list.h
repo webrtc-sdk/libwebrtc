@@ -5,7 +5,30 @@
 
 namespace libwebrtc {
 
-template <class T>
+template <typename TKey, typename TVal>
+class RTCBasePair : public RefCountInterface {
+ private:
+  TKey key_;
+  TVal value_;
+
+ public:
+  RTCBasePair() : key_{}, value_{} {}
+
+  RTCBasePair(const TKey key, const TVal value) : key_(key), value_(value) {}
+
+  RTCBasePair(const std::pair<TKey, TVal> pair)
+      : key_(pair.first), value_(pair.second) {}
+
+  ~RTCBasePair() {}
+
+  TKey& key() { return key_; }
+  const TKey& key() const { return key_; }
+
+  TVal& value() { return value_; }
+  const TVal& value() const { return value_; }
+}; // end class RTCBasePair
+
+template <typename T>
 class RTCBaseList : public RefCountInterface {
  protected:
   using raw_type = typename std::aligned_storage<sizeof(T), alignof(T)>::type;

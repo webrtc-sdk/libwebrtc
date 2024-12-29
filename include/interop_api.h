@@ -272,6 +272,11 @@ enum class rtcResultU4 : unsigned int {
   kInvalidPointer = 0x80004003,
 };  // end enum class rtcResultU4
 
+struct rtcStringPair {
+  const char* key = nullptr;
+  const char* value = nullptr;
+}; // end struct rtcStringPair
+
 struct rtcIceServer {
   const char* uri = nullptr;
   const char* username = nullptr;
@@ -477,6 +482,12 @@ using rtcRtpFecParametersHandle = rtcRefCountedObjectHandle;
 
 /// Opaque handle to a native RTCRtpCodecParameters interop object.
 using rtcRtpCodecParametersHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpCodecParametersPair interop object.
+using rtcRtpCodecParametersPairHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpCodecParametersMap interop object.
+using rtcRtpCodecParametersMapHandle = rtcRefCountedObjectHandle;
 
 /// Opaque handle to a native RTCRtpCodecParametersList interop object.
 using rtcRtpCodecParametersListHandle = rtcRefCountedObjectHandle;
@@ -2158,6 +2169,86 @@ RTCRtpExtensionList_GetItem (
     rtcRtpExtensionListHandle handle,
     int index,
     rtcRtpExtensionHandle* pOutRetVal
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpCodecParametersPair interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Creates a new pair instance.
+ * 
+ * @param pair - Single pair item
+ * @param pOutRetVal - The handle of the object to be returned.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParametersPair_Create(
+    const rtcStringPair* pair,
+    rtcRtpCodecParametersPairHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParametersPair_GetKey(
+    rtcRtpCodecParametersPairHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParametersPair_GetValue(
+    rtcRtpCodecParametersPairHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpCodecParametersMap interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Creates a new pair map.
+ * 
+ * @param pairs - Array
+ * @param length - Count of array
+ * @param pOutRetVal - The handle of the object to be returned.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParametersMap_Create(
+    const rtcStringPair* pairs,
+    int length,
+    rtcRtpCodecParametersPairHandle* pOutRetVal
+) noexcept;
+
+/**
+ * Returns the number of pairs.
+ * 
+ * @param handle - Map handle
+ * @return int - The number of pairs
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCRtpCodecParametersMap_GetCount (
+    rtcRtpCodecParametersMapHandle handle
+) noexcept;
+
+/**
+ * Returns the pair whose index is specified.
+ * 
+ * @param handle - Map handle
+ * @param index - Pair index
+ * @param pOutRetVal - Pair handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParametersMap_GetItem (
+    rtcRtpCodecParametersMapHandle handle,
+    int index,
+    rtcRtpCodecParametersPairHandle* pOutRetVal
 ) noexcept;
 
 /*

@@ -382,6 +382,65 @@ RTCRtpExtensionListImpl::~RTCRtpExtensionListImpl() {
   RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
 }
 
+scoped_refptr<RTCRtpCodecParametersPair> RTCRtpCodecParametersPair::Create(
+  const std::pair<string, string>& source) {
+  return new RefCountedObject<RTCRtpCodecParametersPairImpl>(source);
+}
+
+scoped_refptr<RTCRtpCodecParametersPair> RTCRtpCodecParametersPair::Create() {
+  return new RefCountedObject<RTCRtpCodecParametersPairImpl>();
+}
+
+RTCRtpCodecParametersPairImpl::RTCRtpCodecParametersPairImpl()
+  : RTCRtpCodecParametersPair() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpCodecParametersPairImpl::RTCRtpCodecParametersPairImpl(
+  const std::pair<string, string>& source)
+  : RTCRtpCodecParametersPair(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpCodecParametersPairImpl::~RTCRtpCodecParametersPairImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
+scoped_refptr<RTCRtpCodecParametersMap> RTCRtpCodecParametersMap::Create(
+  const vector<scoped_refptr<RTCRtpCodecParametersPair>>& source) {
+  return new RefCountedObject<RTCRtpCodecParametersMapImpl>(source);
+}
+
+scoped_refptr<RTCRtpCodecParametersMap> RTCRtpCodecParametersMap::Create() {
+  return new RefCountedObject<RTCRtpCodecParametersMapImpl>();
+}
+
+RTCRtpCodecParametersMapImpl::RTCRtpCodecParametersMapImpl()
+  : RTCRtpCodecParametersMap() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpCodecParametersMapImpl::RTCRtpCodecParametersMapImpl(
+  const vector<scoped_refptr<RTCRtpCodecParametersPair>>& source)
+  : RTCRtpCodecParametersMap(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpCodecParametersMapImpl::~RTCRtpCodecParametersMapImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
+vector<std::pair<string, string>> RTCRtpCodecParametersMapImpl::to_parameters() {
+  std::vector<std::pair<string, string>> parameters;
+  size_t nCount = count();
+  parameters.reserve(nCount);
+  for (size_t i = 0; i < nCount; i++) {
+      scoped_refptr<RTCRtpCodecParametersPair> ipPair = item(i);
+      parameters.push_back(std::pair<string, string>(ipPair->key(), ipPair->value()));
+  }
+  return parameters;
+}
+
 RTCRtpCodecParametersImpl::RTCRtpCodecParametersImpl(
     webrtc::RtpCodecParameters rtp_codec_parameters)
     : rtp_codec_parameters_(rtp_codec_parameters) {}
@@ -481,6 +540,15 @@ void RTCRtpCodecParametersImpl::set_parameters(
     const map<string, string> parameters_in) {
   std::map<std::string, std::string> parameters;
   for (auto item : parameters_in) {
+    parameters[to_std_string(item.first)] = to_std_string(item.second);
+  }
+  rtp_codec_parameters_.parameters = parameters;
+}
+
+void RTCRtpCodecParametersImpl::set_parameters(
+    const vector<std::pair<string, string>> parameters_in) {
+  std::map<std::string, std::string> parameters;
+  for (auto item : parameters_in.std_vector()) {
     parameters[to_std_string(item.first)] = to_std_string(item.second);
   }
   rtp_codec_parameters_.parameters = parameters;

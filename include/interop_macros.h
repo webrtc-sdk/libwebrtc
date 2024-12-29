@@ -93,7 +93,7 @@
                               list_type_name, item_type_name)                 \
   CHECK_OUT_POINTER(out_val);                                                 \
   CHECK_NATIVE_HANDLE(handle);                                                \
-  if (static_cast<int>(index) < 1) {                                          \
+  if (static_cast<int>(index) < 0) {                                          \
     return rtcResultU4::kOutOfRange;                                          \
   }                                                                           \
   scoped_refptr<list_type_name> pList = static_cast<list_type_name*>(handle); \

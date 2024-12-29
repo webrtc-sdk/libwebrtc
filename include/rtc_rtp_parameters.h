@@ -133,6 +133,53 @@ class RTCRtpRtxParameters : public RefCountInterface {
   virtual bool operator!=(scoped_refptr<RTCRtpRtxParameters> o) const = 0;
 };
 
+/**
+ * class RTCRtpCodecParametersPair
+ */
+class RTCRtpCodecParametersPair : public RTCBasePair<string, string> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpCodecParametersPair> Create(
+    const std::pair<string, string>& source);
+
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpCodecParametersPair> Create();
+
+ protected:
+  RTCRtpCodecParametersPair()
+   : RTCBasePair<string, string>()
+  {}
+
+  RTCRtpCodecParametersPair(const std::pair<string, string>& source)
+   : RTCBasePair<string, string>(source)
+   {}
+
+  ~RTCRtpCodecParametersPair() {}
+};
+
+/**
+ * class RTCRtpCodecParametersMap
+ */
+class RTCRtpCodecParametersMap : public RTCBaseList<scoped_refptr<RTCRtpCodecParametersPair>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpCodecParametersMap> Create(
+    const vector<scoped_refptr<RTCRtpCodecParametersPair>>& source);
+  
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpCodecParametersMap> Create();
+
+ protected:
+  RTCRtpCodecParametersMap()
+    : RTCBaseList<scoped_refptr<RTCRtpCodecParametersPair>>()
+  {}
+
+  RTCRtpCodecParametersMap(const vector<scoped_refptr<RTCRtpCodecParametersPair>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtpCodecParametersPair>>(source)
+  {}
+
+  ~RTCRtpCodecParametersMap() {}
+
+ public:
+  virtual vector<std::pair<string, string>> to_parameters() = 0;
+};
+
 class RTCRtpCodecParameters : public RefCountInterface {
  public:
   virtual const string mime_type() const = 0;
@@ -164,6 +211,7 @@ class RTCRtpCodecParameters : public RefCountInterface {
 
   virtual const vector<std::pair<string, string>> parameters() = 0;
   virtual void set_parameters(const map<string, string> parameters) = 0;
+  virtual void set_parameters(const vector<std::pair<string, string>> parameters) = 0;
 
   virtual bool operator==(scoped_refptr<RTCRtpCodecParameters> o) = 0;
   virtual bool operator!=(scoped_refptr<RTCRtpCodecParameters> o) = 0;

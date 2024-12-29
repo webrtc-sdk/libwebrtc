@@ -166,6 +166,106 @@ RTCRtpExtensionList_GetItem (
 
 /*
  * ----------------------------------------------------------------------
+ * RTCRtpCodecParametersPair interop methods
+ * ----------------------------------------------------------------------
+ */
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParametersPair_Create(
+    const rtcStringPair* pair,
+    rtcRtpCodecParametersPairHandle* pOutRetVal
+) noexcept
+{
+    CHECK_OUT_POINTER(pOutRetVal);
+
+    scoped_refptr<RTCRtpCodecParametersPair> p;
+    if (pair) {
+        p = RTCRtpCodecParametersPair::Create(
+            std::pair<string, string>(string(pair->key), string(pair->value))
+        );
+    }
+    else {
+        p = RTCRtpCodecParametersPair::Create();
+    }
+    *pOutRetVal = static_cast<rtcRtpCodecParametersPairHandle>(p.release());
+    return rtcResultU4::kSuccess;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParametersPair_GetKey(
+    rtcRtpCodecParametersPairHandle handle,
+    char* value,
+    int sz_value
+) noexcept
+{
+    DECLARE_GET_STRING(handle, value, sz_value, RTCRtpCodecParametersPair, key);
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParametersPair_GetValue(
+    rtcRtpCodecParametersPairHandle handle,
+    char* value,
+    int sz_value
+) noexcept
+{
+    DECLARE_GET_STRING(handle, value, sz_value, RTCRtpCodecParametersPair, value);
+}
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpCodecParametersMap interop methods
+ * ----------------------------------------------------------------------
+ */
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParametersMap_Create(
+    const rtcStringPair* pairs,
+    int length,
+    rtcRtpCodecParametersPairHandle* pOutRetVal
+) noexcept
+{
+    CHECK_OUT_POINTER(pOutRetVal);
+    if (length > 0) {
+        CHECK_POINTER_EX(pairs, rtcResultU4::kInvalidParameter);
+    }
+
+    scoped_refptr<RTCRtpCodecParametersMap> pMap;
+    std::vector<scoped_refptr<RTCRtpCodecParametersPair>> items;
+    if (length > 0) {
+        for (int i = 0; i < length; i++) {
+            items.push_back(
+                RTCRtpCodecParametersPair::Create(std::pair<string, string>(
+                    string(pairs[i].key),
+                    string(pairs[i].value)
+                ))
+            );
+        }
+    }
+    pMap = RTCRtpCodecParametersMap::Create(items);
+    *pOutRetVal = static_cast<rtcRtpCodecParametersPairHandle>(pMap.release());
+    return rtcResultU4::kSuccess;
+}
+
+int LIB_WEBRTC_CALL
+RTCRtpCodecParametersMap_GetCount (
+    rtcRtpCodecParametersMapHandle handle
+) noexcept
+{
+    DECLARE_LIST_GET_COUNT(handle, RTCRtpCodecParametersMap);
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParametersMap_GetItem (
+    rtcRtpCodecParametersMapHandle handle,
+    int index,
+    rtcRtpCodecParametersPairHandle* pOutRetVal
+) noexcept
+{
+    DECLARE_LIST_GET_ITEM(handle, index, pOutRetVal, rtcRtpCodecParametersPairHandle, RTCRtpCodecParametersMap, RTCRtpCodecParametersPair);
+}
+
+/*
+ * ----------------------------------------------------------------------
  * RTCRtpCodecParameters interop methods
  * ----------------------------------------------------------------------
  */
@@ -328,7 +428,7 @@ RTCRtpCodecParameters_SetRtcpFeedBacks (
 rtcResultU4 LIB_WEBRTC_CALL
 RTCRtpCodecParameters_GetParameters (
     rtcRtpCodecParametersHandle handle,
-    rtcObjectHandle* pOutRetVal
+    rtcRtpCodecParametersMapHandle* pOutRetVal
 ) noexcept
 {
     return rtcResultU4::kInvalidOperation;
@@ -337,7 +437,7 @@ RTCRtpCodecParameters_GetParameters (
 rtcResultU4 LIB_WEBRTC_CALL
 RTCRtpCodecParameters_SetParameters (
     rtcRtpCodecParametersHandle handle,
-    rtcObjectHandle value
+    rtcRtpCodecParametersMapHandle value
 ) noexcept
 {
     return rtcResultU4::kInvalidOperation;

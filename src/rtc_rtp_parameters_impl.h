@@ -32,6 +32,28 @@ class RTCRtcpFeedbackListImpl : public RTCRtcpFeedbackList {
   ~RTCRtcpFeedbackListImpl();
 };
 
+/**
+ * class RTCRtpCodecParametersPairImpl
+ */
+class RTCRtpCodecParametersPairImpl : public RTCRtpCodecParametersPair {
+ public:
+  RTCRtpCodecParametersPairImpl();
+  RTCRtpCodecParametersPairImpl(const std::pair<string, string>& source);
+  ~RTCRtpCodecParametersPairImpl();
+};
+
+/**
+ * class RTCRtpCodecParametersMapImpl
+ */
+class RTCRtpCodecParametersMapImpl : public RTCRtpCodecParametersMap {
+ public:
+  RTCRtpCodecParametersMapImpl();
+  RTCRtpCodecParametersMapImpl(const vector<scoped_refptr<RTCRtpCodecParametersPair>>& source);
+  ~RTCRtpCodecParametersMapImpl();
+
+  virtual vector<std::pair<string, string>> to_parameters() override;
+};
+
 class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
  public:
   RTCRtpCodecParametersImpl(webrtc::RtpCodecParameters rtp_codec_parameters);
@@ -54,7 +76,8 @@ class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
   virtual void set_rtcp_feedback(
       vector<scoped_refptr<RTCRtcpFeedback>> rtcp_feedbacks) override;
   virtual const vector<std::pair<string, string>> parameters() override;
-  virtual void set_parameters(map<string, string> parameters) override;
+  virtual void set_parameters(const map<string, string> parameters) override;
+  virtual void set_parameters(const vector<std::pair<string, string>> parameters) override;
   virtual bool operator==(scoped_refptr<RTCRtpCodecParameters> o) override;
   virtual bool operator!=(scoped_refptr<RTCRtpCodecParameters> o) override;
 
