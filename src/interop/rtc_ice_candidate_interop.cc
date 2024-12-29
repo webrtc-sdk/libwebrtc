@@ -38,18 +38,7 @@ RTCIceCandidate_GetCandidate(
     int sz_value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(iceCandidate);
-    ZERO_MEMORY(value, sz_value);
-    if (sz_value < 1) {
-        return rtcResultU4::kBufferTooSmall;
-    }
-
-    scoped_refptr<RTCIceCandidate> pIceCandidate = static_cast<RTCIceCandidate*>(iceCandidate);
-    string strValue = pIceCandidate->candidate();
-    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
-    return strValue.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(iceCandidate, value, sz_value, RTCIceCandidate, candidate);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -59,18 +48,7 @@ RTCIceCandidate_GetSdpMid(
     int sz_value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(iceCandidate);
-    ZERO_MEMORY(value, sz_value);
-    if (sz_value < 1) {
-        return rtcResultU4::kBufferTooSmall;
-    }
-
-    scoped_refptr<RTCIceCandidate> pIceCandidate = static_cast<RTCIceCandidate*>(iceCandidate);
-    string strValue = pIceCandidate->sdp_mid();
-    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
-    return strValue.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(iceCandidate, value, sz_value, RTCIceCandidate, sdp_mid);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -79,11 +57,5 @@ RTCIceCandidate_GetSdpMlineIndex(
     int* pOutRetVal
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(iceCandidate);
-    CHECK_POINTER(pOutRetVal);
-    *pOutRetVal = -1;
-
-    scoped_refptr<RTCIceCandidate> pIceCandidate = static_cast<RTCIceCandidate*>(iceCandidate);
-    *pOutRetVal = pIceCandidate->sdp_mline_index();
-    return rtcResultU4::kSuccess;
+    DECLARE_GET_VALUE(iceCandidate, pOutRetVal, int, RTCIceCandidate, sdp_mline_index);
 }

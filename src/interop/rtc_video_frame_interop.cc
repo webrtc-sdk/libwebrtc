@@ -140,13 +140,7 @@ RTCVideoFrame_GetRotation(
     rtcVideoRotation* pOutRetVal
 ) noexcept
 {
-    CHECK_POINTER(pOutRetVal);
-    *pOutRetVal = rtcVideoRotation::kVideoRotation_0;
-    CHECK_NATIVE_HANDLE(videoFrame);
-
-    scoped_refptr<RTCVideoFrame> pvf = static_cast<RTCVideoFrame*>(videoFrame);
-    *pOutRetVal = static_cast<rtcVideoRotation>(pvf->rotation());
-    return rtcResultU4::kSuccess;
+    DECLARE_GET_VALUE(videoFrame, pOutRetVal, rtcVideoRotation, RTCVideoFrame, rotation);
 }
 
 rtcTimestamp LIB_WEBRTC_CALL
@@ -167,11 +161,7 @@ RTCVideoFrame_SetTimestampInMicroseconds(
     rtcTimestamp timestampInMicroseconds
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(videoFrame);
-
-    scoped_refptr<RTCVideoFrame> pvf = static_cast<RTCVideoFrame*>(videoFrame);
-    pvf->set_timestamp_us(static_cast<int64_t>(timestampInMicroseconds));
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_VALUE(videoFrame, timestampInMicroseconds, int64_t, RTCVideoFrame, set_timestamp_us);
 }
 
 int LIB_WEBRTC_CALL

@@ -10,29 +10,7 @@
 #endif
 
 #include "rtc_types.h"
-
-#define CHECK_POINTER_EX(p, r) \
-  if ((p) == nullptr) {        \
-    return (r);                \
-  }
-#define CHECK_POINTER(p) CHECK_POINTER_EX(p, rtcResultU4::kInvalidPointer)
-#define RESET_OUT_POINTER_EX(p, v) \
-  if ((p) != nullptr) {            \
-    *(p) = (v);                    \
-  }
-#define RESET_OUT_POINTER(p) RESET_OUT_POINTER_EX(p, nullptr)
-#define CHECK_OUT_POINTER(p)             \
-  if ((p) != nullptr) {                  \
-    *(p) = nullptr;                      \
-  } else {                               \
-    return rtcResultU4::kInvalidPointer; \
-  }
-#define CHECK_NATIVE_HANDLE(h) \
-  CHECK_POINTER_EX(h, rtcResultU4::kInvalidNativeHandle)
-#define ZERO_MEMORY(p, sz)               \
-  if (static_cast<void*>(p) && static_cast<int>(sz) > 0) {     \
-    memset(static_cast<void*>(p), 0, static_cast<size_t>(sz)); \
-  }
+#include "interop_macros.h"
 
 extern "C" {
 
@@ -51,7 +29,7 @@ using rtcDesktopType = libwebrtc::DesktopType;
 using rtcTimestamp = long long;
 
 /// 32-bit boolean for interop API.
-enum class rtcBool32 : int { kTrue = -1, kFalse = 0 };
+enum class rtcBool32 : int { kFalse = 0, kTrue = 1 };
 
 enum class rtcKeyRingSize : int { kMin = 1, kDefault = 16, kMax = 256 };
 
@@ -485,8 +463,14 @@ using rtcRtpCapabilitiesHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCRtcpFeedback interop object.
 using rtcRtcpFeedbackHandle = rtcRefCountedObjectHandle;
 
+/// Opaque handle to a native RTCRtcpFeedbackList interop object.
+using rtcRtcpFeedbackListHandle = rtcRefCountedObjectHandle;
+
 /// Opaque handle to a native RTCRtpExtension interop object.
 using rtcRtpExtensionHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpExtensionList interop object.
+using rtcRtpExtensionListHandle = rtcRefCountedObjectHandle;
 
 /// Opaque handle to a native RtpFecParameters interop object.
 using rtcRtpFecParametersHandle = rtcRefCountedObjectHandle;
@@ -494,11 +478,20 @@ using rtcRtpFecParametersHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCRtpCodecParameters interop object.
 using rtcRtpCodecParametersHandle = rtcRefCountedObjectHandle;
 
+/// Opaque handle to a native RTCRtpCodecParametersList interop object.
+using rtcRtpCodecParametersListHandle = rtcRefCountedObjectHandle;
+
 /// Opaque handle to a native RTCRtcpParameters interop object.
 using rtcRtcpParametersHandle = rtcRefCountedObjectHandle;
 
+/// Opaque handle to a native RTCRtcpParametersList interop object.
+using rtcRtcpParametersListHandle = rtcRefCountedObjectHandle;
+
 /// Opaque handle to a native RTCRtpEncodingParameters interop object.
 using rtcRtpEncodingParametersHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpEncodingParametersList interop object.
+using rtcRtpEncodingParametersListHandle = rtcRefCountedObjectHandle;
 
 /// Opaque handle to a native RTCRtpParameters interop object.
 using rtcRtpParametersHandle = rtcRefCountedObjectHandle;
@@ -1970,6 +1963,718 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCRtpCapabilities_SetHeaderExtensions(
     rtcRtpCapabilitiesHandle handle,
     rtcRtpHeaderExtensionCapabilityListHandle hHeaderExtensions
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtcpFeedback interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Returns the RtcpFeedback type.
+ * 
+ * @param handle - Object handle
+ * @param pOutRetVal - The value to return.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpFeedback_GetType(
+    rtcRtcpFeedbackHandle handle,
+    rtcRtcpFeedbackType* pOutRetVal
+) noexcept;
+
+/**
+ * Sets the RtcpFeedback type.
+ * 
+ * @param handle - Object handle
+ * @param value - The new value to set.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpFeedback_SetType(
+    rtcRtcpFeedbackHandle handle,
+    rtcRtcpFeedbackType value
+) noexcept;
+
+/**
+ * Returns the RtcpFeedback message type.
+ * 
+ * @param handle - Object handle
+ * @param pOutRetVal - The value to return.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpFeedback_GetMessageType(
+    rtcRtcpFeedbackHandle handle,
+    rtcRtcpFeedbackMessageType* pOutRetVal
+) noexcept;
+
+/**
+ * Sets the RtcpFeedback message type.
+ * 
+ * @param handle - Object handle
+ * @param value - The new value to set.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpFeedback_SetMessageType(
+    rtcRtcpFeedbackHandle handle,
+    rtcRtcpFeedbackMessageType value
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtcpFeedbackList interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Returns the number of RTCRtcpFeedbackList.
+ * 
+ * @param handle - List handle
+ * @return int - The number of items
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCRtcpFeedbackList_GetCount (
+    rtcRtcpFeedbackListHandle handle
+) noexcept;
+
+/**
+ * Returns the Rtcp Feedback capability whose index is specified.
+ * 
+ * @param handle - List handle
+ * @param index - Item index
+ * @param pOutRetVal - Item handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpFeedbackList_GetItem (
+    rtcRtcpFeedbackListHandle handle,
+    int index,
+    rtcRtcpFeedbackHandle* pOutRetVal
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpExtension interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Returns the text value for RtpExtension.
+ * 
+ * @param handle - Object handle
+ * @param value - Return string buffer address
+ * @param sz_value - Size of value
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpExtension_ToString (
+    rtcRtpExtensionHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+/**
+ * Returns the uri for RtpExtension.
+ * 
+ * @param handle - Object handle
+ * @param value - Return string buffer address
+ * @param sz_value - Size of value
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpExtension_GetUri (
+    rtcRtpExtensionHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+/**
+ * Sets the RtpExtension uri value.
+ * 
+ * @param handle - Object handle
+ * @param value - The new value to set.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpExtension_SetUri (
+    rtcRtpExtensionHandle handle,
+    const char* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpExtension_GetId (
+    rtcRtpExtensionHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpExtension_SetId (
+    rtcRtpExtensionHandle handle,
+    int value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpExtension_GetEncrypt (
+    rtcRtpExtensionHandle handle,
+    rtcBool32* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpExtension_SetEncrypt (
+    rtcRtpExtensionHandle handle,
+    rtcBool32 value
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpExtensionList interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Returns the number of RTCRtpExtensionList.
+ * 
+ * @param handle - List handle
+ * @return int - The number of items
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCRtpExtensionList_GetCount (
+    rtcRtpExtensionListHandle handle
+) noexcept;
+
+/**
+ * Returns the rtp extension whose index is specified.
+ * 
+ * @param handle - List handle
+ * @param index - Item index
+ * @param pOutRetVal - Item handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpExtensionList_GetItem (
+    rtcRtpExtensionListHandle handle,
+    int index,
+    rtcRtpExtensionHandle* pOutRetVal
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpCodecParameters interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_GetMimeType (
+    rtcRtpCodecParametersHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_GetName (
+    rtcRtpCodecParametersHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_SetName (
+    rtcRtpCodecParametersHandle handle,
+    const char* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_GetKind (
+    rtcRtpCodecParametersHandle handle,
+    rtcMediaType* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_SetKind (
+    rtcRtpCodecParametersHandle handle,
+    rtcMediaType value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_GetPayloadType (
+    rtcRtpCodecParametersHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_SetPayloadType (
+    rtcRtpCodecParametersHandle handle,
+    int value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_GetClockRate (
+    rtcRtpCodecParametersHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_SetClockRate (
+    rtcRtpCodecParametersHandle handle,
+    int value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_GetNumChannels (
+    rtcRtpCodecParametersHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_SetNumChannels (
+    rtcRtpCodecParametersHandle handle,
+    int value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_GetMaxPTime (
+    rtcRtpCodecParametersHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_SetMaxPTime (
+    rtcRtpCodecParametersHandle handle,
+    int value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_GetPTime (
+    rtcRtpCodecParametersHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_SetPTime (
+    rtcRtpCodecParametersHandle handle,
+    int value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_GetRtcpFeedBacks (
+    rtcRtpCodecParametersHandle handle,
+    rtcRtcpFeedbackListHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_SetRtcpFeedBacks (
+    rtcRtpCodecParametersHandle handle,
+    rtcRtcpFeedbackListHandle value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_GetParameters (
+    rtcRtpCodecParametersHandle handle,
+    rtcObjectHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParameters_SetParameters (
+    rtcRtpCodecParametersHandle handle,
+    rtcObjectHandle value
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpCodecParametersList interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Returns the number of RTCRtpCodecParametersList.
+ * 
+ * @param handle - List handle
+ * @return int - The number of items
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCRtpCodecParametersList_GetCount (
+    rtcRtpCodecParametersListHandle handle
+) noexcept;
+
+/**
+ * Returns the rtp codec parameters index is specified.
+ * 
+ * @param handle - List handle
+ * @param index - Item index
+ * @param pOutRetVal - Item handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecParametersList_GetItem (
+    rtcRtpCodecParametersListHandle handle,
+    int index,
+    rtcRtpCodecParametersHandle* pOutRetVal
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtcpParameters interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpParameters_GetSSRC (
+    rtcRtcpParametersHandle handle,
+    unsigned int* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpParameters_SetSSRC (
+    rtcRtcpParametersHandle handle,
+    unsigned int value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpParameters_GetCName (
+    rtcRtcpParametersHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpParameters_SetCName (
+    rtcRtcpParametersHandle handle,
+    const char* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpParameters_GetReducedSize (
+    rtcRtcpParametersHandle handle,
+    rtcBool32* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpParameters_SetReducedSize (
+    rtcRtcpParametersHandle handle,
+    rtcBool32 value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpParameters_GetMux (
+    rtcRtcpParametersHandle handle,
+    rtcBool32* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpParameters_SetMux (
+    rtcRtcpParametersHandle handle,
+    rtcBool32 value
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtcpParametersList interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Returns the number of RTCRtcpParametersList.
+ * 
+ * @param handle - List handle
+ * @return int - The number of items
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCRtcpParametersList_GetCount (
+    rtcRtcpParametersListHandle handle
+) noexcept;
+
+/**
+ * Returns the rtcp parameters index is specified.
+ * 
+ * @param handle - List handle
+ * @param index - Item index
+ * @param pOutRetVal - Item handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtcpParametersList_GetItem (
+    rtcRtcpParametersListHandle handle,
+    int index,
+    rtcRtcpParametersHandle* pOutRetVal
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpEncodingParameters interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetSSRC (
+    rtcRtpEncodingParametersHandle handle,
+    unsigned int* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetSSRC (
+    rtcRtpEncodingParametersHandle handle,
+    unsigned int value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetBitratePriority (
+    rtcRtpEncodingParametersHandle handle,
+    double* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetBitratePriority (
+    rtcRtpEncodingParametersHandle handle,
+    double value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetNetworkPriority (
+    rtcRtpEncodingParametersHandle handle,
+    rtcNetworkPriority* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetNetworkPriority (
+    rtcRtpEncodingParametersHandle handle,
+    rtcNetworkPriority value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetMaxBitrateBps (
+    rtcRtpEncodingParametersHandle handle,
+    int* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetMaxBitrateBps (
+    rtcRtpEncodingParametersHandle handle,
+    int value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetMinBitrateBps (
+    rtcRtpEncodingParametersHandle handle,
+    int* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetMinBitrateBps (
+    rtcRtpEncodingParametersHandle handle,
+    int value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetMaxFramerate (
+    rtcRtpEncodingParametersHandle handle,
+    double* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetMaxFramerate (
+    rtcRtpEncodingParametersHandle handle,
+    double value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetNumTemporalLayers (
+    rtcRtpEncodingParametersHandle handle,
+    int* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetNumTemporalLayers (
+    rtcRtpEncodingParametersHandle handle,
+    int value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetScaleResolutionDownBy (
+    rtcRtpEncodingParametersHandle handle,
+    double* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetScaleResolutionDownBy (
+    rtcRtpEncodingParametersHandle handle,
+    double value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetScalabilityMode (
+    rtcRtpEncodingParametersHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetScalabilityMode (
+    rtcRtpEncodingParametersHandle handle,
+    const char* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetActive (
+    rtcRtpEncodingParametersHandle handle,
+    rtcBool32* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetActive (
+    rtcRtpEncodingParametersHandle handle,
+    rtcBool32 value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetRid (
+    rtcRtpEncodingParametersHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetRid (
+    rtcRtpEncodingParametersHandle handle,
+    const char* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_GetAdaptivePTime(
+    rtcRtpEncodingParametersHandle handle,
+    rtcBool32* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_SetAdaptivePTime (
+    rtcRtpEncodingParametersHandle handle,
+    rtcBool32 value
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpEncodingParametersList interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Returns the number of RTCRtpEncodingParametersList.
+ * 
+ * @param handle - List handle
+ * @return int - The number of items
+ */
+LIB_WEBRTC_API int LIB_WEBRTC_CALL
+RTCRtpEncodingParametersList_GetCount (
+    rtcRtpEncodingParametersListHandle handle
+) noexcept;
+
+/**
+ * Returns the rtp encoding parameters index is specified.
+ * 
+ * @param handle - List handle
+ * @param index - Item index
+ * @param pOutRetVal - Item handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParametersList_GetItem (
+    rtcRtpEncodingParametersListHandle handle,
+    int index,
+    rtcRtpEncodingParametersHandle* pOutRetVal
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpParameters interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_GetTransactionId (
+    rtcRtpParametersHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_SetTransactionId (
+    rtcRtpParametersHandle handle,
+    const char* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_GetMid (
+    rtcRtpParametersHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_SetMid (
+    rtcRtpParametersHandle handle,
+    const char* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_GetCodecs (
+    rtcRtpParametersHandle handle,
+    rtcRtpCodecParametersListHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_SetCodecs (
+    rtcRtpParametersHandle handle,
+    rtcRtpCodecParametersListHandle value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_GetHeaderExtensions (
+    rtcRtpParametersHandle handle,
+    rtcRtpExtensionListHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_SetHeaderExtensions (
+    rtcRtpParametersHandle handle,
+    rtcRtpExtensionListHandle value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_GetEncodings (
+    rtcRtpParametersHandle handle,
+    rtcRtpEncodingParametersListHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_SetEncodings (
+    rtcRtpParametersHandle handle,
+    rtcRtpEncodingParametersListHandle value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_GetRtcpParameters (
+    rtcRtpParametersHandle handle,
+    rtcRtcpParametersHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_SetRtcpParameters (
+    rtcRtpParametersHandle handle,
+    rtcRtcpParametersHandle value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_GetDegradationPreference (
+    rtcRtpParametersHandle handle,
+    rtcDegradationPreference* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpParameters_SetDegradationPreference (
+    rtcRtpParametersHandle handle,
+    rtcDegradationPreference value
 ) noexcept;
 
 /*

@@ -77,19 +77,7 @@ RTCDataChannel_GetLabel(
     int label_size
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(dataChannel);
-    CHECK_POINTER(label);
-    ZERO_MEMORY(label, label_size);
-    if (label_size < 1) {
-        return rtcResultU4::kInvalidParameter;
-    }
-
-    scoped_refptr<RTCDataChannelImpl> pDataChannel = static_cast<RTCDataChannelImpl*>(dataChannel);
-    string strLabel = pDataChannel->label();
-    size_t len = strLabel.copy_to(label, static_cast<size_t>(label_size));
-    return strLabel.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(dataChannel, label, label_size, RTCDataChannel, label);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -98,13 +86,7 @@ RTCDataChannel_GetId(
     int* id
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(dataChannel);
-    CHECK_POINTER(id);
-    RESET_OUT_POINTER_EX(id, 0);
-
-    scoped_refptr<RTCDataChannelImpl> pDataChannel = static_cast<RTCDataChannelImpl*>(dataChannel);
-    *id = pDataChannel->id();
-    return rtcResultU4::kSuccess;
+    DECLARE_GET_VALUE(dataChannel, id, int, RTCDataChannel, id);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -113,11 +95,5 @@ RTCDataChannel_GetState(
     rtcDataChannelState* state
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(dataChannel);
-    CHECK_POINTER(state);
-    RESET_OUT_POINTER_EX(state, static_cast<rtcDataChannelState>(-1));
-
-    scoped_refptr<RTCDataChannelImpl> pDataChannel = static_cast<RTCDataChannelImpl*>(dataChannel);
-    *state = static_cast<rtcDataChannelState>(pDataChannel->state());
-    return rtcResultU4::kSuccess;
+    DECLARE_GET_VALUE(dataChannel, state, rtcDataChannelState, RTCDataChannel, state);
 }

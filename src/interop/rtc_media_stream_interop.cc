@@ -178,19 +178,7 @@ RTCMediaStream_GetLabel (
     int sz_value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(mediaStream);
-    ZERO_MEMORY(value, sz_value);
-    CHECK_POINTER(value);
-    if (sz_value < 1) {
-        return rtcResultU4::kBufferTooSmall;
-    }
-
-    scoped_refptr<RTCMediaStream> pMediaStream = static_cast<RTCMediaStream*>(mediaStream);
-    string strValue = pMediaStream->label();
-    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
-    return strValue.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(mediaStream, value, sz_value, RTCMediaStream, label);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -200,30 +188,15 @@ RTCMediaStream_GetId (
     int sz_value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(mediaStream);
-    ZERO_MEMORY(value, sz_value);
-    CHECK_POINTER(value);
-    if (sz_value < 1) {
-        return rtcResultU4::kBufferTooSmall;
-    }
-
-    scoped_refptr<RTCMediaStream> pMediaStream = static_cast<RTCMediaStream*>(mediaStream);
-    string strValue = pMediaStream->id();
-    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
-    return strValue.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(mediaStream, value, sz_value, RTCMediaStream, id);
 }
 
 int LIB_WEBRTC_CALL
 RTCMediaStreamList_GetCount (
-    rtcMediaStreamListHandle mediaStreamList
+    rtcMediaStreamListHandle handle
 ) noexcept
 {
-    CHECK_POINTER_EX(mediaStreamList, 0);
-
-    scoped_refptr<RTCMediaStreamList> pMediaStreamList = static_cast<RTCMediaStreamList*>(mediaStreamList);
-    return static_cast<int>(pMediaStreamList->count());
+    DECLARE_LIST_GET_COUNT(handle, RTCMediaStreamList);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -233,18 +206,5 @@ RTCMediaStreamList_GetItem (
     rtcMediaStreamHandle* pOutRetVal
 ) noexcept
 {
-    CHECK_OUT_POINTER(pOutRetVal);
-    RESET_OUT_POINTER(pOutRetVal);
-    CHECK_NATIVE_HANDLE(mediaStreamList);
-    if (index < 0) {
-        return rtcResultU4::kOutOfRange;
-    }
-
-    scoped_refptr<RTCMediaStreamList> pMediaStreamList = static_cast<RTCMediaStreamList*>(mediaStreamList);
-    scoped_refptr<RTCMediaStream> pMediaStream = pMediaStreamList->item(static_cast<size_t>(index));
-    if (pMediaStream == nullptr) {
-        return rtcResultU4::kUnknownError;
-    }
-    *pOutRetVal = static_cast<rtcMediaStreamHandle>(pMediaStream.release());
-    return rtcResultU4::kSuccess;
+    DECLARE_LIST_GET_ITEM(mediaStreamList, index, pOutRetVal, rtcMediaStreamHandle, RTCMediaStreamList, RTCMediaStream);
 }

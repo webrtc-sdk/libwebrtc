@@ -4,6 +4,7 @@
 #include "base/refcount.h"
 #include "base/scoped_ref_ptr.h"
 #include "rtc_types.h"
+#include "rtc_base_list.h"
 
 namespace libwebrtc {
 
@@ -48,6 +49,7 @@ enum class RTCDegradationPreference {
 };
 
 class RTCRtcpFeedback : public RefCountInterface {
+ public:
   virtual RTCRtcpFeedbackType type() = 0;
   virtual void set_type(RTCRtcpFeedbackType value) = 0;
 
@@ -56,6 +58,22 @@ class RTCRtcpFeedback : public RefCountInterface {
 
   virtual bool operator==(scoped_refptr<RTCRtcpFeedback> o) = 0;
   virtual bool operator!=(scoped_refptr<RTCRtcpFeedback> o) = 0;
+};
+
+/**
+ * class RTCRtcpFeedbackList
+ */
+class RTCRtcpFeedbackList : public RTCBaseList<scoped_refptr<RTCRtcpFeedback>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtcpFeedbackList> Create(
+    const vector<scoped_refptr<RTCRtcpFeedback>>& source);
+
+ protected:
+  RTCRtcpFeedbackList(const vector<scoped_refptr<RTCRtcpFeedback>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtcpFeedback>>(source)
+  {}
+
+  ~RTCRtcpFeedbackList() {}
 };
 
 class RTCRtpExtension : public RefCountInterface {
@@ -77,6 +95,22 @@ class RTCRtpExtension : public RefCountInterface {
 
   virtual bool encrypt() = 0;
   virtual void set_encrypt(bool value) = 0;
+};
+
+/**
+ * class RTCRtpExtensionList
+ */
+class RTCRtpExtensionList : public RTCBaseList<scoped_refptr<RTCRtpExtension>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpExtensionList> Create(
+    const vector<scoped_refptr<RTCRtpExtension>>& source);
+
+ protected:
+  RTCRtpExtensionList(const vector<scoped_refptr<RTCRtpExtension>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtpExtension>>(source)
+  {}
+
+  ~RTCRtpExtensionList() {}
 };
 
 class RtpFecParameters : public RefCountInterface {
@@ -138,6 +172,22 @@ class RTCRtpCodecParameters : public RefCountInterface {
   virtual ~RTCRtpCodecParameters() {}
 };
 
+/**
+ * class RTCRtpCodecParametersList
+ */
+class RTCRtpCodecParametersList : public RTCBaseList<scoped_refptr<RTCRtpCodecParameters>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpCodecParametersList> Create(
+    const vector<scoped_refptr<RTCRtpCodecParameters>>& source);
+
+ protected:
+  RTCRtpCodecParametersList(const vector<scoped_refptr<RTCRtpCodecParameters>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtpCodecParameters>>(source)
+  {}
+
+  ~RTCRtpCodecParametersList() {}
+};
+
 class RTCRtcpParameters : public RefCountInterface {
  public:
   virtual uint32_t ssrc() = 0;
@@ -154,6 +204,22 @@ class RTCRtcpParameters : public RefCountInterface {
 
   virtual bool operator==(scoped_refptr<RTCRtcpParameters> o) const = 0;
   virtual bool operator!=(scoped_refptr<RTCRtcpParameters> o) const = 0;
+};
+
+/**
+ * class RTCRtcpParametersList
+ */
+class RTCRtcpParametersList : public RTCBaseList<scoped_refptr<RTCRtcpParameters>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtcpParametersList> Create(
+    const vector<scoped_refptr<RTCRtcpParameters>>& source);
+
+ protected:
+  RTCRtcpParametersList(const vector<scoped_refptr<RTCRtcpParameters>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtcpParameters>>(source)
+  {}
+
+  ~RTCRtcpParametersList() {}
 };
 
 enum class RTCPriority {
@@ -205,6 +271,22 @@ class RTCRtpEncodingParameters : public RefCountInterface {
 
   virtual bool operator==(scoped_refptr<RTCRtpEncodingParameters> o) const = 0;
   virtual bool operator!=(scoped_refptr<RTCRtpEncodingParameters> o) const = 0;
+};
+
+/**
+ * class RTCRtpEncodingParametersList
+ */
+class RTCRtpEncodingParametersList : public RTCBaseList<scoped_refptr<RTCRtpEncodingParameters>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpEncodingParametersList> Create(
+    const vector<scoped_refptr<RTCRtpEncodingParameters>>& source);
+
+ protected:
+  RTCRtpEncodingParametersList(const vector<scoped_refptr<RTCRtpEncodingParameters>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtpEncodingParameters>>(source)
+  {}
+
+  ~RTCRtpEncodingParametersList() {}
 };
 
 struct RTCRtpParameters : public RefCountInterface {

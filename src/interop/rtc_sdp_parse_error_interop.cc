@@ -23,19 +23,7 @@ RTCSdpParseError_GetLine(
     int sz_value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(sdpParseError);
-    CHECK_POINTER_EX(value, rtcResultU4::kInvalidParameter);
-    if (sz_value < 1) {
-        return rtcResultU4::kBufferTooSmall;
-    }
-    ZERO_MEMORY(value, sz_value);
-
-    scoped_refptr<RTCSdpParseError> pSdpParseError = static_cast<RTCSdpParseError*>(sdpParseError);
-    string strValue = pSdpParseError->line();
-    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
-    return strValue.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(sdpParseError, value, sz_value, RTCSdpParseError, line);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -44,11 +32,7 @@ RTCSdpParseError_SetLine(
     const char* value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(sdpParseError);
-
-    scoped_refptr<RTCSdpParseError> pSdpParseError = static_cast<RTCSdpParseError*>(sdpParseError);
-    pSdpParseError->set_line(string(value));
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_VALUE(sdpParseError, value, string, RTCSdpParseError, set_line);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -58,19 +42,7 @@ RTCSdpParseError_GetDescription(
     int sz_value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(sdpParseError);
-    CHECK_POINTER_EX(value, rtcResultU4::kInvalidParameter);
-    if (sz_value < 1) {
-        return rtcResultU4::kBufferTooSmall;
-    }
-    ZERO_MEMORY(value, sz_value);
-
-    scoped_refptr<RTCSdpParseError> pSdpParseError = static_cast<RTCSdpParseError*>(sdpParseError);
-    string strValue = pSdpParseError->description();
-    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
-    return strValue.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(sdpParseError, value, sz_value, RTCSdpParseError, description);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -79,9 +51,5 @@ RTCSdpParseError_SetDescription(
     const char* value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(sdpParseError);
-
-    scoped_refptr<RTCSdpParseError> pSdpParseError = static_cast<RTCSdpParseError*>(sdpParseError);
-    pSdpParseError->set_description(string(value));
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_VALUE(sdpParseError, value, string, RTCSdpParseError, set_description);
 }

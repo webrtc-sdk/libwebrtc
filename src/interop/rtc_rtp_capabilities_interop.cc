@@ -31,19 +31,7 @@ RTCRtpCodecCapability_GetMimeType(
     int sz_value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-    ZERO_MEMORY(value, sz_value);
-    CHECK_POINTER(value);
-    if (sz_value < 1) {
-        return rtcResultU4::kBufferTooSmall;
-    }
-
-    scoped_refptr<RTCRtpCodecCapability> pCodec = static_cast<RTCRtpCodecCapability*>(handle);
-    string strValue = pCodec->mime_type();
-    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
-    return strValue.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(handle, value, sz_value, RTCRtpCodecCapability, mime_type);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -52,11 +40,7 @@ RTCRtpCodecCapability_SetMimeType(
     const char* value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpCodecCapability> pCodec = static_cast<RTCRtpCodecCapability*>(handle);
-    pCodec->set_mime_type(string(value));
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_VALUE(handle, value, string, RTCRtpCodecCapability, set_mime_type);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -65,13 +49,7 @@ RTCRtpCodecCapability_GetClockRate(
     int* pOutRetVal
 ) noexcept
 {
-    CHECK_POINTER(pOutRetVal);
-    RESET_OUT_POINTER_EX(pOutRetVal, 0);
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpCodecCapability> pCodec = static_cast<RTCRtpCodecCapability*>(handle);
-    *pOutRetVal = pCodec->clock_rate();
-    return rtcResultU4::kSuccess;
+    DECLARE_GET_VALUE(handle, pOutRetVal, int, RTCRtpCodecCapability, clock_rate);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -80,11 +58,7 @@ RTCRtpCodecCapability_SetClockRate(
     int value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpCodecCapability> pCodec = static_cast<RTCRtpCodecCapability*>(handle);
-    pCodec->set_clock_rate(value);
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_VALUE(handle, value, int, RTCRtpCodecCapability, set_clock_rate);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -93,13 +67,7 @@ RTCRtpCodecCapability_GetChannels(
     int* pOutRetVal
 ) noexcept
 {
-    CHECK_POINTER(pOutRetVal);
-    RESET_OUT_POINTER_EX(pOutRetVal, 0);
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpCodecCapability> pCodec = static_cast<RTCRtpCodecCapability*>(handle);
-    *pOutRetVal = pCodec->channels();
-    return rtcResultU4::kSuccess;
+    DECLARE_GET_VALUE(handle, pOutRetVal, int, RTCRtpCodecCapability, channels);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -108,11 +76,7 @@ RTCRtpCodecCapability_SetChannels(
     int value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpCodecCapability> pCodec = static_cast<RTCRtpCodecCapability*>(handle);
-    pCodec->set_channels(value);
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_VALUE(handle, value, int, RTCRtpCodecCapability, set_channels);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -122,19 +86,7 @@ RTCRtpCodecCapability_GetSdpFmtpLine(
     int sz_value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-    ZERO_MEMORY(value, sz_value);
-    CHECK_POINTER(value);
-    if (sz_value < 1) {
-        return rtcResultU4::kBufferTooSmall;
-    }
-
-    scoped_refptr<RTCRtpCodecCapability> pCodec = static_cast<RTCRtpCodecCapability*>(handle);
-    string strValue = pCodec->sdp_fmtp_line();
-    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
-    return strValue.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(handle, value, sz_value, RTCRtpCodecCapability, sdp_fmtp_line);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -143,11 +95,7 @@ RTCRtpCodecCapability_SetSdpFmtpLine(
     const char* value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpCodecCapability> pCodec = static_cast<RTCRtpCodecCapability*>(handle);
-    pCodec->set_sdp_fmtp_line(string(value));
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_VALUE(handle, value, string, RTCRtpCodecCapability, set_sdp_fmtp_line);
 }
 
 /*
@@ -161,9 +109,7 @@ RTCRtpCodecCapabilityList_GetCount (
     rtcRtpCodecCapabilityListHandle handle
 ) noexcept
 {
-    CHECK_POINTER_EX(handle, 0);
-    scoped_refptr<RTCRtpCodecCapabilityList> pList = static_cast<RTCRtpCodecCapabilityList*>(handle);
-    return static_cast<int>(pList->count());
+    DECLARE_LIST_GET_COUNT(handle, RTCRtpCodecCapabilityList);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -173,19 +119,7 @@ RTCRtpCodecCapabilityList_GetItem (
     rtcRtpCodecCapabilityHandle* pOutRetVal
 ) noexcept
 {
-    CHECK_OUT_POINTER(pOutRetVal);
-    CHECK_NATIVE_HANDLE(handle);
-    if (index < 0) {
-        return rtcResultU4::kOutOfRange;
-    }
-    
-    scoped_refptr<RTCRtpCodecCapabilityList> pList = static_cast<RTCRtpCodecCapabilityList*>(handle);
-    if (static_cast<size_t>(index) >= pList->count()) {
-        return rtcResultU4::kOutOfRange;
-    }
-    scoped_refptr<RTCRtpCodecCapability> pItem = pList->item(static_cast<size_t>(index));
-    *pOutRetVal = static_cast<rtcRtpCodecCapabilityHandle>(pItem.release());
-    return rtcResultU4::kSuccess;
+    DECLARE_LIST_GET_ITEM(handle, index, pOutRetVal, rtcRtpCodecCapabilityHandle, RTCRtpCodecCapabilityList, RTCRtpCodecCapability);
 }
 
 /*
@@ -201,19 +135,7 @@ RTCRtpHeaderExtensionCapability_GetUri(
     int sz_value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-    ZERO_MEMORY(value, sz_value);
-    CHECK_POINTER(value);
-    if (sz_value < 1) {
-        return rtcResultU4::kBufferTooSmall;
-    }
-
-    scoped_refptr<RTCRtpHeaderExtensionCapability> pHeaderExtension = static_cast<RTCRtpHeaderExtensionCapability*>(handle);
-    string strValue = pHeaderExtension->uri();
-    size_t len = strValue.copy_to(value, static_cast<size_t>(sz_value));
-    return strValue.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(handle, value, sz_value, RTCRtpHeaderExtensionCapability, uri);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -222,11 +144,7 @@ RTCRtpHeaderExtensionCapability_SetUri(
     const char* value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpHeaderExtensionCapability> pHeaderExtension = static_cast<RTCRtpHeaderExtensionCapability*>(handle);
-    pHeaderExtension->set_uri(string(value));
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_VALUE(handle, value, string, RTCRtpHeaderExtensionCapability, set_uri);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -235,13 +153,7 @@ RTCRtpHeaderExtensionCapability_GetPreferredId(
     int* pOutRetVal
 ) noexcept
 {
-    CHECK_POINTER(pOutRetVal);
-    RESET_OUT_POINTER_EX(pOutRetVal, 0);
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpHeaderExtensionCapability> pHeaderExtension = static_cast<RTCRtpHeaderExtensionCapability*>(handle);
-    *pOutRetVal = pHeaderExtension->preferred_id();
-    return rtcResultU4::kSuccess;
+    DECLARE_GET_VALUE(handle, pOutRetVal, int, RTCRtpHeaderExtensionCapability, preferred_id);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -250,11 +162,7 @@ RTCRtpHeaderExtensionCapability_SetPreferredId(
     int value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpHeaderExtensionCapability> pHeaderExtension = static_cast<RTCRtpHeaderExtensionCapability*>(handle);
-    pHeaderExtension->set_preferred_id(value);
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_VALUE(handle, value, int, RTCRtpHeaderExtensionCapability, set_preferred_id);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -263,13 +171,7 @@ RTCRtpHeaderExtensionCapability_GetPreferredEncrypt(
     rtcBool32* pOutRetVal
 ) noexcept
 {
-    CHECK_POINTER(pOutRetVal);
-    RESET_OUT_POINTER_EX(pOutRetVal, rtcBool32::kFalse);
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpHeaderExtensionCapability> pHeaderExtension = static_cast<RTCRtpHeaderExtensionCapability*>(handle);
-    *pOutRetVal = pHeaderExtension->preferred_encrypt() ? rtcBool32::kTrue : rtcBool32::kFalse;
-    return rtcResultU4::kSuccess;
+    DECLARE_GET_VALUE(handle, pOutRetVal, rtcBool32, RTCRtpHeaderExtensionCapability, preferred_encrypt);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -278,11 +180,7 @@ RTCRtpHeaderExtensionCapability_SetPreferredEncrypt(
     rtcBool32 value
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpHeaderExtensionCapability> pHeaderExtension = static_cast<RTCRtpHeaderExtensionCapability*>(handle);
-    pHeaderExtension->set_preferred_encrypt(value != rtcBool32::kFalse);
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_VALUE(handle, value, bool, RTCRtpHeaderExtensionCapability, set_preferred_encrypt);
 }
 
 /*
@@ -296,10 +194,7 @@ RTCRtpHeaderExtensionCapabilityList_GetCount (
     rtcRtpHeaderExtensionCapabilityListHandle handle
 ) noexcept
 {
-    CHECK_POINTER_EX(handle, 0);
-    scoped_refptr<RTCRtpHeaderExtensionCapabilityList> pList =
-        static_cast<RTCRtpHeaderExtensionCapabilityList*>(handle);
-    return static_cast<int>(pList->count());
+    DECLARE_LIST_GET_COUNT(handle, RTCRtpHeaderExtensionCapabilityList);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -309,20 +204,7 @@ RTCRtpHeaderExtensionCapabilityList_GetItem (
     rtcRtpHeaderExtensionCapabilityHandle* pOutRetVal
 ) noexcept
 {
-    CHECK_OUT_POINTER(pOutRetVal);
-    CHECK_NATIVE_HANDLE(handle);
-    if (index < 0) {
-        return rtcResultU4::kOutOfRange;
-    }
-
-    scoped_refptr<RTCRtpHeaderExtensionCapabilityList> pList =
-        static_cast<RTCRtpHeaderExtensionCapabilityList*>(handle);
-    if (static_cast<size_t>(index) >= pList->count()) {
-        return rtcResultU4::kOutOfRange;
-    }
-    scoped_refptr<RTCRtpHeaderExtensionCapability> pItem = pList->item(static_cast<size_t>(index));
-    *pOutRetVal = static_cast<rtcRtpHeaderExtensionCapabilityHandle>(pItem.release());
-    return rtcResultU4::kSuccess;
+    DECLARE_LIST_GET_ITEM(handle, index, pOutRetVal, rtcRtpHeaderExtensionCapabilityHandle, RTCRtpHeaderExtensionCapabilityList, RTCRtpHeaderExtensionCapability);
 }
 
 /*
@@ -337,18 +219,7 @@ RTCRtpCapabilities_GetCodecs(
     rtcRtpCodecCapabilityListHandle* pOutRetVal
 ) noexcept
 {
-    CHECK_OUT_POINTER(pOutRetVal);
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpCapabilities> pRtpCapabilities = static_cast<RTCRtpCapabilities*>(handle);
-    scoped_refptr<RTCRtpCodecCapabilityList> codecs = RTCRtpCodecCapabilityList::Create(
-        pRtpCapabilities->codecs()
-    );
-    if (codecs == nullptr) {
-        return rtcResultU4::kUnknownError;
-    }
-    *pOutRetVal = static_cast<rtcRtpCodecCapabilityListHandle>(codecs.release());
-    return rtcResultU4::kSuccess;
+    DECLARE_GET_LIST_HANDLE(handle, pOutRetVal, rtcRtpCodecCapabilityListHandle, RTCRtpCapabilities, RTCRtpCodecCapabilityList, codecs);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -357,13 +228,7 @@ RTCRtpCapabilities_SetCodecs(
     rtcRtpCodecCapabilityListHandle hCodecs
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-    CHECK_POINTER_EX(hCodecs, rtcResultU4::kInvalidParameter);
-
-    scoped_refptr<RTCRtpCapabilities> pRtpCapabilities = static_cast<RTCRtpCapabilities*>(handle);
-    scoped_refptr<RTCRtpCodecCapabilityList> codecs = static_cast<RTCRtpCodecCapabilityList*>(hCodecs);
-    pRtpCapabilities->set_codecs(codecs->to_vector());
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_LIST_HANDLE(handle, hCodecs, RTCRtpCapabilities, RTCRtpCodecCapabilityList, set_codecs);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -372,18 +237,7 @@ RTCRtpCapabilities_GetHeaderExtensions(
     rtcRtpHeaderExtensionCapabilityListHandle* pOutRetVal
 ) noexcept
 {
-    CHECK_OUT_POINTER(pOutRetVal);
-    CHECK_NATIVE_HANDLE(handle);
-
-    scoped_refptr<RTCRtpCapabilities> pRtpCapabilities = static_cast<RTCRtpCapabilities*>(handle);
-    scoped_refptr<RTCRtpHeaderExtensionCapabilityList> header_extensions = RTCRtpHeaderExtensionCapabilityList::Create(
-        pRtpCapabilities->header_extensions()
-    );
-    if (header_extensions == nullptr) {
-        return rtcResultU4::kUnknownError;
-    }
-    *pOutRetVal = static_cast<rtcRtpHeaderExtensionCapabilityListHandle>(header_extensions.release());
-    return rtcResultU4::kSuccess;
+    DECLARE_GET_LIST_HANDLE(handle, pOutRetVal, rtcRtpHeaderExtensionCapabilityListHandle, RTCRtpCapabilities, RTCRtpHeaderExtensionCapabilityList, header_extensions);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -392,12 +246,5 @@ RTCRtpCapabilities_SetHeaderExtensions(
     rtcRtpHeaderExtensionCapabilityListHandle hHeaderExtensions
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(handle);
-    CHECK_POINTER_EX(hHeaderExtensions, rtcResultU4::kInvalidParameter);
-
-    scoped_refptr<RTCRtpCapabilities> pRtpCapabilities = static_cast<RTCRtpCapabilities*>(handle);
-    scoped_refptr<RTCRtpHeaderExtensionCapabilityList> header_extensions = 
-        static_cast<RTCRtpHeaderExtensionCapabilityList*>(hHeaderExtensions);
-    pRtpCapabilities->set_header_extensions(header_extensions->to_vector());
-    return rtcResultU4::kSuccess;
+    DECLARE_SET_LIST_HANDLE(handle, hHeaderExtensions, RTCRtpCapabilities, RTCRtpHeaderExtensionCapabilityList, set_header_extensions);
 }

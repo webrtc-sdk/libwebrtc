@@ -20,19 +20,7 @@ RTCMediaTrack_GetKind(
     int cchOutKind
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(mediaTrack);
-    ZERO_MEMORY(pOutKind, cchOutKind);
-    CHECK_POINTER(pOutKind);
-    if (cchOutKind < 1) {
-        return rtcResultU4::kBufferTooSmall;
-    }
-
-    scoped_refptr<RTCMediaTrack> pMediaTrack = static_cast<RTCMediaTrack*>(mediaTrack);
-    string strValue = pMediaTrack->kind();
-    size_t len = strValue.copy_to(pOutKind, static_cast<size_t>(cchOutKind));
-    return strValue.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(mediaTrack, pOutKind, cchOutKind, RTCMediaTrack, kind);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -42,19 +30,7 @@ RTCMediaTrack_GetId(
     int cchOutId
 ) noexcept
 {
-    CHECK_NATIVE_HANDLE(mediaTrack);
-    ZERO_MEMORY(pOutId, cchOutId);
-    CHECK_POINTER(pOutId);
-    if (cchOutId < 1) {
-        return rtcResultU4::kBufferTooSmall;
-    }
-
-    scoped_refptr<RTCMediaTrack> pMediaTrack = static_cast<RTCMediaTrack*>(mediaTrack);
-    string strValue = pMediaTrack->id();
-    size_t len = strValue.copy_to(pOutId, static_cast<size_t>(cchOutId));
-    return strValue.size() > len
-        ? rtcResultU4::kBufferTooSmall
-        : rtcResultU4::kSuccess;
+    DECLARE_GET_STRING(mediaTrack, pOutId, cchOutId, RTCMediaTrack, id);
 }
 
 rtcBool32 LIB_WEBRTC_CALL

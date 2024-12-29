@@ -126,10 +126,13 @@ RTCAudioDevice_SetPlayoutDevice(
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(audiDevice);
+    if (index < 1) {
+        return rtcResultU4::kOutOfRange;
+    }
 
     scoped_refptr<RTCAudioDevice> pAudioDevice = static_cast<RTCAudioDevice*>(audiDevice);
     int nCount = (int)pAudioDevice->PlayoutDevices();
-    if (index < 0 || index >= nCount) {
+    if (index >= nCount) {
         return rtcResultU4::kOutOfRange;
     }
     return static_cast<rtcResultU4>(pAudioDevice->SetPlayoutDevice((uint16_t)index));
@@ -142,10 +145,13 @@ RTCAudioDevice_SetRecordingDevice(
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(audiDevice);
+    if (index < 1) {
+        return rtcResultU4::kOutOfRange;
+    }
 
     scoped_refptr<RTCAudioDevice> pAudioDevice = static_cast<RTCAudioDevice*>(audiDevice);
     int nCount = (int)pAudioDevice->RecordingDevices();
-    if (index < 0 || index >= nCount) {
+    if (index >= nCount) {
         return rtcResultU4::kOutOfRange;
     }
     return static_cast<rtcResultU4>(pAudioDevice->SetRecordingDevice((uint16_t)index));

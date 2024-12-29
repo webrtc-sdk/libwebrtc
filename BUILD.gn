@@ -159,6 +159,7 @@ rtc_shared_library("libwebrtc") {
   # for interop methods
   if (is_win && libwebrtc_interop) {
     sources += [
+      "include/interop_macros.h",
       "include/interop_api.h",
       "src/interop/ref_counted_object_interop.cc",
       "src/interop/libwebrtc_interop.cc",
@@ -176,6 +177,7 @@ rtc_shared_library("libwebrtc") {
       "src/interop/rtc_ice_candidate_interop.cc",
       "src/interop/rtc_media_stream_interop.cc",
       "src/interop/rtc_rtp_capabilities_interop.cc",
+      "src/interop/rtc_rtp_parameters_interop.cc",
       "src/interop/rtc_rtp_transceiver_interop.cc",
       "src/interop/rtc_peerconnection_interop.cc",
     ]
