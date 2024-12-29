@@ -2364,13 +2364,13 @@ RTCRtpCodecParameters_SetRtcpFeedBacks (
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCRtpCodecParameters_GetParameters (
     rtcRtpCodecParametersHandle handle,
-    rtcObjectHandle* pOutRetVal
+    rtcRtpCodecParametersMapHandle* pOutRetVal
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCRtpCodecParameters_SetParameters (
     rtcRtpCodecParametersHandle handle,
-    rtcObjectHandle value
+    rtcRtpCodecParametersMapHandle value
 ) noexcept;
 
 /*

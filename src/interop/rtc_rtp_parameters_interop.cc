@@ -431,7 +431,21 @@ RTCRtpCodecParameters_GetParameters (
     rtcRtpCodecParametersMapHandle* pOutRetVal
 ) noexcept
 {
-    return rtcResultU4::kInvalidOperation;
+    CHECK_OUT_POINTER(pOutRetVal);
+    CHECK_NATIVE_HANDLE(handle);
+
+    scoped_refptr<RTCRtpCodecParameters> p = static_cast<RTCRtpCodecParameters*>(handle);
+    std::vector<std::pair<string, string>> parameters = p->parameters().std_vector();
+    std::vector<scoped_refptr<RTCRtpCodecParametersPair>> pParameters;
+    for (auto item : parameters) {
+        pParameters.push_back(RTCRtpCodecParametersPair::Create(item));
+    }
+    scoped_refptr<RTCRtpCodecParametersMap> pMap = RTCRtpCodecParametersMap::Create(pParameters);
+    if (pMap == nullptr) {
+        return rtcResultU4::kUnknownError;
+    }
+    *pOutRetVal = static_cast<rtcRtpCodecParametersMapHandle>(pMap.release());
+    return rtcResultU4::kSuccess;
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
@@ -440,7 +454,16 @@ RTCRtpCodecParameters_SetParameters (
     rtcRtpCodecParametersMapHandle value
 ) noexcept
 {
-    return rtcResultU4::kInvalidOperation;
+    CHECK_NATIVE_HANDLE(handle);
+
+    scoped_refptr<RTCRtpCodecParameters> p = static_cast<RTCRtpCodecParameters*>(handle);
+    vector<std::pair<string, string>> parameters;
+    if (value) {
+        scoped_refptr<RTCRtpCodecParametersMap> pMap = static_cast<RTCRtpCodecParametersMap*>(value);
+        parameters = pMap->to_parameters();
+    }
+    p->set_parameters(parameters);
+    return rtcResultU4::kSuccess;
 }
 
 /*
