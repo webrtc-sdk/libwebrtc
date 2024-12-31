@@ -573,6 +573,20 @@ struct rtcDataChannelObserverCallbacks {
   rtcDataChannelObserverMessageDelegate MessageReceived{};
 };
 
+/**
+ * RTCRtpReceiver: first packet received callback delegate
+ */
+using rtcRtpReceiverFirstPacketReceivedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcMediaType media_type);
+
+/**
+ * Callback delegate structure for RTCRtpReceiverObserver.
+ */
+struct rtcRtpReceiverObserverCallbacks {
+  rtcObjectHandle UserData{};
+  rtcRtpReceiverFirstPacketReceivedDelegate FirstPacketReceived{};
+};
+
 /*
  * ----------------------------------------------------------------------
  * LibWebRTC interop methods
@@ -2766,6 +2780,79 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCRtpParameters_SetDegradationPreference (
     rtcRtpParametersHandle handle,
     rtcDegradationPreference value
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpReceiver interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiver_GetTrack (
+    rtcRtpReceiverHandle handle,
+    rtcMediaTrackHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiver_GetDtlsTransport (
+    rtcRtpReceiverHandle handle,
+    rtcDtlsTransportHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiver_GetStreamIds (
+    rtcRtpReceiverHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiver_GetStreams (
+    rtcRtpReceiverHandle handle,
+    rtcMediaStreamListHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiver_GetMediaType (
+    rtcRtpReceiverHandle handle,
+    rtcMediaType* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiver_GetId (
+    rtcRtpReceiverHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiver_GetParameters (
+    rtcRtpReceiverHandle handle,
+    rtcRtpParametersHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiver_SetParameters (
+    rtcRtpReceiverHandle handle,
+    rtcRtpParametersHandle value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiver_RegisterObserver (
+    rtcRtpReceiverHandle handle,
+    rtcRtpReceiverObserverCallbacks* callbacks
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiver_UnregisterObserver(
+    rtcRtpReceiverHandle handle
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiver_SetJitterBufferMinimumDelay (
+    rtcRtpReceiverHandle handle,
+    double value
 ) noexcept;
 
 /*

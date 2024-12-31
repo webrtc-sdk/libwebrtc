@@ -20,6 +20,9 @@ RTCDesktopMediaList_RegisterMediaListObserver(
 {
     CHECK_NATIVE_HANDLE(hMediaList);
     CHECK_POINTER_EX(callbacks, rtcResultU4::kInvalidParameter);
+
+    // unregistered
+    RTCDesktopMediaList_DeRegisterMediaListObserver(hMediaList);
     
     MediaListObserver* pObserver = static_cast<MediaListObserver*>(new MediaListObserverImpl(callbacks));
     scoped_refptr<RTCDesktopMediaList> pMediaList = static_cast<RTCDesktopMediaList*>(hMediaList);

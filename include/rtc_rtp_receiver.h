@@ -45,6 +45,8 @@ class RTCRtpReceiver : public RefCountInterface {
 
   virtual void SetJitterBufferMinimumDelay(double delay_seconds) = 0;
 
+  virtual RTCRtpReceiverObserver* GetObserver() = 0;
+
   // virtual Vector<RtpSource> GetSources() const = 0;
 
   // virtual void SetFrameDecryptor(

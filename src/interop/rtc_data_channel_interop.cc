@@ -48,6 +48,9 @@ RTCDataChannel_RegisterObserver(
     CHECK_NATIVE_HANDLE(dataChannel);
     CHECK_POINTER_EX(callbacks, rtcResultU4::kInvalidParameter);
     
+    // unregistered
+    RTCDataChannel_UnregisterObserver(dataChannel);
+
     RTCDataChannelObserver* pObserver = static_cast<RTCDataChannelObserver*>(new RTCDataChannelObserverImpl(callbacks));
     scoped_refptr<RTCDataChannel> pDataChannel = static_cast<RTCDataChannel*>(dataChannel);
     pDataChannel->RegisterObserver(pObserver);

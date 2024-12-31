@@ -5,6 +5,22 @@
 #include "rtc_rtp_receiver.h"
 
 namespace libwebrtc {
+
+/**
+ * class RTCRtpReceiverObserverImpl
+ */
+class RTCRtpReceiverObserverImpl : public RTCRtpReceiverObserver
+{
+ public:
+   RTCRtpReceiverObserverImpl(void* callbacks /* rtcRtpReceiverObserverCallbacks* */);
+   ~RTCRtpReceiverObserverImpl();
+
+   void OnFirstPacketReceived(RTCMediaType media_type) override;
+
+ private:
+   void* callbacks_ /* rtcRtpReceiverObserverCallbacks* */;
+}; // end class RTCRtpReceiverObserverImpl
+
 class RTCRtpReceiverImpl : public RTCRtpReceiver,
                            webrtc::RtpReceiverObserverInterface {
  public:
@@ -23,6 +39,7 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
   virtual void SetObserver(RTCRtpReceiverObserver* observer) override;
   virtual void SetJitterBufferMinimumDelay(double delay_seconds) override;
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver();
+  virtual RTCRtpReceiverObserver* GetObserver() override { return observer_; }
 
  private:
   rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver_;
