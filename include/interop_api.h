@@ -2857,6 +2857,86 @@ RTCRtpReceiver_SetJitterBufferMinimumDelay (
 
 /*
  * ----------------------------------------------------------------------
+ * RTCRtpSender interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_GetTrack (
+    rtcRtpSenderHandle handle,
+    rtcMediaTrackHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_SetTrack (
+    rtcRtpSenderHandle handle,
+    rtcMediaTrackHandle value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_GetDtlsTransport (
+    rtcRtpSenderHandle handle,
+    rtcDtlsTransportHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_GetSSRC (
+    rtcRtpSenderHandle handle,
+    unsigned int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_GetMediaType (
+    rtcRtpSenderHandle handle,
+    rtcMediaType* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_GetId (
+    rtcRtpSenderHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_GetStreamIds (
+    rtcRtpSenderHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_SetStreamIds (
+    rtcRtpSenderHandle handle,
+    const char* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_SetEncodings (
+    rtcRtpSenderHandle handle,
+    rtcRtpEncodingParametersListHandle value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_GetParameters (
+    rtcRtpSenderHandle handle,
+    rtcRtpParametersHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_SetParameters (
+    rtcRtpSenderHandle handle,
+    rtcRtpParametersHandle value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSender_GetDtmfSender (
+    rtcRtpSenderHandle handle,
+    rtcDtmfSenderHandle* pOutRetVal
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
  * RTCRtpTransceiverInit interop methods
  * ----------------------------------------------------------------------
  */

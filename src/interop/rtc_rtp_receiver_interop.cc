@@ -1,6 +1,7 @@
 #include "rtc_rtp_receiver.h"
 #include "interop_api.h"
 #include "rtc_media_stream.h"
+#include "rtc_dtls_transport.h"
 #include "src/rtc_rtp_receiver_impl.h"
 
 using namespace libwebrtc;
@@ -20,8 +21,7 @@ RTCRtpReceiver_GetDtlsTransport (
     rtcDtlsTransportHandle* pOutRetVal
 ) noexcept
 {
-    //DECLARE_GET_VALUE(handle, pOutRetVal, rtcDtlsTransportHandle, RTCRtpReceiver, dtls_transport().release);
-    return rtcResultU4::kInvalidOperation;
+    DECLARE_GET_VALUE(handle, pOutRetVal, rtcDtlsTransportHandle, RTCRtpReceiver, dtls_transport().release);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
