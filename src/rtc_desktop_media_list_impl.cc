@@ -276,7 +276,7 @@ MediaListObserverImpl::~MediaListObserverImpl()
 void MediaListObserverImpl::OnMediaSourceAdded(scoped_refptr<MediaSource> source)
 {
   if (callbacks_) {
-    rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
+    rtcMediaListObserverCallbacks* pCallbacks = reinterpret_cast<rtcMediaListObserverCallbacks*>(callbacks_);
     rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
     pCallbacks->MediaSourceAdded(pCallbacks->UserData, pSource);
   }
@@ -285,7 +285,7 @@ void MediaListObserverImpl::OnMediaSourceAdded(scoped_refptr<MediaSource> source
 void MediaListObserverImpl::OnMediaSourceRemoved(scoped_refptr<MediaSource> source)
 {
   if (callbacks_) {
-    rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
+    rtcMediaListObserverCallbacks* pCallbacks = reinterpret_cast<rtcMediaListObserverCallbacks*>(callbacks_);
     rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
     pCallbacks->MediaSourceRemoved(pCallbacks->UserData, pSource);
   }
@@ -294,7 +294,7 @@ void MediaListObserverImpl::OnMediaSourceRemoved(scoped_refptr<MediaSource> sour
 void MediaListObserverImpl::OnMediaSourceNameChanged(scoped_refptr<MediaSource> source)
 {
   if (callbacks_) {
-    rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
+    rtcMediaListObserverCallbacks* pCallbacks = reinterpret_cast<rtcMediaListObserverCallbacks*>(callbacks_);
     rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
     pCallbacks->MediaSourceNameChanged(pCallbacks->UserData, pSource);
   }
@@ -303,7 +303,7 @@ void MediaListObserverImpl::OnMediaSourceNameChanged(scoped_refptr<MediaSource> 
 void MediaListObserverImpl::OnMediaSourceThumbnailChanged(scoped_refptr<MediaSource> source)
 {
   if (callbacks_) {
-    rtcMediaListObserverCallbacks* pCallbacks = static_cast<rtcMediaListObserverCallbacks*>(callbacks_);
+    rtcMediaListObserverCallbacks* pCallbacks = reinterpret_cast<rtcMediaListObserverCallbacks*>(callbacks_);
     rtcDesktopMediaSourceHandle pSource = static_cast<rtcDesktopMediaSourceHandle>(source.release());
     pCallbacks->MediaSourceThumbnailChanged(pCallbacks->UserData, pSource);
   }

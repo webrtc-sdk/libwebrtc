@@ -11,7 +11,7 @@
 namespace libwebrtc {
 
 /**
- * class RTCDataChannelObserverImpl 
+ * class RTCRtpReceiverObserverImpl 
  */
 
 RTCRtpReceiverObserverImpl::RTCRtpReceiverObserverImpl(
@@ -36,7 +36,7 @@ RTCRtpReceiverObserverImpl::~RTCRtpReceiverObserverImpl()
 void RTCRtpReceiverObserverImpl::OnFirstPacketReceived(RTCMediaType media_type)
 {
   if (callbacks_) {
-    rtcRtpReceiverObserverCallbacks* pCallbacks = static_cast<rtcRtpReceiverObserverCallbacks*>(callbacks_);
+    rtcRtpReceiverObserverCallbacks* pCallbacks = reinterpret_cast<rtcRtpReceiverObserverCallbacks*>(callbacks_);
     pCallbacks->FirstPacketReceived(
       pCallbacks->UserData,
       static_cast<rtcMediaType>(media_type));

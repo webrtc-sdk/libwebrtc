@@ -1,11 +1,15 @@
 #include "rtc_dtls_transport_impl.h"
 
 #include "base/refcountedobject.h"
+#include "interop_api.h"
 
 // #include "rtc_ice_transport_impl.h"
 
 namespace libwebrtc {
 
+/**
+ * class RTCDtlsTransportInformationImpl
+ */
 RTCDtlsTransportInformationImpl::RTCDtlsTransportInformationImpl(
     webrtc::DtlsTransportInformation dtls_transport_information)
     : dtls_transport_information_(dtls_transport_information) {}
@@ -37,6 +41,56 @@ RTCDtlsTransportInformationImpl::dtls_transport_information() {
   return dtls_transport_information_;
 }
 
+/**
+ * class RTCDtlsTransportObserverImpl 
+ */
+
+RTCDtlsTransportObserverImpl::RTCDtlsTransportObserverImpl(
+  void* callbacks /* rtcDtlsTransportObserverCallbacks* */)
+  : callbacks_(nullptr)
+{
+  if (callbacks) {
+    size_t nSize = sizeof(rtcDtlsTransportObserverCallbacks);
+    callbacks_ = malloc(nSize);
+    memcpy(callbacks_, (const void*)callbacks, nSize);
+  }
+}
+
+RTCDtlsTransportObserverImpl::~RTCDtlsTransportObserverImpl()
+{
+  if (callbacks_) {
+    free(callbacks_);
+  }
+  callbacks_ = nullptr;
+}
+
+void RTCDtlsTransportObserverImpl::OnStateChange(scoped_refptr<RTCDtlsTransportInformation> info)
+{
+  if (callbacks_) {
+    rtcDtlsTransportObserverCallbacks* pCallbacks = reinterpret_cast<rtcDtlsTransportObserverCallbacks*>(callbacks_);
+    pCallbacks->StateChanged(
+      pCallbacks->UserData,
+      static_cast<rtcDtlsTransportInformationHandle>(info.release())
+    );
+  }
+}
+
+void RTCDtlsTransportObserverImpl::OnError(const int type, const char* message)
+{
+  if (callbacks_) {
+    rtcDtlsTransportObserverCallbacks* pCallbacks = reinterpret_cast<rtcDtlsTransportObserverCallbacks*>(callbacks_);
+    pCallbacks->Error(
+      pCallbacks->UserData,
+      type,
+      message,
+      message ? strlen(message) : 0
+    );
+  }
+}
+
+/**
+ * class RTCDtlsTransportImpl
+ */
 RTCDtlsTransportImpl::RTCDtlsTransportImpl(
     rtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport)
     : dtls_transport_(dtls_transport), observer_(nullptr) {}
@@ -59,7 +113,14 @@ void RTCDtlsTransportImpl::UnregisterObserver() {
 }
 
 void RTCDtlsTransportImpl::OnStateChange(
-    webrtc::DtlsTransportInformation info) {}
+    webrtc::DtlsTransportInformation info)
+{
+  if (observer_) {
+    scoped_refptr<RTCDtlsTransportInformation> pInfo = 
+      new RefCountedObject<RTCDtlsTransportInformationImpl>(info);
+    observer_->OnStateChange(pInfo);
+  }
+}
 
 void RTCDtlsTransportImpl::OnError(webrtc::RTCError error) {
   if (observer_) {

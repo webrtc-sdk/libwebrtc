@@ -28,7 +28,7 @@ RTCDataChannelObserverImpl::~RTCDataChannelObserverImpl()
 void RTCDataChannelObserverImpl::OnStateChange(RTCDataChannelState state)
 {
   if (callbacks_) {
-    rtcDataChannelObserverCallbacks* pCallbacks = static_cast<rtcDataChannelObserverCallbacks*>(callbacks_);
+    rtcDataChannelObserverCallbacks* pCallbacks = reinterpret_cast<rtcDataChannelObserverCallbacks*>(callbacks_);
     pCallbacks->StateChanged(
       pCallbacks->UserData,
       static_cast<rtcDataChannelState>(state));
@@ -38,7 +38,7 @@ void RTCDataChannelObserverImpl::OnStateChange(RTCDataChannelState state)
 void RTCDataChannelObserverImpl::OnMessage(const char* buffer, int length, bool binary)
 {
   if (callbacks_) {
-    rtcDataChannelObserverCallbacks* pCallbacks = static_cast<rtcDataChannelObserverCallbacks*>(callbacks_);
+    rtcDataChannelObserverCallbacks* pCallbacks = reinterpret_cast<rtcDataChannelObserverCallbacks*>(callbacks_);
     pCallbacks->MessageReceived(
       pCallbacks->UserData,
       buffer,

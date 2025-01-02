@@ -587,6 +587,41 @@ struct rtcRtpReceiverObserverCallbacks {
   rtcRtpReceiverFirstPacketReceivedDelegate FirstPacketReceived{};
 };
 
+/**
+ * RTCDtmfSender: Tone changed callback delegate
+ */
+using rtcDtmfSenderToneChangedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, const char* tone, int tone_len, const char* tone_buffer, int tone_buffer_len);
+
+/**
+ * Callback delegate structure for RTCDtmfSenderObserver.
+ */
+struct rtcDtmfSenderObserverCallbacks {
+  rtcObjectHandle UserData{};
+  rtcDtmfSenderToneChangedDelegate ToneChanged{};
+};
+
+/**
+ * RTCDtlsTransport: State changed callback delegate
+ */
+using rtcDtlsTransportStateChangedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcDtlsTransportInformationHandle info);
+
+/**
+ * RTCDtlsTransport: Error callback delegate
+ */
+using rtcDtlsTransportErrorDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, const int type, const char* message, int message_len);
+
+/**
+ * Callback delegate structure for RTCDtlsTransportObserver.
+ */
+struct rtcDtlsTransportObserverCallbacks {
+  rtcObjectHandle UserData{};
+  rtcDtlsTransportStateChangedDelegate StateChanged{};
+  rtcDtlsTransportErrorDelegate Error{};
+};
+
 /*
  * ----------------------------------------------------------------------
  * LibWebRTC interop methods
@@ -2857,6 +2892,63 @@ RTCRtpReceiver_SetJitterBufferMinimumDelay (
 
 /*
  * ----------------------------------------------------------------------
+ * RTCDtmfSender interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtmfSender_RegisterObserver (
+    rtcDtmfSenderHandle handle,
+    rtcDtmfSenderObserverCallbacks* callbacks
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtmfSender_UnregisterObserver (
+    rtcDtmfSenderHandle handle
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtmfSender_InsertDtmf (
+    rtcDtmfSenderHandle handle,
+    const char* tones,
+    int duration,
+    int inter_tone_gap,
+    const int* comma_delay = nullptr
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtmfSender_CanInsertDtmf (
+    rtcDtmfSenderHandle handle,
+    rtcBool32* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtmfSender_GetTones (
+    rtcDtmfSenderHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtmfSender_GetDuration (
+    rtcDtmfSenderHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtmfSender_GetInterToneGap (
+    rtcDtmfSenderHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtmfSender_GetCommaDelay (
+    rtcDtmfSenderHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
  * RTCRtpSender interop methods
  * ----------------------------------------------------------------------
  */
@@ -2912,9 +3004,9 @@ RTCRtpSender_SetStreamIds (
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCRtpSender_SetEncodings (
+RTCRtpSender_GetInitEncodings (
     rtcRtpSenderHandle handle,
-    rtcRtpEncodingParametersListHandle value
+    rtcRtpEncodingParametersListHandle* pOutRetVal
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
@@ -2933,6 +3025,53 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCRtpSender_GetDtmfSender (
     rtcRtpSenderHandle handle,
     rtcDtmfSenderHandle* pOutRetVal
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCDtlsTransportInformation interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtlsTransportInformation_GetState (
+    rtcDtlsTransportInformationHandle handle,
+    rtcDtlsTransportState* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtlsTransportInformation_GetSslCipherSuite (
+    rtcDtlsTransportInformationHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtlsTransportInformation_GetSrtpCipherSuite (
+    rtcDtlsTransportInformationHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCDtlsTransport interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtlsTransport_GetInformation (
+    rtcDtlsTransportHandle handle,
+    rtcDtlsTransportInformationHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtlsTransport_RegisterObserver (
+    rtcDtlsTransportHandle handle,
+    rtcDtlsTransportObserverCallbacks* callbacks
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDtlsTransport_UnregisterObserver (
+    rtcDtlsTransportHandle handle
 ) noexcept;
 
 /*
