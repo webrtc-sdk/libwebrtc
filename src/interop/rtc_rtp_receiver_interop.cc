@@ -37,19 +37,10 @@ RTCRtpReceiver_GetStreamIds (
     }
     ZERO_MEMORY(value, sz_value);
     CHECK_NATIVE_HANDLE(handle);
-    sz_value--;
 
     scoped_refptr<RTCRtpReceiver> p = static_cast<RTCRtpReceiver*>(handle);
-    std::vector<string> streamIds = p->stream_ids().std_vector();
-    std::string strValue;
-    for (auto stream_id : streamIds) {
-        strValue += stream_id.std_string() + "\n";
-    }
-    size_t len = std::min(strValue.size(), static_cast<size_t>(sz_value));
-    if (strValue.size() > 0 && len > 0) {
-        strncpy(value, strValue.c_str(), len);
-        value[len] = '\0';
-    }
+    string strValue = string::join("\n", p->stream_ids());
+    size_t len = strValue.copy_to(value, sz_value);
     return strValue.size() > len
         ? rtcResultU4::kBufferTooSmall
         : rtcResultU4::kSuccess;

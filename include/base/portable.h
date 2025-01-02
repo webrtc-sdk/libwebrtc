@@ -16,6 +16,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <sstream>
 
 /**
  * This file defines structures that can be passed across shared library/DLL
@@ -37,6 +38,9 @@ namespace portable {
 #endif
 
 #define PORTABLE_STRING_BUF_SIZE 48
+
+template <typename T>
+class vector;
 
 class string {
  private:
@@ -102,6 +106,34 @@ class string {
     dest[cch_len] = '\0';
     return cch_len;
   }
+
+  inline std::vector<string> split(string delimiter, bool removeEmptyEntries = true)
+  {
+    std::string input = std_string();
+    std::string item;
+    std::vector<string> tokens;
+    size_t start = 0;
+    size_t end = input.find(delimiter.c_string());
+
+    while (end != std::string::npos) {
+      item = input.substr(start, end - start);
+      if (!removeEmptyEntries || item.size() > 0) {
+        tokens.push_back(item);
+      }
+      start = end + delimiter.size();
+      end = input.find(delimiter.c_string(), start);
+    }
+
+    item = input.substr(start);
+    if (removeEmptyEntries && item.size() == 0) {
+      return tokens;
+    }
+
+    tokens.push_back(input.substr(start));
+    return tokens;
+  }
+
+  static std::string join(string separator, const vector<string>& values);
 };
 
 inline std::string to_std_string(const string& str) { return str.std_string(); }
@@ -234,6 +266,22 @@ class vector {
     m_size = 0;
   }
 };
+
+inline std::string string::join(string separator, const vector<string>& values)
+{
+    size_t count = values.size();
+    if (count == 0) {
+        return std::string();
+    }
+    std::string retVal;
+    for (size_t i = 0; i < count; i++) {
+        retVal += values[i].std_string();
+        if ((i + 1) < count) {
+            retVal += separator.std_string();
+        }
+    }
+    return retVal;
+}
 
 template <typename K, typename V>
 class pair {

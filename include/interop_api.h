@@ -3080,21 +3080,139 @@ RTCDtlsTransport_UnregisterObserver (
  * ----------------------------------------------------------------------
  */
 
-/**
- * Creates a new instance of the RTCRtpTransceiverInit object.
- * 
- * @param pOutRetVal - Object handle
- * @return rtcResultU4 - 0 if successful, otherwise an error code.
- */
-/*
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCRtpTransceiverInit_Create(
+RTCRtpTransceiverInit_Create (
     rtcRtpTransceiverDirection direction,
-    const char** stream_ids,
-    rtcRtpEncodingParametersHandle hEncodings,
+    const char* stream_ids,
+    /* [optional, in] */ rtcRtpEncodingParametersListHandle encodings,
     rtcRtpTransceiverInitHandle* pOutRetVal
 ) noexcept;
-*/
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiverInit_GetDirection (
+    rtcRtpTransceiverInitHandle handle,
+    rtcRtpTransceiverDirection* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiverInit_SetDirection (
+    rtcRtpTransceiverInitHandle handle,
+    rtcRtpTransceiverDirection value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiverInit_GetStreamIds (
+    rtcRtpTransceiverInitHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiverInit_SetStreamIds (
+    rtcRtpTransceiverInitHandle handle,
+    const char* value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiverInit_GetEncodings (
+    rtcRtpTransceiverInitHandle handle,
+    rtcRtpEncodingParametersListHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiverInit_SetEncodings (
+    rtcRtpTransceiverInitHandle handle,
+    rtcRtpEncodingParametersListHandle value
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCRtpTransceiver interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_GetMediaType (
+    rtcRtpTransceiverHandle handle,
+    rtcMediaType* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_GetMid (
+    rtcRtpTransceiverHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_GetSender (
+    rtcRtpTransceiverHandle handle,
+    rtcRtpSenderHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_GetReceiver (
+    rtcRtpTransceiverHandle handle,
+    rtcRtpReceiverHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_Stopped (
+    rtcRtpTransceiverHandle handle,
+    rtcBool32* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_Stopping (
+    rtcRtpTransceiverHandle handle,
+    rtcBool32* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_GetDirection (
+    rtcRtpTransceiverHandle handle,
+    rtcRtpTransceiverDirection* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_SetDirectionWithError (
+    rtcRtpTransceiverHandle handle,
+    rtcRtpTransceiverDirection value,
+    char* retVal,
+    int sz_retVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_GetCurrentDirection (
+    rtcRtpTransceiverHandle handle,
+    rtcRtpTransceiverDirection* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_GetFiredDirection (
+    rtcRtpTransceiverHandle handle,
+    rtcRtpTransceiverDirection* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_StopStandard (
+    rtcRtpTransceiverHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_SetCodecPreferences (
+    rtcRtpTransceiverHandle handle,
+    rtcRtpCodecCapabilityListHandle value
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiver_GetTransceiverId (
+    rtcRtpTransceiverHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
 
 }  // extern "C"
 
