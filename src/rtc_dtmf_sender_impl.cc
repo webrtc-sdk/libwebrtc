@@ -33,9 +33,8 @@ void RTCDtmfSenderObserverImpl::OnToneChange(const string tone, const string ton
     pCallbacks->ToneChanged(
       pCallbacks->UserData,
       tone.c_string(),
-      static_cast<int>(((string*)&tone)->size()),
-      tone_buffer.c_string(),
-      static_cast<int>(((string*)&tone_buffer)->size()));
+      tone_buffer.c_string()
+    );
   }
 }
 
@@ -46,9 +45,8 @@ void RTCDtmfSenderObserverImpl::OnToneChange(const string tone)
     pCallbacks->ToneChanged(
       pCallbacks->UserData,
       tone.c_string(),
-      static_cast<int>(((string*)&tone)->size()),
-      nullptr,
-      0);
+      nullptr
+    );
   }
 }
 

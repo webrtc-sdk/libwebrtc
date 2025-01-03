@@ -160,26 +160,39 @@ RTCAudioDevice_SetRecordingDevice(
 rtcResultU4 LIB_WEBRTC_CALL
 RTCAudioDevice_RegisterDeviceChangeCallback(
     rtcAudioDeviceHandle audiDevice,
-    rtcAudioDeviceChangeDelegate deviceChangeCallback
+    rtcAudioDeviceCallbacks* callbacks
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(audiDevice);
 
     scoped_refptr<RTCAudioDevice> pAudioDevice = static_cast<RTCAudioDevice*>(audiDevice);
     RTCAudioDevice::OnDeviceChangeCallback cb;
-    if (deviceChangeCallback == nullptr) {
+    if (callbacks == nullptr || callbacks->DeviceChanged == nullptr) {
         cb = nullptr;
     }
     else {
-        cb = [deviceChangeCallback](void) {
-            if (deviceChangeCallback) {
-                deviceChangeCallback();
+        rtcAudioDeviceCallbacks cb2 = *callbacks;
+        cb = [cb2](void) {
+            if (cb2.DeviceChanged) {
+                cb2.DeviceChanged(cb2.UserData);
             }
         };
     }
 
     return static_cast<rtcResultU4>(pAudioDevice->OnDeviceChange(cb));
 } // end RTCAudioDevice_RegisterDeviceChangeCallback
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioDevice_UnregisterDeviceChangeCallback(
+    rtcAudioDeviceHandle audiDevice
+) noexcept
+{
+    CHECK_NATIVE_HANDLE(audiDevice);
+
+    scoped_refptr<RTCAudioDevice> pAudioDevice = static_cast<RTCAudioDevice*>(audiDevice);
+    RTCAudioDevice::OnDeviceChangeCallback cb = nullptr;
+    return static_cast<rtcResultU4>(pAudioDevice->OnDeviceChange(cb));
+} // end RTCAudioDevice_UnregisterDeviceChangeCallback
 
 rtcResultU4 LIB_WEBRTC_CALL
 RTCAudioDevice_SetMicrophoneVolume(

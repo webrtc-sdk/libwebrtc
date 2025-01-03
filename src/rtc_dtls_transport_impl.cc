@@ -82,8 +82,7 @@ void RTCDtlsTransportObserverImpl::OnError(const int type, const char* message)
     pCallbacks->Error(
       pCallbacks->UserData,
       type,
-      message,
-      message ? strlen(message) : 0
+      message
     );
   }
 }

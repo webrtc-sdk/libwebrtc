@@ -137,3 +137,21 @@ RTCRtpReceiver_SetJitterBufferMinimumDelay (
 {
     DECLARE_SET_VALUE(handle, value, double, RTCRtpReceiver, SetJitterBufferMinimumDelay);
 }
+
+int LIB_WEBRTC_CALL
+RTCRtpReceiverList_GetCount (
+    rtcRtpReceiverListHandle handle
+) noexcept
+{
+    DECLARE_LIST_GET_COUNT(handle, RTCRtpReceiverList);
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpReceiverList_GetItem (
+    rtcRtpReceiverListHandle handle,
+    int index,
+    rtcRtpReceiverHandle* pOutRetVal
+) noexcept
+{
+    DECLARE_LIST_GET_ITEM(handle, index, pOutRetVal, rtcRtpReceiverHandle, RTCRtpReceiverList, RTCRtpReceiver);
+}

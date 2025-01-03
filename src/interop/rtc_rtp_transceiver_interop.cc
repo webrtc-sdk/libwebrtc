@@ -246,3 +246,21 @@ RTCRtpTransceiver_GetTransceiverId (
 {
     DECLARE_GET_STRING(handle, value, sz_value, RTCRtpTransceiver, transceiver_id);
 }
+
+int LIB_WEBRTC_CALL
+RTCRtpTransceiverList_GetCount (
+    rtcRtpTransceiverListHandle handle
+) noexcept
+{
+    DECLARE_LIST_GET_COUNT(handle, RTCRtpTransceiverList);
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpTransceiverList_GetItem (
+    rtcRtpTransceiverListHandle handle,
+    int index,
+    rtcRtpTransceiverHandle* pOutRetVal
+) noexcept
+{
+    DECLARE_LIST_GET_ITEM(handle, index, pOutRetVal, rtcRtpTransceiverHandle, RTCRtpTransceiverList, RTCRtpTransceiver);
+}

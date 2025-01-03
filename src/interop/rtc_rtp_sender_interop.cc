@@ -132,3 +132,21 @@ RTCRtpSender_GetDtmfSender (
 {
     DECLARE_GET_VALUE(handle, pOutRetVal, rtcDtmfSenderHandle, RTCRtpSender, dtmf_sender().release);
 }
+
+int LIB_WEBRTC_CALL
+RTCRtpSenderList_GetCount (
+    rtcRtpSenderListHandle handle
+) noexcept
+{
+    DECLARE_LIST_GET_COUNT(handle, RTCRtpSenderList);
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpSenderList_GetItem (
+    rtcRtpSenderListHandle handle,
+    int index,
+    rtcRtpSenderHandle* pOutRetVal
+) noexcept
+{
+    DECLARE_LIST_GET_ITEM(handle, index, pOutRetVal, rtcRtpSenderHandle, RTCRtpSenderList, RTCRtpSender);
+}
