@@ -49,6 +49,15 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
 
 };  // namespace libwebrtc
 
+/**
+ * class RTCRtpReceiverListImpl
+ */
+class RTCRtpReceiverListImpl : public RTCRtpReceiverList {
+ public:
+  RTCRtpReceiverListImpl(const vector<scoped_refptr<RTCRtpReceiver>>& source);
+  ~RTCRtpReceiverListImpl();
+}; // end class RTCRtpReceiverListImpl
+
 }  // namespace libwebrtc
 
 #endif  // !LIB_WEBRTC_RTP_RECEIV

@@ -131,4 +131,19 @@ void RTCRtpReceiverImpl::SetJitterBufferMinimumDelay(double delay_seconds) {
   rtp_receiver_->SetJitterBufferMinimumDelay(delay_seconds);
 }
 
+scoped_refptr<RTCRtpReceiverList> RTCRtpReceiverList::Create(
+    const vector<scoped_refptr<RTCRtpReceiver>>& source) {
+  return new RefCountedObject<RTCRtpReceiverListImpl>(source);
+}
+
+RTCRtpReceiverListImpl::RTCRtpReceiverListImpl(
+    const vector<scoped_refptr<RTCRtpReceiver>>& source)
+    : RTCRtpReceiverList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpReceiverListImpl::~RTCRtpReceiverListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
 }  // namespace libwebrtc

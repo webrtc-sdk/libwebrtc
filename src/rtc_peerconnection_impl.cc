@@ -16,6 +16,8 @@
 #include "rtc_rtp_sender_impl.h"
 #include "rtc_rtp_transceiver_impl.h"
 
+#include "interop_api.h"
+
 using rtc::Thread;
 
 static std::map<libwebrtc::RtcpMuxPolicy,
@@ -182,6 +184,173 @@ class CreateSessionDescriptionObserverProxy
   OnSdpCreateSuccess success_callback_;
   OnSdpCreateFailure failure_callback_;
 };
+
+scoped_refptr<RTCStatsMemberList> RTCStatsMemberList::Create(
+    const vector<scoped_refptr<RTCStatsMember>>& source) {
+  return new RefCountedObject<RTCStatsMemberListImpl>(source);
+}
+
+RTCStatsMemberListImpl::RTCStatsMemberListImpl(
+    const vector<scoped_refptr<RTCStatsMember>>& source)
+    : RTCStatsMemberList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCStatsMemberListImpl::~RTCStatsMemberListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
+scoped_refptr<MediaRTCStatsList> MediaRTCStatsList::Create(
+    const vector<scoped_refptr<MediaRTCStats>>& source) {
+  return new RefCountedObject<MediaRTCStatsListImpl>(source);
+}
+
+MediaRTCStatsListImpl::MediaRTCStatsListImpl(
+    const vector<scoped_refptr<MediaRTCStats>>& source)
+    : MediaRTCStatsList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+MediaRTCStatsListImpl::~MediaRTCStatsListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
+/**
+ * class RTCPeerConnectionObserverImpl 
+ */
+
+RTCPeerConnectionObserverImpl::RTCPeerConnectionObserverImpl(
+  void* callbacks /* rtcPeerConnectionObserverCallbacks* */)
+  : callbacks_(nullptr)
+{
+  if (callbacks) {
+    size_t nSize = sizeof(rtcPeerConnectionObserverCallbacks);
+    callbacks_ = malloc(nSize);
+    memcpy(callbacks_, (const void*)callbacks, nSize);
+  }
+}
+
+RTCPeerConnectionObserverImpl::~RTCPeerConnectionObserverImpl()
+{
+  if (callbacks_) {
+    free(callbacks_);
+  }
+  callbacks_ = nullptr;
+}
+
+void RTCPeerConnectionObserverImpl::OnSignalingState(RTCSignalingState state) {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->SignalingStateChanged(
+      pCallbacks->UserData,
+      static_cast<rtcSignalingState>(state));
+  }
+}
+
+void RTCPeerConnectionObserverImpl::OnPeerConnectionState(RTCPeerConnectionState state) {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->ConnectionStateChanged(
+      pCallbacks->UserData,
+      static_cast<rtcPeerConnectionState>(state));
+  }
+}
+
+void RTCPeerConnectionObserverImpl::OnIceGatheringState(RTCIceGatheringState state) {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->IceGatheringStateChanged(
+      pCallbacks->UserData,
+      static_cast<rtcIceGatheringState>(state));
+  }
+}
+
+void RTCPeerConnectionObserverImpl::OnIceConnectionState(RTCIceConnectionState state) {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->IceConnectionStateChanged(
+      pCallbacks->UserData,
+      static_cast<rtcIceConnectionState>(state));
+  }
+}
+
+void RTCPeerConnectionObserverImpl::OnIceCandidate(scoped_refptr<RTCIceCandidate> candidate) {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->IceCandidateReadytoSend(
+      pCallbacks->UserData,
+      static_cast<rtcIceCandidateHandle>(candidate.release()));
+  }
+}
+
+void RTCPeerConnectionObserverImpl::OnAddStream(scoped_refptr<RTCMediaStream> stream) {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->StreamAdded(
+      pCallbacks->UserData,
+      static_cast<rtcMediaStreamHandle>(stream.release()));
+  }
+}
+
+void RTCPeerConnectionObserverImpl::OnRemoveStream(scoped_refptr<RTCMediaStream> stream) {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->StreamRemoved(
+      pCallbacks->UserData,
+      static_cast<rtcMediaStreamHandle>(stream.release()));
+  }
+}
+
+void RTCPeerConnectionObserverImpl::OnDataChannel(scoped_refptr<RTCDataChannel> data_channel) {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->DataChannelAdded(
+      pCallbacks->UserData,
+      static_cast<rtcDataChannelHandle>(data_channel.release()));
+  }
+}
+
+void RTCPeerConnectionObserverImpl::OnRenegotiationNeeded() {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->RenegotiationNeeded(pCallbacks->UserData);
+  }
+}
+
+void RTCPeerConnectionObserverImpl::OnTrack(scoped_refptr<RTCRtpTransceiver> transceiver) {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->TransceiverAdded(
+      pCallbacks->UserData,
+      static_cast<rtcRtpTransceiverHandle>(transceiver.release()));
+  }
+}
+
+void RTCPeerConnectionObserverImpl::OnAddTrack(vector<scoped_refptr<RTCMediaStream>> streams,
+                      scoped_refptr<RTCRtpReceiver> receiver) {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->TrackAdded(
+      pCallbacks->UserData,
+      static_cast<rtcMediaStreamListHandle>(RTCMediaStreamList::Create(streams).release()),
+      static_cast<rtcRtpReceiverHandle>(receiver.release())
+    );
+  }
+}
+
+void RTCPeerConnectionObserverImpl::OnRemoveTrack(scoped_refptr<RTCRtpReceiver> receiver) {
+  if (callbacks_) {
+    rtcPeerConnectionObserverCallbacks* pCallbacks = reinterpret_cast<rtcPeerConnectionObserverCallbacks*>(callbacks_);
+    pCallbacks->TrackRemoved(
+      pCallbacks->UserData,
+      static_cast<rtcRtpReceiverHandle>(receiver.release())
+    );
+  }
+}
+
+/**
+ * class RTCPeerConnectionImpl 
+ */
 
 RTCPeerConnectionImpl::RTCPeerConnectionImpl(
     const RTCConfiguration& configuration,

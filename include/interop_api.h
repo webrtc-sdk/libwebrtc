@@ -360,6 +360,12 @@ using rtcRefCountedObjectHandle = rtcObjectHandle;
 /// Opaque handle to a native RTCPeerConnectionFactory interop object.
 using rtcPeerConnectionFactoryHandle = rtcRefCountedObjectHandle;
 
+/// Opaque handle to a native RTCStatsMemberList interop object.
+using rtcStatsMemberListHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native MediaRTCStatsList interop object.
+using rtcMediaRTCStatsListHandle = rtcRefCountedObjectHandle;
+
 /// Opaque handle to a native RTCPeerConnection interop object.
 using rtcPeerConnectionHandle = rtcRefCountedObjectHandle;
 
@@ -510,14 +516,23 @@ using rtcRtpParametersHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCRtpReceiver interop object.
 using rtcRtpReceiverHandle = rtcRefCountedObjectHandle;
 
+/// Opaque handle to a native RTCRtpReceiverList interop object.
+using rtcRtpReceiverListHandle = rtcRefCountedObjectHandle;
+
 /// Opaque handle to a native RTCRtpSender interop object.
 using rtcRtpSenderHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpSenderList interop object.
+using rtcRtpSenderListHandle = rtcRefCountedObjectHandle;
 
 /// Opaque handle to a native RTCRtpTransceiverInit interop object.
 using rtcRtpTransceiverInitHandle = rtcRefCountedObjectHandle;
 
 /// Opaque handle to a native RTCRtpTransceiver interop object.
 using rtcRtpTransceiverHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCRtpTransceiverList interop object.
+using rtcRtpTransceiverListHandle = rtcRefCountedObjectHandle;
 
 /// Opaque handle to a native RTCSessionDescription interop object.
 using rtcSessionDescriptionHandle = rtcRefCountedObjectHandle;
@@ -621,6 +636,86 @@ struct rtcDtlsTransportObserverCallbacks {
   rtcDtlsTransportStateChangedDelegate StateChanged{};
   rtcDtlsTransportErrorDelegate Error{};
 };
+
+/**
+ * RTCPeerConnectionObserverCallbacks
+ */
+using rtcSignalingStateChangedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcSignalingState state);
+
+using rtcConnectionStateChangedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcPeerConnectionState state);
+
+using rtcIceGatheringStateChangedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcIceGatheringState state);
+
+using rtcIceConnectionStateChangedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcIceConnectionState state);
+
+using rtcIceCandidateReadytoSendDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcIceCandidateHandle iceCandidate);
+
+using rtcStreamAddedRemovedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcMediaStreamHandle mediaStream);
+
+using rtcDataChannelAddedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcDataChannelHandle dataChannel);
+
+using rtcRenegotiationNeededDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data);
+
+using rtcTransceiverAddedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcRtpTransceiverHandle rtpTransceiver);
+
+using rtcTrackAddedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcMediaStreamListHandle mediaStreamList, rtcRtpReceiverHandle rtpReceiver);
+
+using rtcTrackRemovedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcRtpReceiverHandle rtpReceiver);
+
+/**
+ * Callback delegate structure for RTCPeerConnectionObserver.
+ */
+struct rtcPeerConnectionObserverCallbacks {
+  rtcObjectHandle UserData{};
+  rtcSignalingStateChangedDelegate SignalingStateChanged{};
+  rtcConnectionStateChangedDelegate ConnectionStateChanged{};
+  rtcIceGatheringStateChangedDelegate IceGatheringStateChanged{};
+  rtcIceConnectionStateChangedDelegate IceConnectionStateChanged{};
+  rtcIceCandidateReadytoSendDelegate IceCandidateReadytoSend{};
+  rtcStreamAddedRemovedDelegate StreamAdded{};
+  rtcStreamAddedRemovedDelegate StreamRemoved{};        
+  rtcDataChannelAddedDelegate DataChannelAdded{};
+  rtcRenegotiationNeededDelegate RenegotiationNeeded{};        
+  rtcTransceiverAddedDelegate TransceiverAdded{};
+  rtcTrackAddedDelegate TrackAdded{};
+  rtcTrackRemovedDelegate TrackRemoved{};
+}; // end struct rtcPeerConnectionObserverCallbacks
+
+/*-----------------------------------------------------------------*/
+
+using rtcOnStatsCollectorSuccessDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcMediaRTCStatsListHandle reports);
+
+using rtcOnStatsCollectorFailureDelegate = void(LIB_WEBRTC_CALL*)(
+    const char* error, int error_len);
+
+using rtcOnSdpCreateSuccessDelegate = void(LIB_WEBRTC_CALL*)(
+    const char* sdp, int sdp_len, const char* type, int type_len);
+
+using rtcOnSdpCreateFailureDelegate = void(LIB_WEBRTC_CALL*)(
+    const char* error, int error_len);
+
+using rtcOnSetSdpSuccessDelegate = void(LIB_WEBRTC_CALL*)();
+
+using rtcOnSetSdpFailureDelegate = void(LIB_WEBRTC_CALL*)(
+    const char* error, int error_len);
+
+using rtcOnGetSdpSuccessDelegate = void(LIB_WEBRTC_CALL*)(
+    const char* sdp, int sdp_len, const char* type, int type_len);
+
+using rtcOnGetSdpFailureDelegate = void(LIB_WEBRTC_CALL*)(
+    const char* error, int error_len);
 
 /*
  * ----------------------------------------------------------------------
@@ -3212,6 +3307,246 @@ RTCRtpTransceiver_GetTransceiverId (
     rtcRtpTransceiverHandle handle,
     char* value,
     int sz_value
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCPeerConnection interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_IsInitialized (
+    rtcPeerConnectionHandle handle,
+    rtcBool32* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_AddStream (
+    rtcPeerConnectionHandle handle,
+    rtcMediaStreamHandle stream,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_RemoveStream (
+    rtcPeerConnectionHandle handle,
+    rtcMediaStreamHandle stream,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_CreateLocalMediaStream (
+    rtcPeerConnectionHandle handle,
+    const char* stream_id,
+    rtcMediaStreamHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_CreateDataChannel (
+    rtcPeerConnectionHandle handle,
+    const char* label,
+    /* [optional, in] */ rtcDataChannelInit* dataChannelDict,
+    rtcDataChannelHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_CreateOffer (
+    rtcPeerConnectionHandle handle,
+    rtcOnSdpCreateSuccessDelegate success,
+    rtcOnSdpCreateFailureDelegate failure,
+    rtcMediaConstraintsHandle constraints
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_CreateAnswer (
+    rtcPeerConnectionHandle handle,
+    rtcOnSdpCreateSuccessDelegate success,
+    rtcOnSdpCreateFailureDelegate failure,
+    rtcMediaConstraintsHandle constraints
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_RestartIce (
+    rtcPeerConnectionHandle handle
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_Close (
+    rtcPeerConnectionHandle handle
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_SetLocalDescription (
+    rtcPeerConnectionHandle handle,
+    const char* sdp,
+    const char* type,
+    rtcOnSetSdpSuccessDelegate success,
+    rtcOnSetSdpFailureDelegate failure
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_SetRemoteDescription (
+    rtcPeerConnectionHandle handle,
+    const char* sdp,
+    const char* type,
+    rtcOnSetSdpSuccessDelegate success,
+    rtcOnSetSdpFailureDelegate failure
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetLocalDescription (
+    rtcPeerConnectionHandle handle,
+    rtcOnGetSdpSuccessDelegate success,
+    rtcOnGetSdpFailureDelegate failure
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetRemoteDescription (
+    rtcPeerConnectionHandle handle,
+    rtcOnGetSdpSuccessDelegate success,
+    rtcOnGetSdpFailureDelegate failure
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_AddCandidate (
+    rtcPeerConnectionHandle handle,
+    const char* mid, 
+    int mid_mline_index,
+    const char* candiate
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_RegisterObserver (
+    rtcPeerConnectionHandle handle,
+    rtcPeerConnectionObserverCallbacks* callbacks
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_UnregisterObserver (
+    rtcPeerConnectionHandle handle
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetLocalStreams (
+    rtcPeerConnectionHandle handle,
+    rtcMediaStreamListHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetRemoteStreams (
+    rtcPeerConnectionHandle handle,
+    rtcMediaStreamListHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetSenderStats (
+    rtcPeerConnectionHandle handle,
+    rtcRtpSenderHandle sender,
+    rtcOnStatsCollectorSuccessDelegate success,
+    rtcOnStatsCollectorFailureDelegate failure,
+    rtcBool32* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetReceiverStats (
+    rtcPeerConnectionHandle handle,
+    rtcRtpReceiverHandle receiver,
+    rtcOnStatsCollectorSuccessDelegate success,
+    rtcOnStatsCollectorFailureDelegate failure,
+    rtcBool32* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetStats (
+    rtcPeerConnectionHandle handle,
+    rtcOnStatsCollectorSuccessDelegate success,
+    rtcOnStatsCollectorFailureDelegate failure
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_AddTransceiver1 (
+    rtcPeerConnectionHandle handle,
+    rtcMediaType media_type,
+    rtcRtpTransceiverHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_AddTransceiver2 (
+    rtcPeerConnectionHandle handle,
+    rtcMediaTrackHandle track,
+    rtcRtpTransceiverHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_AddTransceiver3 (
+    rtcPeerConnectionHandle handle,
+    rtcMediaTrackHandle track,
+    rtcRtpTransceiverInitHandle init,
+    rtcRtpTransceiverHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_AddTrack (
+    rtcPeerConnectionHandle handle,
+    rtcMediaTrackHandle track,
+    const char* stream_ids,
+    rtcRtpSenderHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_RemoveTrack (
+    rtcPeerConnectionHandle handle,
+    rtcRtpSenderHandle sender,
+    rtcBool32* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetSenders (
+    rtcPeerConnectionHandle handle,
+    rtcRtpSenderListHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetTransceivers (
+    rtcPeerConnectionHandle handle,
+    rtcRtpTransceiverListHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetReceivers (
+    rtcPeerConnectionHandle handle,
+    rtcRtpReceiverListHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetSignalingState (
+    rtcPeerConnectionHandle handle,
+    rtcSignalingState* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetIceConnectionState (
+    rtcPeerConnectionHandle handle,
+    rtcIceConnectionState* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetStandardizedIceConnectionState (
+    rtcPeerConnectionHandle handle,
+    rtcIceConnectionState* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetPeerConnectionState (
+    rtcPeerConnectionHandle handle,
+    rtcPeerConnectionState* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnection_GetIceGatheringState (
+    rtcPeerConnectionHandle handle,
+    rtcIceGatheringState* pOutRetVal
 ) noexcept;
 
 }  // extern "C"

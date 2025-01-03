@@ -74,17 +74,6 @@ class RTCBaseList : public RefCountInterface {
 
   void clear() { destroy_all(); }
 
-  bool removeAt(size_t index) {
-    if (index >= m_count) {
-      return false;
-    }
-    destroy(&m_items[index]);
-    m_count--;
-    for (size_t i = index; i < m_count; i++) {
-      m_items[i] = m_items[i + 1];
-    }
-  }
-
  protected:
   void destroy(T* rt) { reinterpret_cast<const T*>(rt)->~T(); }
 

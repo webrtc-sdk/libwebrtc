@@ -58,6 +58,22 @@ class RTCRtpReceiver : public RefCountInterface {
   //    scoped_refptr<FrameTransformerInterface> frame_transformer) = 0;
 };
 
+/**
+ * class RTCRtpReceiverList
+ */
+class RTCRtpReceiverList : public RTCBaseList<scoped_refptr<RTCRtpReceiver>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpReceiverList> Create(
+    const vector<scoped_refptr<RTCRtpReceiver>>& source);
+
+ protected:
+  RTCRtpReceiverList(const vector<scoped_refptr<RTCRtpReceiver>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtpReceiver>>(source)
+  {}
+
+  ~RTCRtpReceiverList() {}
+}; // end class RTCRtpReceiverList
+
 }  // namespace libwebrtc
 
 #endif  // !LIB_WEBRTC_RTP_RECEIVER_H_

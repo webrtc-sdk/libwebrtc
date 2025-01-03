@@ -79,7 +79,7 @@ class string {
     return *this;
   }
 
-  inline size_t size() { return m_length; }
+  inline size_t size() const { return m_length; }
 
   inline const char* c_string() const {
     return m_dynamic == 0 ? m_buf : m_dynamic;
