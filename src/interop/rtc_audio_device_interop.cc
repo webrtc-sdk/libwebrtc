@@ -145,7 +145,7 @@ RTCAudioDevice_SetRecordingDevice(
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(audiDevice);
-    if (index < 1) {
+    if (index < 0) {
         return rtcResultU4::kOutOfRange;
     }
 
