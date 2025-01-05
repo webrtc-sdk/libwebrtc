@@ -123,24 +123,23 @@ RTCPeerConnection_CreateDataChannel (
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_CreateOffer (
     rtcPeerConnectionHandle handle,
-    rtcOnGetSdpCallbacks* callbacks,
+    rtcObjectHandle user_data,
+    rtcOnGetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure,
     rtcMediaConstraintsHandle constraints
 ) noexcept
 {
   CHECK_NATIVE_HANDLE(handle);
-  CHECK_POINTER_EX(callbacks, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(success, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(failure, rtcResultU4::kInvalidParameter);
   CHECK_POINTER_EX(constraints, rtcResultU4::kInvalidParameter);
 
   scoped_refptr<RTCPeerConnection> p = static_cast<RTCPeerConnection*>(handle);
-  OnSdpCreateSuccess fn_success = [callbacks](const string sdp, const string type) {
-    if (callbacks && callbacks->Success) {
-        callbacks->Success(callbacks->UserData, sdp.c_string(), type.c_string());
-    }
+  OnSdpCreateSuccess fn_success = [success, user_data](const string sdp, const string type) {
+    success(user_data, sdp.c_string(), type.c_string());
   };
-  OnSdpCreateFailure fn_failure = [callbacks](const char* error) {
-    if (callbacks && callbacks->Failure) {
-        callbacks->Failure(callbacks->UserData, error);
-    }
+  OnSdpCreateFailure fn_failure = [failure, user_data](const char* error) {
+    failure(user_data, error);
   };
   scoped_refptr<RTCMediaConstraints> pConstraints= static_cast<RTCMediaConstraints*>(constraints);
   p->CreateOffer(fn_success, fn_failure, pConstraints);
@@ -150,24 +149,23 @@ RTCPeerConnection_CreateOffer (
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_CreateAnswer (
     rtcPeerConnectionHandle handle,
-    rtcOnGetSdpCallbacks* callbacks,
+    rtcObjectHandle user_data,
+    rtcOnGetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure,
     rtcMediaConstraintsHandle constraints
 ) noexcept
 {
   CHECK_NATIVE_HANDLE(handle);
-  CHECK_POINTER_EX(callbacks, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(success, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(failure, rtcResultU4::kInvalidParameter);
   CHECK_POINTER_EX(constraints, rtcResultU4::kInvalidParameter);
 
   scoped_refptr<RTCPeerConnection> p = static_cast<RTCPeerConnection*>(handle);
-  OnSdpCreateSuccess fn_success = [callbacks](const string sdp, const string type) {
-    if (callbacks && callbacks->Success) {
-        callbacks->Success(callbacks->UserData, sdp.c_string(), type.c_string());
-    }
+  OnSdpCreateSuccess fn_success = [success, user_data](const string sdp, const string type) {
+    success(user_data, sdp.c_string(), type.c_string());
   };
-  OnSdpCreateFailure fn_failure = [callbacks](const char* error) {
-    if (callbacks && callbacks->Failure) {
-        callbacks->Failure(callbacks->UserData, error);
-    }
+  OnSdpCreateFailure fn_failure = [failure, user_data](const char* error) {
+    failure(user_data, error);
   };
   scoped_refptr<RTCMediaConstraints> pConstraints= static_cast<RTCMediaConstraints*>(constraints);
   p->CreateAnswer(fn_success, fn_failure, pConstraints);
@@ -205,21 +203,20 @@ RTCPeerConnection_SetLocalDescription (
     rtcPeerConnectionHandle handle,
     const char* sdp,
     const char* type,
-    rtcOnSetSdpCallbacks* callbacks
+    rtcObjectHandle user_data,
+    rtcOnSetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure
 ) noexcept
 {
   CHECK_NATIVE_HANDLE(handle);
-  CHECK_POINTER_EX(callbacks, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(success, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(failure, rtcResultU4::kInvalidParameter);
 
-  OnSetSdpSuccess fn_success = [callbacks]() {
-    if (callbacks && callbacks->Success) {
-      callbacks->Success(callbacks->UserData);
-    }
+  OnSetSdpSuccess fn_success = [success, user_data]() {
+    success(user_data);
   };
-  OnSetSdpFailure fn_failure = [callbacks](const char* error) {
-    if (callbacks && callbacks->Failure) {
-        callbacks->Failure(callbacks->UserData, error);
-    }
+  OnSetSdpFailure fn_failure = [failure, user_data](const char* error) {
+    failure(user_data, error);
   };
   scoped_refptr<RTCPeerConnection> p = static_cast<RTCPeerConnection*>(handle);
   p->SetLocalDescription(string(sdp), string(type), fn_success, fn_failure);
@@ -231,21 +228,20 @@ RTCPeerConnection_SetRemoteDescription (
     rtcPeerConnectionHandle handle,
     const char* sdp,
     const char* type,
-    rtcOnSetSdpCallbacks* callbacks
+    rtcObjectHandle user_data,
+    rtcOnSetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure
 ) noexcept
 {
   CHECK_NATIVE_HANDLE(handle);
-  CHECK_POINTER_EX(callbacks, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(success, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(failure, rtcResultU4::kInvalidParameter);
 
-  OnSetSdpSuccess fn_success = [callbacks]() {
-    if (callbacks && callbacks->Success) {
-      callbacks->Success(callbacks->UserData);
-    }
+  OnSetSdpSuccess fn_success = [success, user_data]() {
+    success(user_data);
   };
-  OnSetSdpFailure fn_failure = [callbacks](const char* error) {
-    if (callbacks && callbacks->Failure) {
-        callbacks->Failure(callbacks->UserData, error);
-    }
+  OnSetSdpFailure fn_failure = [failure, user_data](const char* error) {
+    failure(user_data, error);
   };
   scoped_refptr<RTCPeerConnection> p = static_cast<RTCPeerConnection*>(handle);
   p->SetRemoteDescription(string(sdp), string(type), fn_success, fn_failure);
@@ -255,21 +251,20 @@ RTCPeerConnection_SetRemoteDescription (
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_GetLocalDescription (
     rtcPeerConnectionHandle handle,
-    rtcOnGetSdpCallbacks* callbacks
+    rtcObjectHandle user_data,
+    rtcOnGetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure
 ) noexcept
 {
   CHECK_NATIVE_HANDLE(handle);
-  CHECK_POINTER_EX(callbacks, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(success, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(failure, rtcResultU4::kInvalidParameter);
 
-  OnGetSdpSuccess fn_success = [callbacks](const char* sdp, const char* type) {
-    if (callbacks && callbacks->Success) {
-      callbacks->Success(callbacks->UserData, sdp, type);
-    }
+  OnGetSdpSuccess fn_success = [success, user_data](const char* sdp, const char* type) {
+    success(user_data, sdp, type);
   };
-  OnGetSdpFailure fn_failure = [callbacks](const char* error) {
-    if (callbacks && callbacks->Failure) {
-        callbacks->Failure(callbacks->UserData, error);
-    }
+  OnGetSdpFailure fn_failure = [failure, user_data](const char* error) {
+    failure(user_data, error);
   };
   scoped_refptr<RTCPeerConnection> p = static_cast<RTCPeerConnection*>(handle);
   p->GetLocalDescription(fn_success, fn_failure);
@@ -279,21 +274,20 @@ RTCPeerConnection_GetLocalDescription (
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_GetRemoteDescription (
     rtcPeerConnectionHandle handle,
-    rtcOnGetSdpCallbacks* callbacks
+    rtcObjectHandle user_data,
+    rtcOnGetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure
 ) noexcept
 {
   CHECK_NATIVE_HANDLE(handle);
-  CHECK_POINTER_EX(callbacks, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(success, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(failure, rtcResultU4::kInvalidParameter);
 
-  OnGetSdpSuccess fn_success = [callbacks](const char* sdp, const char* type) {
-    if (callbacks && callbacks->Success) {
-      callbacks->Success(callbacks->UserData, sdp, type);
-    }
+  OnGetSdpSuccess fn_success = [success, user_data](const char* sdp, const char* type) {
+    success(user_data, sdp, type);
   };
-  OnGetSdpFailure fn_failure = [callbacks](const char* error) {
-    if (callbacks && callbacks->Failure) {
-        callbacks->Failure(callbacks->UserData, error);
-    }
+  OnGetSdpFailure fn_failure = [failure, user_data](const char* error) {
+    failure(user_data, error);
   };
   scoped_refptr<RTCPeerConnection> p = static_cast<RTCPeerConnection*>(handle);
   p->GetRemoteDescription(fn_success, fn_failure);
@@ -377,7 +371,9 @@ rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_GetSenderStats (
     rtcPeerConnectionHandle handle,
     rtcRtpSenderHandle sender,
-    rtcOnStatsCallbacks* callbacks,
+    rtcObjectHandle user_data,
+    rtcOnStatsCollectorSuccessDelegate success,
+    rtcOnFailureDelegate failure,
     rtcBool32* pOutRetVal
 ) noexcept
 {
@@ -386,21 +382,18 @@ RTCPeerConnection_GetSenderStats (
   }
   CHECK_NATIVE_HANDLE(handle);
   CHECK_POINTER_EX(sender, rtcResultU4::kInvalidParameter);
-  CHECK_POINTER_EX(callbacks, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(success, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(failure, rtcResultU4::kInvalidParameter);
 
-  OnStatsCollectorSuccess fn_success = [callbacks](const vector<scoped_refptr<MediaRTCStats>> reports) {
-    if (callbacks && callbacks->Success) {
-      scoped_refptr<MediaRTCStatsList> pList = MediaRTCStatsList::Create(reports);
-      callbacks->Success(
-        callbacks->UserData,
-        static_cast<rtcMediaRTCStatsListHandle>(pList.release())
-      );
-    }
+  OnStatsCollectorSuccess fn_success = [success, user_data](const vector<scoped_refptr<MediaRTCStats>> reports) {
+    scoped_refptr<MediaRTCStatsList> pList = MediaRTCStatsList::Create(reports);
+    success(
+      user_data,
+      static_cast<rtcMediaRTCStatsListHandle>(pList.release())
+    );
   };
-  OnStatsCollectorFailure fn_failure = [callbacks](const char* error) {
-    if (callbacks && callbacks->Failure) {
-        callbacks->Failure(callbacks->UserData, error);
-    }
+  OnStatsCollectorFailure fn_failure = [failure, user_data](const char* error) {
+    failure(user_data, error);
   };
   scoped_refptr<RTCPeerConnection> p = static_cast<RTCPeerConnection*>(handle);
   scoped_refptr<RTCRtpSender> pSender = static_cast<RTCRtpSender*>(sender);
@@ -415,7 +408,9 @@ rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_GetReceiverStats (
     rtcPeerConnectionHandle handle,
     rtcRtpReceiverHandle receiver,
-    rtcOnStatsCallbacks* callbacks,
+    rtcObjectHandle user_data,
+    rtcOnStatsCollectorSuccessDelegate success,
+    rtcOnFailureDelegate failure,
     rtcBool32* pOutRetVal
 ) noexcept
 {
@@ -424,21 +419,18 @@ RTCPeerConnection_GetReceiverStats (
   }
   CHECK_NATIVE_HANDLE(handle);
   CHECK_POINTER_EX(receiver, rtcResultU4::kInvalidParameter);
-  CHECK_POINTER_EX(callbacks, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(success, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(failure, rtcResultU4::kInvalidParameter);
 
-  OnStatsCollectorSuccess fn_success = [callbacks](const vector<scoped_refptr<MediaRTCStats>> reports) {
-    if (callbacks && callbacks->Success) {
-      scoped_refptr<MediaRTCStatsList> pList = MediaRTCStatsList::Create(reports);
-      callbacks->Success(
-        callbacks->UserData,
-        static_cast<rtcMediaRTCStatsListHandle>(pList.release())
-      );
-    }
+  OnStatsCollectorSuccess fn_success = [success, user_data](const vector<scoped_refptr<MediaRTCStats>> reports) {
+    scoped_refptr<MediaRTCStatsList> pList = MediaRTCStatsList::Create(reports);
+    success(
+      user_data,
+      static_cast<rtcMediaRTCStatsListHandle>(pList.release())
+    );
   };
-  OnStatsCollectorFailure fn_failure = [callbacks](const char* error) {
-    if (callbacks && callbacks->Failure) {
-        callbacks->Failure(callbacks->UserData, error);
-    }
+  OnStatsCollectorFailure fn_failure = [failure, user_data](const char* error) {
+    failure(user_data, error);
   };
   scoped_refptr<RTCPeerConnection> p = static_cast<RTCPeerConnection*>(handle);
   scoped_refptr<RTCRtpReceiver> pReceiver = static_cast<RTCRtpReceiver*>(receiver);
@@ -452,25 +444,24 @@ RTCPeerConnection_GetReceiverStats (
 rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_GetStats (
     rtcPeerConnectionHandle handle,
-    rtcOnStatsCallbacks* callbacks
+    rtcObjectHandle user_data,
+    rtcOnStatsCollectorSuccessDelegate success,
+    rtcOnFailureDelegate failure
 ) noexcept
 {
   CHECK_NATIVE_HANDLE(handle);
-  CHECK_POINTER_EX(callbacks, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(success, rtcResultU4::kInvalidParameter);
+  CHECK_POINTER_EX(failure, rtcResultU4::kInvalidParameter);
 
-  OnStatsCollectorSuccess fn_success = [callbacks](const vector<scoped_refptr<MediaRTCStats>> reports) {
-    if (callbacks && callbacks->Success) {
-      scoped_refptr<MediaRTCStatsList> pList = MediaRTCStatsList::Create(reports);
-      callbacks->Success(
-        callbacks->UserData,
-        static_cast<rtcMediaRTCStatsListHandle>(pList.release())
-      );
-    }
+  OnStatsCollectorSuccess fn_success = [success, user_data](const vector<scoped_refptr<MediaRTCStats>> reports) {
+    scoped_refptr<MediaRTCStatsList> pList = MediaRTCStatsList::Create(reports);
+    success(
+      user_data,
+      static_cast<rtcMediaRTCStatsListHandle>(pList.release())
+    );
   };
-  OnStatsCollectorFailure fn_failure = [callbacks](const char* error) {
-    if (callbacks && callbacks->Failure) {
-        callbacks->Failure(callbacks->UserData, error);
-    }
+  OnStatsCollectorFailure fn_failure = [failure, user_data](const char* error) {
+    failure(user_data, error);
   };
   scoped_refptr<RTCPeerConnection> p = static_cast<RTCPeerConnection*>(handle);
   p->GetStats(fn_success, fn_failure);

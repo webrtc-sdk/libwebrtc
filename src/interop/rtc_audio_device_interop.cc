@@ -160,21 +160,21 @@ RTCAudioDevice_SetRecordingDevice(
 rtcResultU4 LIB_WEBRTC_CALL
 RTCAudioDevice_RegisterDeviceChangeCallback(
     rtcAudioDeviceHandle audiDevice,
-    rtcAudioDeviceCallbacks* callbacks
+    rtcObjectHandle userData,
+    rtcAudioDeviceChangeDelegate callback
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(audiDevice);
 
     scoped_refptr<RTCAudioDevice> pAudioDevice = static_cast<RTCAudioDevice*>(audiDevice);
     RTCAudioDevice::OnDeviceChangeCallback cb;
-    if (callbacks == nullptr || callbacks->DeviceChanged == nullptr) {
+    if (callback == nullptr) {
         cb = nullptr;
     }
     else {
-        rtcAudioDeviceCallbacks cb2 = *callbacks;
-        cb = [cb2](void) {
-            if (cb2.DeviceChanged) {
-                cb2.DeviceChanged(cb2.UserData);
+        cb = [callback, userData](void) {
+            if (callback) {
+                callback(userData);
             }
         };
     }

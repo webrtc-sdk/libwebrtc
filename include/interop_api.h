@@ -546,14 +546,6 @@ using rtcAudioDeviceChangeDelegate = void(LIB_WEBRTC_CALL*)(
     rtcObjectHandle user_data);
 
 /**
- * Callback delegate structure for RTCAudioDevice.
- */
-struct rtcAudioDeviceCallbacks {
-  rtcObjectHandle UserData{};
-  rtcAudioDeviceChangeDelegate DeviceChanged{};
-};
-
-/**
  * Callback delegate for MediaListObserver.
  */
 using rtcMediaListObserverDelegate = void(LIB_WEBRTC_CALL*)(
@@ -713,33 +705,6 @@ using rtcOnGetSdpSuccessDelegate = void(LIB_WEBRTC_CALL*)(
     rtcObjectHandle user_data, const char* sdp, const char* type);
 
 using rtcOnSetSdpSuccessDelegate = void(LIB_WEBRTC_CALL*)(rtcObjectHandle user_data);
-
-/**
- * Callback delegate structure for RTCPeerConnection.
- */
-struct rtcOnStatsCallbacks {
-  rtcObjectHandle UserData{};
-  rtcOnStatsCollectorSuccessDelegate Success{};
-  rtcOnFailureDelegate Failure{};
-}; // end struct rtcOnStatsCallbacks
-
-/**
- * Callback delegate structure for RTCPeerConnection.
- */
-struct rtcOnGetSdpCallbacks {
-  rtcObjectHandle UserData{};
-  rtcOnGetSdpSuccessDelegate Success{};
-  rtcOnFailureDelegate Failure{};
-}; // end struct rtcOnGetSdpCallbacks
-
-/**
- * Callback delegate structure for RTCPeerConnection.
- */
-struct rtcOnSetSdpCallbacks {
-  rtcObjectHandle UserData{};
-  rtcOnSetSdpSuccessDelegate Success{};
-  rtcOnFailureDelegate Failure{};
-}; // end struct rtcOnSetSdpCallbacks
 
 /*
  * ----------------------------------------------------------------------
@@ -1047,7 +1012,8 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCAudioDevice_SetRecordingDevice(
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCAudioDevice_RegisterDeviceChangeCallback(
     rtcAudioDeviceHandle audiDevice,
-    rtcAudioDeviceCallbacks* callbacks
+    rtcObjectHandle userData,
+    rtcAudioDeviceChangeDelegate callback
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
@@ -3455,14 +3421,18 @@ RTCPeerConnection_CreateDataChannel (
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_CreateOffer (
     rtcPeerConnectionHandle handle,
-    rtcOnGetSdpCallbacks* callbacks,
+    rtcObjectHandle user_data,
+    rtcOnGetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure,
     rtcMediaConstraintsHandle constraints
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_CreateAnswer (
     rtcPeerConnectionHandle handle,
-    rtcOnGetSdpCallbacks* callbacks,
+    rtcObjectHandle user_data,
+    rtcOnGetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure,
     rtcMediaConstraintsHandle constraints
 ) noexcept;
 
@@ -3481,7 +3451,9 @@ RTCPeerConnection_SetLocalDescription (
     rtcPeerConnectionHandle handle,
     const char* sdp,
     const char* type,
-    rtcOnSetSdpCallbacks* callbacks
+    rtcObjectHandle user_data,
+    rtcOnSetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
@@ -3489,19 +3461,25 @@ RTCPeerConnection_SetRemoteDescription (
     rtcPeerConnectionHandle handle,
     const char* sdp,
     const char* type,
-    rtcOnSetSdpCallbacks* callbacks
+    rtcObjectHandle user_data,
+    rtcOnSetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_GetLocalDescription (
     rtcPeerConnectionHandle handle,
-    rtcOnGetSdpCallbacks* callbacks
+    rtcObjectHandle user_data,
+    rtcOnGetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_GetRemoteDescription (
     rtcPeerConnectionHandle handle,
-    rtcOnGetSdpCallbacks* callbacks
+    rtcObjectHandle user_data,
+    rtcOnGetSdpSuccessDelegate success,
+    rtcOnFailureDelegate failure
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
@@ -3539,7 +3517,9 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_GetSenderStats (
     rtcPeerConnectionHandle handle,
     rtcRtpSenderHandle sender,
-    rtcOnStatsCallbacks* callbacks,
+    rtcObjectHandle user_data,
+    rtcOnStatsCollectorSuccessDelegate success,
+    rtcOnFailureDelegate failure,
     rtcBool32* pOutRetVal
 ) noexcept;
 
@@ -3547,14 +3527,18 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_GetReceiverStats (
     rtcPeerConnectionHandle handle,
     rtcRtpReceiverHandle receiver,
-    rtcOnStatsCallbacks* callbacks,
+    rtcObjectHandle user_data,
+    rtcOnStatsCollectorSuccessDelegate success,
+    rtcOnFailureDelegate failure,
     rtcBool32* pOutRetVal
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_GetStats (
     rtcPeerConnectionHandle handle,
-    rtcOnStatsCallbacks* callbacks
+    rtcObjectHandle user_data,
+    rtcOnStatsCollectorSuccessDelegate success,
+    rtcOnFailureDelegate failure
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
