@@ -31,6 +31,24 @@
 
 namespace libwebrtc {
 
+/**
+ * class DesktopCapturerObserverImpl
+ */
+class DesktopCapturerObserverImpl : public DesktopCapturerObserver
+{
+ public:
+   DesktopCapturerObserverImpl(void* callbacks /* rtcDesktopCapturerObserverCallbacks* */);
+   ~DesktopCapturerObserverImpl();
+
+  void OnStart(scoped_refptr<RTCDesktopCapturer> capturer) override;
+  void OnPaused(scoped_refptr<RTCDesktopCapturer> capturer) override;
+  void OnStop(scoped_refptr<RTCDesktopCapturer> capturer) override;
+  void OnError(scoped_refptr<RTCDesktopCapturer> capturer) override;
+
+ private:
+   void* callbacks_ /* rtcDesktopCapturerObserverCallbacks* */;
+}; // end class DesktopCapturerObserverImpl
+
 class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
                                public webrtc::DesktopCapturer::Callback,
                                public webrtc::internal::VideoCapturer {
@@ -57,6 +75,8 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   bool IsRunning() override;
 
   scoped_refptr<MediaSource> source() override { return source_; }
+
+  DesktopCapturerObserver* GetObserver() override { return observer_; }
 
  protected:
   virtual void OnCaptureResult(

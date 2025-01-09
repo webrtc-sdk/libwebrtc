@@ -86,6 +86,8 @@ class RTCDesktopCapturer : public RefCountInterface {
    */
   virtual scoped_refptr<MediaSource> source() = 0;
 
+  virtual DesktopCapturerObserver* GetObserver() = 0;
+
   /**
    * @brief Destroys the RTCDesktopCapturer object.
    */
@@ -130,7 +132,7 @@ class DesktopCapturerObserver {
   virtual void OnError(scoped_refptr<RTCDesktopCapturer> capturer) = 0;
 
  protected:
-  ~DesktopCapturerObserver() {}
+  virtual ~DesktopCapturerObserver() {}
 };
 
 }  // namespace libwebrtc

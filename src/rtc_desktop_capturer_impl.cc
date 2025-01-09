@@ -23,9 +23,69 @@
 #include "modules/desktop_capture/win/window_capture_utils.h"
 #endif
 
+#include "interop_api.h"
+
 namespace libwebrtc {
 
 enum { kCaptureDelay = 33, kCaptureMessageId = 1000 };
+
+/**
+ * DesktopCapturerObserverImpl
+ */
+
+DesktopCapturerObserverImpl::DesktopCapturerObserverImpl(void* callbacks /* rtcDesktopCapturerObserverCallbacks* */)
+  : callbacks_(nullptr)
+{
+  if (callbacks) {
+    size_t nSize = sizeof(rtcDesktopCapturerObserverCallbacks);
+    callbacks_ = malloc(nSize);
+    memcpy(callbacks_, (const void*)callbacks, nSize);
+  }
+}
+
+DesktopCapturerObserverImpl::~DesktopCapturerObserverImpl()
+{
+  if (callbacks_) {
+    free(callbacks_);
+  }
+  callbacks_ = nullptr;
+}
+
+void DesktopCapturerObserverImpl::OnStart(scoped_refptr<RTCDesktopCapturer> capturer)
+{
+  if (callbacks_) {
+    rtcDesktopCapturerObserverCallbacks* pCallbacks = reinterpret_cast<rtcDesktopCapturerObserverCallbacks*>(callbacks_);
+    pCallbacks->Started(pCallbacks->UserData);
+  }
+}
+
+void DesktopCapturerObserverImpl::OnPaused(scoped_refptr<RTCDesktopCapturer> capturer)
+{
+  if (callbacks_) {
+    rtcDesktopCapturerObserverCallbacks* pCallbacks = reinterpret_cast<rtcDesktopCapturerObserverCallbacks*>(callbacks_);
+    pCallbacks->Paused(pCallbacks->UserData);
+  }
+}
+
+void DesktopCapturerObserverImpl::OnStop(scoped_refptr<RTCDesktopCapturer> capturer)
+{
+  if (callbacks_) {
+    rtcDesktopCapturerObserverCallbacks* pCallbacks = reinterpret_cast<rtcDesktopCapturerObserverCallbacks*>(callbacks_);
+    pCallbacks->Stopped(pCallbacks->UserData);
+  }
+}
+
+void DesktopCapturerObserverImpl::OnError(scoped_refptr<RTCDesktopCapturer> capturer)
+{
+  if (callbacks_) {
+    rtcDesktopCapturerObserverCallbacks* pCallbacks = reinterpret_cast<rtcDesktopCapturerObserverCallbacks*>(callbacks_);
+    pCallbacks->Failed(pCallbacks->UserData);
+  }
+}
+
+/**
+ * class RTCDesktopCapturerImpl
+ */
 
 RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
     DesktopType type, webrtc::DesktopCapturer::SourceId source_id,

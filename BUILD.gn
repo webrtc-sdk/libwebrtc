@@ -189,6 +189,7 @@ rtc_shared_library("libwebrtc") {
     if (libwebrtc_desktop_capture) {
       sources += [
         "src/interop/rtc_desktop_media_list_interop.cc",
+        "src/interop/rtc_desktop_capturer_interop.cc",
         "src/interop/rtc_desktop_device_interop.cc",
       ]
     }

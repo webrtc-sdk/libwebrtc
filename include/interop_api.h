@@ -187,6 +187,12 @@ enum class rtcNetworkPriority : int {
   kHigh = 3
 };
 
+enum class rtcDesktopCaptureState : int { 
+    CS_RUNNING = 0, 
+    CS_STOPPED = 1, 
+    CS_FAILED = 2 
+};
+
 /// 32-bit result enumerator
 enum class rtcResultU4 : unsigned int {
   /// The operation was successful.
@@ -560,6 +566,23 @@ struct rtcMediaListObserverCallbacks {
   rtcMediaListObserverDelegate MediaSourceRemoved{};
   rtcMediaListObserverDelegate MediaSourceNameChanged{};
   rtcMediaListObserverDelegate MediaSourceThumbnailChanged{};
+};
+
+/**
+ * Desktop capturer callback delegate
+ */
+using rtcDesktopCapturerCommonDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data);
+
+/**
+ * Callback delegate structure for DesktopCapturerObserver.
+ */
+struct rtcDesktopCapturerObserverCallbacks {
+  rtcObjectHandle UserData{};
+  rtcDesktopCapturerCommonDelegate Started{};
+  rtcDesktopCapturerCommonDelegate Paused{};
+  rtcDesktopCapturerCommonDelegate Stopped{};
+  rtcDesktopCapturerCommonDelegate Failed{};
 };
 
 /**
@@ -1539,6 +1562,58 @@ MediaSource_UpdateThumbnail(rtcDesktopMediaSourceHandle mediaSource) noexcept;
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 MediaSource_GetThumbnail(rtcDesktopMediaSourceHandle mediaSource,
                          unsigned char* pBuffer, int* refSizeOfBuffer) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCDesktopCapturer interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopCapturer_RegisterObserver(
+    rtcDesktopCapturerHandle handle,
+    rtcDesktopCapturerObserverCallbacks* callbacks
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopCapturer_UnregisterObserver(
+    rtcDesktopCapturerHandle handle
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopCapturer_Start1(
+    rtcDesktopCapturerHandle handle,
+    unsigned int fps,
+    rtcDesktopCaptureState* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopCapturer_Start2(
+    rtcDesktopCapturerHandle handle,
+    unsigned int fps,
+    unsigned int x,
+    unsigned int y,
+    unsigned int width,
+    unsigned int height,
+    rtcDesktopCaptureState* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopCapturer_Stop(
+    rtcDesktopCapturerHandle handle
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopCapturer_IsRunning(
+    rtcDesktopCapturerHandle handle,
+    rtcBool32* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDesktopCapturer_GetSource(
+    rtcDesktopCapturerHandle handle,
+    rtcDesktopMediaSourceHandle* pOutRetVal
+) noexcept;
 
 /*
  * ----------------------------------------------------------------------
