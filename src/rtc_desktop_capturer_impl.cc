@@ -170,7 +170,9 @@ RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
   capture_state_ = CS_RUNNING;
   thread_->PostTask([this] { CaptureFrame(); });
   if (observer_) {
-    signaling_thread_->BlockingCall([&, this]() { observer_->OnStart(this); });
+    signaling_thread_->BlockingCall([&, this]() { 
+      if (observer_) { observer_->OnStart(this); }
+    });
   }
   return capture_state_;
 }
@@ -178,7 +180,9 @@ RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
 void RTCDesktopCapturerImpl::Stop() {
   if (observer_) {
     if (!signaling_thread_->IsCurrent()) {
-      signaling_thread_->BlockingCall([&, this]() { observer_->OnStop(this); });
+      signaling_thread_->BlockingCall([&, this]() { 
+        if (observer_) { observer_->OnStop(this); }
+      });
     } else {
       observer_->OnStop(this);
     }
@@ -202,8 +206,9 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
   if (result != result_) {
     if (result == webrtc::DesktopCapturer::Result::ERROR_PERMANENT) {
       if (observer_) {
-        signaling_thread_->BlockingCall(
-            [&, this]() { observer_->OnError(this); });
+        signaling_thread_->BlockingCall([&, this]() {
+          if (observer_) { observer_->OnError(this); }
+        });
       }
       capture_state_ = CS_FAILED;
       return;
@@ -212,8 +217,9 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
     if (result == webrtc::DesktopCapturer::Result::ERROR_TEMPORARY) {
       result_ = result;
       if (observer_) {
-        signaling_thread_->BlockingCall(
-            [&, this]() { observer_->OnPaused(this); });
+        signaling_thread_->BlockingCall([&, this]() {
+          if (observer_) { observer_->OnPaused(this); }
+        });
       }
       return;
     }
@@ -221,8 +227,9 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
     if (result == webrtc::DesktopCapturer::Result::SUCCESS) {
       result_ = result;
       if (observer_) {
-        signaling_thread_->BlockingCall(
-            [&, this]() { observer_->OnStart(this); });
+        signaling_thread_->BlockingCall([&, this]() {
+          if (observer_) { observer_->OnStart(this); }
+        });
       }
     }
   }
