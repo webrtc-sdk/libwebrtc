@@ -24,6 +24,7 @@ using rtcMediaSecurityType = libwebrtc::MediaSecurityType;
 using rtcSdpSemantics = libwebrtc::SdpSemantics;
 using rtcMediaType = libwebrtc::RTCMediaType;
 using rtcDesktopType = libwebrtc::DesktopType;
+using rtcCaptureState = libwebrtc::RTCCaptureState;
 
 /// 64-bit timestamp for interop API.
 using rtcTimestamp = long long;
@@ -185,12 +186,6 @@ enum class rtcNetworkPriority : int {
   kLow = 1,
   kMedium = 2,
   kHigh = 3
-};
-
-enum class rtcDesktopCaptureState : int { 
-    CS_RUNNING = 0, 
-    CS_STOPPED = 1, 
-    CS_FAILED = 2 
 };
 
 /// 32-bit result enumerator
@@ -405,6 +400,9 @@ using rtcDesktopMediaSourceHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCDesktopMediaList interop object.
 using rtcDesktopMediaListHandle = rtcRefCountedObjectHandle;
 
+/// Opaque handle to a native RTCDummyVideoCapturer interop object.
+using rtcDummyVideoCapturerHandle = rtcRefCountedObjectHandle;
+
 /// Opaque handle to a native RTCMediaStream interop object.
 using rtcMediaStreamHandle = rtcRefCountedObjectHandle;
 
@@ -583,6 +581,30 @@ struct rtcDesktopCapturerObserverCallbacks {
   rtcDesktopCapturerCommonDelegate Paused{};
   rtcDesktopCapturerCommonDelegate Stopped{};
   rtcDesktopCapturerCommonDelegate Failed{};
+};
+
+/**
+ * Dummy video capturer callback delegate
+ */
+using rtcDummyVideoCapturerCommonDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data);
+
+/**
+ * Dummy video capturer fill buffer callback delegate
+ */
+using rtcDummyVideoCapturerFillBufferDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcVideoFrameHandle frame);
+
+/**
+ * Callback delegate structure for DummyVideoCapturerObserver.
+ */
+struct rtcDummyVideoCapturerObserverCallbacks {
+  rtcObjectHandle UserData{};
+  rtcDummyVideoCapturerCommonDelegate Started{};
+  rtcDummyVideoCapturerCommonDelegate Paused{};
+  rtcDummyVideoCapturerCommonDelegate Stopped{};
+  rtcDummyVideoCapturerCommonDelegate Failed{};
+  rtcDummyVideoCapturerFillBufferDelegate FillBuffer{};
 };
 
 /**
@@ -908,6 +930,27 @@ RTCPeerConnectionFactory_CreateDesktopSource(
     const char* video_source_label, rtcMediaConstraintsHandle constraints,
     rtcVideoSourceHandle* pRetVal) noexcept;
 #endif  // RTC_DESKTOP_DEVICE
+
+/**
+ * @brief Creates a new instance of the RTCDummyVideoCapturer object.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_CreateDummyVideoCapturer(
+    rtcPeerConnectionFactoryHandle factory, 
+    unsigned int fps,
+    unsigned int width,
+    unsigned int height,
+    rtcDummyVideoCapturerHandle* pRetVal) noexcept;
+
+/**
+ * @brief Creates a new instance of the RTCVideoSource object.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_CreateDummyVideoSource(
+    rtcPeerConnectionFactoryHandle factory, 
+    rtcDummyVideoCapturerHandle capturer,
+    const char* video_source_label,
+    rtcVideoSourceHandle* pRetVal) noexcept;
 
 /**
  * @brief Creates a new instance of the RTCAudioTrack object.
@@ -1584,7 +1627,7 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCDesktopCapturer_Start1(
     rtcDesktopCapturerHandle handle,
     unsigned int fps,
-    rtcDesktopCaptureState* pOutRetVal
+    rtcCaptureState* pOutRetVal
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
@@ -1595,7 +1638,7 @@ RTCDesktopCapturer_Start2(
     unsigned int y,
     unsigned int width,
     unsigned int height,
-    rtcDesktopCaptureState* pOutRetVal
+    rtcCaptureState* pOutRetVal
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
@@ -1647,6 +1690,62 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCDesktopDevice_GetDesktopMediaList(
     rtcDesktopMediaListHandle* pOutRetVal) noexcept;
 
 #endif  // RTC_DESKTOP_DEVICE
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCDummyVideoCapturer interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyVideoCapturer_RegisterObserver(
+    rtcDummyVideoCapturerHandle handle,
+    rtcDummyVideoCapturerObserverCallbacks* callbacks
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyVideoCapturer_UnregisterObserver(
+    rtcDummyVideoCapturerHandle handle
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyVideoCapturer_Start1(
+    rtcDummyVideoCapturerHandle handle,
+    rtcCaptureState* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyVideoCapturer_Start2(
+    rtcDummyVideoCapturerHandle handle,
+    unsigned int fps,
+    rtcCaptureState* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyVideoCapturer_Start3(
+    rtcDummyVideoCapturerHandle handle,
+    unsigned int fps,
+    unsigned int width,
+    unsigned int height,
+    rtcCaptureState* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyVideoCapturer_Stop(
+    rtcDummyVideoCapturerHandle handle
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyVideoCapturer_IsRunning(
+    rtcDummyVideoCapturerHandle handle,
+    rtcBool32* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyVideoCapturer_GetState(
+    rtcDummyVideoCapturerHandle handle,
+    rtcCaptureState* pOutRetVal
+) noexcept;
 
 /*
  * ----------------------------------------------------------------------

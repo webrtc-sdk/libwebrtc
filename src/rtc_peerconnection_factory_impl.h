@@ -11,6 +11,7 @@
 #include "rtc_peerconnection.h"
 #include "rtc_peerconnection_factory.h"
 #include "rtc_video_device_impl.h"
+#include "src/internal/dummy_capturer.h"
 
 #ifdef RTC_DESKTOP_DEVICE
 #include "rtc_desktop_capturer_impl.h"
@@ -53,6 +54,11 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
       const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) override;
 #endif
+  virtual scoped_refptr<RTCDummyVideoCapturer> CreateDummyVideoCapturer(
+      uint32_t fps, uint32_t width, uint32_t height) override;
+  virtual scoped_refptr<RTCVideoSource> CreateDummyVideoSource(
+      scoped_refptr<RTCDummyVideoCapturer> capturer, const string video_source_label) override;
+
   virtual scoped_refptr<RTCAudioTrack> CreateAudioTrack(
       scoped_refptr<RTCAudioSource> source, const string track_id) override;
 
@@ -83,6 +89,10 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<RTCVideoSource> CreateVideoSource_s(
       scoped_refptr<RTCVideoCapturer> capturer, const char* video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints);
+
+  scoped_refptr<RTCVideoSource> CreateDummyVideoSource_s(
+      scoped_refptr<RTCDummyVideoCapturer> capturer, const char* video_source_label);
+
 #ifdef RTC_DESKTOP_DEVICE
   scoped_refptr<RTCVideoSource> CreateDesktopSource_d(
       scoped_refptr<RTCDesktopCapturer> capturer,

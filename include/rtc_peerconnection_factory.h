@@ -11,6 +11,7 @@
 #include "rtc_mediaconstraints.h"
 #include "rtc_video_device.h"
 #include "rtc_video_source.h"
+#include "rtc_dummy_video_capturer.h"
 
 namespace libwebrtc {
 
@@ -49,6 +50,11 @@ class RTCPeerConnectionFactory : public RefCountInterface {
       const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) = 0;
 #endif
+  virtual scoped_refptr<RTCDummyVideoCapturer> CreateDummyVideoCapturer(
+      uint32_t fps, uint32_t width, uint32_t height) = 0;
+  virtual scoped_refptr<RTCVideoSource> CreateDummyVideoSource(
+      scoped_refptr<RTCDummyVideoCapturer> capturer, const string video_source_label) = 0;
+
   virtual scoped_refptr<RTCAudioTrack> CreateAudioTrack(
       scoped_refptr<RTCAudioSource> source, const string track_id) = 0;
 

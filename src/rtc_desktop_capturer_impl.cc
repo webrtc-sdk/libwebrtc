@@ -123,7 +123,7 @@ RTCDesktopCapturerImpl::~RTCDesktopCapturerImpl() {
   capturer_.reset();
 }
 
-RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
+RTCCaptureState RTCDesktopCapturerImpl::Start(
     uint32_t fps, uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
   x_ = x;
   y_ = y;
@@ -136,14 +136,14 @@ RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
   return Start(fps);
 }
 
-RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
+RTCCaptureState RTCDesktopCapturerImpl::Start(
     uint32_t fps) {
-  if (capture_state_ == CS_RUNNING) {
+  if (capture_state_ == RTCCaptureState::CS_RUNNING) {
     return capture_state_;
   }
 
   if (fps == 0) {
-    capture_state_ = CS_FAILED;
+    capture_state_ = RTCCaptureState::CS_FAILED;
     return capture_state_;
   }
 
@@ -155,19 +155,19 @@ RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
 
   if (source_id_ != -1) {
     if (!capturer_->SelectSource(source_id_)) {
-      capture_state_ = CS_FAILED;
+      capture_state_ = RTCCaptureState::CS_FAILED;
       return capture_state_;
     }
     if (type_ == kWindow) {
       if (!capturer_->FocusOnSelectedSource()) {
-        capture_state_ = CS_FAILED;
+        capture_state_ = RTCCaptureState::CS_FAILED;
         return capture_state_;
       }
     }
   }
 
   thread_->BlockingCall([this] { capturer_->Start(this); });
-  capture_state_ = CS_RUNNING;
+  capture_state_ = RTCCaptureState::CS_RUNNING;
   thread_->PostTask([this] { CaptureFrame(); });
   if (observer_) {
     signaling_thread_->BlockingCall([&, this]() { 
@@ -187,11 +187,11 @@ void RTCDesktopCapturerImpl::Stop() {
       observer_->OnStop(this);
     }
   }
-  capture_state_ = CS_STOPPED;
+  capture_state_ = RTCCaptureState::CS_STOPPED;
 }
 
 bool RTCDesktopCapturerImpl::IsRunning() {
-  return capture_state_ == CS_RUNNING;
+  return capture_state_ == RTCCaptureState::CS_RUNNING;
 }
 
 #ifdef WEBRTC_WIN
@@ -210,7 +210,7 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
           if (observer_) { observer_->OnError(this); }
         });
       }
-      capture_state_ = CS_FAILED;
+      capture_state_ = RTCCaptureState::CS_FAILED;
       return;
     }
 
@@ -279,7 +279,7 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
 
 void RTCDesktopCapturerImpl::CaptureFrame() {
   RTC_DCHECK_RUN_ON(thread_.get());
-  if (capture_state_ == CS_RUNNING) {
+  if (capture_state_ == RTCCaptureState::CS_RUNNING) {
     capturer_->CaptureFrame();
     thread_->PostDelayedHighPrecisionTask(
         [this]() { CaptureFrame(); },

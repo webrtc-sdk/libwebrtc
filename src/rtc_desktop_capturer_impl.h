@@ -65,9 +65,9 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   }
 
   void DeRegisterDesktopCapturerObserver() override { observer_ = nullptr; }
-  CaptureState Start(uint32_t fps) override;
+  RTCCaptureState Start(uint32_t fps) override;
 
-  CaptureState Start(uint32_t fps, uint32_t x, uint32_t y, uint32_t w,
+  RTCCaptureState Start(uint32_t fps, uint32_t x, uint32_t y, uint32_t w,
                      uint32_t h) override;
 
   void Stop() override;
@@ -89,7 +89,7 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   std::unique_ptr<webrtc::DesktopCapturer> capturer_;
   std::unique_ptr<rtc::Thread> thread_;
   rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer_;
-  CaptureState capture_state_ = CS_STOPPED;
+  RTCCaptureState capture_state_ = RTCCaptureState::CS_STOPPED;
   DesktopType type_;
   webrtc::DesktopCapturer::SourceId source_id_;
   DesktopCapturerObserver* observer_ = nullptr;

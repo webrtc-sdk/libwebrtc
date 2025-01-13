@@ -17,11 +17,13 @@ class RTCVideoRendererImpl : public RTCVideoRenderer<scoped_refptr<RTCVideoFrame
   void OnFrame(scoped_refptr<RTCVideoFrame> frame) override;
 
   void RegisterFrameCallback(void* user_data /* rtcObjectHandle */, void* callback /* rtcVideoRendererFrameDelegate */) override;
+  void RegisterFrameCallback(OnFrameCallbackSafe callback) override;
   void UnRegisterFrameCallback() override;
  
  private:
   void* user_data_ = nullptr;
   OnFrameCallback callback_ = nullptr;
+  OnFrameCallbackSafe callback_safe_ = nullptr;
 }; // end class RTCVideoRendererImpl
 
 } // end namespace libwebrtc

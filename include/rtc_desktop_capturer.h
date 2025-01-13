@@ -24,12 +24,6 @@ class DesktopCapturerObserver;
 class RTCDesktopCapturer : public RefCountInterface {
  public:
   /**
-   * @brief Enumeration for the possible states of desktop capture.
-   */
-  enum CaptureState { CS_RUNNING, CS_STOPPED, CS_FAILED };
-
- public:
-  /**
    * @brief Registers the given observer for desktop capture events.
    *
    * @param observer Pointer to the observer to be registered.
@@ -49,7 +43,7 @@ class RTCDesktopCapturer : public RefCountInterface {
    *
    * @return The current capture state after attempting to start capture.
    */
-  virtual CaptureState Start(uint32_t fps) = 0;
+  virtual RTCCaptureState Start(uint32_t fps) = 0;
 
   /**
    * @brief Starts desktop capture with the given frame rate and capture
@@ -63,7 +57,7 @@ class RTCDesktopCapturer : public RefCountInterface {
    *
    * @return The current capture state after attempting to start capture.
    */
-  virtual CaptureState Start(uint32_t fps, uint32_t x, uint32_t y, uint32_t w,
+  virtual RTCCaptureState Start(uint32_t fps, uint32_t x, uint32_t y, uint32_t w,
                              uint32_t h) = 0;
 
   /**

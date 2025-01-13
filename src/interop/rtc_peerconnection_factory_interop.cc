@@ -227,6 +227,49 @@ RTCPeerConnectionFactory_CreateDesktopSource(
 #endif // RTC_DESKTOP_DEVICE
 
 rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_CreateDummyVideoCapturer(
+    rtcPeerConnectionFactoryHandle factory, 
+    unsigned int fps,
+    unsigned int width,
+    unsigned int height,
+    rtcDummyVideoCapturerHandle* pRetVal) noexcept
+{
+    CHECK_OUT_POINTER(pRetVal);
+    CHECK_NATIVE_HANDLE(factory);
+    if (fps == 0 || width == 0 || height == 0) {
+        return rtcResultU4::kInvalidParameter;
+    }
+
+    scoped_refptr<RTCPeerConnectionFactory> pFactory = static_cast<RTCPeerConnectionFactory*>(factory);
+    scoped_refptr<RTCDummyVideoCapturer> pDummyVideoCapturer = pFactory->CreateDummyVideoCapturer(
+        fps, width, height
+    );
+    *pRetVal = static_cast<rtcDummyVideoCapturerHandle>(pDummyVideoCapturer.release());
+    return rtcResultU4::kSuccess;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_CreateDummyVideoSource(
+    rtcPeerConnectionFactoryHandle factory, 
+    rtcDummyVideoCapturerHandle capturer,
+    const char* video_source_label,
+    rtcVideoSourceHandle* pRetVal) noexcept
+{
+    CHECK_OUT_POINTER(pRetVal);
+    CHECK_NATIVE_HANDLE(factory);
+    CHECK_POINTER_EX(capturer, rtcResultU4::kInvalidParameter);
+
+    scoped_refptr<RTCPeerConnectionFactory> pFactory = static_cast<RTCPeerConnectionFactory*>(factory);
+    scoped_refptr<RTCDummyVideoCapturer> pDummyVideoCapturer = static_cast<RTCDummyVideoCapturer*>(capturer);
+    scoped_refptr<RTCVideoSource> pVideoSource = pFactory->CreateDummyVideoSource(
+        pDummyVideoCapturer,
+        string(video_source_label)
+    );
+    *pRetVal = static_cast<rtcVideoSourceHandle>(pVideoSource.release());
+    return rtcResultU4::kSuccess;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateAudioTrack(
     rtcPeerConnectionFactoryHandle factory,
     rtcAudioSourceHandle source,

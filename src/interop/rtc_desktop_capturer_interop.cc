@@ -44,15 +44,15 @@ rtcResultU4 LIB_WEBRTC_CALL
 RTCDesktopCapturer_Start1(
     rtcDesktopCapturerHandle handle,
     unsigned int fps,
-    rtcDesktopCaptureState* pOutRetVal
+    rtcCaptureState* pOutRetVal
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(handle);
     CHECK_POINTER(pOutRetVal);
-    *pOutRetVal = rtcDesktopCaptureState::CS_FAILED;
+    *pOutRetVal = rtcCaptureState::CS_FAILED;
 
     scoped_refptr<RTCDesktopCapturer> p = static_cast<RTCDesktopCapturer*>(handle);
-    *pOutRetVal = static_cast<rtcDesktopCaptureState>(p->Start(static_cast<uint32_t>(fps)));
+    *pOutRetVal = static_cast<rtcCaptureState>(p->Start(static_cast<uint32_t>(fps)));
     return rtcResultU4::kSuccess;
 }
 
@@ -64,15 +64,15 @@ RTCDesktopCapturer_Start2(
     unsigned int y,
     unsigned int width,
     unsigned int height,
-    rtcDesktopCaptureState* pOutRetVal
+    rtcCaptureState* pOutRetVal
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(handle);
     CHECK_POINTER(pOutRetVal);
-    *pOutRetVal = rtcDesktopCaptureState::CS_FAILED;
+    *pOutRetVal = rtcCaptureState::CS_FAILED;
 
     scoped_refptr<RTCDesktopCapturer> p = static_cast<RTCDesktopCapturer*>(handle);
-    *pOutRetVal = static_cast<rtcDesktopCaptureState>(p->Start(
+    *pOutRetVal = static_cast<rtcCaptureState>(p->Start(
         static_cast<uint32_t>(fps),
         static_cast<uint32_t>(x),
         static_cast<uint32_t>(y),

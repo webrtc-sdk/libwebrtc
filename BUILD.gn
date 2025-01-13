@@ -96,6 +96,7 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_video_renderer.h",
     "include/rtc_video_source.h",
     "include/rtc_video_track.h",
+    "include/rtc_dummy_video_capturer.h",
     "include/helper.h",
     "src/helper.cc",
     "src/base/portable.cc",
@@ -103,6 +104,8 @@ rtc_shared_library("libwebrtc") {
     "src/internal/vcm_capturer.h",
     "src/internal/video_capturer.cc",
     "src/internal/video_capturer.h",
+    "src/internal/dummy_capturer.cc",
+    "src/internal/dummy_capturer.h",
     "src/libwebrtc.cc",
     "src/rtc_audio_device_impl.cc",
     "src/rtc_audio_device_impl.h",
@@ -154,6 +157,8 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_video_source_impl.h",
     "src/rtc_video_track_impl.cc",
     "src/rtc_video_track_impl.h",
+    "src/rtc_dummy_video_capturer_impl.cc",
+    "src/rtc_dummy_video_capturer_impl.h",
   ]
   
   # for interop methods
@@ -173,6 +178,7 @@ rtc_shared_library("libwebrtc") {
       "src/interop/rtc_video_track_interop.cc",
       "src/interop/rtc_video_frame_interop.cc",
       "src/interop/rtc_video_renderer_interop.cc",
+      "src/interop/rtc_dummy_video_capturer_interop.cc",
       "src/interop/rtc_data_channel_interop.cc",
       "src/interop/rtc_ice_candidate_interop.cc",
       "src/interop/rtc_media_stream_interop.cc",

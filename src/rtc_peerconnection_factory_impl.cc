@@ -14,6 +14,7 @@
 #include "rtc_rtp_capabilities_impl.h"
 #include "rtc_video_device_impl.h"
 #include "rtc_video_source_impl.h"
+#include "rtc_dummy_video_capturer_impl.h"
 #if defined(USE_INTEL_MEDIA_SDK)
 #include "src/win/mediacapabilities.h"
 #include "src/win/msdkvideodecoderfactory.h"
@@ -205,6 +206,19 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
   return source;
 }
 
+scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDummyVideoSource_s(
+      scoped_refptr<RTCDummyVideoCapturer> capturer, const char* video_source_label)
+{
+  rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
+      rtc::scoped_refptr<webrtc::VideoTrackSourceInterface>(
+          new rtc::RefCountedObject<DummyCapturerTrackSource>(capturer));
+
+  scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(
+      new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
+
+  return source;
+}
+
 #ifdef RTC_DESKTOP_DEVICE
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource(
     scoped_refptr<RTCDesktopCapturer> capturer, const string video_source_label,
@@ -270,6 +284,35 @@ scoped_refptr<RTCVideoTrack> RTCPeerConnectionFactoryImpl::CreateVideoTrack(
   // 	}
 
   return video_track;
+}
+
+scoped_refptr<RTCDummyVideoCapturer> RTCPeerConnectionFactoryImpl::CreateDummyVideoCapturer(
+      uint32_t fps, uint32_t width, uint32_t height)
+{
+  return scoped_refptr<RTCDummyVideoCapturer>(
+    new RefCountedObject<RTCDummyVideoCapturerImpl>(
+      signaling_thread_.get(),
+      fps,
+      width,
+      height
+    )
+  );
+}
+
+scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDummyVideoSource(
+      scoped_refptr<RTCDummyVideoCapturer> capturer, const string video_source_label)
+{
+  if (rtc::Thread::Current() != signaling_thread_.get()) {
+    scoped_refptr<RTCVideoSource> source = signaling_thread_->BlockingCall(
+        [this, capturer, video_source_label] {
+          return CreateDummyVideoSource_s(
+              capturer, to_std_string(video_source_label).c_str());
+        });
+    return source;
+  }
+
+  return CreateDummyVideoSource_s(
+      capturer, to_std_string(video_source_label).c_str());
 }
 
 scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(

@@ -30,6 +30,8 @@ enum class MediaSecurityType { kSRTP_None = 0, kSDES_SRTP, kDTLS_SRTP };
 
 enum class RTCMediaType { AUDIO, VIDEO, DATA, UNSUPPORTED };
 
+enum class RTCCaptureState { CS_RUNNING = 0, CS_STOPPED, CS_FAILED };
+
 using string = portable::string;
 
 // template <typename Key, typename T>
