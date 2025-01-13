@@ -1395,6 +1395,20 @@ LIB_WEBRTC_API int LIB_WEBRTC_CALL RTCVideoFrame_ConvertToARGB(
     unsigned char* dst_argb, int dst_stride_argb, int dest_width,
     int dest_height) noexcept;
 
+/**
+ * Copies the source frame and scales it to the dimensions
+ * of the destination frame.
+ * 
+ * @param handle - Destination video frame handle
+ * @param source - Source video frame handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_ScaleFrom(
+    rtcVideoFrameHandle dest, 
+    rtcVideoFrameHandle source
+) noexcept;
+
 /*
  * ----------------------------------------------------------------------
  * RTCVideoRenderer interop methods

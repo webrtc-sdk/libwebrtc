@@ -95,6 +95,29 @@ int VideoFrameBufferImpl::ConvertToARGB(Type type, uint8_t* dst_buffer,
   return buf_size;
 }
 
+void VideoFrameBufferImpl::ScaleFrom(scoped_refptr<RTCVideoFrame> source)
+{
+  if (nullptr == source || this == source.get()) {
+    return;
+  }
+  scoped_refptr<VideoFrameBufferImpl> source_impl =
+      scoped_refptr<VideoFrameBufferImpl>(
+        static_cast<VideoFrameBufferImpl*>(source.get())
+      );
+  if (nullptr == source_impl->buffer_) {
+    return;
+  }
+  rtc::scoped_refptr<webrtc::I420Buffer> i420 =
+      webrtc::I420Buffer::Rotate(*buffer_.get(), rotation_);
+  rtc::scoped_refptr<webrtc::I420Buffer> i420_source =
+      webrtc::I420Buffer::Rotate(
+        *source_impl->buffer_.get(), 
+        static_cast<webrtc::VideoRotation>(source_impl->rotation())
+      );
+  i420->ScaleFrom(*i420_source.get());
+  buffer_ = i420;
+}
+
 libwebrtc::RTCVideoFrame::VideoRotation VideoFrameBufferImpl::rotation() {
   switch (rotation_) {
     case webrtc::kVideoRotation_0:

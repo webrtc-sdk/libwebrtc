@@ -39,6 +39,8 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
   int ConvertToARGB(Type type, uint8_t* dst_argb, int dst_stride_argb,
                     int dest_width, int dest_height) override;
 
+  void ScaleFrom(scoped_refptr<RTCVideoFrame> source) override;
+
   rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer() { return buffer_; }
 
   // System monotonic clock, same timebase as rtc::TimeMicros().

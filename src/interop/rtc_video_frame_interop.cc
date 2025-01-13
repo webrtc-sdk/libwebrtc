@@ -192,3 +192,18 @@ RTCVideoFrame_ConvertToARGB(
         dest_height
     );
 }
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_ScaleFrom(
+    rtcVideoFrameHandle dest, 
+    rtcVideoFrameHandle source
+) noexcept
+{
+    CHECK_NATIVE_HANDLE(dest);
+    CHECK_NATIVE_HANDLE(source);
+
+    scoped_refptr<RTCVideoFrame> pDst = static_cast<RTCVideoFrame*>(dest);
+    scoped_refptr<RTCVideoFrame> pSrc = static_cast<RTCVideoFrame*>(source);
+    pDst->ScaleFrom(pSrc);
+    return rtcResultU4::kSuccess;
+}
