@@ -66,29 +66,35 @@ RTCVideoFrame_Create1(
 
 rtcResultU4 LIB_WEBRTC_CALL
 RTCVideoFrame_Create2(
-    const rtcVideoFrameDatas* frameDatas,
+    int width,
+    int height,
+    const unsigned char* data_y,
+    const unsigned char* data_u,
+    const unsigned char* data_v,
+    int stride_y,
+    int stride_u,
+    int stride_v,
     rtcVideoFrameHandle* pOutRetVal
 ) noexcept
 {
-    if (frameDatas == nullptr
-        || frameDatas->width < 2
-        || (frameDatas->width % 4) != 0
-        || frameDatas->height < 2
-        || frameDatas->data_y == nullptr
-        || frameDatas->data_u == nullptr
-        || frameDatas->data_v == nullptr
-        || frameDatas->stride_y < 1
-        || frameDatas->stride_y < 1
-        || frameDatas->stride_v < 1)
+    if (width < 2
+        || (width % 4) != 0
+        || height < 2
+        || data_y == nullptr
+        || data_u == nullptr
+        || data_v == nullptr
+        || stride_y < 1
+        || stride_y < 1
+        || stride_v < 1)
     {
         return rtcResultU4::kInvalidParameter;
     }
 
     scoped_refptr<RTCVideoFrame> pvf = RTCVideoFrame::Create(
-        frameDatas->width, frameDatas->height,
-        frameDatas->data_y, frameDatas->stride_y,
-        frameDatas->data_u, frameDatas->stride_u,
-        frameDatas->data_v, frameDatas->stride_v
+        width, height,
+        data_y, stride_y,
+        data_u, stride_u,
+        data_v, stride_v
     );
     CHECK_POINTER_EX(pvf, rtcResultU4::kUnknownError);
     *pOutRetVal = static_cast<rtcVideoFrameHandle>(pvf.release());
@@ -111,27 +117,91 @@ RTCVideoFrame_Copy(
     return rtcResultU4::kSuccess;
 }
 
-rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoFrame_GetFrameDatas(
-    rtcVideoFrameHandle videoFrame,
-    rtcVideoFrameDatas* refFrameDatas
+rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetWidth(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
 ) noexcept
 {
-    CHECK_POINTER(refFrameDatas);
-    ZERO_MEMORY(refFrameDatas, sizeof(rtcVideoFrameDatas));
+    DECLARE_GET_VALUE(handle, pOutRetVal, int, RTCVideoFrame, width);
+}
 
-    scoped_refptr<RTCVideoFrame> pvf = static_cast<RTCVideoFrame*>(videoFrame);
-    
-    refFrameDatas->width = pvf->width();
-    refFrameDatas->height = pvf->height();
-    refFrameDatas->data_y = static_cast<const unsigned char*>(pvf->DataY());
-    refFrameDatas->data_u = static_cast<const unsigned char*>(pvf->DataU());
-    refFrameDatas->data_v = static_cast<const unsigned char*>(pvf->DataV());
-    refFrameDatas->stride_y = pvf->StrideY();
-    refFrameDatas->stride_u = pvf->StrideU();
-    refFrameDatas->stride_v = pvf->StrideV();
+rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetHeight(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
+) noexcept
+{
+    DECLARE_GET_VALUE(handle, pOutRetVal, int, RTCVideoFrame, height);
+}
 
+rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetDataY(
+    rtcVideoFrameHandle handle,
+    const unsigned char** pOutRetVal
+) noexcept
+{
+    CHECK_OUT_POINTER(pOutRetVal);
+    CHECK_NATIVE_HANDLE(handle);
+
+    scoped_refptr<RTCVideoFrame> p = static_cast<RTCVideoFrame*>(handle);
+    *pOutRetVal = static_cast<const unsigned char*>(p->DataY());
     return rtcResultU4::kSuccess;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetDataU(
+    rtcVideoFrameHandle handle,
+    const unsigned char** pOutRetVal
+) noexcept
+{
+    CHECK_OUT_POINTER(pOutRetVal);
+    CHECK_NATIVE_HANDLE(handle);
+
+    scoped_refptr<RTCVideoFrame> p = static_cast<RTCVideoFrame*>(handle);
+    *pOutRetVal = static_cast<const unsigned char*>(p->DataU());
+    return rtcResultU4::kSuccess;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetDataV(
+    rtcVideoFrameHandle handle,
+    const unsigned char** pOutRetVal
+) noexcept
+{
+    CHECK_OUT_POINTER(pOutRetVal);
+    CHECK_NATIVE_HANDLE(handle);
+
+    scoped_refptr<RTCVideoFrame> p = static_cast<RTCVideoFrame*>(handle);
+    *pOutRetVal = static_cast<const unsigned char*>(p->DataV());
+    return rtcResultU4::kSuccess;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetStrideY(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
+) noexcept
+{
+    DECLARE_GET_VALUE(handle, pOutRetVal, int, RTCVideoFrame, StrideY);
+}
+
+rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetStrideU(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
+) noexcept
+{
+    DECLARE_GET_VALUE(handle, pOutRetVal, int, RTCVideoFrame, StrideU);
+}
+
+rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetStrideV(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
+) noexcept
+{
+    DECLARE_GET_VALUE(handle, pOutRetVal, int, RTCVideoFrame, StrideV);
 }
 
 rtcResultU4 LIB_WEBRTC_CALL

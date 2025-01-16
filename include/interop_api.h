@@ -313,21 +313,6 @@ struct rtcPeerConnectionConfiguration {
   uint32_t local_video_bandwidth = 512;
 };  // end struct rtcPeerConnectionConfiguration
 
-struct rtcVideoFrameDatas {
-  // frame width in pixel
-  int width = 0;
-  // frame height in pixel
-  int height = 0;
-  // The YUV starting address of the frame buffer.
-  const unsigned char* data_y = nullptr;
-  const unsigned char* data_u = nullptr;
-  const unsigned char* data_v = nullptr;
-  // The stride of the YUV
-  int stride_y = 0;
-  int stride_u = 0;
-  int stride_v = 0;
-};  // end struct rtcVideoFrameDatas
-
 struct rtcDataChannelInit {
   rtcBool32 ordered = rtcBool32::kTrue;
   rtcBool32 reliable = rtcBool32::kTrue;
@@ -1324,8 +1309,17 @@ RTCVideoFrame_Create1(int width, int height, const unsigned char* buffer,
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoFrame_Create2(const rtcVideoFrameDatas* frameDatas,
-                      rtcVideoFrameHandle* pOutRetVal) noexcept;
+RTCVideoFrame_Create2(
+    int width,
+    int height,
+    const unsigned char* data_y,
+    const unsigned char* data_u,
+    const unsigned char* data_v,
+    int stride_y,
+    int stride_u,
+    int stride_v,
+    rtcVideoFrameHandle* pOutRetVal
+) noexcept;
 
 /**
  * Creates a copy of the video frame.
@@ -1337,15 +1331,53 @@ RTCVideoFrame_Create2(const rtcVideoFrameDatas* frameDatas,
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCVideoFrame_Copy(
     rtcVideoFrameHandle videoFrame, rtcVideoFrameHandle* pOutRetVal) noexcept;
 
-/**
- * Returns the datas of the video frame.
- *
- * @param videoFrame - Source video frame handle
- * @param refFrameDatas - The frame datas.
- * @return rtcResultU4 - 0 if successful, otherwise an error code.
- */
-LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCVideoFrame_GetFrameDatas(
-    rtcVideoFrameHandle videoFrame, rtcVideoFrameDatas* refFrameDatas) noexcept;
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetWidth(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetHeight(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetDataY(
+    rtcVideoFrameHandle handle,
+    const unsigned char** pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetDataU(
+    rtcVideoFrameHandle handle,
+    const unsigned char** pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetDataV(
+    rtcVideoFrameHandle handle,
+    const unsigned char** pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetStrideY(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetStrideU(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetStrideV(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
+) noexcept;
 
 /**
  * Returns the rotation of the video frame. (See: rtcVideoRotation)
