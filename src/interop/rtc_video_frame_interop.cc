@@ -196,7 +196,8 @@ RTCVideoFrame_ConvertToARGB(
 rtcResultU4 LIB_WEBRTC_CALL
 RTCVideoFrame_ScaleFrom(
     rtcVideoFrameHandle dest, 
-    rtcVideoFrameHandle source
+    rtcVideoFrameHandle source,
+    int* pOutRetVal
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(dest);
@@ -204,6 +205,63 @@ RTCVideoFrame_ScaleFrom(
 
     scoped_refptr<RTCVideoFrame> pDst = static_cast<RTCVideoFrame*>(dest);
     scoped_refptr<RTCVideoFrame> pSrc = static_cast<RTCVideoFrame*>(source);
-    pDst->ScaleFrom(pSrc);
+    int buffer_size = pDst->ScaleFrom(pSrc);
+    if (pOutRetVal) {
+        *pOutRetVal = buffer_size;
+    }
+    return rtcResultU4::kSuccess;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_ScaleFrom2(
+    rtcVideoFrameHandle dest, 
+    rtcVideoFrameType frameType,
+    const unsigned char* src_argb,
+    int src_stride_argb,
+    int src_width,
+    int src_height,
+    int* pOutRetVal
+) noexcept
+{
+    CHECK_NATIVE_HANDLE(dest);
+    CHECK_POINTER_EX(src_argb, rtcResultU4::kInvalidParameter);
+    if (src_width < 16 || 
+        src_height < 16 ||
+        src_stride_argb < 64 ||
+        (src_width * 4) > src_stride_argb)
+    {
+        return rtcResultU4::kInvalidParameter;
+    }
+
+    RTCVideoFrame::Type type;
+    switch (frameType)
+    {
+    case rtcVideoFrameType::kARGB:
+        type = RTCVideoFrame::Type::kARGB;
+        break;
+    case rtcVideoFrameType::kBGRA:
+        type = RTCVideoFrame::Type::kBGRA;
+        break;
+    case rtcVideoFrameType::kABGR:
+        type = RTCVideoFrame::Type::kABGR;
+        break;
+    case rtcVideoFrameType::kRGBA:
+        type = RTCVideoFrame::Type::kRGBA;
+        break;
+    default:
+        return rtcResultU4::kInvalidParameter;
+    }
+    
+    scoped_refptr<RTCVideoFrame> pDst = static_cast<RTCVideoFrame*>(dest);
+    int buffer_size = pDst->ScaleFrom(
+        type,
+        static_cast<const uint8_t*>(src_argb),
+        src_stride_argb,
+        src_width,
+        src_height
+    );
+    if (pOutRetVal) {
+        *pOutRetVal = buffer_size;
+    }
     return rtcResultU4::kSuccess;
 }

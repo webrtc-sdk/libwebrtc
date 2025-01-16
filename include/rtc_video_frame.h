@@ -54,7 +54,15 @@ class RTCVideoFrame : public RefCountInterface {
   virtual int ConvertToARGB(Type type, uint8_t* dst_argb, int dst_stride_argb,
                             int dest_width, int dest_height) = 0;
 
-  virtual void ScaleFrom(scoped_refptr<RTCVideoFrame> source) = 0;
+  virtual int ScaleFrom(scoped_refptr<RTCVideoFrame> source) = 0;
+
+  virtual int ScaleFrom(
+    Type type,
+    const uint8_t* src_argb,
+    int src_stride_argb,
+    int src_width,
+    int src_height
+  ) = 0;
 
  protected:
   virtual ~RTCVideoFrame() {}

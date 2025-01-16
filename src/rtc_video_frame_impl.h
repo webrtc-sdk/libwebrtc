@@ -39,7 +39,15 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
   int ConvertToARGB(Type type, uint8_t* dst_argb, int dst_stride_argb,
                     int dest_width, int dest_height) override;
 
-  void ScaleFrom(scoped_refptr<RTCVideoFrame> source) override;
+  int ScaleFrom(scoped_refptr<RTCVideoFrame> source) override;
+
+  int ScaleFrom(
+    Type type,
+    const uint8_t* src_argb,
+    int src_stride_argb,
+    int src_width,
+    int src_height
+  ) override;
 
   rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer() { return buffer_; }
 
