@@ -30,11 +30,11 @@ void LibWebRTC::Terminate() {
 
 // Creates and returns an instance of RTCPeerConnectionFactory.
 scoped_refptr<RTCPeerConnectionFactory>
-LibWebRTC::CreateRTCPeerConnectionFactory() {
+LibWebRTC::CreateRTCPeerConnectionFactory(bool use_dummy_audio /*= false*/) {
   scoped_refptr<RTCPeerConnectionFactory> rtc_peerconnection_factory =
       scoped_refptr<RTCPeerConnectionFactory>(
           new RefCountedObject<RTCPeerConnectionFactoryImpl>());
-  rtc_peerconnection_factory->Initialize();
+  rtc_peerconnection_factory->Initialize(use_dummy_audio);
   return rtc_peerconnection_factory;
 }
 

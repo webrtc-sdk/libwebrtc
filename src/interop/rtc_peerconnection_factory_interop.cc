@@ -48,13 +48,14 @@ RTCPeerConnectionFactory_Create() noexcept
 
 rtcBool32 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_Initialize(
-    rtcPeerConnectionFactoryHandle factory
+    rtcPeerConnectionFactoryHandle factory,
+    rtcBool32 use_dummy_audio /*= rtcBool32::kFalse*/
 ) noexcept
 {
     CHECK_POINTER_EX(factory, rtcBool32::kFalse);
 
     scoped_refptr<RTCPeerConnectionFactory> pFactory = static_cast<RTCPeerConnectionFactory*>(factory);
-    return pFactory->Initialize()
+    return pFactory->Initialize(use_dummy_audio != rtcBool32::kFalse)
         ? rtcBool32::kTrue
         : rtcBool32::kFalse;
 } // end RTCPeerConnectionFactory_Initialize

@@ -16,7 +16,7 @@ namespace libwebrtc {
 class DummyVideoCapturerObserverImpl : public DummyVideoCapturerObserver
 {
  public:
-   DummyVideoCapturerObserverImpl(void* callbacks /* rtcDesktopCapturerObserverCallbacks* */);
+   DummyVideoCapturerObserverImpl(void* callbacks /* rtcVideoCapturerObserverCallbacks* */);
    ~DummyVideoCapturerObserverImpl();
 
   void OnStart() override;
@@ -26,7 +26,7 @@ class DummyVideoCapturerObserverImpl : public DummyVideoCapturerObserver
   void OnFillBuffer(scoped_refptr<RTCVideoFrame> frame) override;
 
  private:
-   void* callbacks_ /* rtcDesktopCapturerObserverCallbacks* */;
+   void* callbacks_ /* rtcVideoCapturerObserverCallbacks* */;
 }; // end class DummyVideoCapturerObserverImpl
 
 /**

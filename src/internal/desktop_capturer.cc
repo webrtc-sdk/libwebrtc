@@ -1,3 +1,3 @@
-#include "desktop_capturer.h"
+#include "src/internal/desktop_capturer.h"
 
 namespace libwebrtc {}  // namespace libwebrtc

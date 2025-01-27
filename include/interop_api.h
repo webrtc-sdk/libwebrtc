@@ -406,6 +406,9 @@ using rtcVideoTrackHandle = rtcMediaTrackHandle;
 /// Opaque handle to a native RTCVideoFrame interop object.
 using rtcVideoFrameHandle = rtcRefCountedObjectHandle;
 
+/// Opaque handle to a native RTCAudioData interop object.
+using rtcAudioDataHandle = rtcRefCountedObjectHandle;
+
 /// Opaque handle to a native RTCVideoRenderer interop object.
 using rtcVideoRendererHandle = rtcRefCountedObjectHandle;  // ???
 
@@ -593,6 +596,30 @@ struct rtcDummyVideoCapturerObserverCallbacks {
 };
 
 /**
+ * Dummy audio source callback delegate
+ */
+using rtcDummyAudioSourceCommonDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data);
+
+/**
+ * Dummy audio source fill buffer callback delegate
+ */
+using rtcDummyAudioSourceFillBufferDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, rtcAudioDataHandle frame);
+
+/**
+ * Callback delegate structure for DummyAudioSourceObserver.
+ */
+struct rtcDummyAudioSourceObserverCallbacks {
+  rtcObjectHandle UserData{};
+  rtcDummyAudioSourceCommonDelegate Started{};
+  rtcDummyAudioSourceCommonDelegate Paused{};
+  rtcDummyAudioSourceCommonDelegate Stopped{};
+  rtcDummyAudioSourceCommonDelegate Failed{};
+  rtcDummyAudioSourceFillBufferDelegate FillBuffer{};
+};
+
+/**
  * Callback OnFrame delegate for RTCVideoRenderer.
  */
 using rtcVideoRendererFrameDelegate = void(LIB_WEBRTC_CALL*)(
@@ -764,7 +791,9 @@ LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL LibWebRTC_Initialize() noexcept;
  * RTCPeerConnectionFactory.
  */
 LIB_WEBRTC_API rtcPeerConnectionFactoryHandle LIB_WEBRTC_CALL
-LibWebRTC_CreateRTCPeerConnectionFactory() noexcept;
+LibWebRTC_CreateRTCPeerConnectionFactory(
+    rtcBool32 use_dummy_audio = rtcBool32::kFalse
+) noexcept;
 
 /**
  * @brief Terminates the WebRTC PeerConnectionFactory and threads.
@@ -841,7 +870,9 @@ RTCPeerConnectionFactory_Create() noexcept;
  * do not use this method.
  */
 LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL RTCPeerConnectionFactory_Initialize(
-    rtcPeerConnectionFactoryHandle factory) noexcept;
+    rtcPeerConnectionFactoryHandle factory,
+    rtcBool32 use_dummy_audio = rtcBool32::kFalse
+) noexcept;
 
 /**
  * @brief Terminates the RTCPeerConnectionFactor object.

@@ -15,6 +15,9 @@
 #include "rtc_video_device_impl.h"
 #include "rtc_video_source_impl.h"
 #include "rtc_dummy_video_capturer_impl.h"
+#include "rtc_dummy_audio_source_impl.h"
+#include "src/internal/dummy_capturer.h"
+#include "src/internal/dummy_audio_capturer.h"
 #if defined(USE_INTEL_MEDIA_SDK)
 #include "src/win/mediacapabilities.h"
 #include "src/win/msdkvideodecoderfactory.h"
@@ -47,7 +50,8 @@ RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl() {}
 
 RTCPeerConnectionFactoryImpl::~RTCPeerConnectionFactoryImpl() {}
 
-bool RTCPeerConnectionFactoryImpl::Initialize() {
+bool RTCPeerConnectionFactoryImpl::Initialize(bool use_dummy_audio /*= false*/) {
+  use_dummy_audio_ = use_dummy_audio;
   worker_thread_ = rtc::Thread::Create();
   worker_thread_->SetName("worker_thread", nullptr);
   RTC_CHECK(worker_thread_->Start()) << "Failed to start thread";
@@ -102,7 +106,9 @@ bool RTCPeerConnectionFactoryImpl::Terminate() {
 void RTCPeerConnectionFactoryImpl::CreateAudioDeviceModule_w() {
   if (!audio_device_module_)
     audio_device_module_ = webrtc::AudioDeviceModule::Create(
-        webrtc::AudioDeviceModule::kPlatformDefaultAudio,
+        use_dummy_audio_ 
+          ? webrtc::AudioDeviceModule::kDummyAudio
+          : webrtc::AudioDeviceModule::kPlatformDefaultAudio,
         task_queue_factory_.get());
 }
 
@@ -160,6 +166,28 @@ scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
 
   scoped_refptr<RTCAudioSourceImpl> source = scoped_refptr<RTCAudioSourceImpl>(
       new RefCountedObject<RTCAudioSourceImpl>(rtc_source_track));
+  return source;
+}
+
+scoped_refptr<RTCDummyAudioSource> RTCPeerConnectionFactoryImpl::CreateDummyAudioSource(
+    const string audio_source_label,
+    int sample_rate_hz /*= 16000 */,
+    uint32_t num_channels /*= 2*/
+) {
+
+  rtc::scoped_refptr<webrtc::internal::DummyAudioCapturer> rtc_source_track =
+      rtc::scoped_refptr<webrtc::internal::DummyAudioCapturer>(
+        new rtc::RefCountedObject<webrtc::internal::DummyAudioCapturer>(
+          task_queue_factory_.get(),
+          signaling_thread_.get(),
+          16, /* bits_per_sample */
+          sample_rate_hz,
+          num_channels
+        )
+      );
+
+  scoped_refptr<RTCDummyAudioSource> source = scoped_refptr<RTCDummyAudioSource>(
+      new RefCountedObject<RTCDummyAudioSourceImpl>(rtc_source_track));
   return source;
 }
 
@@ -319,6 +347,20 @@ scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
     scoped_refptr<RTCAudioSource> source, const string track_id) {
   RTCAudioSourceImpl* source_impl =
       static_cast<RTCAudioSourceImpl*>(source.get());
+
+  rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track(
+      rtc_peerconnection_factory_->CreateAudioTrack(
+          to_std_string(track_id), source_impl->rtc_audio_source().get()));
+
+  scoped_refptr<AudioTrackImpl> track = scoped_refptr<AudioTrackImpl>(
+      new RefCountedObject<AudioTrackImpl>(audio_track));
+  return track;
+}
+
+scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
+    scoped_refptr<RTCDummyAudioSource> source, const string track_id) {
+  RTCDummyAudioSourceImpl* source_impl =
+      static_cast<RTCDummyAudioSourceImpl*>(source.get());
 
   rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track(
       rtc_peerconnection_factory_->CreateAudioTrack(
