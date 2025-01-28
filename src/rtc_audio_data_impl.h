@@ -12,6 +12,7 @@ namespace libwebrtc {
 class RTCAudioDataImpl : public RTCAudioData {
  public:
   RTCAudioDataImpl(
+    uint32_t index,
     const uint8_t* data,
     uint32_t bits_per_sample,
     int sample_rate_hz,
@@ -20,6 +21,7 @@ class RTCAudioDataImpl : public RTCAudioData {
   virtual ~RTCAudioDataImpl();
 
  public:
+  uint32_t index() const override { return index_; }
   const uint8_t* data() const override { return data_.get(); }
   size_t data_size() const override { return data_size_; }
   uint32_t bits_per_sample() const override { return bits_per_sample_; }
@@ -29,9 +31,10 @@ class RTCAudioDataImpl : public RTCAudioData {
 
   int ScaleFrom(scoped_refptr<RTCAudioData> src) override;
 
-  int Clear(bool fill_1khz_tone = false) override;
+  int Clear(RTCAudioDataToneFrequency frequency = RTCAudioDataToneFrequency::kNone) override;
 
  private:
+  uint32_t index_;
   uint32_t bits_per_sample_;
   uint32_t samples_per_channel_;
   int sample_rate_hz_;

@@ -28,7 +28,8 @@ class DummyAudioCapturer : public AudioSourceInterface {
     rtc::Thread* signaling_thread,
     int bits_per_sample,
     int sample_rate_hz,
-    size_t number_of_channels
+    size_t number_of_channels,
+    const std::string name
   );
 
   virtual ~DummyAudioCapturer();
@@ -64,6 +65,8 @@ class DummyAudioCapturer : public AudioSourceInterface {
   size_t number_of_channels() { return number_of_channels_; }
   size_t number_of_frames() { return number_of_frames_; }
 
+  const char* name() const { return name_.c_str(); }
+
   RTCCaptureState Start();
   void Stop();
   RTCCaptureState CaptureState();
@@ -89,6 +92,8 @@ class DummyAudioCapturer : public AudioSourceInterface {
  private:
   std::unique_ptr<TaskQueueBase, TaskQueueDeleter> task_queue_;
   rtc::Thread* signaling_thread_ = nullptr;
+  std::string name_;
+  uint32_t sample_index_ = 0;
   int bits_per_sample_ = 16;
   int sample_rate_hz_ = 44100;
   size_t number_of_channels_ = 2;

@@ -180,6 +180,32 @@ RTCPeerConnectionFactory_CreateAudioSource(
 } // end RTCPeerConnectionFactory_CreateAudioSource
 
 rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_CreateDummyAudioSource(
+    rtcPeerConnectionFactoryHandle factory,
+    const char* audio_source_label,
+    int sample_rate_hz,
+    unsigned int num_channels,
+    rtcDummyAudioSourceHandle* pRetVal
+) noexcept
+{
+    CHECK_OUT_POINTER(pRetVal);
+    CHECK_NATIVE_HANDLE(factory);
+
+    scoped_refptr<RTCPeerConnectionFactory> pFactory = static_cast<RTCPeerConnectionFactory*>(factory);
+    if (!pFactory->GetUseDummyAudio()) {
+        return rtcResultU4::kDummyAudioSourceNotSupported;
+    }
+    scoped_refptr<RTCDummyAudioSource> audio_source = pFactory->CreateDummyAudioSource(
+        string(audio_source_label),
+        sample_rate_hz,
+        static_cast<uint32_t>(num_channels)
+    );
+
+    *pRetVal = static_cast<rtcDummyAudioSourceHandle>(audio_source.release());
+    return rtcResultU4::kSuccess;
+} // end RTCPeerConnectionFactory_CreateDummyAudioSource
+
+rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateVideoSource(
     rtcPeerConnectionFactoryHandle factory,
     rtcVideoCapturerHandle capturer,
@@ -291,6 +317,29 @@ RTCPeerConnectionFactory_CreateAudioTrack(
 } // end RTCPeerConnectionFactory_CreateAudioTrack
 
 rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_CreateDummyAudioTrack(
+    rtcPeerConnectionFactoryHandle factory,
+    rtcDummyAudioSourceHandle source,
+    const char* track_id,
+    rtcAudioTrackHandle* pRetVal
+) noexcept
+{
+    CHECK_OUT_POINTER(pRetVal);
+    CHECK_NATIVE_HANDLE(factory);
+    CHECK_POINTER_EX(source, rtcResultU4::kInvalidParameter);
+
+    scoped_refptr<RTCPeerConnectionFactory> pFactory = static_cast<RTCPeerConnectionFactory*>(factory);
+    if (!pFactory->GetUseDummyAudio()) {
+        return rtcResultU4::kDummyAudioSourceNotSupported;
+    }
+    scoped_refptr<RTCDummyAudioSource> audio_source = static_cast<RTCDummyAudioSource*>(source);
+    scoped_refptr<RTCAudioTrack> audio_track = pFactory->CreateAudioTrack(audio_source, string(track_id));
+
+    *pRetVal = static_cast<rtcAudioTrackHandle>(audio_track.release());
+    return rtcResultU4::kSuccess;
+} // end RTCPeerConnectionFactory_CreateAudioTrack
+
+rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateVideoTrack(
     rtcPeerConnectionFactoryHandle factory,
     rtcVideoSourceHandle source,
@@ -360,3 +409,12 @@ RTCPeerConnectionFactory_GetRtpReceiverCapabilities(
     *pRetVal = static_cast<rtcRtpCapabilitiesHandle>(rtp_capabilities.release());
     return rtcResultU4::kSuccess;
 } // end RTCPeerConnectionFactory_GetRtpReceiverCapabilities
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_GetUseDummyAudio(
+    rtcPeerConnectionFactoryHandle factory,
+    rtcBool32* pRetVal
+) noexcept
+{
+    DECLARE_GET_VALUE(factory, pRetVal, rtcBool32, RTCPeerConnectionFactory, GetUseDummyAudio);
+}

@@ -4,7 +4,6 @@
 
 namespace libwebrtc {
 
-double RTC_FREQUENCY = 1000.0; // Hertz
 double RTC_PI = 3.14159265358979323846;
 
 /**
@@ -12,6 +11,7 @@ double RTC_PI = 3.14159265358979323846;
  */
 
 scoped_refptr<RTCAudioData> RTCAudioData::Create(
+    uint32_t index,
     const uint8_t* data,
     uint32_t bits_per_sample,
     int sample_rate_hz,
@@ -20,6 +20,7 @@ scoped_refptr<RTCAudioData> RTCAudioData::Create(
     scoped_refptr<RTCAudioData> audio_data =
         scoped_refptr<RTCAudioData>(
             new RefCountedObject<RTCAudioDataImpl>(
+                index,
                 data,
                 bits_per_sample,
                 sample_rate_hz,
@@ -31,6 +32,7 @@ scoped_refptr<RTCAudioData> RTCAudioData::Create(
 
 scoped_refptr<RTCAudioData> RTCAudioData::Create() {
     return RTCAudioData::Create(
+        0,       // index
         nullptr, // data
         16,      // 16 bits
         44100,   // sample_rate in Hz
@@ -43,11 +45,13 @@ scoped_refptr<RTCAudioData> RTCAudioData::Create() {
  */
 
 RTCAudioDataImpl::RTCAudioDataImpl(
+    uint32_t index,
     const uint8_t* data,
     uint32_t bits_per_sample,
     int sample_rate_hz,
     uint32_t num_channels
-) : bits_per_sample_(bits_per_sample)
+) : index_(index)
+  , bits_per_sample_(bits_per_sample)
   , samples_per_channel_(sample_rate_hz / 100) // for 10 ms chunk
   , sample_rate_hz_(sample_rate_hz)
   , num_channels_(num_channels)
@@ -114,17 +118,19 @@ int RTCAudioDataImpl::ScaleFrom(scoped_refptr<RTCAudioData> src) {
   return static_cast<int>(result);
 }
 
-int RTCAudioDataImpl::Clear(bool fill_1khz_tone /* = false */) {
+int RTCAudioDataImpl::Clear(RTCAudioDataToneFrequency frequency /*= RTCAudioDataToneFrequency::kNone*/) {
   if (data_size_ == 0) {
     return 0;
   }
 
-  if (fill_1khz_tone) {
+  if (frequency != RTCAudioDataToneFrequency::kNone) {
+    double freq = static_cast<double>(frequency);
+    size_t first_time = static_cast<size_t>(index_) * static_cast<size_t>(samples_per_channel_);
     if (16 == bits_per_sample_) {
       int16_t* pDest = reinterpret_cast<int16_t*>(data_.get());
       for (size_t i = 0; i < samples_per_channel_; ++i) {
-        double time = static_cast<double>(i) / sample_rate_hz_;
-        int16_t sample = static_cast<int16_t>(32767 * sin(2 * RTC_PI * RTC_FREQUENCY * time));
+        double time = static_cast<double>(first_time + i) / sample_rate_hz_;
+        int16_t sample = static_cast<int16_t>(32767 * sin(2 * RTC_PI * freq * time));
         for (size_t ch = 0; ch < num_channels_; ++ch) {
             pDest[i * num_channels_ + ch] = sample;
         }
@@ -133,8 +139,8 @@ int RTCAudioDataImpl::Clear(bool fill_1khz_tone /* = false */) {
     else if (24 == bits_per_sample_) {
       int32_t* pDest = reinterpret_cast<int32_t*>(data_.get());
       for (size_t i = 0; i < samples_per_channel_; ++i) {
-        double time = static_cast<double>(i) / sample_rate_hz_;
-        int32_t sample = static_cast<int32_t>(8388607 * sin(2 * RTC_PI * RTC_FREQUENCY * time));
+        double time = static_cast<double>(first_time + i) / sample_rate_hz_;
+        int32_t sample = static_cast<int32_t>(8388607 * sin(2 * RTC_PI * freq * time));
         for (size_t ch = 0; ch < num_channels_; ++ch) {
             uint8_t* pByteDest = reinterpret_cast<uint8_t*>(pDest) + (i * num_channels_ + ch) * 3;
             pByteDest[2] = static_cast<uint8_t>((sample >> 16) & 0xFF);
@@ -146,8 +152,8 @@ int RTCAudioDataImpl::Clear(bool fill_1khz_tone /* = false */) {
     else if (32 == bits_per_sample_) {
       int32_t* pDest = reinterpret_cast<int32_t*>(data_.get());
       for (size_t i = 0; i < samples_per_channel_; ++i) {
-        double time = static_cast<double>(i) / sample_rate_hz_;
-        int32_t sample = static_cast<int32_t>(2147483647 * sin(2 * RTC_PI * RTC_FREQUENCY * time));
+        double time = static_cast<double>(first_time + i) / sample_rate_hz_;
+        int32_t sample = static_cast<int32_t>(2147483647 * sin(2 * RTC_PI * freq * time));
         for (size_t ch = 0; ch < num_channels_; ++ch) {
             pDest[i * num_channels_ + ch] = sample;
         }

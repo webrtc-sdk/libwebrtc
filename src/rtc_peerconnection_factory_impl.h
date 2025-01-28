@@ -76,6 +76,8 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   virtual scoped_refptr<RTCMediaStream> CreateStream(
       const string stream_id) override;
 
+  virtual bool GetUseDummyAudio() override { return use_dummy_audio_; }
+
   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
   peer_connection_factory() {
     return rtc_peerconnection_factory_;

@@ -1,5 +1,5 @@
-#ifndef INTERNAL_JPEG_UTIL_HXX
-#define INTERNAL_JPEG_UTIL_HXX
+#ifndef LIB_WEBRTC_JPEG_UTIL_HXX
+#define LIB_WEBRTC_JPEG_UTIL_HXX
 
 #include <inttypes.h>
 
@@ -12,4 +12,4 @@ std::vector<unsigned char> EncodeRGBToJpeg(const unsigned char* data, int width,
                                            int quality);
 }  // namespace libwebrtc
 
-#endif  // INTERNAL_JPEG_UTIL_HXX
+#endif  // LIB_WEBRTC_JPEG_UTIL_HXX

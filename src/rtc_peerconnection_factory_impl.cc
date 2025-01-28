@@ -175,6 +175,10 @@ scoped_refptr<RTCDummyAudioSource> RTCPeerConnectionFactoryImpl::CreateDummyAudi
     uint32_t num_channels /*= 2*/
 ) {
 
+  if (!use_dummy_audio_) {
+    return nullptr;
+  }
+
   rtc::scoped_refptr<webrtc::internal::DummyAudioCapturer> rtc_source_track =
       rtc::scoped_refptr<webrtc::internal::DummyAudioCapturer>(
         new rtc::RefCountedObject<webrtc::internal::DummyAudioCapturer>(
@@ -182,7 +186,8 @@ scoped_refptr<RTCDummyAudioSource> RTCPeerConnectionFactoryImpl::CreateDummyAudi
           signaling_thread_.get(),
           16, /* bits_per_sample */
           sample_rate_hz,
-          num_channels
+          num_channels,
+          audio_source_label.std_string()
         )
       );
 
@@ -359,6 +364,11 @@ scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
 
 scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
     scoped_refptr<RTCDummyAudioSource> source, const string track_id) {
+
+  if (!use_dummy_audio_) {
+    return nullptr;
+  }
+
   RTCDummyAudioSourceImpl* source_impl =
       static_cast<RTCDummyAudioSourceImpl*>(source.get());
 

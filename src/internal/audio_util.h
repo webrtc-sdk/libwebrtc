@@ -1,5 +1,5 @@
-#ifndef INTERNAL_AUDIO_UTIL_HXX
-#define INTERNAL_AUDIO_UTIL_HXX
+#ifndef LIB_WEBRTC_AUDIO_UTIL_HXX
+#define LIB_WEBRTC_AUDIO_UTIL_HXX
 
 #include <inttypes.h>
 
@@ -20,4 +20,4 @@ uint32_t AudioScale(
 
 }  // namespace libwebrtc
 
-#endif  // INTERNAL_AUDIO_UTIL_HXX
+#endif  // LIB_WEBRTC_AUDIO_UTIL_HXX

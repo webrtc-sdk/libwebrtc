@@ -32,6 +32,15 @@ enum class RTCMediaType { AUDIO, VIDEO, DATA, UNSUPPORTED };
 
 enum class RTCCaptureState { CS_RUNNING = 0, CS_STOPPED, CS_FAILED };
 
+enum class RTCAudioDataToneFrequency {
+  kNone = 0,         // Clear audio buffer
+  kTone60Hz = 60,
+  kTone440Hz = 440,
+  kTone1kHz = 1000,
+  kTone2kHz = 2000,
+  kTone5kHz = 5000
+};
+
 using string = portable::string;
 
 // template <typename Key, typename T>

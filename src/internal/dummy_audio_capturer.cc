@@ -11,9 +11,11 @@ DummyAudioCapturer::DummyAudioCapturer(
   rtc::Thread* signaling_thread,
   int bits_per_sample,
   int sample_rate_hz,
-  size_t number_of_channels
+  size_t number_of_channels,
+  const std::string name
 ) : task_queue_(task_queue_factory->CreateTaskQueue("DummyAudioCapturer", TaskQueueFactory::Priority::HIGH))
   , signaling_thread_(signaling_thread)
+  , name_(name)
   , bits_per_sample_(bits_per_sample)
   , sample_rate_hz_(sample_rate_hz)
   , number_of_channels_(number_of_channels)
@@ -35,6 +37,7 @@ RTCCaptureState DummyAudioCapturer::Start()
     return capture_state_;
   }
 
+  sample_index_ = 0;
   capture_delay_ = number_of_frames_ * 1000 / sample_rate_hz_;
   capture_state_ = RTCCaptureState::CS_RUNNING;
   task_queue_->PostTask([this] { CaptureFrame(); });
@@ -124,6 +127,7 @@ void DummyAudioCapturer::FillBuffer()
 {
   RTCAudioDataPtr audio_data = RTCAudioData::Create
   (
+    sample_index_++,
     nullptr,
     static_cast<uint32_t>(bits_per_sample_),
     sample_rate_hz_,
@@ -136,7 +140,7 @@ void DummyAudioCapturer::FillBuffer()
   }
 
 #if defined(DEBUG) || defined(_DEBUG)
-  audio_data->Clear(true); // fill 1Khz tone signal
+  audio_data->Clear(libwebrtc::RTCAudioDataToneFrequency::kTone1kHz); // fill 1Khz tone signal
 #endif // DEBUG
   
   if (observer_ != nullptr) {

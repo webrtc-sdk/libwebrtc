@@ -90,6 +90,9 @@ LibWebRTC_GetErrorMessage(
         case rtcResultU4::kAudioResamplingNotSupported:
             message= "The internal audio resampler used in the audio track read buffer doesn't support the specified input/output frequency ratio. Use a different output frequency for the current audio source to solve the issue.";
             break;
+        case rtcResultU4::kDummyAudioSourceNotSupported:
+            message = "Dummy audio source does not support. To resolve the issue, use the PeerConnectionFactory initialize method with 'use_dummy_audio'.";
+            break;
         case rtcResultU4::kInvalidPointer:
             message = "A null or invalid pointer.";
             break;

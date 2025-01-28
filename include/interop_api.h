@@ -25,6 +25,7 @@ using rtcSdpSemantics = libwebrtc::SdpSemantics;
 using rtcMediaType = libwebrtc::RTCMediaType;
 using rtcDesktopType = libwebrtc::DesktopType;
 using rtcCaptureState = libwebrtc::RTCCaptureState;
+using rtcAudioDataToneFrequency = libwebrtc::RTCAudioDataToneFrequency;
 
 /// 64-bit timestamp for interop API.
 using rtcTimestamp = long long;
@@ -268,6 +269,10 @@ enum class rtcResultU4 : unsigned int {
   /// support the specified input/output frequency ratio. Use a different output
   /// frequency for the current audio source to solve the issue.
   kAudioResamplingNotSupported = 0x80000402,
+  
+  /// Dummy audio source does not support. To resolve the issue,
+  /// use the PeerConnectionFactory initialize method with 'use_dummy_audio'.
+  kDummyAudioSourceNotSupported = 0x80000501,
 
   /// Error rtcResultU4 for a null or invalid pointer.
   kInvalidPointer = 0x80004003,
@@ -363,6 +368,9 @@ using rtcVideoDeviceHandle = rtcRefCountedObjectHandle;
 
 /// Opaque handle to a native RTCAudioSource interop object.
 using rtcAudioSourceHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCDummyAudioSource interop object.
+using rtcDummyAudioSourceHandle = rtcRefCountedObjectHandle;
 
 /// Opaque handle to a native RTCVideoSource interop object.
 using rtcVideoSourceHandle = rtcRefCountedObjectHandle;
@@ -924,8 +932,22 @@ RTCPeerConnectionFactory_GetDesktopDevice(
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_CreateAudioSource(
-    rtcPeerConnectionFactoryHandle factory, const char* audio_source_label,
-    rtcAudioSourceHandle* pRetVal) noexcept;
+    rtcPeerConnectionFactoryHandle factory,
+    const char* audio_source_label,
+    rtcAudioSourceHandle* pRetVal
+) noexcept;
+
+/**
+ * @brief Creates a new instance of the RTCDummyAudioSource object.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_CreateDummyAudioSource(
+    rtcPeerConnectionFactoryHandle factory,
+    const char* audio_source_label,
+    int sample_rate_hz,
+    unsigned int num_channels,
+    rtcAudioSourceHandle* pRetVal
+) noexcept;
 
 /**
  * @brief Creates a new instance of the RTCVideoSource object.
@@ -977,6 +999,14 @@ RTCPeerConnectionFactory_CreateAudioTrack(
     const char* track_id, rtcAudioTrackHandle* pRetVal) noexcept;
 
 /**
+ * @brief Creates a new instance of the RTCAudioTrack object.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_CreateDummyAudioTrack(
+    rtcPeerConnectionFactoryHandle factory, rtcDummyAudioSourceHandle source,
+    const char* track_id, rtcAudioTrackHandle* pRetVal) noexcept;
+
+/**
  * @brief Creates a new instance of the RTCVideoTrack object.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
@@ -1009,6 +1039,97 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnectionFactory_GetRtpReceiverCapabilities(
     rtcPeerConnectionFactoryHandle factory, rtcMediaType media_type,
     rtcRtpCapabilitiesHandle* pRetVal) noexcept;
+
+/**
+ * Returns whether an dummy audio device is used.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCPeerConnectionFactory_GetUseDummyAudio(
+    rtcPeerConnectionFactoryHandle factory,
+    rtcBool32* pRetVal) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCAudioData interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * Creates a new instance of RTCAudioData.
+ * 
+ * @param index - Sample index
+ * @param data - Sample data. (optional)
+ * @param bits_per_sample - Bits per sample. (16, 24, 32)
+ * @param sample_rate_hz - Sample rate in hertz. (16000, 44100, 480000)
+ * @param num_channels - Number of audio channels. [1 ... 8]
+ * @param pOutRetVal - Handle of object.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_Create(
+    unsigned int index,
+    const unsigned char* data,
+    unsigned int bits_per_sample,
+    int sample_rate_hz,
+    unsigned int num_channels,
+    rtcAudioDataHandle* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_GetIndex(
+    rtcAudioDataHandle handle,
+    unsigned int* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_GetData(
+    rtcAudioDataHandle handle,
+    const unsigned char** ppRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_GetDataSize(
+    rtcAudioDataHandle handle,
+    int* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_GetBitsPerSample(
+    rtcAudioDataHandle handle,
+    int* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_GetSamplesPerChannel(
+    rtcAudioDataHandle handle,
+    int* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_GetSampleRateHz(
+    rtcAudioDataHandle handle,
+    int* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_GetNumChannels(
+    rtcAudioDataHandle handle,
+    int* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_ScaleFrom(
+    rtcAudioDataHandle handle,
+    rtcAudioDataHandle source_data,
+    int* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_Clear(
+    rtcAudioDataHandle handle,
+    rtcAudioDataToneFrequency frequency,
+    int* pRetVal
+) noexcept;
 
 /*
  * ----------------------------------------------------------------------
@@ -1142,6 +1263,70 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCAudioDevice_SetSpeakerVolume(
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL RTCAudioDevice_GetSpeakerVolume(
     rtcAudioDeviceHandle audiDevice, unsigned int* volume) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCDummyAudioSource interop methods
+ * ----------------------------------------------------------------------
+ */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyAudioSource_RegisterAudioDataObserver(
+    rtcDummyAudioSourceHandle handle,
+    rtcDummyAudioSourceObserverCallbacks* callbacks
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyAudioSource_DeRegisterAudioDataObserver(
+    rtcDummyAudioSourceHandle handle
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyAudioSource_GetBitsPerSample(
+    rtcDummyAudioSourceHandle handle,
+    int* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyAudioSource_GetSampleRateHz(
+    rtcDummyAudioSourceHandle handle,
+    int* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyAudioSource_GetNumChannels(
+    rtcDummyAudioSourceHandle handle,
+    int* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyAudioSource_GetSamplesPerChannel(
+    rtcDummyAudioSourceHandle handle,
+    int* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyAudioSource_Start(
+    rtcDummyAudioSourceHandle handle,
+    rtcCaptureState* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyAudioSource_Stop(
+    rtcDummyAudioSourceHandle handle
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyAudioSource_GetCaptureState(
+    rtcDummyAudioSourceHandle handle,
+    rtcCaptureState* pRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCDummyAudioSource_IsRunning(
+    rtcDummyAudioSourceHandle handle,
+    rtcBool32* pRetVal
+) noexcept;
 
 /*
  * ----------------------------------------------------------------------

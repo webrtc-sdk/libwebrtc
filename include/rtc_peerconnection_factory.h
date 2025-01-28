@@ -79,6 +79,8 @@ class RTCPeerConnectionFactory : public RefCountInterface {
 
   virtual scoped_refptr<RTCRtpCapabilities> GetRtpReceiverCapabilities(
       RTCMediaType media_type) = 0;
+
+  virtual bool GetUseDummyAudio() = 0;
 };
 
 }  // namespace libwebrtc
