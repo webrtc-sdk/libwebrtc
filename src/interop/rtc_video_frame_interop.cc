@@ -136,6 +136,15 @@ RTCVideoFrame_GetHeight(
 }
 
 rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetSize(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
+) noexcept
+{
+    DECLARE_GET_VALUE(handle, pOutRetVal, int, RTCVideoFrame, size);
+}
+
+rtcResultU4 LIB_WEBRTC_CALL 
 RTCVideoFrame_GetDataY(
     rtcVideoFrameHandle handle,
     const unsigned char** pOutRetVal
@@ -332,6 +341,26 @@ RTCVideoFrame_ScaleFrom2(
     );
     if (pOutRetVal) {
         *pOutRetVal = buffer_size;
+    }
+    return rtcResultU4::kSuccess;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_Clear(
+    rtcVideoFrameHandle handle, 
+    rtcVideoFrameClearType clearType,
+    int* pRetVal
+) noexcept
+{
+    if (pRetVal) {
+        *pRetVal = 0;
+    }
+    CHECK_NATIVE_HANDLE(handle);
+
+    scoped_refptr<RTCVideoFrame> p = static_cast<RTCVideoFrame*>(handle);
+    int result = p->Clear(static_cast<RTCVideoFrameClearType>(clearType));
+    if (pRetVal) {
+        *pRetVal = result;
     }
     return rtcResultU4::kSuccess;
 }

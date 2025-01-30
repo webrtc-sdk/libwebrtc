@@ -21,19 +21,15 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
 
  public:
   int width() const override;
-
   int height() const override;
+  int size() const override;
 
   const uint8_t* DataY() const override;
-
   const uint8_t* DataU() const override;
-
   const uint8_t* DataV() const override;
 
   int StrideY() const override;
-
   int StrideU() const override;
-
   int StrideV() const override;
 
   int ConvertToARGB(Type type, uint8_t* dst_argb, int dst_stride_argb,
@@ -48,6 +44,8 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
     int src_width,
     int src_height
   ) override;
+
+  int Clear(RTCVideoFrameClearType clearType) override;
 
   rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer() { return buffer_; }
 

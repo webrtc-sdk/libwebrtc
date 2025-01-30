@@ -26,6 +26,7 @@ using rtcMediaType = libwebrtc::RTCMediaType;
 using rtcDesktopType = libwebrtc::DesktopType;
 using rtcCaptureState = libwebrtc::RTCCaptureState;
 using rtcAudioDataToneFrequency = libwebrtc::RTCAudioDataToneFrequency;
+using rtcVideoFrameClearType = libwebrtc::RTCVideoFrameClearType;
 
 /// 64-bit timestamp for interop API.
 using rtcTimestamp = long long;
@@ -1560,6 +1561,12 @@ RTCVideoFrame_GetHeight(
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL 
+RTCVideoFrame_GetSize(
+    rtcVideoFrameHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL 
 RTCVideoFrame_GetDataY(
     rtcVideoFrameHandle handle,
     const unsigned char** pOutRetVal
@@ -1679,6 +1686,13 @@ RTCVideoFrame_ScaleFrom2(
     int src_width,
     int src_height,
     int* pOutRetVal
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_Clear(
+    rtcVideoFrameHandle handle, 
+    rtcVideoFrameClearType clearType,
+    int* pRetVal
 ) noexcept;
 
 /*

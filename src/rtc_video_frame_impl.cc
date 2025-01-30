@@ -31,6 +31,11 @@ int VideoFrameBufferImpl::width() const { return buffer_->width(); }
 
 int VideoFrameBufferImpl::height() const { return buffer_->height(); }
 
+int VideoFrameBufferImpl::size() const {
+  int buffer_size = (StrideY() * height()) + (StrideU() * (height() / 2)) + (StrideV() * (height() / 2));
+  return buffer_size;
+}
+
 const uint8_t* VideoFrameBufferImpl::DataY() const {
   return buffer_->GetI420()->DataY();
 }
@@ -65,6 +70,7 @@ int VideoFrameBufferImpl::ConvertToARGB(Type type, uint8_t* dst_buffer,
       webrtc::I420Buffer::Create(dest_width, dest_height);
 
   dest->ScaleFrom(*i420.get());
+  // ARGB buffer size
   int buf_size = dest->width() * dest->height() * (32 >> 3);
   switch (type) {
     case libwebrtc::RTCVideoFrame::Type::kARGB:
@@ -119,8 +125,7 @@ int VideoFrameBufferImpl::ScaleFrom(scoped_refptr<RTCVideoFrame> source)
   i420->ScaleFrom(*i420_source.get());
   buffer_ = i420;
 
-  int buffer_size = (StrideY() * height()) + (StrideU() * (height() / 2)) + (StrideV() * (height() / 2));
-  return buffer_size;
+  return size();
 }
 
 int VideoFrameBufferImpl::ScaleFrom(
@@ -172,7 +177,86 @@ int VideoFrameBufferImpl::ScaleFrom(
   i420_dst->ScaleFrom(*i420_src.get());
   buffer_ = i420_dst;
 
-  int buffer_size = (StrideY() * height()) + (StrideU() * (height() / 2)) + (StrideV() * (height() / 2));
+  return size();
+}
+
+int VideoFrameBufferImpl::Clear(RTCVideoFrameClearType clearType) {
+  int buffer_size = size();
+  if (buffer_size <= 0) {
+    return 0;
+  }
+
+  switch (clearType)
+  {
+  case RTCVideoFrameClearType::kNoise:
+    {
+      const int noiseLevel = 50;
+      const int height = buffer_->height();
+      uint8_t* mutableDataY = const_cast<uint8_t*>(DataY());
+      uint8_t* mutableDataU = const_cast<uint8_t*>(DataU());
+      uint8_t* mutableDataV = const_cast<uint8_t*>(DataV());
+      const int countY = StrideY() * height;
+      const int countU = StrideU() * height / 2;
+      const int countV = StrideV() * height / 2;
+
+      for (int i = 0; i < countY; i++) {
+        mutableDataY[i] = static_cast<uint8_t>((rand() % (256 - noiseLevel)) + noiseLevel);
+      }
+      memset(mutableDataU, 128, countU);
+      memset(mutableDataV, 128, countV);
+    }
+    break;
+  case RTCVideoFrameClearType::kColorBar:
+    {
+      const int width = buffer_->width();
+      const int height = buffer_->height();
+      const int blockWidth = width/ 8;
+      uint8_t* mutableDataY = const_cast<uint8_t*>(DataY());
+      uint8_t* mutableDataU = const_cast<uint8_t*>(DataU());
+      uint8_t* mutableDataV = const_cast<uint8_t*>(DataV());
+      const int strideY = StrideY();
+      const int strideU = StrideU();
+      const int strideV = StrideV();
+
+      // Colorbar colors
+      // Colors: White, Yellow, Cyan, Green, Magenta, Red, Blue, Black
+      const uint8_t colorBarY[8] = {235, 214, 183, 162,  88,  73,  36,   0};
+      const uint8_t colorBarU[8] = {128,  38, 157,  65, 188,  95, 218, 128};
+      const uint8_t colorBarV[8] = {128, 142,  39,  54, 203, 226, 114, 128};
+
+      for (int i = 0; i < 8; ++i) {
+          for (int y = 0; y < height; ++y) {
+              for (int x = i * blockWidth; x < (i + 1) * blockWidth; ++x) {
+                  mutableDataY[y * strideY + x] = colorBarY[i];
+              }
+          }
+      }
+
+      for (int i = 0; i < 8; ++i) {
+          for (int y = 0; y < height / 2; ++y) {
+              for (int x = i * blockWidth / 2; x < (i + 1) * blockWidth / 2; ++x) {
+                  mutableDataU[(y * strideU) + x] = colorBarU[i];
+                  mutableDataV[(y * strideV) + x] = colorBarV[i];
+              }
+          }
+      }
+    }
+    break;
+  default: // Clear
+    {
+      const int height = buffer_->height();
+      uint8_t* mutableDataY = const_cast<uint8_t*>(DataY());
+      uint8_t* mutableDataU = const_cast<uint8_t*>(DataU());
+      uint8_t* mutableDataV = const_cast<uint8_t*>(DataV());
+      const int countY = StrideY() * height;
+      const int countU = StrideU() * height / 2;
+      const int countV = StrideV() * height / 2;
+      memset(mutableDataY, 0, countY);
+      memset(mutableDataU, 128, countU);
+      memset(mutableDataV, 128, countV);
+    }
+    break;
+  }
   return buffer_size;
 }
 

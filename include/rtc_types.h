@@ -41,6 +41,12 @@ enum class RTCAudioDataToneFrequency {
   kTone5kHz = 5000
 };
 
+enum class RTCVideoFrameClearType {
+  kNone = 0,         // Clear video buffer
+  kNoise,
+  kColorBar
+};
+
 using string = portable::string;
 
 // template <typename Key, typename T>
