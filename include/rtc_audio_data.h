@@ -19,6 +19,7 @@ public:
 
 public:
   virtual uint32_t index() const = 0;
+  virtual void set_index(uint32_t index) = 0;
   virtual const uint8_t* data() const = 0;
   virtual size_t data_size() const = 0;
   virtual uint32_t bits_per_sample() const = 0;

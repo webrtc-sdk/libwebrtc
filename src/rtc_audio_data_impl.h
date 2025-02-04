@@ -22,6 +22,7 @@ class RTCAudioDataImpl : public RTCAudioData {
 
  public:
   uint32_t index() const override { return index_; }
+  void set_index(uint32_t index) override { index_ = index; }
   const uint8_t* data() const override { return data_.get(); }
   size_t data_size() const override { return data_size_; }
   uint32_t bits_per_sample() const override { return bits_per_sample_; }

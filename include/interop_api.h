@@ -1083,6 +1083,12 @@ RTCAudioData_GetIndex(
 ) noexcept;
 
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_SetIndex(
+    rtcAudioDataHandle handle,
+    unsigned int index
+) noexcept;
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCAudioData_GetData(
     rtcAudioDataHandle handle,
     const unsigned char** ppRetVal

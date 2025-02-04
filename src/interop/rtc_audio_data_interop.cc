@@ -36,6 +36,15 @@ RTCAudioData_GetIndex(
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioData_SetIndex(
+    rtcAudioDataHandle handle,
+    unsigned int index
+) noexcept
+{
+  DECLARE_SET_VALUE(handle, index, uint32_t, RTCAudioData, set_index);
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
 RTCAudioData_GetData(
     rtcAudioDataHandle handle,
     const unsigned char** ppRetVal
