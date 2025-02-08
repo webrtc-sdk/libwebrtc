@@ -3118,6 +3118,11 @@ RTCRtcpParametersList_GetItem (
  * ----------------------------------------------------------------------
  */
 
+ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+ RTCRtpEncodingParameters_Create (
+     rtcRtpEncodingParametersHandle* pOutRetVal
+ ) noexcept;
+
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCRtpEncodingParameters_GetSSRC (
     rtcRtpEncodingParametersHandle handle,
@@ -3269,6 +3274,13 @@ RTCRtpEncodingParameters_SetAdaptivePTime (
  * RTCRtpEncodingParametersList interop methods
  * ----------------------------------------------------------------------
  */
+
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParametersList_Create (
+    rtcRtpEncodingParametersHandle* items,
+    int count,
+    rtcRtpEncodingParametersListHandle* pOutRetVal
+) noexcept;
 
 /**
  * Returns the number of RTCRtpEncodingParametersList.

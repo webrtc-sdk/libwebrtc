@@ -606,6 +606,18 @@ RTCRtcpParametersList_GetItem (
  */
 
 rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParameters_Create (
+    rtcRtpEncodingParametersHandle* pOutRetVal
+) noexcept
+{
+    CHECK_OUT_POINTER(pOutRetVal);
+
+    scoped_refptr<RTCRtpEncodingParameters> p = RTCRtpEncodingParameters::Create();
+    *pOutRetVal = static_cast<rtcRtpEncodingParametersHandle>(p.release());
+    return rtcResultU4::kSuccess;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
 RTCRtpEncodingParameters_GetSSRC (
     rtcRtpEncodingParametersHandle handle,
     unsigned int* value
@@ -828,6 +840,29 @@ RTCRtpEncodingParameters_SetAdaptivePTime (
  * RTCRtpEncodingParametersList interop methods
  * ----------------------------------------------------------------------
  */
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpEncodingParametersList_Create (
+    rtcRtpEncodingParametersHandle* items,
+    int count,
+    rtcRtpEncodingParametersListHandle* pOutRetVal
+) noexcept
+{
+    CHECK_OUT_POINTER(pOutRetVal);
+    CHECK_POINTER_EX(items, rtcResultU4::kInvalidParameter);
+    if (count <= 0) {
+        return rtcResultU4::kInvalidParameter;
+    }
+
+    std::vector<scoped_refptr<RTCRtpEncodingParameters>> vecItems;
+    for (int i = 0; i < count; i++) {
+        scoped_refptr<RTCRtpEncodingParameters> pItem = static_cast<RTCRtpEncodingParameters*>(items[i]);
+        vecItems.push_back(pItem);
+    }
+    scoped_refptr<RTCRtpEncodingParametersList> p = RTCRtpEncodingParametersList::Create(vecItems);
+    *pOutRetVal = static_cast<rtcRtpEncodingParametersListHandle>(p.release());
+    return rtcResultU4::kSuccess;
+}
 
 int LIB_WEBRTC_CALL
 RTCRtpEncodingParametersList_GetCount (
