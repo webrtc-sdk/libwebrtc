@@ -1,3 +1,9 @@
+/**
+ * File provided for Reference Use Only by isoft (c) 2025.
+ * Copyright (c) isoft. All rights reserved.
+ * 
+ */
+
 #include "src/rtc_dummy_video_capturer_impl.h"
 #include "rtc_video_frame.h"
 #include "third_party/libyuv/include/libyuv.h"
@@ -81,7 +87,9 @@ RTCDummyVideoCapturerImpl::RTCDummyVideoCapturerImpl(
       signaling_thread_(signaling_thread),
       fps_(fps),
       width_(width),
-      height_(height) {
+      height_(height),
+      frame_buffer_(RTCVideoFrame::Create(width, height))
+{
   thread_->Start();
 }
 
@@ -183,11 +191,11 @@ void RTCDummyVideoCapturerImpl::OnFrameReady(const scoped_refptr<RTCVideoFrame>&
 }
 
 void RTCDummyVideoCapturerImpl::FillBuffer() {
-  scoped_refptr<RTCVideoFrame> frame = RTCVideoFrame::Create(width_, height_);
+  //scoped_refptr<RTCVideoFrame> frame = RTCVideoFrame::Create(width_, height_);
   if (observer_ != nullptr) {
-    observer_->OnFillBuffer(frame);
+    observer_->OnFillBuffer(frame_buffer_);
   }
-  OnFrameReady(frame);
+  OnFrameReady(frame_buffer_);
 }
 
 void RTCDummyVideoCapturerImpl::CaptureFrame() {

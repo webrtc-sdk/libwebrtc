@@ -1,3 +1,9 @@
+/**
+ * File provided for Reference Use Only by isoft (c) 2025.
+ * Copyright (c) isoft. All rights reserved.
+ * 
+ */
+
 #include "rtc_rtp_receiver.h"
 #include "interop_api.h"
 #include "rtc_media_stream.h"

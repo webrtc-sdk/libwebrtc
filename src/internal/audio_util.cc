@@ -1,3 +1,9 @@
+/**
+ * File provided for Reference Use Only by isoft (c) 2025.
+ * Copyright (c) isoft. All rights reserved.
+ * 
+ */
+
 #include "audio_util.h"
 
 #include "rtc_types.h"

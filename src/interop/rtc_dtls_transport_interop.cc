@@ -1,3 +1,9 @@
+/**
+ * File provided for Reference Use Only by isoft (c) 2025.
+ * Copyright (c) isoft. All rights reserved.
+ * 
+ */
+
 #include "rtc_dtls_transport.h"
 #include "src/rtc_dtls_transport_impl.h"
 #include "interop_api.h"

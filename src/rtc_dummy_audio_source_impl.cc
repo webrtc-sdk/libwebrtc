@@ -1,3 +1,9 @@
+/**
+ * File provided for Reference Use Only by isoft (c) 2025.
+ * Copyright (c) isoft. All rights reserved.
+ * 
+ */
+
 #include "rtc_dummy_audio_source_impl.h"
 #include "rtc_base/logging.h"
 
@@ -64,7 +70,7 @@ void DummyAudioSourceObserverImpl::OnFillBuffer(
     rtcDummyAudioSourceObserverCallbacks* pCallbacks =
         reinterpret_cast<rtcDummyAudioSourceObserverCallbacks*>(callbacks_);
     rtcAudioDataHandle hData =
-        static_cast<rtcVideoFrameHandle>(audio_data.release());
+        static_cast<rtcAudioDataHandle>(audio_data.release());
     pCallbacks->FillBuffer(pCallbacks->UserData, hData);
   }
 }

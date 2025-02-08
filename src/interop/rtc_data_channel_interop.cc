@@ -1,3 +1,9 @@
+/**
+ * File provided for Reference Use Only by isoft (c) 2025.
+ * Copyright (c) isoft. All rights reserved.
+ * 
+ */
+
 #include "rtc_data_channel.h"
 #include "interop_api.h"
 #include "src/rtc_data_channel_impl.h"

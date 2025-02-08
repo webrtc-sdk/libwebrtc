@@ -42,7 +42,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
 
   virtual scoped_refptr<RTCAudioSource> CreateAudioSource(
       const string audio_source_label) override;
-
+  
   virtual scoped_refptr<RTCDummyAudioSource> CreateDummyAudioSource(
       const string audio_source_label,
       int sample_rate_hz = 16000,

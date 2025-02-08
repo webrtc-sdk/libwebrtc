@@ -1,3 +1,9 @@
+/**
+ * File provided for Reference Use Only by isoft (c) 2025.
+ * Copyright (c) isoft. All rights reserved.
+ * 
+ */
+
 #ifndef LIB_WEBRTC_RTC_DUMMY_VIDEO_CAPTURER_IMPL_HXX
 #define LIB_WEBRTC_RTC_DUMMY_VIDEO_CAPTURER_IMPL_HXX
 
@@ -80,6 +86,7 @@ private:
   uint32_t fps_ = 25;
   uint32_t width_ = 960;
   uint32_t height_ = 540;
+  scoped_refptr<RTCVideoFrame> frame_buffer_;
 }; // end class RTCDummyVideoCapturerImpl
 
 } // namespace libwebrtc

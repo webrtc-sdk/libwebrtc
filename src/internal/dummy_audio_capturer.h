@@ -1,3 +1,9 @@
+/**
+ * File provided for Reference Use Only by isoft (c) 2025.
+ * Copyright (c) isoft. All rights reserved.
+ * 
+ */
+
 #ifndef INTERNAL_DUMMY_AUDIO_CAPTURER_H_
 #define INTERNAL_DUMMY_AUDIO_CAPTURER_H_
 
