@@ -2465,6 +2465,13 @@ RTCRtpCodecCapability_SetSdpFmtpLine(
  * ----------------------------------------------------------------------
  */
 
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecCapabilityList_Create (
+    rtcRtpCodecCapabilityHandle* items,
+    int count,
+    rtcRtpCodecCapabilityListHandle* pOutRetVal
+) noexcept;
+
 /**
  * Returns the number of RtpCodecCapabilityList.
  * 

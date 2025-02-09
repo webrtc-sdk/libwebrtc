@@ -110,6 +110,29 @@ RTCRtpCodecCapability_SetSdpFmtpLine(
  * ----------------------------------------------------------------------
  */
 
+rtcResultU4 LIB_WEBRTC_CALL
+RTCRtpCodecCapabilityList_Create (
+    rtcRtpCodecCapabilityHandle* items,
+    int count,
+    rtcRtpCodecCapabilityListHandle* pOutRetVal
+) noexcept
+{
+    CHECK_OUT_POINTER(pOutRetVal);
+    CHECK_POINTER_EX(items, rtcResultU4::kInvalidParameter);
+    if (count <= 0) {
+        return rtcResultU4::kInvalidParameter;
+    }
+
+    std::vector<scoped_refptr<RTCRtpCodecCapability>> vecItems;
+    for (int i = 0; i < count; i++) {
+        scoped_refptr<RTCRtpCodecCapability> pItem = static_cast<RTCRtpCodecCapability*>(items[i]);
+        vecItems.push_back(pItem);
+    }
+    scoped_refptr<RTCRtpCodecCapabilityList> p = RTCRtpCodecCapabilityList::Create(vecItems);
+    *pOutRetVal = static_cast<rtcRtpCodecCapabilityListHandle>(p.release());
+    return rtcResultU4::kSuccess;
+}
+
 int LIB_WEBRTC_CALL
 RTCRtpCodecCapabilityList_GetCount (
     rtcRtpCodecCapabilityListHandle handle
