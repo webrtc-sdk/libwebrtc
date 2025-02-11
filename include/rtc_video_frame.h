@@ -13,8 +13,6 @@ namespace libwebrtc {
 
 class RTCVideoFrame : public RefCountInterface {
  public:
-  enum class Type { kARGB, kBGRA, kABGR, kRGBA };
-
   enum VideoRotation {
     kVideoRotation_0 = 0,
     kVideoRotation_90 = 90,
@@ -58,18 +56,13 @@ class RTCVideoFrame : public RefCountInterface {
   virtual int64_t timestamp_us() const = 0;
   virtual void set_timestamp_us(int64_t timestamp_us) = 0;
 
-  virtual int ConvertToARGB(Type type, uint8_t* dst_argb, int dst_stride_argb,
-                            int dest_width, int dest_height) = 0;
+  virtual int ConvertToARGB(RTCVideoFrameARGB* pDest) = 0;
 
   virtual int ScaleFrom(scoped_refptr<RTCVideoFrame> source) = 0;
 
-  virtual int ScaleFrom(
-    Type type,
-    const uint8_t* src_argb,
-    int src_stride_argb,
-    int src_width,
-    int src_height
-  ) = 0;
+  virtual int ScaleFrom(RTCVideoFrameARGB* source) = 0;
+
+  virtual int ScaleFrom(RTCVideoFrameYUV* source) = 0;
 
   virtual int Clear(RTCVideoFrameClearType clearType) = 0;
 

@@ -252,29 +252,22 @@ RTCVideoFrame_SetTimestampInMicroseconds(
 int LIB_WEBRTC_CALL
 RTCVideoFrame_ConvertToARGB(
     rtcVideoFrameHandle videoFrame,
-    rtcVideoFrameType type,
-    unsigned char* dst_argb,
-    int dst_stride_argb,
-    int dest_width,
-    int dest_height
+    rtcVideoFrameARGB* dest
 ) noexcept
 {
     CHECK_POINTER_EX(videoFrame, 0);
-    if (dst_argb == nullptr
-        || dest_width < 2
-        || dest_height < 2
-        || dst_stride_argb < 12)
+    CHECK_POINTER_EX(dest, 0);
+    if (dest->data == nullptr
+        || dest->width < 2
+        || dest->height < 2
+        || dest->stride < 12)
     {
         return 0;
     }
 
     scoped_refptr<RTCVideoFrame> pvf = static_cast<RTCVideoFrame*>(videoFrame);
     return pvf->ConvertToARGB(
-        static_cast<RTCVideoFrame::Type>(type),
-        static_cast<uint8_t*>(dst_argb),
-        dst_stride_argb,
-        dest_width,
-        dest_height
+        reinterpret_cast<rtcVideoFrameARGB*>(dest)
     );
 }
 
@@ -298,53 +291,75 @@ RTCVideoFrame_ScaleFrom(
 }
 
 rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoFrame_ScaleFrom2(
+RTCVideoFrame_ScaleFromARGB(
     rtcVideoFrameHandle dest, 
-    rtcVideoFrameType frameType,
-    const unsigned char* src_argb,
-    int src_stride_argb,
-    int src_width,
-    int src_height,
+    rtcVideoFrameARGB* source,
     int* pOutRetVal
 ) noexcept
 {
     CHECK_NATIVE_HANDLE(dest);
-    CHECK_POINTER_EX(src_argb, rtcResultU4::kInvalidParameter);
-    if (src_width < 16 || 
-        src_height < 16 ||
-        src_stride_argb < 64 ||
-        (src_width * 4) > src_stride_argb)
+    CHECK_POINTER_EX(source, rtcResultU4::kInvalidParameter);
+    if (source->data == nullptr ||
+        source->width < 16 || 
+        source->height < 16 ||
+        source->stride < 64 ||
+        (source->width * 4) > source->stride)
     {
         return rtcResultU4::kInvalidParameter;
     }
 
-    RTCVideoFrame::Type type;
-    switch (frameType)
+    switch (source->type)
     {
-    case rtcVideoFrameType::kARGB:
-        type = RTCVideoFrame::Type::kARGB;
-        break;
-    case rtcVideoFrameType::kBGRA:
-        type = RTCVideoFrame::Type::kBGRA;
-        break;
-    case rtcVideoFrameType::kABGR:
-        type = RTCVideoFrame::Type::kABGR;
-        break;
-    case rtcVideoFrameType::kRGBA:
-        type = RTCVideoFrame::Type::kRGBA;
+    case rtcVideoFrameTypeARGB::kARGB:
+    case rtcVideoFrameTypeARGB::kBGRA:
+    case rtcVideoFrameTypeARGB::kABGR:
+    case rtcVideoFrameTypeARGB::kRGBA:
         break;
     default:
         return rtcResultU4::kInvalidParameter;
     }
     
     scoped_refptr<RTCVideoFrame> pDst = static_cast<RTCVideoFrame*>(dest);
-    int buffer_size = pDst->ScaleFrom(
-        type,
-        static_cast<const uint8_t*>(src_argb),
-        src_stride_argb,
-        src_width,
-        src_height
-    );
+    int buffer_size = pDst->ScaleFrom(reinterpret_cast<RTCVideoFrameARGB*>(source));
+    if (pOutRetVal) {
+        *pOutRetVal = buffer_size;
+    }
+    return rtcResultU4::kSuccess;
+}
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_ScaleFromYUV(
+    rtcVideoFrameHandle dest, 
+    rtcVideoFrameYUV* source,
+    int* pOutRetVal
+) noexcept
+{
+    CHECK_NATIVE_HANDLE(dest);
+    CHECK_POINTER_EX(source, rtcResultU4::kInvalidParameter);
+    if (source->width < 16 || 
+        source->height < 16 ||
+        source->dataY == nullptr ||
+        source->dataU == nullptr ||
+        source->dataV == nullptr ||
+        source->strideY < 16 ||
+        source->strideU < 8 ||
+        source->strideV < 8)
+    {
+        return rtcResultU4::kInvalidParameter;
+    }
+
+    switch (source->type)
+    {
+    case rtcVideoFrameTypeYUV::kI420:
+    case rtcVideoFrameTypeYUV::kYUY2:
+    case rtcVideoFrameTypeYUV::kNV12:
+        break;
+    default:
+        return rtcResultU4::kInvalidParameter;
+    }
+    
+    scoped_refptr<RTCVideoFrame> pDst = static_cast<RTCVideoFrame*>(dest);
+    int buffer_size = pDst->ScaleFrom(reinterpret_cast<RTCVideoFrameYUV*>(source));
     if (pOutRetVal) {
         *pOutRetVal = buffer_size;
     }

@@ -38,18 +38,13 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
   int StrideU() const override;
   int StrideV() const override;
 
-  int ConvertToARGB(Type type, uint8_t* dst_argb, int dst_stride_argb,
-                    int dest_width, int dest_height) override;
+  int ConvertToARGB(RTCVideoFrameARGB* pDest) override;
 
   int ScaleFrom(scoped_refptr<RTCVideoFrame> source) override;
 
-  int ScaleFrom(
-    Type type,
-    const uint8_t* src_argb,
-    int src_stride_argb,
-    int src_width,
-    int src_height
-  ) override;
+  int ScaleFrom(RTCVideoFrameARGB* source) override;
+
+  int ScaleFrom(RTCVideoFrameYUV* source) override;
 
   int Clear(RTCVideoFrameClearType clearType) override;
 

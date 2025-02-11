@@ -27,6 +27,10 @@ using rtcDesktopType = libwebrtc::DesktopType;
 using rtcCaptureState = libwebrtc::RTCCaptureState;
 using rtcAudioDataToneFrequency = libwebrtc::RTCAudioDataToneFrequency;
 using rtcVideoFrameClearType = libwebrtc::RTCVideoFrameClearType;
+using rtcVideoFrameTypeARGB = libwebrtc::RTCVideoFrameTypeARGB;
+using rtcVideoFrameTypeYUV = libwebrtc::RTCVideoFrameTypeYUV;
+using rtcVideoFrameARGB = libwebrtc::RTCVideoFrameARGB;
+using rtcVideoFrameYUV = libwebrtc::RTCVideoFrameYUV;
 
 /// 64-bit timestamp for interop API.
 using rtcTimestamp = long long;
@@ -37,14 +41,6 @@ enum class rtcBool32 : int { kFalse = 0, kTrue = 1 };
 enum class rtcKeyRingSize : int { kMin = 1, kDefault = 16, kMax = 256 };
 
 enum class rtcTrackState : int { kUnknown = -1, kLive = 0, kEnded = 1 };
-
-enum class rtcVideoFrameType : int {
-  kUnknown = -1,
-  kARGB = 0,
-  kBGRA = 1,
-  kABGR = 2,
-  kRGBA = 3
-};
 
 enum class rtcVideoRotation : int {
   kVideoRotation_0 = 0,
@@ -1644,17 +1640,13 @@ RTCVideoFrame_SetTimestampInMicroseconds(
  * Converts the video frame to RGB colorspace.
  *
  * @param videoFrame - Source video frame handle
- * @param type - Type of destination video frame buffer.
- * @param dst_argb - Destination video frame buffer.
- * @param dst_stride_argb - Stride of destination video frame buffer.
- * @param dest_width - Width of destination video frame buffer.
- * @param dest_height - Height of destination video frame buffer.
+ * @param dest - Destination video frame.
  * @return int - Size of destination
  */
 LIB_WEBRTC_API int LIB_WEBRTC_CALL RTCVideoFrame_ConvertToARGB(
-    rtcVideoFrameHandle videoFrame, rtcVideoFrameType type,
-    unsigned char* dst_argb, int dst_stride_argb, int dest_width,
-    int dest_height) noexcept;
+    rtcVideoFrameHandle videoFrame,
+    rtcVideoFrameARGB* dest
+) noexcept;
 
 /**
  * Copies the source frame and scales it to the dimensions
@@ -1676,21 +1668,28 @@ RTCVideoFrame_ScaleFrom(
  * of the destination frame.
  * 
  * @param handle - Destination video frame handle
- * @param frameType - RGBA frame type
- * @param src_argb - Source frame buffer address
- * @param src_stride_argb - Source stride
- * @param src_width - Source frame width
- * @param src_height - Source frame height
+ * @param source - Source video frame.
  * @return rtcResultU4 - 0 if successful, otherwise an error code.
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
-RTCVideoFrame_ScaleFrom2(
+RTCVideoFrame_ScaleFromARGB(
     rtcVideoFrameHandle dest, 
-    rtcVideoFrameType frameType,
-    const unsigned char* src_argb,
-    int src_stride_argb,
-    int src_width,
-    int src_height,
+    rtcVideoFrameARGB* source,
+    int* pOutRetVal
+) noexcept;
+
+/**
+ * Copies the source frame and scales it to the dimensions
+ * of the destination frame.
+ * 
+ * @param handle - Destination video frame handle
+ * @param source - Source video frame.
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCVideoFrame_ScaleFromYUV(
+    rtcVideoFrameHandle dest, 
+    rtcVideoFrameYUV* source,
     int* pOutRetVal
 ) noexcept;
 

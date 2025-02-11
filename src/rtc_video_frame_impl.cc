@@ -66,42 +66,53 @@ int VideoFrameBufferImpl::StrideV() const {
   return buffer_->GetI420()->StrideV();
 }
 
-int VideoFrameBufferImpl::ConvertToARGB(Type type, uint8_t* dst_buffer,
-                                        int dst_stride, int dest_width,
-                                        int dest_height) {
+int VideoFrameBufferImpl::ConvertToARGB(RTCVideoFrameARGB* pDest)
+{
+  if (pDest == nullptr) {
+    return 0;
+  }
+
   rtc::scoped_refptr<webrtc::I420Buffer> i420 =
       webrtc::I420Buffer::Rotate(*buffer_.get(), rotation_);
 
   rtc::scoped_refptr<webrtc::I420Buffer> dest =
-      webrtc::I420Buffer::Create(dest_width, dest_height);
+      webrtc::I420Buffer::Create(pDest->width, pDest->height);
 
   dest->ScaleFrom(*i420.get());
   // ARGB buffer size
   int buf_size = dest->width() * dest->height() * (32 >> 3);
-  switch (type) {
-    case libwebrtc::RTCVideoFrame::Type::kARGB:
-      libyuv::I420ToARGB(dest->DataY(), dest->StrideY(), dest->DataU(),
-                         dest->StrideU(), dest->DataV(), dest->StrideV(),
-                         dst_buffer, dest->width() * 32 / 8, dest->width(),
-                         dest->height());
+  switch (pDest->type) {
+    case RTCVideoFrameTypeARGB::kARGB:
+      libyuv::I420ToARGB(dest->DataY(), dest->StrideY(),
+                         dest->DataU(), dest->StrideU(),
+                         dest->DataV(), dest->StrideV(),
+                         pDest->data, pDest->stride,
+                         pDest->width,
+                         pDest->height);
       break;
-    case libwebrtc::RTCVideoFrame::Type::kBGRA:
-      libyuv::I420ToBGRA(dest->DataY(), dest->StrideY(), dest->DataU(),
-                         dest->StrideU(), dest->DataV(), dest->StrideV(),
-                         dst_buffer, dest->width() * 32 / 8, dest->width(),
-                         dest->height());
+    case RTCVideoFrameTypeARGB::kBGRA:
+      libyuv::I420ToBGRA(dest->DataY(), dest->StrideY(),
+                         dest->DataU(), dest->StrideU(),
+                         dest->DataV(), dest->StrideV(),
+                         pDest->data, pDest->stride,
+                         pDest->width,
+                         pDest->height);
       break;
-    case libwebrtc::RTCVideoFrame::Type::kABGR:
-      libyuv::I420ToABGR(dest->DataY(), dest->StrideY(), dest->DataU(),
-                         dest->StrideU(), dest->DataV(), dest->StrideV(),
-                         dst_buffer, dest->width() * 32 / 8, dest->width(),
-                         dest->height());
+    case RTCVideoFrameTypeARGB::kABGR:
+      libyuv::I420ToABGR(dest->DataY(), dest->StrideY(),
+                         dest->DataU(), dest->StrideU(),
+                         dest->DataV(), dest->StrideV(),
+                         pDest->data, pDest->stride,
+                         pDest->width,
+                         pDest->height);
       break;
-    case libwebrtc::RTCVideoFrame::Type::kRGBA:
-      libyuv::I420ToRGBA(dest->DataY(), dest->StrideY(), dest->DataU(),
-                         dest->StrideU(), dest->DataV(), dest->StrideV(),
-                         dst_buffer, dest->width() * 32 / 8, dest->width(),
-                         dest->height());
+    case RTCVideoFrameTypeARGB::kRGBA:
+      libyuv::I420ToRGBA(dest->DataY(), dest->StrideY(),
+                         dest->DataU(), dest->StrideU(),
+                         dest->DataV(), dest->StrideV(),
+                         pDest->data, pDest->stride,
+                         pDest->width,
+                         pDest->height);
       break;
     default:
       break;
@@ -134,47 +145,61 @@ int VideoFrameBufferImpl::ScaleFrom(scoped_refptr<RTCVideoFrame> source)
   return size();
 }
 
-int VideoFrameBufferImpl::ScaleFrom(
-    Type type,
-    const uint8_t* src_argb,
-    int src_stride_argb,
-    int src_width,
-    int src_height
-  )
+int VideoFrameBufferImpl::ScaleFrom(RTCVideoFrameARGB* source)
 {
+  if (source == nullptr ||
+      source->data == nullptr ||
+      source->width < 16 || 
+      source->height < 16 ||
+      source->stride < 64 ||
+      (source->width * 4) > source->stride)
+  {
+    return 0;
+  }
+
+  switch (source->type) {
+    case RTCVideoFrameTypeARGB::kARGB:
+    case RTCVideoFrameTypeARGB::kBGRA:
+    case RTCVideoFrameTypeARGB::kABGR:
+    case RTCVideoFrameTypeARGB::kRGBA:
+      break;
+    default:
+      return 0; // Unknown type
+  }
+
   rtc::scoped_refptr<webrtc::I420Buffer> i420_src =
-      webrtc::I420Buffer::Create(src_width, src_height);
+      webrtc::I420Buffer::Create(source->width, source->height);
   rtc::scoped_refptr<webrtc::I420Buffer> i420_dst =
       webrtc::I420Buffer::Create(width(), height());
 
-  switch (type) {
-    case libwebrtc::RTCVideoFrame::Type::kARGB:
-      libyuv::ARGBToI420(src_argb, src_stride_argb,
+  switch (source->type) {
+    case RTCVideoFrameTypeARGB::kARGB:
+      libyuv::ARGBToI420(source->data, source->stride,
                          i420_src->MutableDataY(), i420_src->StrideY(),
                          i420_src->MutableDataU(), i420_src->StrideU(),
                          i420_src->MutableDataV(), i420_src->StrideV(),
-                         src_width, src_height);
+                         source->width, source->height);
       break;
-    case libwebrtc::RTCVideoFrame::Type::kBGRA:
-      libyuv::BGRAToI420(src_argb, src_stride_argb,
+    case RTCVideoFrameTypeARGB::kBGRA:
+      libyuv::BGRAToI420(source->data, source->stride,
                          i420_src->MutableDataY(), i420_src->StrideY(),
                          i420_src->MutableDataU(), i420_src->StrideU(),
                          i420_src->MutableDataV(), i420_src->StrideV(),
-                         src_width, src_height);
+                         source->width, source->height);
       break;
-    case libwebrtc::RTCVideoFrame::Type::kABGR:
-      libyuv::ABGRToI420(src_argb, src_stride_argb,
+    case RTCVideoFrameTypeARGB::kABGR:
+      libyuv::ABGRToI420(source->data, source->stride,
                          i420_src->MutableDataY(), i420_src->StrideY(),
                          i420_src->MutableDataU(), i420_src->StrideU(),
                          i420_src->MutableDataV(), i420_src->StrideV(),
-                         src_width, src_height);
+                         source->width, source->height);
       break;
-    case libwebrtc::RTCVideoFrame::Type::kRGBA:
-      libyuv::RGBAToI420(src_argb, src_stride_argb,
+    case RTCVideoFrameTypeARGB::kRGBA:
+      libyuv::RGBAToI420(source->data, source->stride,
                          i420_src->MutableDataY(), i420_src->StrideY(),
                          i420_src->MutableDataU(), i420_src->StrideU(),
                          i420_src->MutableDataV(), i420_src->StrideV(),
-                         src_width, src_height);
+                         source->width, source->height);
       break;
     default:
       break;
@@ -184,6 +209,75 @@ int VideoFrameBufferImpl::ScaleFrom(
   buffer_ = i420_dst;
 
   return size();
+}
+
+int VideoFrameBufferImpl::ScaleFrom(RTCVideoFrameYUV* source)
+{
+  if (source == nullptr ||
+      source->width < 16 || 
+      source->height < 16 ||
+      source->dataY == nullptr ||
+      source->dataU == nullptr ||
+      source->dataV == nullptr ||
+      source->strideY < 16 ||
+      source->strideU < 8 ||
+      source->strideV < 8)
+  {
+    return 0;
+  }
+
+  switch (source->type) {
+    case RTCVideoFrameTypeYUV::kI420:
+    case RTCVideoFrameTypeYUV::kYUY2:
+    case RTCVideoFrameTypeYUV::kNV12:
+      break;
+    default:
+      return 0; // Unknown type
+  }
+
+  if (source->type == RTCVideoFrameTypeYUV::kI420) {
+    scoped_refptr<RTCVideoFrame> videoFrame = RTCVideoFrame::Create(
+      source->width,
+      source->height,
+      static_cast<const uint8_t*>(source->dataY),
+      source->strideY,
+      static_cast<const uint8_t*>(source->dataU),
+      source->strideU,
+      static_cast<const uint8_t*>(source->dataV),
+      source->strideV
+    );
+
+    return ScaleFrom(videoFrame);
+  }
+  else if (source->type == RTCVideoFrameTypeYUV::kYUY2) {
+    rtc::scoped_refptr<webrtc::I420Buffer> i420_src =
+      webrtc::I420Buffer::Create(source->width, source->height);
+    rtc::scoped_refptr<webrtc::I420Buffer> i420_dst =
+        webrtc::I420Buffer::Create(width(), height());
+        
+    int retVal = libyuv::YUY2ToI420(
+      static_cast<const uint8_t*>(source->dataY),
+      source->strideY,
+      i420_src->MutableDataY(), i420_src->StrideY(),
+      i420_src->MutableDataU(), i420_src->StrideU(),
+      i420_src->MutableDataV(), i420_src->StrideV(),
+      source->width, source->height
+    );
+
+    if (retVal != 0) {
+      return 0; // error
+    }
+
+    i420_dst->ScaleFrom(*i420_src.get());
+    buffer_ = i420_dst;
+
+    return size();
+  }
+  else if (source->type == RTCVideoFrameTypeYUV::kNV12) {
+    return 0; // Not yet supported !!!
+  }
+
+  return 0;
 }
 
 int VideoFrameBufferImpl::Clear(RTCVideoFrameClearType clearType) {
