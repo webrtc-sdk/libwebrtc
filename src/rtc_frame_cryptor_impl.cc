@@ -26,8 +26,6 @@ webrtc::FrameCryptorTransformer::Algorithm AlgorithmToFrameCryptorAlgorithm(
   switch (algorithm) {
     case Algorithm::kAesGcm:
       return webrtc::FrameCryptorTransformer::Algorithm::kAesGcm;
-    case Algorithm::kAesCbc:
-      return webrtc::FrameCryptorTransformer::Algorithm::kAesCbc;
     default:
       return webrtc::FrameCryptorTransformer::Algorithm::kAesGcm;
   }
