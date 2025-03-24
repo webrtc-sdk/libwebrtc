@@ -39,6 +39,8 @@ const string RTCDataChannelImpl::label() const { return label_; }
 
 int RTCDataChannelImpl::id() const { return rtc_data_channel_->id(); }
 
+uint64_t RTCDataChannelImpl::buffered_amount() const { return rtc_data_channel_->buffered_amount(); }
+
 void RTCDataChannelImpl::OnStateChange() {
   webrtc::DataChannelInterface::DataState state = rtc_data_channel_->state();
   switch (state) {

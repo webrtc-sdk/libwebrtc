@@ -27,6 +27,8 @@ class RTCDataChannelImpl : public RTCDataChannel,
 
   virtual int id() const override;
 
+  virtual uint64_t buffered_amount() const override;
+
   virtual RTCDataChannelState state() override;
 
   rtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel() {
