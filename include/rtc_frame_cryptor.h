@@ -11,7 +11,6 @@ namespace libwebrtc {
 
 enum class Algorithm {
   kAesGcm = 0,
-  kAesCbc,
 };
 
 #define DEFAULT_KEYRING_SIZE 16

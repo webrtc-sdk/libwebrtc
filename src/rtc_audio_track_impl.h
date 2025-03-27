@@ -14,13 +14,25 @@
 
 namespace libwebrtc {
 
-class AudioTrackImpl : public RTCAudioTrack {
+class AudioTrackImpl : public RTCAudioTrack, public webrtc::AudioTrackSinkInterface {
  public:
   AudioTrackImpl(rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track);
 
   virtual ~AudioTrackImpl();
 
   virtual void SetVolume(double volume) override;
+
+  virtual void AddAudioSink(
+      RTCAudioRenderer<scoped_refptr<RTCAudioFrame>>* sink) override;
+
+  virtual void RemoveAudioSink(
+      RTCAudioRenderer<scoped_refptr<RTCAudioFrame>>* sink) override;
+
+  virtual void OnData(const void* audio_data,
+                      int bits_per_sample,
+                      int sample_rate,
+                      size_t number_of_channels,
+                      size_t number_of_frames) override;
 
   virtual const string kind() const override { return kind_; }
 
@@ -43,6 +55,8 @@ class AudioTrackImpl : public RTCAudioTrack {
  private:
   rtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track_;
   string id_, kind_;
+  mutable webrtc::Mutex mutex_;
+  std::list<RTCAudioRenderer<scoped_refptr<RTCAudioFrame>>*> renderers_;
 };
 
 }  // namespace libwebrtc

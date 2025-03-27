@@ -16,11 +16,11 @@ bool RTCRtpSenderImpl::set_track(scoped_refptr<RTCMediaTrack> track) {
     return rtp_sender_->SetTrack(nullptr);
   }
   if (std::string(webrtc::MediaStreamTrackInterface::kVideoKind) ==
-      track->kind().std_string()) {
+      to_std_string(track->kind())) {
     VideoTrackImpl* impl = static_cast<VideoTrackImpl*>(track.get());
     return rtp_sender_->SetTrack(impl->rtc_track().get());
   } else if (std::string(webrtc::MediaStreamTrackInterface::kAudioKind) ==
-             track->kind().std_string()) {
+             to_std_string(track->kind())) {
     AudioTrackImpl* impl = static_cast<AudioTrackImpl*>(track.get());
     return rtp_sender_->SetTrack(impl->rtc_track().get());
   }
@@ -74,7 +74,7 @@ const vector<string> RTCRtpSenderImpl::stream_ids() const {
 
 void RTCRtpSenderImpl::set_stream_ids(const vector<string> stream_ids) const {
   std::vector<std::string> list;
-  for (auto id : stream_ids.std_vector()) {
+  for (auto id : to_std_vector(stream_ids)) {
     list.push_back(to_std_string(id));
   }
   rtp_sender_->SetStreams(list);
