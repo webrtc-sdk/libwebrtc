@@ -51,6 +51,8 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
 
   void set_rotation(webrtc::VideoRotation rotation) { rotation_ = rotation; }
 
+  webrtc::VideoRotation rtc_rotation() { return rotation_; }
+
  private:
   rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer_;
   int64_t timestamp_us_ = 0;

@@ -135,21 +135,30 @@ class RTCStatsMemberImpl : public RTCStatsMember {
   }
 
   vector<string> ValueSequenceString() const override {
-    return attr_.get<std::vector<std::string>>();
+    auto val = attr_.get<std::vector<std::string>>();
+    vector<string> out;
+    for (const auto& v : val) {
+      out.push_back(v);
+    }
+    return out;
   }
 
   map<string, uint64_t> ValueMapStringUint64() const override {
-    // const std::map<std::string, uint64_t>& mapout = *member_->cast_to<
-    //    webrtc::RTCStatsMember<std::map<std::string, uint64_t>>>();
-    return map<string, uint64_t>();
+    auto val = attr_.get<std::map<std::string, uint64_t>>();
+    map<string, uint64_t> out;
+    for (const auto& v : val) {
+      out[v.first] = v.second;
+    }
+    return out;
   }
 
   map<string, double> ValueMapStringDouble() const override {
-    // const std::map<std::string, double>& mapout =
-    //    *member_
-    //         ->cast_to<webrtc::RTCStatsMember<std::map<std::string,
-    //         double>>>();
-    return map<string, double>();
+    auto val = attr_.get<std::map<std::string, double>>();
+    map<string, double> out;
+    for (const auto& v : val) {
+      out[v.first] = v.second;
+    }
+    return out;
   }
 
  private:

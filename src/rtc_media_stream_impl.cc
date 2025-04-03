@@ -96,7 +96,7 @@ vector<scoped_refptr<RTCMediaTrack>> MediaStreamImpl::tracks() {
 scoped_refptr<RTCAudioTrack> MediaStreamImpl::FindAudioTrack(
     const string track_id) {
   for (auto track : audio_tracks_) {
-    if (track->id().std_string() == track_id.std_string()) return track;
+    if (to_std_string(track->id()) == to_std_string(track_id)) return track;
   }
 
   return scoped_refptr<RTCAudioTrack>();
@@ -105,7 +105,7 @@ scoped_refptr<RTCAudioTrack> MediaStreamImpl::FindAudioTrack(
 scoped_refptr<RTCVideoTrack> MediaStreamImpl::FindVideoTrack(
     const string track_id) {
   for (auto track : video_tracks_) {
-    if (track->id().std_string() == track_id.std_string()) return track;
+    if (to_std_string(track->id()) == to_std_string(track_id)) return track;
   }
 
   return scoped_refptr<RTCVideoTrack>();

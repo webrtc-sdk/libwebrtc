@@ -50,7 +50,7 @@ class MediaSourceImpl : public MediaSource {
   string name() const override { return string(source.title); }
 
   // Returns the thumbnail of the source, jpeg format.
-  portable::vector<unsigned char> thumbnail() const override {
+  vector<unsigned char> thumbnail() const override {
     return thumbnail_;
   }
 

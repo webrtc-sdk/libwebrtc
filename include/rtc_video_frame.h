@@ -17,10 +17,10 @@ class RTCVideoFrame : public RefCountInterface {
   };
 
  public:
-  LIB_WEBRTC_API static scoped_refptr<RTCVideoFrame> Create(
+ LIB_WEBRTC_API static scoped_refptr<RTCVideoFrame> Create(
       int width, int height, const uint8_t* buffer, int length);
 
-  LIB_WEBRTC_API static scoped_refptr<RTCVideoFrame> Create(
+ LIB_WEBRTC_API static scoped_refptr<RTCVideoFrame> Create(
       int width, int height, const uint8_t* data_y, int stride_y,
       const uint8_t* data_u, int stride_u, const uint8_t* data_v, int stride_v);
 

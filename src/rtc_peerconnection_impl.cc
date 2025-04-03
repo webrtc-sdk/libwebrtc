@@ -183,15 +183,19 @@ class CreateSessionDescriptionObserverProxy
 };
 
 RTCPeerConnectionImpl::RTCPeerConnectionImpl(
-    const RTCConfiguration& configuration,
+    const RTCConfiguration* configuration,
     scoped_refptr<RTCMediaConstraints> constraints,
     rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
         peer_connection_factory)
     : rtc_peerconnection_factory_(peer_connection_factory),
-      configuration_(configuration),
-      constraints_(constraints),
       callback_crt_sec_(new webrtc::Mutex()) {
   RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor";
+  if (configuration) {
+    configuration_ = *configuration;
+  }
+  if (constraints) {
+    constraints_ = constraints;
+  }
   Initialize();
 }
 
@@ -669,7 +673,7 @@ scoped_refptr<RTCMediaStream> RTCPeerConnectionImpl::CreateLocalMediaStream(
     return nullptr;
   }
   auto stream =
-      rtc_peerconnection_factory_->CreateLocalMediaStream(stream_id.c_string());
+      rtc_peerconnection_factory_->CreateLocalMediaStream(stream_id.c_str());
   auto rtc_stream = new RefCountedObject<MediaStreamImpl>(stream);
   local_streams_.push_back(rtc_stream);
   return rtc_stream;
@@ -806,7 +810,7 @@ scoped_refptr<RTCRtpSender> RTCPeerConnectionImpl::AddTrack(
   webrtc::RTCErrorOr<rtc::scoped_refptr<webrtc::RtpSenderInterface>> errorOr;
 
   std::vector<std::string> stream_ids;
-  for (auto id : streamIds.std_vector()) {
+  for (auto id : to_std_vector(streamIds)) {
     stream_ids.push_back(to_std_string(id));
   }
   std::string kind = to_std_string(track->kind());

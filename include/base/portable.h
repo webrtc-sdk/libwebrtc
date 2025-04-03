@@ -1,15 +1,7 @@
 #ifndef INFINISPAN_HOTROD_PORTABLE_H
 #define INFINISPAN_HOTROD_PORTABLE_H
 
-#ifdef LIB_WEBRTC_API_EXPORTS
-#define LIB_PORTABLE_API __declspec(dllexport)
-#elif defined(LIB_WEBRTC_API_DLL)
-#define LIB_PORTABLE_API __declspec(dllimport)
-#elif !defined(WIN32)
-#define LIB_PORTABLE_API __attribute__((visibility("default")))
-#else
-#define LIB_PORTABLE_API
-#endif
+#include "../rtc_config.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -45,9 +37,9 @@ class string {
   size_t m_length;
 
  public:
-  LIB_PORTABLE_API string();
-  LIB_PORTABLE_API void init(const char* str, size_t len);
-  LIB_PORTABLE_API void destroy();
+  LIB_WEBRTC_API string();
+  LIB_WEBRTC_API void init(const char* str, size_t len);
+  LIB_WEBRTC_API void destroy();
 
   inline string(const char* str) { init(str, strlen(str)); }
 
@@ -63,7 +55,7 @@ class string {
     return *this;
   }
 
-  LIB_PORTABLE_API ~string();
+  LIB_WEBRTC_API ~string();
 
   inline string& operator=(const std::string& str) {
     destroy();
@@ -73,7 +65,7 @@ class string {
 
   inline size_t size() { return m_length; }
 
-  inline const char* c_string() const {
+  inline const char* c_str() const {
     return m_dynamic == 0 ? m_buf : m_dynamic;
   }
 
@@ -81,8 +73,6 @@ class string {
     return std::string(m_dynamic == 0 ? m_buf : m_dynamic, m_length);
   }
 };
-
-inline std::string to_std_string(const string& str) { return str.std_string(); }
 
 template <typename T>
 class identity {
