@@ -6,6 +6,13 @@
 
 namespace libwebrtc {
 
+class AudioTrackSink {
+ public:
+  virtual void OnData(const void* audio_data, int bits_per_sample,
+                      int sample_rate, size_t number_of_channels,
+                      size_t number_of_frames) = 0;
+};
+
 /**
  * The RTCAudioTrack class represents an audio track in WebRTC.
  * Audio tracks are used to transmit audio data over a WebRTC peer connection.
@@ -16,6 +23,10 @@ class RTCAudioTrack : public RTCMediaTrack {
  public:
   // volume in [0-10]
   virtual void SetVolume(double volume) = 0;
+
+  virtual void AddSink(AudioTrackSink* sink) = 0;
+
+  virtual void RemoveSink(AudioTrackSink* sink) = 0;
 
  protected:
   /**
