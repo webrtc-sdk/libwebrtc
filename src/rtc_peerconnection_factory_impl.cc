@@ -63,6 +63,10 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
     worker_thread_->BlockingCall([=] { CreateAudioDeviceModule_w(); });
   }
 
+  if (!audio_processing_impl_) {
+    worker_thread_->BlockingCall([this] { audio_processing_impl_ = new RefCountedObject<RTCAudioProcessingImpl>(); });
+  }
+
   if (!rtc_peerconnection_factory_) {
     rtc_peerconnection_factory_ = webrtc::CreatePeerConnectionFactory(
         network_thread_.get(), worker_thread_.get(), signaling_thread_.get(),
@@ -74,7 +78,7 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
         webrtc::CreateBuiltinVideoEncoderFactory(),
         webrtc::CreateBuiltinVideoDecoderFactory(),
 #endif
-        nullptr, nullptr);
+        nullptr, audio_processing_impl_->GetAudioProcessing());
   }
 
   if (!rtc_peerconnection_factory_.get()) {
@@ -89,6 +93,7 @@ bool RTCPeerConnectionFactoryImpl::Terminate() {
   worker_thread_->BlockingCall([&] {
     audio_device_impl_ = nullptr;
     video_device_impl_ = nullptr;
+    audio_processing_impl_ = nullptr;
   });
   rtc_peerconnection_factory_ = NULL;
   if (audio_device_module_) {
@@ -142,6 +147,15 @@ scoped_refptr<RTCAudioDevice> RTCPeerConnectionFactoryImpl::GetAudioDevice() {
             audio_device_module_, worker_thread_.get()));
 
   return audio_device_impl_;
+}
+
+scoped_refptr<RTCAudioProcessing> RTCPeerConnectionFactoryImpl::GetAudioProcessing() {
+
+  if (!audio_processing_impl_) {
+    worker_thread_->BlockingCall([this] { audio_processing_impl_ = new RefCountedObject<RTCAudioProcessingImpl>(); });
+  }
+
+  return audio_processing_impl_;
 }
 
 scoped_refptr<RTCVideoDevice> RTCPeerConnectionFactoryImpl::GetVideoDevice() {

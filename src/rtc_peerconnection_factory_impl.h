@@ -7,6 +7,7 @@
 #include "api/peer_connection_interface.h"
 #include "api/task_queue/task_queue_factory.h"
 #include "rtc_audio_device_impl.h"
+#include "rtc_audio_processing_impl.h"
 #include "rtc_base/thread.h"
 #include "rtc_peerconnection.h"
 #include "rtc_peerconnection_factory.h"
@@ -39,6 +40,8 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<RTCAudioDevice> GetAudioDevice() override;
 
   scoped_refptr<RTCVideoDevice> GetVideoDevice() override;
+
+  scoped_refptr<RTCAudioProcessing> GetAudioProcessing() override;
 
   virtual scoped_refptr<RTCAudioSource> CreateAudioSource(
       const string audio_source_label) override;
@@ -97,6 +100,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
       rtc_peerconnection_factory_;
   rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
   scoped_refptr<AudioDeviceImpl> audio_device_impl_;
+  scoped_refptr<RTCAudioProcessingImpl> audio_processing_impl_;
   scoped_refptr<RTCVideoDeviceImpl> video_device_impl_;
 #ifdef RTC_DESKTOP_DEVICE
   scoped_refptr<RTCDesktopDeviceImpl> desktop_device_impl_;
