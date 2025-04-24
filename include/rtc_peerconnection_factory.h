@@ -41,7 +41,9 @@ class RTCPeerConnectionFactory : public RefCountInterface {
   virtual scoped_refptr<RTCDesktopDevice> GetDesktopDevice() = 0;
 #endif
   virtual scoped_refptr<RTCAudioSource> CreateAudioSource(
-      const string audio_source_label) = 0;
+      const string audio_source_label,
+      RTCAudioSource::SourceType source_type =
+          RTCAudioSource::SourceType::kMicrophone) = 0;
 
   virtual scoped_refptr<RTCVideoSource> CreateVideoSource(
       scoped_refptr<RTCVideoCapturer> capturer, const string video_source_label,

@@ -19,6 +19,8 @@
 #include "src/internal/desktop_capturer.h"
 #endif
 
+#include "src/internal/custom_media_context.h"
+
 namespace libwebrtc {
 
 class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
@@ -44,7 +46,8 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<RTCAudioProcessing> GetAudioProcessing() override;
 
   virtual scoped_refptr<RTCAudioSource> CreateAudioSource(
-      const string audio_source_label) override;
+      const string audio_source_label,
+      RTCAudioSource::SourceType source_type) override;
 
   virtual scoped_refptr<RTCVideoSource> CreateVideoSource(
       scoped_refptr<RTCVideoCapturer> capturer, const string video_source_label,
@@ -96,6 +99,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   std::unique_ptr<rtc::Thread> worker_thread_;
   std::unique_ptr<rtc::Thread> signaling_thread_;
   std::unique_ptr<rtc::Thread> network_thread_;
+  rtc::scoped_refptr<webrtc::CustomMediaContext> custom_media_context_;
   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
       rtc_peerconnection_factory_;
   rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;

@@ -24,6 +24,8 @@
 #endif
 #include <api/task_queue/default_task_queue_factory.h>
 
+#include "src/internal/custom_media_context.h"
+
 namespace libwebrtc {
 
 #if defined(USE_INTEL_MEDIA_SDK)
@@ -55,6 +57,9 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
   signaling_thread_->SetName("signaling_thread", nullptr);
   RTC_CHECK(signaling_thread_->Start()) << "Failed to start thread";
 
+  custom_media_context_ = rtc::make_ref_counted<webrtc::CustomMediaContext>(
+      signaling_thread_.get());
+
   network_thread_ = rtc::Thread::CreateWithSocketServer();
   network_thread_->SetName("network_thread", nullptr);
   RTC_CHECK(network_thread_->Start()) << "Failed to start thread";
@@ -64,21 +69,25 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
   }
 
   if (!audio_processing_impl_) {
-    worker_thread_->BlockingCall([this] { audio_processing_impl_ = new RefCountedObject<RTCAudioProcessingImpl>(); });
+    worker_thread_->BlockingCall([this] {
+      audio_processing_impl_ = new RefCountedObject<RTCAudioProcessingImpl>();
+    });
   }
 
   if (!rtc_peerconnection_factory_) {
-    rtc_peerconnection_factory_ = webrtc::CreatePeerConnectionFactory(
-        network_thread_.get(), worker_thread_.get(), signaling_thread_.get(),
-        audio_device_module_, webrtc::CreateBuiltinAudioEncoderFactory(),
-        webrtc::CreateBuiltinAudioDecoderFactory(),
+    rtc_peerconnection_factory_ =
+        custom_media_context_->CreatePeerConnectionFactory(
+            network_thread_.get(), worker_thread_.get(),
+            signaling_thread_.get(), audio_device_module_,
+            webrtc::CreateBuiltinAudioEncoderFactory(),
+            webrtc::CreateBuiltinAudioDecoderFactory(),
 #if defined(USE_INTEL_MEDIA_SDK)
-        CreateIntelVideoEncoderFactory(), CreateIntelVideoDecoderFactory(),
+            CreateIntelVideoEncoderFactory(), CreateIntelVideoDecoderFactory(),
 #else
-        webrtc::CreateBuiltinVideoEncoderFactory(),
-        webrtc::CreateBuiltinVideoDecoderFactory(),
+            webrtc::CreateBuiltinVideoEncoderFactory(),
+            webrtc::CreateBuiltinVideoDecoderFactory(),
 #endif
-        nullptr, audio_processing_impl_->GetAudioProcessing());
+            nullptr, audio_processing_impl_->GetAudioProcessing(), nullptr);
   }
 
   if (!rtc_peerconnection_factory_.get()) {
@@ -149,10 +158,12 @@ scoped_refptr<RTCAudioDevice> RTCPeerConnectionFactoryImpl::GetAudioDevice() {
   return audio_device_impl_;
 }
 
-scoped_refptr<RTCAudioProcessing> RTCPeerConnectionFactoryImpl::GetAudioProcessing() {
-
+scoped_refptr<RTCAudioProcessing>
+RTCPeerConnectionFactoryImpl::GetAudioProcessing() {
   if (!audio_processing_impl_) {
-    worker_thread_->BlockingCall([this] { audio_processing_impl_ = new RefCountedObject<RTCAudioProcessingImpl>(); });
+    worker_thread_->BlockingCall([this] {
+      audio_processing_impl_ = new RefCountedObject<RTCAudioProcessingImpl>();
+    });
   }
 
   return audio_processing_impl_;
@@ -167,12 +178,12 @@ scoped_refptr<RTCVideoDevice> RTCPeerConnectionFactoryImpl::GetVideoDevice() {
 }
 
 scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
-    const string audio_source_label) {
-  rtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_source_track =
-      rtc_peerconnection_factory_->CreateAudioSource(cricket::AudioOptions());
-
+    const string audio_source_label, RTCAudioSource::SourceType source_type) {
+  auto options = cricket::AudioOptions();
+  rtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_source_track =
+      custom_media_context_->CreateAudioSource(&options);
   scoped_refptr<RTCAudioSourceImpl> source = scoped_refptr<RTCAudioSourceImpl>(
-      new RefCountedObject<RTCAudioSourceImpl>(rtc_source_track));
+      new RefCountedObject<RTCAudioSourceImpl>(rtc_source_track, source_type));
   return source;
 }
 
