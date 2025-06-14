@@ -1,0 +1,33 @@
+diff --git a/modules/congestion_controller/goog_cc/loss_based_bwe_v2.cc b/modules/congestion_controller/goog_cc/loss_based_bwe_v2.cc
+index 7deeb7ad64..f913557f8c 100644
+--- a/modules/congestion_controller/goog_cc/loss_based_bwe_v2.cc
++++ b/modules/congestion_controller/goog_cc/loss_based_bwe_v2.cc
+@@ -545,11 +545,14 @@ absl::optional<LossBasedBweV2::Config> LossBasedBweV2::CreateConfig(
+                     key_value_config->Lookup("WebRTC-Bwe-LossBasedBweV2"));
+   }
+
+-  absl::optional<Config> config;
++  // absl::optional<Config> config;
+   if (!enabled.Get()) {
+-    return config;
++    return std::nullopt;
+   }
+-  config.emplace();
++
++  Config _config;
++  Config* config = &_config;
++
+   config->bandwidth_rampup_upper_bound_factor =
+       bandwidth_rampup_upper_bound_factor.Get();
+   config->bandwidth_rampup_upper_bound_factor_in_hold =
+@@ -608,7 +611,7 @@ absl::optional<LossBasedBweV2::Config> LossBasedBweV2::CreateConfig(
+   config->padding_duration = padding_duration.Get();
+   config->bound_best_candidate = bound_best_candidate.Get();
+   config->pace_at_loss_based_estimate = pace_at_loss_based_estimate.Get();
+-  return config;
++  return _config;
+ }
+
+ bool LossBasedBweV2::IsConfigValid() const {
+
+
