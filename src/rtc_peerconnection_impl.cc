@@ -56,7 +56,7 @@ static std::map<libwebrtc::TcpCandidatePolicy,
         {libwebrtc::TcpCandidatePolicy::kTcpCandidatePolicyDisabled,
          webrtc::PeerConnectionInterface::kTcpCandidatePolicyDisabled},
         {libwebrtc::TcpCandidatePolicy::kTcpCandidatePolicyEnabled,
-         webrtc::PeerConnectionInterface::kTcpCandidatePolicyDisabled}};
+         webrtc::PeerConnectionInterface::kTcpCandidatePolicyEnabled}};
 
 static std::map<webrtc::PeerConnectionInterface::PeerConnectionState,
                 libwebrtc::RTCPeerConnectionState>
