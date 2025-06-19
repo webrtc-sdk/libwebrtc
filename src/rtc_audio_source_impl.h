@@ -17,16 +17,16 @@ namespace libwebrtc {
 class RTCAudioSourceImpl : public RTCAudioSource {
  public:
   RTCAudioSourceImpl(
-      rtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source);
+      webrtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source);
 
   virtual ~RTCAudioSourceImpl();
 
-  rtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source() {
+  webrtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source() {
     return rtc_audio_source_;
   }
 
  private:
-  rtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source_;
+  webrtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source_;
 };
 
 }  // namespace libwebrtc

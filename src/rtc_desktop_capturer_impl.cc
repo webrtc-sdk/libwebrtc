@@ -29,8 +29,8 @@ enum { kCaptureDelay = 33, kCaptureMessageId = 1000 };
 
 RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
     DesktopType type, webrtc::DesktopCapturer::SourceId source_id,
-    rtc::Thread* signaling_thread, scoped_refptr<MediaSource> source)
-    : thread_(rtc::Thread::Create()),
+    webrtc::Thread* signaling_thread, scoped_refptr<MediaSource> source)
+    : thread_(webrtc::Thread::Create()),
       source_id_(source_id),
       signaling_thread_(signaling_thread),
       source_(source) {
@@ -201,7 +201,7 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
 #endif
                           width, height, libyuv::kRotate0, libyuv::FOURCC_ARGB);
 
-    OnFrame(webrtc::VideoFrame(i420_buffer_, 0, rtc::TimeMillis(),
+    OnFrame(webrtc::VideoFrame(i420_buffer_, 0, webrtc::TimeMillis(),
                                webrtc::kVideoRotation_0));
   }
 #ifdef WEBRTC_WIN

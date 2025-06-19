@@ -14,7 +14,7 @@ class RTCDtmfSenderImpl : public RTCDtmfSender,
                           public webrtc::DtmfSenderObserverInterface {
  public:
   RTCDtmfSenderImpl(
-      rtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender);
+      webrtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender);
 
   virtual void RegisterObserver(RTCDtmfSenderObserver* observer) override;
   virtual void UnregisterObserver() override;
@@ -33,10 +33,10 @@ class RTCDtmfSenderImpl : public RTCDtmfSender,
 
   virtual void OnToneChange(const std::string& tone) override;
 
-  rtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender();
+  webrtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender();
 
  private:
-  rtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender_;
+  webrtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender_;
   RTCDtmfSenderObserver* observer_;
 };
 

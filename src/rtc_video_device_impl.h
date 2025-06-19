@@ -38,7 +38,7 @@ class RTCVideoCapturerImpl : public RTCVideoCapturer {
 
 class RTCVideoDeviceImpl : public RTCVideoDevice {
  public:
-  RTCVideoDeviceImpl(rtc::Thread* worker_thread);
+  RTCVideoDeviceImpl(webrtc::Thread* worker_thread);
 
  public:
   uint32_t NumberOfDevices() override;
@@ -55,7 +55,7 @@ class RTCVideoDeviceImpl : public RTCVideoDevice {
 
  private:
   std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> device_info_;
-  rtc::Thread* worker_thread_ = nullptr;
+  webrtc::Thread* worker_thread_ = nullptr;
 };
 
 }  // namespace libwebrtc

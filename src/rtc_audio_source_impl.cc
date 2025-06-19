@@ -3,7 +3,7 @@
 namespace libwebrtc {
 
 RTCAudioSourceImpl::RTCAudioSourceImpl(
-    rtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source)
+    webrtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source)
     : rtc_audio_source_(rtc_audio_source) {
   RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
 }

@@ -16,7 +16,7 @@ namespace libwebrtc {
 
 class AudioTrackImpl : public RTCAudioTrack {
  public:
-  AudioTrackImpl(rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track);
+  AudioTrackImpl(webrtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track);
 
   virtual ~AudioTrackImpl();
 
@@ -32,7 +32,7 @@ class AudioTrackImpl : public RTCAudioTrack {
     return rtc_track_->set_enabled(enable);
   }
 
-  rtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track() {
+  webrtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track() {
     return rtc_track_;
   }
 
@@ -41,7 +41,7 @@ class AudioTrackImpl : public RTCAudioTrack {
   }
 
  private:
-  rtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track_;
+  webrtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track_;
   string id_, kind_;
 };
 

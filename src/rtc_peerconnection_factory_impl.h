@@ -62,7 +62,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   virtual scoped_refptr<RTCMediaStream> CreateStream(
       const string stream_id) override;
 
-  rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
+  webrtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
   peer_connection_factory() {
     return rtc_peerconnection_factory_;
   }
@@ -73,7 +73,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<RTCRtpCapabilities> GetRtpReceiverCapabilities(
       RTCMediaType media_type) override;
 
-  rtc::Thread* signaling_thread() { return signaling_thread_.get(); }
+  webrtc::Thread* signaling_thread() { return signaling_thread_.get(); }
 
  protected:
   void CreateAudioDeviceModule_w();
@@ -90,12 +90,12 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
       scoped_refptr<RTCMediaConstraints> constraints);
 #endif
  private:
-  std::unique_ptr<rtc::Thread> worker_thread_;
-  std::unique_ptr<rtc::Thread> signaling_thread_;
-  std::unique_ptr<rtc::Thread> network_thread_;
-  rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
+  std::unique_ptr<webrtc::Thread> worker_thread_;
+  std::unique_ptr<webrtc::Thread> signaling_thread_;
+  std::unique_ptr<webrtc::Thread> network_thread_;
+  webrtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
       rtc_peerconnection_factory_;
-  rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
+  webrtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
   scoped_refptr<AudioDeviceImpl> audio_device_impl_;
   scoped_refptr<RTCVideoDeviceImpl> video_device_impl_;
 #ifdef RTC_DESKTOP_DEVICE

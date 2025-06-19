@@ -4,7 +4,7 @@
 
 namespace libwebrtc {
 
-RTCVideoDeviceImpl::RTCVideoDeviceImpl(rtc::Thread* worker_thread)
+RTCVideoDeviceImpl::RTCVideoDeviceImpl(webrtc::Thread* worker_thread)
     : device_info_(webrtc::VideoCaptureFactory::CreateDeviceInfo()),
       worker_thread_(worker_thread) {}
 
