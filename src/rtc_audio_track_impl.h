@@ -77,6 +77,7 @@ class AudioTrackImpl : public RTCAudioTrack {
   }
 
  private:
+  void RemoveSinks();
   rtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track_;
   std::map<AudioTrackSink*, std::unique_ptr<AudioTrackSinkAdapter>> sinks_;
   webrtc::Mutex mutex_;
