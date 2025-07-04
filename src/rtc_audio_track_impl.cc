@@ -12,10 +12,21 @@ AudioTrackImpl::AudioTrackImpl(
 
 AudioTrackImpl::~AudioTrackImpl() {
   RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+  RemoveSinks();
 }
 
 void AudioTrackImpl::SetVolume(double volume) {
   rtc_track_->GetSource()->SetVolume(volume);
+}
+
+void AudioTrackImpl::RemoveSinks() {
+  webrtc::MutexLock lock(&mutex_);
+  auto it = sinks_.begin();
+  while ( it != sinks_.end()) {
+    rtc_track_->RemoveSink(it->second.get());
+    it++;
+  }
+  sinks_.clear();
 }
 
 }  // namespace libwebrtc

@@ -63,8 +63,21 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
     worker_thread_->BlockingCall([&] { CreateAudioDeviceModule_w(); });
   }
 
+  if (!audio_processing_impl_) {
+    worker_thread_->BlockingCall([this] {
+      audio_processing_impl_ = new RefCountedObject<RTCAudioProcessingImpl>();
+    });
+  }
+
+  if (!audio_transport_factory_) {
+    worker_thread_->BlockingCall([this] {
+      audio_transport_factory_ =
+          webrtc::make_ref_counted<CustomAudioTransportFactory>();
+    });
+  }
+
   if (!rtc_peerconnection_factory_) {
-    rtc_peerconnection_factory_ = webrtc::CreatePeerConnectionFactory(
+    rtc_peerconnection_factory_ = CreatePeerConnectionFactory(
         network_thread_.get(), worker_thread_.get(), signaling_thread_.get(),
         audio_device_module_, webrtc::CreateBuiltinAudioEncoderFactory(),
         webrtc::CreateBuiltinAudioDecoderFactory(),
@@ -74,7 +87,8 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
         webrtc::CreateBuiltinVideoEncoderFactory(),
         webrtc::CreateBuiltinVideoDecoderFactory(),
 #endif
-        nullptr, nullptr);
+        nullptr, audio_processing_impl_->GetAudioProcessing(), nullptr, nullptr,
+        audio_transport_factory_);
   }
 
   if (!rtc_peerconnection_factory_.get()) {
@@ -89,6 +103,7 @@ bool RTCPeerConnectionFactoryImpl::Terminate() {
   worker_thread_->BlockingCall([&] {
     audio_device_impl_ = nullptr;
     video_device_impl_ = nullptr;
+    audio_processing_impl_ = nullptr;
   });
   rtc_peerconnection_factory_ = NULL;
   if (audio_device_module_) {
@@ -144,6 +159,17 @@ scoped_refptr<RTCAudioDevice> RTCPeerConnectionFactoryImpl::GetAudioDevice() {
   return audio_device_impl_;
 }
 
+scoped_refptr<RTCAudioProcessing>
+RTCPeerConnectionFactoryImpl::GetAudioProcessing() {
+  if (!audio_processing_impl_) {
+    worker_thread_->BlockingCall([this] {
+      audio_processing_impl_ = new RefCountedObject<RTCAudioProcessingImpl>();
+    });
+  }
+
+  return audio_processing_impl_;
+}
+
 scoped_refptr<RTCVideoDevice> RTCPeerConnectionFactoryImpl::GetVideoDevice() {
   if (!video_device_impl_)
     video_device_impl_ = scoped_refptr<RTCVideoDeviceImpl>(
@@ -152,13 +178,37 @@ scoped_refptr<RTCVideoDevice> RTCPeerConnectionFactoryImpl::GetVideoDevice() {
   return video_device_impl_;
 }
 
-scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
-    const string audio_source_label) {
-  webrtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_source_track =
-      rtc_peerconnection_factory_->CreateAudioSource(webrtc::AudioOptions());
+webrtc::scoped_refptr<libwebrtc::LocalAudioSource>
+RTCPeerConnectionFactoryImpl::CreateAudioSourceWithOptions(
+    webrtc::AudioOptions* options, bool is_custom_source) {
+  RTC_DCHECK(options);
+  // if is_custom_source == true, not using the default audio transport,
+  // you can put costom audio frame via LocalAudioSource::CaptureFrame(...)
+  // and the audio transport will be null.
+  // otherwise, use the default audio transport, audio transport will
+  // put audio frame from your platform adm to your
+  // LocalAudioSource::SendAudioData(...).
+  if (webrtc::Thread::Current() != signaling_thread_.get()) {
+    return signaling_thread_->BlockingCall([this, options, is_custom_source] {
+      return libwebrtc::LocalAudioSource::Create(
+          options, is_custom_source
+                       ? nullptr
+                       : audio_transport_factory_->audio_transport_impl());
+    });
+  }
+  return libwebrtc::LocalAudioSource::Create(
+      options, is_custom_source
+                   ? nullptr
+                   : audio_transport_factory_->audio_transport_impl());
+}
 
+scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
+    const string audio_source_label, RTCAudioSource::SourceType source_type) {
+  auto options = webrtc::AudioOptions();
+  webrtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_source_track =
+      CreateAudioSourceWithOptions(&options);
   scoped_refptr<RTCAudioSourceImpl> source = scoped_refptr<RTCAudioSourceImpl>(
-      new RefCountedObject<RTCAudioSourceImpl>(rtc_source_track));
+      new RefCountedObject<RTCAudioSourceImpl>(rtc_source_track, source_type));
   return source;
 }
 

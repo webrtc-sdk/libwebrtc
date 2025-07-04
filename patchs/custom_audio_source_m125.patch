@@ -1,0 +1,92 @@
+diff --git a/audio/audio_receive_stream.cc b/audio/audio_receive_stream.cc
+index 415ad0640a..1467860a71 100644
+--- a/audio/audio_receive_stream.cc
++++ b/audio/audio_receive_stream.cc
+@@ -467,8 +467,8 @@ AudioReceiveStreamImpl::GetAssociatedSendStreamForTesting() const {
+   return associated_send_stream_;
+ }
+ 
+-internal::AudioState* AudioReceiveStreamImpl::audio_state() const {
+-  auto* audio_state = static_cast<internal::AudioState*>(audio_state_.get());
++webrtc::AudioState* AudioReceiveStreamImpl::audio_state() const {
++  auto* audio_state = static_cast<webrtc::AudioState*>(audio_state_.get());
+   RTC_DCHECK(audio_state);
+   return audio_state;
+ }
+diff --git a/audio/audio_receive_stream.h b/audio/audio_receive_stream.h
+index db49631638..982cad39a4 100644
+--- a/audio/audio_receive_stream.h
++++ b/audio/audio_receive_stream.h
+@@ -144,7 +144,7 @@ class AudioReceiveStreamImpl final : public webrtc::AudioReceiveStreamInterface,
+       const webrtc::AudioReceiveStreamInterface::Config& config);
+ 
+  private:
+-  internal::AudioState* audio_state() const;
++  webrtc::AudioState* audio_state() const;
+ 
+   RTC_NO_UNIQUE_ADDRESS SequenceChecker worker_thread_checker_;
+   // TODO(bugs.webrtc.org/11993): This checker conceptually represents
+diff --git a/audio/audio_state.h b/audio/audio_state.h
+index f21cca771e..a4eb0fedf1 100644
+--- a/audio/audio_state.h
++++ b/audio/audio_state.h
+@@ -54,13 +54,14 @@ class AudioState : public webrtc::AudioState {
+     return config_.audio_device_module.get();
+   }
+ 
+-  void AddReceivingStream(webrtc::AudioReceiveStreamInterface* stream);
+-  void RemoveReceivingStream(webrtc::AudioReceiveStreamInterface* stream);
++  void AddReceivingStream(webrtc::AudioReceiveStreamInterface* stream) override;
++  void RemoveReceivingStream(
++      webrtc::AudioReceiveStreamInterface* stream) override;
+ 
+   void AddSendingStream(webrtc::AudioSendStream* stream,
+                         int sample_rate_hz,
+-                        size_t num_channels);
+-  void RemoveSendingStream(webrtc::AudioSendStream* stream);
++                        size_t num_channels) override;
++  void RemoveSendingStream(webrtc::AudioSendStream* stream) override;
+ 
+  private:
+   void UpdateAudioTransportWithSendingStreams();
+diff --git a/audio/audio_transport_impl.h b/audio/audio_transport_impl.h
+index 24b09d2140..1b39e52869 100644
+--- a/audio/audio_transport_impl.h
++++ b/audio/audio_transport_impl.h
+@@ -82,7 +82,7 @@ class AudioTransportImpl : public AudioTransport {
+                       int64_t* elapsed_time_ms,
+                       int64_t* ntp_time_ms) override;
+ 
+-  void UpdateAudioSenders(std::vector<AudioSender*> senders,
++  virtual void UpdateAudioSenders(std::vector<AudioSender*> senders,
+                           int send_sample_rate_hz,
+                           size_t send_num_channels);
+   void SetStereoChannelSwapping(bool enable);
+diff --git a/call/audio_state.h b/call/audio_state.h
+index 85f04758dd..7bd7ce25f1 100644
+--- a/call/audio_state.h
++++ b/call/audio_state.h
+@@ -20,6 +20,8 @@
+ namespace webrtc {
+ 
+ class AudioTransport;
++class AudioReceiveStreamInterface;
++class AudioSendStream;
+ 
+ // AudioState holds the state which must be shared between multiple instances of
+ // webrtc::Call for audio processing purposes.
+@@ -62,6 +64,14 @@ class AudioState : public rtc::RefCountInterface {
+   // Notify the AudioState that a stream updated it's mute state.
+   virtual void OnMuteStreamChanged() = 0;
+ 
++  virtual void AddReceivingStream(AudioReceiveStreamInterface* stream) = 0;
++  virtual void RemoveReceivingStream(AudioReceiveStreamInterface* stream) = 0;
++
++  virtual void AddSendingStream(AudioSendStream* stream,
++                        int sample_rate_hz,
++                        size_t num_channels) = 0;
++  virtual void RemoveSendingStream(AudioSendStream* stream) = 0;
++
+   static rtc::scoped_refptr<AudioState> Create(
+       const AudioState::Config& config);
+ 

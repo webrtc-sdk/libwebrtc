@@ -14,6 +14,22 @@
 
 namespace libwebrtc {
 
+class AudioTrackSinkAdapter : public webrtc::AudioTrackSinkInterface {
+ public:
+  AudioTrackSinkAdapter(AudioTrackSink* sink) : sink_(sink) {}
+
+  void OnData(const void* audio_data, int bits_per_sample, int sample_rate,
+              size_t number_of_channels, size_t number_of_frames) override {
+    if (sink_) {
+      sink_->OnData(audio_data, bits_per_sample, sample_rate,
+                    number_of_channels, number_of_frames);
+    }
+  }
+
+ private:
+  AudioTrackSink* sink_;
+};
+
 class AudioTrackImpl : public RTCAudioTrack {
  public:
   AudioTrackImpl(webrtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track);
@@ -32,6 +48,26 @@ class AudioTrackImpl : public RTCAudioTrack {
     return rtc_track_->set_enabled(enable);
   }
 
+  virtual void AddSink(AudioTrackSink* sink) override {
+    webrtc::MutexLock lock(&mutex_);
+    if (sinks_.find(sink) != sinks_.end()) {
+      return;
+    }
+    auto adapter = std::make_unique<AudioTrackSinkAdapter>(sink);
+    rtc_track_->AddSink(adapter.get());
+    sinks_[sink] = std::move(adapter);
+  }
+
+  virtual void RemoveSink(AudioTrackSink* sink) override {
+    webrtc::MutexLock lock(&mutex_);
+    auto it = sinks_.find(sink);
+    if (it == sinks_.end()) {
+      return;
+    }
+    rtc_track_->RemoveSink(it->second.get());
+    sinks_.erase(it);
+  }
+
   webrtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track() {
     return rtc_track_;
   }
@@ -41,7 +77,10 @@ class AudioTrackImpl : public RTCAudioTrack {
   }
 
  private:
+  void RemoveSinks();
   webrtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track_;
+  std::map<AudioTrackSink*, std::unique_ptr<AudioTrackSinkAdapter>> sinks_;
+  webrtc::Mutex mutex_;
   string id_, kind_;
 };
 

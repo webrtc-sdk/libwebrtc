@@ -11,13 +11,26 @@
 #include "rtc_audio_source.h"
 #include "rtc_base/logging.h"
 #include "rtc_base/synchronization/mutex.h"
+#include "src/internal/local_audio_track.h"
 
 namespace libwebrtc {
 
 class RTCAudioSourceImpl : public RTCAudioSource {
  public:
   RTCAudioSourceImpl(
-      webrtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source);
+      webrtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_audio_source,
+      SourceType source_type);
+
+  void CaptureFrame(const void* audio_data, int bits_per_sample,
+                    int sample_rate, size_t number_of_channels,
+                    size_t number_of_frames) override {
+    RTC_DCHECK(rtc_audio_source_);
+    RTC_DCHECK(audio_data);
+    rtc_audio_source_->OnData(audio_data, bits_per_sample, sample_rate,
+                              number_of_channels, number_of_frames);
+  }
+
+  SourceType GetSourceType() const override { return source_type_; }
 
   virtual ~RTCAudioSourceImpl();
 
@@ -26,7 +39,8 @@ class RTCAudioSourceImpl : public RTCAudioSource {
   }
 
  private:
-  webrtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source_;
+  webrtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_audio_source_;
+  SourceType source_type_;
 };
 
 }  // namespace libwebrtc
