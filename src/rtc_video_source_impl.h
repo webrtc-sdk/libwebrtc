@@ -14,16 +14,16 @@ namespace libwebrtc {
 class RTCVideoSourceImpl : public RTCVideoSource {
  public:
   RTCVideoSourceImpl(
-      rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_source_track);
+      webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_source_track);
   virtual ~RTCVideoSourceImpl();
 
-  virtual rtc::scoped_refptr<webrtc::VideoTrackSourceInterface>
+  virtual webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface>
   rtc_source_track() {
     return rtc_source_track_;
   }
 
  private:
-  rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track_;
+  webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track_;
 };
 }  // namespace libwebrtc
 

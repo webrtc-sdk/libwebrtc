@@ -32,7 +32,7 @@ class RTCDtlsTransportImpl : public RTCDtlsTransport,
                              public webrtc::DtlsTransportObserverInterface {
  public:
   RTCDtlsTransportImpl(
-      rtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport);
+      webrtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport);
 
   virtual scoped_refptr<RTCDtlsTransportInformation> GetInformation() override;
 
@@ -45,10 +45,10 @@ class RTCDtlsTransportImpl : public RTCDtlsTransport,
 
   virtual void OnError(webrtc::RTCError error) override;
 
-  rtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport();
+  webrtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport();
 
  private:
-  rtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport_;
+  webrtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport_;
   RTCDtlsTransportObserver* observer_;
 };
 

@@ -38,7 +38,7 @@ RTCDtlsTransportInformationImpl::dtls_transport_information() {
 }
 
 RTCDtlsTransportImpl::RTCDtlsTransportImpl(
-    rtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport)
+    webrtc::scoped_refptr<webrtc::DtlsTransportInterface> dtls_transport)
     : dtls_transport_(dtls_transport), observer_(nullptr) {}
 
 scoped_refptr<RTCDtlsTransportInformation>
@@ -67,7 +67,7 @@ void RTCDtlsTransportImpl::OnError(webrtc::RTCError error) {
   }
 }
 
-rtc::scoped_refptr<webrtc::DtlsTransportInterface>
+webrtc::scoped_refptr<webrtc::DtlsTransportInterface>
 RTCDtlsTransportImpl::dtls_transport() {
   return dtls_transport_;
 }

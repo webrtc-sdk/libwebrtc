@@ -16,7 +16,7 @@ namespace libwebrtc {
 
 class RTCDesktopDeviceImpl : public RTCDesktopDevice {
  public:
-  RTCDesktopDeviceImpl(rtc::Thread* signaling_thread);
+  RTCDesktopDeviceImpl(webrtc::Thread* signaling_thread);
   ~RTCDesktopDeviceImpl();
 
   scoped_refptr<RTCDesktopCapturer> CreateDesktopCapturer(
@@ -26,7 +26,7 @@ class RTCDesktopDeviceImpl : public RTCDesktopDevice {
       DesktopType type) override;
 
  private:
-  rtc::Thread* signaling_thread_ = nullptr;
+  webrtc::Thread* signaling_thread_ = nullptr;
   std::map<DesktopType, scoped_refptr<RTCDesktopMediaListImpl>>
       desktop_media_lists_;
 };

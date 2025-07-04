@@ -11,8 +11,8 @@ namespace libwebrtc {
 class AudioDeviceImpl : public RTCAudioDevice, public webrtc::AudioDeviceSink {
  public:
   AudioDeviceImpl(
-      rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module,
-      rtc::Thread* worker_thread);
+      webrtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module,
+      webrtc::Thread* worker_thread);
 
   virtual ~AudioDeviceImpl();
 
@@ -45,8 +45,8 @@ class AudioDeviceImpl : public RTCAudioDevice, public webrtc::AudioDeviceSink {
   void OnDevicesUpdated() override;
 
  private:
-  rtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
-  rtc::Thread* worker_thread_ = nullptr;
+  webrtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module_;
+  webrtc::Thread* worker_thread_ = nullptr;
   OnDeviceChangeCallback listener_ = nullptr;
 };
 

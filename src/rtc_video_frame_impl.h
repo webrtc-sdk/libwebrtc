@@ -12,8 +12,8 @@ namespace libwebrtc {
 class VideoFrameBufferImpl : public RTCVideoFrame {
  public:
   VideoFrameBufferImpl(
-      rtc::scoped_refptr<webrtc::VideoFrameBuffer> frame_buffer);
-  VideoFrameBufferImpl(rtc::scoped_refptr<webrtc::I420Buffer> frame_buffer);
+      webrtc::scoped_refptr<webrtc::VideoFrameBuffer> frame_buffer);
+  VideoFrameBufferImpl(webrtc::scoped_refptr<webrtc::I420Buffer> frame_buffer);
 
   virtual ~VideoFrameBufferImpl();
 
@@ -39,9 +39,9 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
   int ConvertToARGB(Type type, uint8_t* dst_argb, int dst_stride_argb,
                     int dest_width, int dest_height) override;
 
-  rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer() { return buffer_; }
+  webrtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer() { return buffer_; }
 
-  // System monotonic clock, same timebase as rtc::TimeMicros().
+  // System monotonic clock, same timebase as webrtc::TimeMicros().
   int64_t timestamp_us() const { return timestamp_us_; }
   void set_timestamp_us(int64_t timestamp_us) { timestamp_us_ = timestamp_us; }
 
@@ -52,7 +52,7 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
   void set_rotation(webrtc::VideoRotation rotation) { rotation_ = rotation; }
 
  private:
-  rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer_;
+  webrtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer_;
   int64_t timestamp_us_ = 0;
   webrtc::VideoRotation rotation_ = webrtc::kVideoRotation_0;
 };
