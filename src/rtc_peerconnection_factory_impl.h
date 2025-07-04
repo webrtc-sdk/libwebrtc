@@ -88,8 +88,8 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   void DestroyAudioDeviceModule_w();
 
   webrtc::scoped_refptr<libwebrtc::LocalAudioSource>
-  RTCPeerConnectionFactoryImpl::CreateAudioSourceWithOptions(
-      webrtc::AudioOptions* options, bool is_custom_source = false);
+  CreateAudioSourceWithOptions(webrtc::AudioOptions* options,
+                               bool is_custom_source = false);
 
   scoped_refptr<RTCVideoSource> CreateVideoSource_s(
       scoped_refptr<RTCVideoCapturer> capturer, const char* video_source_label,
