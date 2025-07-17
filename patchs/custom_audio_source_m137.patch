@@ -1,5 +1,5 @@
 diff --git a/api/audio/audio_device_defines.h b/api/audio/audio_device_defines.h
-index 63eca2a422..88f8463c6f 100644
+index 63eca2a422..52395ae7e6 100644
 --- a/api/audio/audio_device_defines.h
 +++ b/api/audio/audio_device_defines.h
 @@ -21,6 +21,8 @@
@@ -11,11 +11,12 @@ index 63eca2a422..88f8463c6f 100644
  static const int kAdmMaxDeviceNameSize = 128;
  static const int kAdmMaxFileNameSize = 512;
  static const int kAdmMaxGuidSize = 128;
-@@ -86,7 +88,12 @@ class AudioTransport {
+@@ -86,7 +88,13 @@ class AudioTransport {
                                int64_t* elapsed_time_ms,
                                int64_t* ntp_time_ms) = 0;
  
 - protected:
++
 +  virtual void UpdateAudioSenders(std::vector<AudioSender*> senders,
 +                                  int send_sample_rate_hz,
 +                                  size_t send_num_channels) {}
@@ -86,17 +87,17 @@ index 7d6d0cc3df..c8574ddd6f 100644
          std::move(deps.video_encoder_factory),
          std::move(deps.video_decoder_factory), env.field_trials());
 diff --git a/api/peer_connection_interface.h b/api/peer_connection_interface.h
-index e5b3853e11..b1c3f09dc4 100644
+index e5b3853e11..e41b3aa125 100644
 --- a/api/peer_connection_interface.h
 +++ b/api/peer_connection_interface.h
-@@ -146,6 +146,7 @@
- #include "rtc_base/ssl_stream_adapter.h"
- #include "rtc_base/system/rtc_export.h"
- #include "rtc_base/thread.h"
+@@ -125,6 +125,7 @@
+ #include "api/video/video_bitrate_allocator_factory.h"
+ #include "api/video_codecs/video_decoder_factory.h"
+ #include "api/video_codecs/video_encoder_factory.h"
 +#include "audio/audio_transport_impl.h"
- 
- namespace webrtc {
- // IWYU pragma: begin_keep
+ #include "call/rtp_transport_controller_send_factory_interface.h"
+ #include "media/base/media_config.h"
+ // TODO(bugs.webrtc.org/7447): We plan to provide a way to let applications
 @@ -1472,6 +1473,7 @@ struct RTC_EXPORT PeerConnectionFactoryDependencies final {
    scoped_refptr<AudioEncoderFactory> audio_encoder_factory;
    scoped_refptr<AudioDecoderFactory> audio_decoder_factory;
@@ -134,7 +135,7 @@ index bc248120ef..d8f766c7bc 100644
    RTC_NO_UNIQUE_ADDRESS SequenceChecker worker_thread_checker_;
    // TODO(bugs.webrtc.org/11993): This checker conceptually represents
 diff --git a/audio/audio_state.cc b/audio/audio_state.cc
-index 49f669cf07..dabe4b849e 100644
+index 2e1c32b018..67b2ffa1b0 100644
 --- a/audio/audio_state.cc
 +++ b/audio/audio_state.cc
 @@ -29,9 +29,16 @@ namespace internal {
@@ -166,15 +167,7 @@ index 49f669cf07..dabe4b849e 100644
  }
  
  void AudioState::SetPlayout(bool enabled) {
-@@ -140,7 +147,6 @@ void AudioState::AddSendingStream(webrtc::AudioSendStream* stream,
-     if (!adm->Recording()) {
-       if (adm->InitRecording() == 0) {
-         if (recording_enabled_) {
--
-           // TODO: Verify if the following windows only logic is still required.
- #if defined(WEBRTC_WIN)
-           if (adm->BuiltInAECIsAvailable() && !adm->Playing()) {
-@@ -174,7 +180,7 @@ void AudioState::RemoveSendingStream(webrtc::AudioSendStream* stream) {
+@@ -167,7 +174,7 @@ void AudioState::RemoveSendingStream(webrtc::AudioSendStream* stream) {
  
  void AudioState::SetStereoChannelSwapping(bool enable) {
    RTC_DCHECK(thread_checker_.IsCurrent());
@@ -183,7 +176,7 @@ index 49f669cf07..dabe4b849e 100644
  }
  
  void AudioState::UpdateAudioTransportWithSendingStreams() {
-@@ -187,8 +193,8 @@ void AudioState::UpdateAudioTransportWithSendingStreams() {
+@@ -180,8 +187,8 @@ void AudioState::UpdateAudioTransportWithSendingStreams() {
      max_sample_rate_hz = std::max(max_sample_rate_hz, kv.second.sample_rate_hz);
      max_num_channels = std::max(max_num_channels, kv.second.num_channels);
    }
@@ -194,7 +187,7 @@ index 49f669cf07..dabe4b849e 100644
  }
  
  void AudioState::UpdateNullAudioPollerState() {
-@@ -196,7 +202,7 @@ void AudioState::UpdateNullAudioPollerState() {
+@@ -189,7 +196,7 @@ void AudioState::UpdateNullAudioPollerState() {
    // disabled.
    if (!receiving_streams_.empty() && !playout_enabled_) {
      if (!null_audio_poller_.Running()) {
@@ -203,29 +196,19 @@ index 49f669cf07..dabe4b849e 100644
        null_audio_poller_ = RepeatingTaskHandle::Start(
            TaskQueueBase::Current(), [audio_transport] {
              static constexpr size_t kNumChannels = 1;
-@@ -225,7 +231,6 @@ void AudioState::UpdateNullAudioPollerState() {
- }
- 
- void AudioState::OnMuteStreamChanged() {
--
-   auto* adm = config_.audio_device_module.get();
-   bool should_record = ShouldRecord();
- 
-@@ -256,7 +261,8 @@ bool AudioState::ShouldRecord() {
-     }
-   }
- 
--  RTC_LOG(LS_INFO) << "ShouldRecord: " << muted_count << " muted, " << stream_count << " sending";
-+  RTC_LOG(LS_INFO) << "ShouldRecord: " << muted_count << " muted, "
-+                   << stream_count << " sending";
-   return muted_count != stream_count;
- }
- 
 diff --git a/audio/audio_state.h b/audio/audio_state.h
-index f21cca771e..96eeacf8f3 100644
+index 88aaaa3697..820b2d4884 100644
 --- a/audio/audio_state.h
 +++ b/audio/audio_state.h
-@@ -54,13 +54,13 @@ class AudioState : public webrtc::AudioState {
+@@ -21,6 +21,7 @@
+ #include "rtc_base/ref_count.h"
+ #include "rtc_base/task_utils/repeating_task.h"
+ #include "rtc_base/thread_annotations.h"
++#include  "audio/audio_transport_impl.h"
+ 
+ namespace webrtc {
+ 
+@@ -52,13 +53,13 @@ class AudioState : public webrtc::AudioState {
      return config_.audio_device_module.get();
    }
  
@@ -243,7 +226,7 @@ index f21cca771e..96eeacf8f3 100644
  
   private:
    void UpdateAudioTransportWithSendingStreams();
-@@ -77,7 +77,7 @@ class AudioState : public webrtc::AudioState {
+@@ -72,7 +73,7 @@ class AudioState : public webrtc::AudioState {
  
    // Transports mixed audio from the mixer to the audio device and
    // recorded audio to the sending streams.
@@ -253,22 +236,21 @@ index f21cca771e..96eeacf8f3 100644
    // Null audio poller is used to continue polling the audio streams if audio
    // playout is disabled so that audio processing still happens and the audio
 diff --git a/audio/audio_transport_impl.h b/audio/audio_transport_impl.h
-index a240eb0fe5..b326b6fdac 100644
+index a240eb0fe5..6229191e1d 100644
 --- a/audio/audio_transport_impl.h
 +++ b/audio/audio_transport_impl.h
-@@ -84,8 +84,9 @@ class AudioTransportImpl : public AudioTransport {
+@@ -84,8 +84,8 @@ class AudioTransportImpl : public AudioTransport {
  
    void UpdateAudioSenders(std::vector<AudioSender*> senders,
                            int send_sample_rate_hz,
 -                          size_t send_num_channels);
 -  void SetStereoChannelSwapping(bool enable);
 +                          size_t send_num_channels) override;
-+
 +  void SetStereoChannelSwapping(bool enable) override;
  
   private:
    void SendProcessedData(std::unique_ptr<AudioFrame> audio_frame);
-@@ -112,6 +113,15 @@ class AudioTransportImpl : public AudioTransport {
+@@ -112,6 +112,15 @@ class AudioTransportImpl : public AudioTransport {
    // Converts mixed audio to the audio device output rate.
    PushResampler<int16_t> render_resampler_;
  };
@@ -285,10 +267,10 @@ index a240eb0fe5..b326b6fdac 100644
  
  #endif  // AUDIO_AUDIO_TRANSPORT_IMPL_H_
 diff --git a/call/audio_state.h b/call/audio_state.h
-index 1e5b17c74e..1888dc952a 100644
+index d58b7ff97e..88c0e895c5 100644
 --- a/call/audio_state.h
 +++ b/call/audio_state.h
-@@ -16,12 +16,14 @@
+@@ -16,10 +16,12 @@
  #include "api/ref_count.h"
  #include "api/scoped_refptr.h"
  #include "modules/async_audio_processing/async_audio_processing.h"
@@ -300,11 +282,8 @@ index 1e5b17c74e..1888dc952a 100644
 +class AudioReceiveStreamInterface;
 +class AudioSendStream;
  
--// AudioState holds the state which must be shared between multiple instances of
-+// AudioState holds the state which must be shared between multipleq instances of
+ // AudioState holds the state which must be shared between multiple instances of
  // webrtc::Call for audio processing purposes.
- class AudioState : public RefCountInterface {
-  public:
 @@ -40,6 +42,8 @@ class AudioState : public RefCountInterface {
      scoped_refptr<webrtc::AudioDeviceModule> audio_device_module;
  
@@ -314,9 +293,9 @@ index 1e5b17c74e..1888dc952a 100644
    };
  
    virtual AudioProcessing* audio_processing() = 0;
-@@ -61,6 +65,15 @@ class AudioState : public RefCountInterface {
-   // Notify the AudioState that a stream updated it's mute state.
-   virtual void OnMuteStreamChanged() = 0;
+@@ -58,6 +62,16 @@ class AudioState : public RefCountInterface {
+ 
+   virtual void SetStereoChannelSwapping(bool enable) = 0;
  
 +  virtual void AddReceivingStream(AudioReceiveStreamInterface* stream) = 0;
 +
@@ -325,13 +304,14 @@ index 1e5b17c74e..1888dc952a 100644
 +  virtual void AddSendingStream(AudioSendStream* stream,
 +                        int sample_rate_hz,
 +                        size_t num_channels) = 0;
++
 +  virtual void RemoveSendingStream(AudioSendStream* stream) = 0;
 +
    static scoped_refptr<AudioState> Create(const AudioState::Config& config);
  
    ~AudioState() override {}
 diff --git a/media/engine/webrtc_voice_engine.cc b/media/engine/webrtc_voice_engine.cc
-index 9c7f1e8a98..d01043afa2 100644
+index d1a22b5b03..fb57e25459 100644
 --- a/media/engine/webrtc_voice_engine.cc
 +++ b/media/engine/webrtc_voice_engine.cc
 @@ -458,7 +458,8 @@ WebRtcVoiceEngine::WebRtcVoiceEngine(
@@ -363,7 +343,7 @@ index 9c7f1e8a98..d01043afa2 100644
      config.audio_device_module = adm_;
      if (audio_frame_processor_) {
 diff --git a/media/engine/webrtc_voice_engine.h b/media/engine/webrtc_voice_engine.h
-index fc4a0409d5..ed5bf415cb 100644
+index 0293bcff9e..d8f72e33f9 100644
 --- a/media/engine/webrtc_voice_engine.h
 +++ b/media/engine/webrtc_voice_engine.h
 @@ -83,7 +83,8 @@ class WebRtcVoiceEngine final : public VoiceEngineInterface {
@@ -376,10 +356,11 @@ index fc4a0409d5..ed5bf415cb 100644
  
    WebRtcVoiceEngine() = delete;
    WebRtcVoiceEngine(const WebRtcVoiceEngine&) = delete;
-@@ -157,6 +158,7 @@ class WebRtcVoiceEngine final : public VoiceEngineInterface {
+@@ -157,6 +158,8 @@ class WebRtcVoiceEngine final : public VoiceEngineInterface {
    scoped_refptr<AudioProcessing> apm_;
    // Asynchronous audio processing.
    std::unique_ptr<AudioFrameProcessor> audio_frame_processor_;
++  // The audio transport factory.
 +  scoped_refptr<AudioTransportFactory> audio_transport_factory_;
    // The primary instance of WebRtc VoiceEngine.
    scoped_refptr<AudioState> audio_state_;

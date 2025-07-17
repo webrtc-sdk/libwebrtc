@@ -8,7 +8,7 @@ AudioDeviceImpl::AudioDeviceImpl(
     webrtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module,
     webrtc::Thread* worker_thread)
     : audio_device_module_(audio_device_module), worker_thread_(worker_thread) {
-  audio_device_module_->SetAudioDeviceSink(this);
+  audio_device_module_->SetObserver(this);
 }
 
 AudioDeviceImpl::~AudioDeviceImpl() {

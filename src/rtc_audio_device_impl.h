@@ -8,7 +8,7 @@
 #include "rtc_base/thread.h"
 
 namespace libwebrtc {
-class AudioDeviceImpl : public RTCAudioDevice, public webrtc::AudioDeviceSink {
+class AudioDeviceImpl : public RTCAudioDevice, public webrtc::AudioDeviceObserver {
  public:
   AudioDeviceImpl(
       webrtc::scoped_refptr<webrtc::AudioDeviceModule> audio_device_module,
