@@ -27,7 +27,7 @@ namespace libwebrtc {
       CallbackLogSink(RTCCallbackLoggerMessageHandler _callbackHandler)
           : callback_handler(_callbackHandler) {}
 
-      void OnLogMessage(const string& message) override {
+      void OnLogMessage(const std::string& message) override {
           callback_handler(string(message));
       }
 
