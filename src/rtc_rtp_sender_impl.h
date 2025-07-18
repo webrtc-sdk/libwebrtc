@@ -9,7 +9,7 @@ namespace libwebrtc {
 
 class RTCRtpSenderImpl : public RTCRtpSender {
  public:
-  RTCRtpSenderImpl(rtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender);
+  RTCRtpSenderImpl(webrtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender);
 
   virtual bool set_track(scoped_refptr<RTCMediaTrack> track) override;
   virtual scoped_refptr<RTCMediaTrack> track() const override;
@@ -26,12 +26,12 @@ class RTCRtpSenderImpl : public RTCRtpSender {
       const scoped_refptr<RTCRtpParameters> parameters) override;
   virtual scoped_refptr<RTCDtmfSender> dtmf_sender() const override;
 
-  rtc::scoped_refptr<webrtc::RtpSenderInterface> rtc_rtp_sender() {
+  webrtc::scoped_refptr<webrtc::RtpSenderInterface> rtc_rtp_sender() {
     return rtp_sender_;
   }
 
  private:
-  rtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender_;
+  webrtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender_;
 };
 }  // namespace libwebrtc
 

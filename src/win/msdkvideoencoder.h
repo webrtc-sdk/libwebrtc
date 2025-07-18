@@ -34,10 +34,10 @@ enum MemType {
 /// Encoder with Intel MediaSDK as the backend.
 class MSDKVideoEncoder : public webrtc::VideoEncoder {
  public:
-  explicit MSDKVideoEncoder(const cricket::VideoCodec& codec);
+  explicit MSDKVideoEncoder(const webrtc::VideoCodec& codec);
   virtual ~MSDKVideoEncoder();
 
-  static std::unique_ptr<MSDKVideoEncoder> Create(cricket::VideoCodec format);
+  static std::unique_ptr<MSDKVideoEncoder> Create(webrtc::VideoCodec format);
   int InitEncode(const webrtc::VideoCodec* codec_settings, int number_of_cores,
                  size_t max_payload_size) override;
   int Encode(const webrtc::VideoFrame& input_image,
@@ -67,7 +67,7 @@ class MSDKVideoEncoder : public webrtc::VideoEncoder {
   int32_t height_;
   uint32_t frame_rate;
   webrtc::VideoCodecType codec_type_;
-  cricket::VideoCodec rtp_codec_parameters_;
+  webrtc::VideoCodec rtp_codec_parameters_;
   uint8_t num_temporal_layers_ = 1;
 
   MFXVideoSession* m_mfx_session_;
@@ -86,7 +86,7 @@ class MSDKVideoEncoder : public webrtc::VideoEncoder {
   mfxFrameAllocResponse m_enc_response_;
   mfxFrameSurface1* m_penc_surfaces_;  // frames array for encoder
   mfxU32 m_frames_processed_;
-  std::unique_ptr<rtc::Thread> encoder_thread_;
+  std::unique_ptr<webrtc::Thread> encoder_thread_;
   std::atomic<bool> inited_;
 
   std::unique_ptr<webrtc::IvfFileWriter> dump_writer_;

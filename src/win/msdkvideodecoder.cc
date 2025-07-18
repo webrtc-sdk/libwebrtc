@@ -37,9 +37,9 @@ int32_t MSDKVideoDecoder::Release() {
 MSDKVideoDecoder::MSDKVideoDecoder()
     : width_(0),
       height_(0)
-      //,decoder_thread_(new rtc::Thread(rtc::SocketServer::CreateDefault()))
+      //,decoder_thread_(new webrtc::Thread(webrtc::SocketServer::CreateDefault()))
       ,
-      decoder_thread_(rtc::Thread::Create()) {
+      decoder_thread_(webrtc::Thread::Create()) {
   decoder_thread_->SetName("MSDKVideoDecoderThread", nullptr);
   RTC_CHECK(decoder_thread_->Start())
       << "Failed to start MSDK video decoder thread";
@@ -63,7 +63,7 @@ MSDKVideoDecoder::~MSDKVideoDecoder() {
 
 void MSDKVideoDecoder::CheckOnCodecThread() {
   RTC_CHECK(decoder_thread_.get() ==
-            rtc::ThreadManager::Instance()->CurrentThread())
+            webrtc::ThreadManager::Instance()->CurrentThread())
       << "Running on wrong thread!";
 }
 
@@ -367,7 +367,7 @@ dec_header:
         m_pmfx_allocator_->GetFrameHDL(dxMemId, (mfxHDL*)&pair);
 
 #if 0
-         rtc::scoped_refptr<webrtc::VideoFrameBuffer> cropped_buffer =
+         webrtc::scoped_refptr<webrtc::VideoFrameBuffer> cropped_buffer =
             WrapI420Buffer(frame_info.Width, frame_info.Height,
                            av_frame_->data[kYPlaneIndex],
                            av_frame_->linesize[kYPlaneIndex],
@@ -392,8 +392,8 @@ dec_header:
           // TODO(johny): we should extend the buffer structure to include
           // not only the CropW|CropH value, but also the CropX|CropY for the
           // renderer to correctly setup the video processor input view.
-          rtc::scoped_refptr<owt::base::NativeHandleBuffer> buffer =
-              new rtc::RefCountedObject<owt::base::NativeHandleBuffer>(
+          webrtc::scoped_refptr<owt::base::NativeHandleBuffer> buffer =
+              new webrtc::RefCountedObject<owt::base::NativeHandleBuffer>(
                   (void*)surface_handle_.get(), frame_info.CropW,
                   frame_info.CropH);
           webrtc::VideoFrame decoded_frame(buffer, inputImage.Timestamp(), 0,
@@ -494,7 +494,7 @@ int32_t MSDKVideoDecoder::RegisterDecodeCompleteCallback(
 }
 
 std::unique_ptr<MSDKVideoDecoder> MSDKVideoDecoder::Create(
-    cricket::VideoCodec format) {
+    webrtc::VideoCodec format) {
   return absl::make_unique<MSDKVideoDecoder>();
 }
 

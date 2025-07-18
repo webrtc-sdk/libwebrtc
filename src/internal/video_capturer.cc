@@ -38,7 +38,7 @@ void VideoCapturer::OnFrame(const VideoFrame& frame) {
   if (out_height != frame.height() || out_width != frame.width()) {
     // Video adapter has requested a down-scale. Allocate a new buffer and
     // return scaled version.
-    rtc::scoped_refptr<I420Buffer> scaled_buffer =
+    webrtc::scoped_refptr<I420Buffer> scaled_buffer =
         I420Buffer::Create(out_width, out_height);
     scaled_buffer->ScaleFrom(*frame.video_frame_buffer()->ToI420());
     broadcaster_.OnFrame(VideoFrame::Builder()
@@ -53,23 +53,23 @@ void VideoCapturer::OnFrame(const VideoFrame& frame) {
   }
 }
 
-rtc::VideoSinkWants VideoCapturer::GetSinkWants() {
+webrtc::VideoSinkWants VideoCapturer::GetSinkWants() {
   return broadcaster_.wants();
 }
 
-void VideoCapturer::AddOrUpdateSink(rtc::VideoSinkInterface<VideoFrame>* sink,
-                                    const rtc::VideoSinkWants& wants) {
+void VideoCapturer::AddOrUpdateSink(webrtc::VideoSinkInterface<VideoFrame>* sink,
+                                    const webrtc::VideoSinkWants& wants) {
   broadcaster_.AddOrUpdateSink(sink, wants);
   UpdateVideoAdapter();
 }
 
-void VideoCapturer::RemoveSink(rtc::VideoSinkInterface<VideoFrame>* sink) {
+void VideoCapturer::RemoveSink(webrtc::VideoSinkInterface<VideoFrame>* sink) {
   broadcaster_.RemoveSink(sink);
   UpdateVideoAdapter();
 }
 
 void VideoCapturer::UpdateVideoAdapter() {
-  rtc::VideoSinkWants wants = broadcaster_.wants();
+  webrtc::VideoSinkWants wants = broadcaster_.wants();
 
   if (0 < wants.resolutions.size()) {
     auto size = wants.resolutions.at(0);

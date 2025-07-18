@@ -9,33 +9,33 @@
 
 namespace libwebrtc {
 RTCRtpReceiverImpl::RTCRtpReceiverImpl(
-    rtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver)
+    webrtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver)
     : rtp_receiver_(rtp_receiver), observer_(nullptr) {}
 
-rtc::scoped_refptr<webrtc::RtpReceiverInterface>
+webrtc::scoped_refptr<webrtc::RtpReceiverInterface>
 RTCRtpReceiverImpl::rtp_receiver() {
   return rtp_receiver_;
 }
 
-void RTCRtpReceiverImpl::OnFirstPacketReceived(cricket::MediaType media_type) {
+void RTCRtpReceiverImpl::OnFirstPacketReceived(webrtc::MediaType media_type) {
   if (nullptr != observer_) {
     observer_->OnFirstPacketReceived(static_cast<RTCMediaType>(media_type));
   }
 }
 
 scoped_refptr<RTCMediaTrack> RTCRtpReceiverImpl::track() const {
-  rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track =
+  webrtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track =
       rtp_receiver_->track();
   if (nullptr == track.get()) {
     return scoped_refptr<RTCMediaTrack>();
   }
   if (track->kind() == webrtc::MediaStreamTrackInterface::kVideoKind) {
     return scoped_refptr<RTCMediaTrack>(new RefCountedObject<VideoTrackImpl>(
-        rtc::scoped_refptr<webrtc::VideoTrackInterface>(
+        webrtc::scoped_refptr<webrtc::VideoTrackInterface>(
             static_cast<webrtc::VideoTrackInterface*>(track.get()))));
   } else if (track->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
     return scoped_refptr<RTCMediaTrack>(new RefCountedObject<AudioTrackImpl>(
-        rtc::scoped_refptr<webrtc::AudioTrackInterface>(
+        webrtc::scoped_refptr<webrtc::AudioTrackInterface>(
             static_cast<webrtc::AudioTrackInterface*>(track.get()))));
   }
   return scoped_refptr<RTCMediaTrack>();

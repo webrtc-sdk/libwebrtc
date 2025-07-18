@@ -35,8 +35,8 @@ class IceTransportInit final {
   IceTransportInit& operator=(const IceTransportInit&) = delete;
   IceTransportInit& operator=(IceTransportInit&&) = default;
 
-  cricket::PortAllocator* port_allocator() { return port_allocator_; }
-  void set_port_allocator(cricket::PortAllocator* port_allocator) {
+  webrtc::PortAllocator* port_allocator() { return port_allocator_; }
+  void set_port_allocator(webrtc::PortAllocator* port_allocator) {
     port_allocator_ = port_allocator;
   }
 
