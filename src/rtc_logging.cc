@@ -42,7 +42,13 @@ namespace libwebrtc {
   }
 
   void LibWebRTCLogging::setLogSink(RTCLoggingSeverity severity, RTCCallbackLoggerMessageHandler callbackHandler) {
+    removeLogSink();
     log_sink.reset(new CallbackLogSink(callbackHandler));
     rtc::LogMessage::AddLogToStream(log_sink.get(), getNativeLoggingSeverity(severity));
+  }
+
+  void LibWebRTCLogging::removeLogSink() {
+    if(log_sink)
+      rtc::LogMessage::RemoveLogToStream(log_sink.get());
   }
 }  // namespace libwebrtc

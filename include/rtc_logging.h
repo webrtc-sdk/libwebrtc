@@ -19,6 +19,7 @@ namespace libwebrtc {
     public:
       LIB_WEBRTC_API static void setMinDebugLogLevel(RTCLoggingSeverity severity);
       LIB_WEBRTC_API static void setLogSink(RTCLoggingSeverity severity, RTCCallbackLoggerMessageHandler callbackHandler);
+      LIB_WEBRTC_API static void removeLogSink();
   };
 }  // namespace libwebrtc
 
