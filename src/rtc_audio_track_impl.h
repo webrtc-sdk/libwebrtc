@@ -32,7 +32,7 @@ class AudioTrackSinkAdapter : public webrtc::AudioTrackSinkInterface {
 
 class AudioTrackImpl : public RTCAudioTrack {
  public:
-  AudioTrackImpl(rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track);
+  AudioTrackImpl(webrtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track);
 
   virtual ~AudioTrackImpl();
 
@@ -68,7 +68,7 @@ class AudioTrackImpl : public RTCAudioTrack {
     sinks_.erase(it);
   }
 
-  rtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track() {
+  webrtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track() {
     return rtc_track_;
   }
 
@@ -78,7 +78,7 @@ class AudioTrackImpl : public RTCAudioTrack {
 
  private:
   void RemoveSinks();
-  rtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track_;
+  webrtc::scoped_refptr<webrtc::AudioTrackInterface> rtc_track_;
   std::map<AudioTrackSink*, std::unique_ptr<AudioTrackSinkAdapter>> sinks_;
   webrtc::Mutex mutex_;
   string id_, kind_;

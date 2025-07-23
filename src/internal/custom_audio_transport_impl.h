@@ -20,6 +20,7 @@ class CustomAudioTransportImpl : public AudioTransport, public AudioSender {
   CustomAudioTransportImpl(
       AudioMixer* mixer, AudioProcessing* audio_processing,
       AsyncAudioProcessing::Factory* async_audio_processing_factory);
+  ~CustomAudioTransportImpl() {}
 
   int32_t RecordedDataIsAvailable(const void* audioSamples, size_t nSamples,
                                   size_t nBytesPerSample, size_t nChannels,
@@ -33,7 +34,7 @@ class CustomAudioTransportImpl : public AudioTransport, public AudioSender {
       size_t nChannels, uint32_t samplesPerSec, uint32_t totalDelayMS,
       int32_t clockDrift, uint32_t currentMicLevel, bool keyPressed,
       uint32_t& newMicLevel,
-      absl::optional<int64_t> estimated_capture_time_ns) override;
+      std::optional<int64_t> estimated_capture_time_ns) override;
 
   int32_t NeedMorePlayData(size_t nSamples, size_t nBytesPerSample,
                            size_t nChannels, uint32_t samplesPerSec,
@@ -48,22 +49,46 @@ class CustomAudioTransportImpl : public AudioTransport, public AudioSender {
 
   virtual void UpdateAudioSenders(std::vector<AudioSender*> senders,
                                   int send_sample_rate_hz,
-                                  size_t send_num_channels);
+                                  size_t send_num_channels) override;
 
   void AddAudioSender(AudioSender* sender);
 
   void RemoveAudioSender(AudioSender* sender);
 
-  void SetStereoChannelSwapping(bool enable);
+  void SetStereoChannelSwapping(bool enable) override;
 
   void SendAudioData(std::unique_ptr<AudioFrame> audio_frame) override;
 
  private:
-  webrtc::AudioTransportImpl audio_transport_impl_;
+  std::unique_ptr<webrtc::AudioTransportImpl> audio_transport_impl_;
   mutable Mutex capture_lock_;
   std::vector<AudioSender*> audio_senders_ RTC_GUARDED_BY(capture_lock_);
 };
 
-}  // namespace libwebrtc
+class CustomAudioTransportFactory : public AudioTransportFactory {
+ public:
+  CustomAudioTransportFactory() = default;
+  ~CustomAudioTransportFactory() = default;
+  std::unique_ptr<AudioTransport> Create(
+      webrtc::AudioMixer* mixer, webrtc::AudioProcessing* audio_processing,
+      webrtc::AsyncAudioProcessing::Factory* async_audio_processing_factory)
+      override {
+    std::unique_ptr<CustomAudioTransportImpl> transport =
+        std::make_unique<CustomAudioTransportImpl>(
+            mixer, audio_processing, async_audio_processing_factory);
+
+    audio_transport_impl_ = transport.get();
+    return transport;
+  }
+
+  CustomAudioTransportImpl* audio_transport_impl() const {
+    return audio_transport_impl_;
+  }
+
+ private:
+  CustomAudioTransportImpl* audio_transport_impl_ = nullptr;
+};
+
+}  // namespace webrtc
 
 #endif  // INTERNAL_CUSTOM_AUDIO_TRANSPORT_STATE_H_

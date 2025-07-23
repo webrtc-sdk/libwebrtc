@@ -31,7 +31,7 @@ class RTCRtpTransceiverInitImpl : public RTCRtpTransceiverInit {
 class RTCRtpTransceiverImpl : public RTCRtpTransceiver {
  public:
   RTCRtpTransceiverImpl(
-      rtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver);
+      webrtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver);
 
   virtual RTCMediaType media_type() const override;
   virtual const string mid() const override;
@@ -49,10 +49,10 @@ class RTCRtpTransceiverImpl : public RTCRtpTransceiver {
   virtual void SetCodecPreferences(
       vector<scoped_refptr<RTCRtpCodecCapability>> codecs) override;
   virtual const string transceiver_id() const override;
-  rtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver();
+  webrtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver();
 
  private:
-  rtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver_;
+  webrtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver_;
 };
 
 }  // namespace libwebrtc

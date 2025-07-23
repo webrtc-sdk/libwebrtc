@@ -7,7 +7,7 @@
 
 namespace libwebrtc {
 
-RTCDesktopDeviceImpl::RTCDesktopDeviceImpl(rtc::Thread* signaling_thread)
+RTCDesktopDeviceImpl::RTCDesktopDeviceImpl(webrtc::Thread* signaling_thread)
     : signaling_thread_(signaling_thread) {}
 
 RTCDesktopDeviceImpl::~RTCDesktopDeviceImpl() {}

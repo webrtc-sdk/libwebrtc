@@ -30,10 +30,10 @@ namespace libwebrtc {
 
 class ScreenCapturerTrackSource : public webrtc::VideoTrackSource {
  public:
-  static rtc::scoped_refptr<ScreenCapturerTrackSource> Create(
+  static webrtc::scoped_refptr<ScreenCapturerTrackSource> Create(
       scoped_refptr<RTCDesktopCapturer> capturer) {
     if (capturer) {
-      return rtc::make_ref_counted<ScreenCapturerTrackSource>(capturer);
+      return webrtc::make_ref_counted<ScreenCapturerTrackSource>(capturer);
     }
     return nullptr;
   }
@@ -44,7 +44,7 @@ class ScreenCapturerTrackSource : public webrtc::VideoTrackSource {
   virtual ~ScreenCapturerTrackSource() { capturer_->Stop(); }
 
  private:
-  rtc::VideoSourceInterface<webrtc::VideoFrame>* source() override {
+  webrtc::VideoSourceInterface<webrtc::VideoFrame>* source() override {
     return static_cast<RTCDesktopCapturerImpl*>(capturer_.get());
   }
 
