@@ -40,6 +40,16 @@ static std::map<libwebrtc::CandidateNetworkPolicy,
         {libwebrtc::CandidateNetworkPolicy::kCandidateNetworkPolicyLowCost,
          webrtc::PeerConnectionInterface::kCandidateNetworkPolicyLowCost}};
 
+static std::map<libwebrtc::BundlePolicy,
+  webrtc::PeerConnectionInterface::BundlePolicy>
+    bundle_policy_map = {
+        {libwebrtc::kBundlePolicyBalanced,
+        webrtc::PeerConnectionInterface::kBundlePolicyBalanced},
+        {libwebrtc::kBundlePolicyMaxBundle,
+        webrtc::PeerConnectionInterface::kBundlePolicyMaxBundle},
+        {libwebrtc::kBundlePolicyMaxCompat,
+        webrtc::PeerConnectionInterface::kBundlePolicyMaxCompat}};
+
 static std::map<libwebrtc::IceTransportsType,
                 webrtc::PeerConnectionInterface::IceTransportsType>
     ice_transport_type_map = {{libwebrtc::IceTransportsType::kAll,
@@ -400,7 +410,7 @@ bool RTCPeerConnectionImpl::Initialize() {
       config.servers.push_back(server);
     }
   }
-
+  config.bundle_policy = bundle_policy_map[configuration_.bundle_policy];
   config.sdp_semantics = sdp_semantics_map[configuration_.sdp_semantics];
   config.candidate_network_policy =
       candidate_network_policy_map[configuration_.candidate_network_policy];
