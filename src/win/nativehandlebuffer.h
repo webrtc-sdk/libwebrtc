@@ -17,7 +17,7 @@ class NativeHandleBuffer : public VideoFrameBuffer {
   Type type() const override { return Type::kNative; }
   int width() const override { return width_; }
   int height() const override { return height_; }
-  rtc::scoped_refptr<I420BufferInterface> ToI420() override {
+  webrtc::scoped_refptr<I420BufferInterface> ToI420() override {
     RTC_NOTREACHED();
     return nullptr;
   }

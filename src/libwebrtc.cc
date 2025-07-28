@@ -13,7 +13,7 @@ static bool g_is_initialized = false;
 // Initializes SSL, if not initialized.
 bool LibWebRTC::Initialize() {
   if (!g_is_initialized) {
-    rtc::InitializeSSL();
+    webrtc::InitializeSSL();
     g_is_initialized = true;
   }
   return g_is_initialized;
@@ -21,8 +21,8 @@ bool LibWebRTC::Initialize() {
 
 // Stops and cleans up the threads and SSL.
 void LibWebRTC::Terminate() {
-  rtc::ThreadManager::Instance()->SetCurrentThread(NULL);
-  rtc::CleanupSSL();
+  webrtc::ThreadManager::Instance()->SetCurrentThread(NULL);
+  webrtc::CleanupSSL();
 
   // Resets the static variable g_is_initialized to false.
   g_is_initialized = false;

@@ -70,35 +70,35 @@ MSDKVideoDecoderFactory::CreateVideoDecoder(
     else if (codec == webrtc::kVideoCodecVP9)
       vp9_hw = false;
   }
-  if (absl::EqualsIgnoreCase(format.name, cricket::kVp9CodecName) && !vp9_hw) {
+  if (absl::EqualsIgnoreCase(format.name, webrtc::kVp9CodecName) && !vp9_hw) {
     return webrtc::VP9Decoder::Create();
-  } else if (absl::EqualsIgnoreCase(format.name, cricket::kVp8CodecName) &&
+  } else if (absl::EqualsIgnoreCase(format.name, webrtc::kVp8CodecName) &&
              !vp8_hw) {
     RTC_LOG(LS_ERROR)
         << "Not supporting HW VP8 decoder. Requesting SW decoding.";
     return webrtc::VP8Decoder::Create();
-  } else if (absl::EqualsIgnoreCase(format.name, cricket::kH264CodecName) &&
+  } else if (absl::EqualsIgnoreCase(format.name, webrtc::kH264CodecName) &&
              !h264_hw) {
     return webrtc::H264Decoder::Create();
-  } else if (absl::EqualsIgnoreCase(format.name, cricket::kAv1CodecName) &&
+  } else if (absl::EqualsIgnoreCase(format.name, webrtc::kAv1CodecName) &&
              !av1_hw) {
     return webrtc::CreateLibaomAv1Decoder();
   }
 
-  return MSDKVideoDecoder::Create(cricket::VideoCodec(format));
+  return MSDKVideoDecoder::Create(webrtc::VideoCodec(format));
 }
 
 std::vector<webrtc::SdpVideoFormat>
 MSDKVideoDecoderFactory::GetSupportedFormats() const {
   std::vector<webrtc::SdpVideoFormat> supported_codecs;
-  supported_codecs.push_back(webrtc::SdpVideoFormat(cricket::kVp8CodecName));
+  supported_codecs.push_back(webrtc::SdpVideoFormat(webrtc::kVp8CodecName));
   for (const webrtc::SdpVideoFormat& format : webrtc::SupportedVP9Codecs())
     supported_codecs.push_back(format);
   for (const webrtc::SdpVideoFormat& format :
        owt::base::CodecUtils::SupportedH264Codecs())
     supported_codecs.push_back(format);
   if (webrtc::kIsLibaomAv1DecoderSupported) {
-    supported_codecs.push_back(webrtc::SdpVideoFormat(cricket::kAv1CodecName));
+    supported_codecs.push_back(webrtc::SdpVideoFormat(webrtc::kAv1CodecName));
   }
   return supported_codecs;
 }

@@ -69,10 +69,10 @@ void RTCRtpTransceiverInitImpl::set_send_encodings(
 }
 
 RTCRtpTransceiverImpl::RTCRtpTransceiverImpl(
-    rtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver)
+    webrtc::scoped_refptr<webrtc::RtpTransceiverInterface> rtp_transceiver)
     : rtp_transceiver_(rtp_transceiver) {}
 
-rtc::scoped_refptr<webrtc::RtpTransceiverInterface>
+webrtc::scoped_refptr<webrtc::RtpTransceiverInterface>
 libwebrtc::RTCRtpTransceiverImpl::rtp_transceiver() {
   return rtp_transceiver_;
 }

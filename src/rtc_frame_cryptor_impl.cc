@@ -42,7 +42,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
       key_index_(0),
       key_provider_(key_provider),
       sender_(sender),
-      observer_(rtc::make_ref_counted<RTCFrameCryptorObserverAdapter>()) {
+      observer_(webrtc::make_ref_counted<RTCFrameCryptorObserverAdapter>()) {
   auto factoryImpl = static_cast<RTCPeerConnectionFactoryImpl*>(factory.get());
   auto keyImpl = static_cast<DefaultKeyProviderImpl*>(key_provider.get());
   RTCRtpSenderImpl* impl = static_cast<RTCRtpSenderImpl*>(sender.get());
@@ -50,7 +50,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
       impl->rtc_rtp_sender()->track()->kind() == "audio"
           ? webrtc::FrameCryptorTransformer::MediaType::kAudioFrame
           : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
-  e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
+  e2ee_transformer_ = webrtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
       new webrtc::FrameCryptorTransformer(
           factoryImpl->signaling_thread(), participant_id_.std_string(),
           mediaType, AlgorithmToFrameCryptorAlgorithm(algorithm),
@@ -72,7 +72,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
       key_provider_(key_provider),
       receiver_(receiver),
       observer_(
-          rtc::make_ref_counted<libwebrtc::RTCFrameCryptorObserverAdapter>()) {
+          webrtc::make_ref_counted<libwebrtc::RTCFrameCryptorObserverAdapter>()) {
   auto factoryImpl = static_cast<RTCPeerConnectionFactoryImpl*>(factory.get());
   auto keyImpl = static_cast<DefaultKeyProviderImpl*>(key_provider.get());
   RTCRtpReceiverImpl* impl = static_cast<RTCRtpReceiverImpl*>(receiver.get());
@@ -80,7 +80,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
       impl->rtp_receiver()->track()->kind() == "audio"
           ? webrtc::FrameCryptorTransformer::MediaType::kAudioFrame
           : webrtc::FrameCryptorTransformer::MediaType::kVideoFrame;
-  e2ee_transformer_ = rtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
+  e2ee_transformer_ = webrtc::scoped_refptr<webrtc::FrameCryptorTransformer>(
       new webrtc::FrameCryptorTransformer(
           factoryImpl->signaling_thread(), participant_id_.std_string(),
           mediaType, AlgorithmToFrameCryptorAlgorithm(algorithm),

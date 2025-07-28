@@ -1,5 +1,7 @@
 #include "rtc_audio_processing_impl.h"
 
+#include "api/audio/builtin_audio_processing_builder.h"
+#include "api/environment/environment_factory.h"
 #include "modules/audio_processing/audio_buffer.h"
 #include "modules/audio_processing/ns/ns_common.h"
 #include "rtc_base/logging.h"
@@ -81,10 +83,10 @@ RTCAudioProcessingImpl::RTCAudioProcessingImpl() {
   std::unique_ptr<webrtc::CustomProcessing> render_pre_processor(
       render_pre_processor_);
 
-  apm_ = webrtc::AudioProcessingBuilder()
+  apm_ = webrtc::BuiltinAudioProcessingBuilder()
              .SetCapturePostProcessing(std::move(capture_post_processor))
              .SetRenderPreProcessing(std::move(render_pre_processor))
-             .Create();
+             .Build(webrtc::CreateEnvironment());
 
   webrtc::AudioProcessing::Config config;
   apm_->ApplyConfig(config);

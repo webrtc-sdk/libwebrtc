@@ -18,7 +18,7 @@ namespace libwebrtc {
 class RTCAudioSourceImpl : public RTCAudioSource {
  public:
   RTCAudioSourceImpl(
-      rtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_audio_source,
+      webrtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_audio_source,
       SourceType source_type);
 
   void CaptureFrame(const void* audio_data, int bits_per_sample,
@@ -34,12 +34,12 @@ class RTCAudioSourceImpl : public RTCAudioSource {
 
   virtual ~RTCAudioSourceImpl();
 
-  rtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source() {
+  webrtc::scoped_refptr<webrtc::AudioSourceInterface> rtc_audio_source() {
     return rtc_audio_source_;
   }
 
  private:
-  rtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_audio_source_;
+  webrtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_audio_source_;
   SourceType source_type_;
 };
 

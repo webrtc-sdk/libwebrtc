@@ -28,12 +28,12 @@ using namespace rtc;
 namespace owt {
 namespace base {
 
-MSDKVideoEncoder::MSDKVideoEncoder(const cricket::VideoCodec& format)
+MSDKVideoEncoder::MSDKVideoEncoder(const webrtc::VideoCodec& format)
     : callback_(nullptr),
       bitrate_(0),
       width_(0),
       height_(0),
-      encoder_thread_(rtc::Thread::Create()),
+      encoder_thread_(webrtc::Thread::Create()),
       inited_(false) {
   m_penc_surfaces_ = nullptr;
   m_frames_processed_ = 0;
@@ -55,9 +55,9 @@ MSDKVideoEncoder::MSDKVideoEncoder(const cricket::VideoCodec& format)
   if (!encoder_dump_file_name_.empty()) {
     enable_bitstream_dump_ = true;
     char filename_buffer[256];
-    rtc::SimpleStringBuilder ssb(filename_buffer);
+    webrtc::SimpleStringBuilder ssb(filename_buffer);
     ssb << encoder_dump_file_name_ << "/webrtc_send_stream_"
-        << rtc::TimeMicros() << ".ivf";
+        << webrtc::TimeMicros() << ".ivf";
     dump_writer_ = webrtc::IvfFileWriter::Wrap(
         webrtc::FileWrapper::OpenWriteOnly(ssb.str()),
         /* byte_limit= */ 100000000);
@@ -94,7 +94,7 @@ int MSDKVideoEncoder::InitEncode(const webrtc::VideoCodec* codec_settings,
   codec_type_ = codec_settings->codecType;
   // return encoder_thread_->Invoke<int>(
   //     RTC_FROM_HERE,
-  //     rtc::Bind(&MSDKVideoEncoder::InitEncodeOnEncoderThread, this,
+  //     webrtc::Bind(&MSDKVideoEncoder::InitEncodeOnEncoderThread, this,
   //               codec_settings, number_of_cores, max_payload_size));
   return encoder_thread_->Invoke<int>(
       RTC_FROM_HERE, [this, codec_settings, number_of_cores, max_payload_size] {
@@ -421,7 +421,7 @@ int MSDKVideoEncoder::Encode(
   ptr = pData.Y + pInfo.CropX + pInfo.CropY * pData.Pitch;
 
   if (MFX_FOURCC_NV12 == pInfo.FourCC) {
-    rtc::scoped_refptr<webrtc::I420BufferInterface> buffer(
+    webrtc::scoped_refptr<webrtc::I420BufferInterface> buffer(
         input_image.video_frame_buffer()->ToI420());
 
     libyuv::I420ToNV12(buffer->DataY(), buffer->StrideY(), buffer->DataU(),
@@ -432,7 +432,7 @@ int MSDKVideoEncoder::Encode(
     return WEBRTC_VIDEO_CODEC_ERROR;
   } else if (MFX_FOURCC_P010 == pInfo.FourCC) {
     // Source is always I420.
-    rtc::scoped_refptr<webrtc::I420BufferInterface> buffer(
+    webrtc::scoped_refptr<webrtc::I420BufferInterface> buffer(
         input_image.video_frame_buffer()->ToI420());
     libyuv::I420ToI010(buffer->DataY(), buffer->StrideY(), buffer->DataU(),
                        buffer->StrideU(), buffer->DataV(), buffer->StrideV(),
@@ -704,7 +704,7 @@ uint32_t MaxSizeOfKeyframeAsPercentage(uint32_t optimal_buffer_size,
 }
 
 std::unique_ptr<MSDKVideoEncoder> MSDKVideoEncoder::Create(
-    cricket::VideoCodec format) {
+    webrtc::VideoCodec format) {
   return absl::make_unique<MSDKVideoEncoder>(format);
 }
 
