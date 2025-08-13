@@ -181,7 +181,7 @@ scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
     const string audio_source_label, RTCAudioSource::SourceType source_type) {
   auto options = cricket::AudioOptions();
   rtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_source_track =
-      custom_media_context_->CreateAudioSource(&options);
+      custom_media_context_->CreateAudioSource(&options, source_type == RTCAudioSource::SourceType::kCustom);
   scoped_refptr<RTCAudioSourceImpl> source = scoped_refptr<RTCAudioSourceImpl>(
       new RefCountedObject<RTCAudioSourceImpl>(rtc_source_track, source_type));
   return source;
