@@ -9,7 +9,7 @@
 namespace libwebrtc {
 
 MediaStreamImpl::MediaStreamImpl(
-    rtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_media_stream)
+    webrtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_media_stream)
     : rtc_media_stream_(rtc_media_stream) {
   rtc_media_stream_->RegisterObserver(this);
 

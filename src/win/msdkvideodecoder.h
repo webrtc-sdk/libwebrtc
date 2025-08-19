@@ -55,7 +55,7 @@ class MSDKVideoDecoder : public webrtc::VideoDecoder {
   explicit MSDKVideoDecoder();
   virtual ~MSDKVideoDecoder();
 
-  static std::unique_ptr<MSDKVideoDecoder> Create(cricket::VideoCodec format);
+  static std::unique_ptr<MSDKVideoDecoder> Create(webrtc::VideoCodec format);
 
   bool Configure(const Settings& settings) override;
 
@@ -110,7 +110,7 @@ class MSDKVideoDecoder : public webrtc::VideoDecoder {
   bool inited_;
   int width_;
   int height_;
-  std::unique_ptr<rtc::Thread>
+  std::unique_ptr<webrtc::Thread>
       decoder_thread_;  // Thread on which the decoder will be working on.
 
   webrtc::VideoDecoder::Settings settings_;

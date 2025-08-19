@@ -136,7 +136,7 @@ bool MediaUtils::GetH264TemporalInfo(uint8_t* buffer, size_t buffer_length,
 }
 
 absl::optional<AV1Profile> StringToAV1Profile(const std::string& str) {
-  const absl::optional<int> i = rtc::StringToNumber<int>(str);
+  const absl::optional<int> i = webrtc::StringToNumber<int>(str);
   if (!i.has_value()) return absl::nullopt;
 
   switch (i.value()) {
@@ -154,7 +154,7 @@ absl::optional<AV1Profile> StringToAV1Profile(const std::string& str) {
 
 absl::optional<H265ProfileId> StringToH265Profile(const std::string& str) {
 #ifdef OWT_USE_MSDK
-  const absl::optional<int> i = rtc::StringToNumber<int>(str);
+  const absl::optional<int> i = webrtc::StringToNumber<int>(str);
   if (!i.has_value()) return absl::nullopt;
   // See ISO/IEC-23008-2 section A.3.5. we use the general_profile_idc
   // as the profile-id per RFC 7798.

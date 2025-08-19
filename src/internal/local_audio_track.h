@@ -15,14 +15,14 @@ using namespace webrtc;
 class LocalAudioSource : public Notifier<AudioSourceInterface>, AudioSender {
  public:
   // Creates an instance of CustomLocalAudioSource.
-  static rtc::scoped_refptr<LocalAudioSource> Create(
-      const cricket::AudioOptions* audio_options,
+  static webrtc::scoped_refptr<LocalAudioSource> Create(
+      const webrtc::AudioOptions* audio_options,
       webrtc::CustomAudioTransportImpl* audio_transport);
 
   SourceState state() const override { return kLive; }
   bool remote() const override { return false; }
 
-  const cricket::AudioOptions options() const override { return options_; }
+  const webrtc::AudioOptions options() const override { return options_; }
 
   void AddSink(AudioTrackSinkInterface* sink) override {
     webrtc::MutexLock lock(&sink_lock_);
@@ -70,10 +70,10 @@ class LocalAudioSource : public Notifier<AudioSourceInterface>, AudioSender {
   }
 
  private:
-  void Initialize(const cricket::AudioOptions* audio_options);
+  void Initialize(const webrtc::AudioOptions* audio_options);
   mutable webrtc::Mutex sink_lock_;
   std::vector<AudioTrackSinkInterface*> sinks_ RTC_GUARDED_BY(sink_lock_);
-  cricket::AudioOptions options_;
+  webrtc::AudioOptions options_;
   webrtc::CustomAudioTransportImpl* audio_transport_;
 };
 }  // namespace libwebrtc

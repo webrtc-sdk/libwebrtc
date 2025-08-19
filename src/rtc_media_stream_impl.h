@@ -18,18 +18,18 @@ class WebRTCStatsCollectorCallback : public webrtc::RTCStatsCollectorCallback {
       : success_(success), failure_(failure) {}
   ~WebRTCStatsCollectorCallback() {}
 
-  static rtc::scoped_refptr<WebRTCStatsCollectorCallback> Create(
+  static webrtc::scoped_refptr<WebRTCStatsCollectorCallback> Create(
       OnStatsCollectorSuccess success, OnStatsCollectorFailure failure) {
-    rtc::scoped_refptr<WebRTCStatsCollectorCallback> rtc_stats_observer =
-        rtc::scoped_refptr<WebRTCStatsCollectorCallback>(
-            new rtc::RefCountedObject<WebRTCStatsCollectorCallback>(success,
+    webrtc::scoped_refptr<WebRTCStatsCollectorCallback> rtc_stats_observer =
+        webrtc::scoped_refptr<WebRTCStatsCollectorCallback>(
+            new webrtc::RefCountedObject<WebRTCStatsCollectorCallback>(success,
                                                                     failure));
     rtc_stats_observer->AddRef();
     return rtc_stats_observer;
   }
 
   virtual void OnStatsDelivered(
-      const rtc::scoped_refptr<const webrtc::RTCStatsReport>& report) override;
+      const webrtc::scoped_refptr<const webrtc::RTCStatsReport>& report) override;
 
  private:
   OnStatsCollectorSuccess success_;
@@ -186,7 +186,7 @@ class MediaStreamImpl : public RTCMediaStream,
                         public webrtc::ObserverInterface {
  public:
   MediaStreamImpl(
-      rtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_media_stream);
+      webrtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_media_stream);
 
   ~MediaStreamImpl();
 
@@ -217,7 +217,7 @@ class MediaStreamImpl : public RTCMediaStream,
   virtual void OnChanged() override;
 
  public:
-  rtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_media_stream() {
+  webrtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_media_stream() {
     return rtc_media_stream_;
   }
 
@@ -226,8 +226,8 @@ class MediaStreamImpl : public RTCMediaStream,
   }
 
  private:
-  rtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_media_stream_;
-  rtc::scoped_refptr<webrtc::PeerConnectionInterface> rtc_peerconnection_;
+  webrtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_media_stream_;
+  webrtc::scoped_refptr<webrtc::PeerConnectionInterface> rtc_peerconnection_;
   std::vector<scoped_refptr<RTCAudioTrack>> audio_tracks_;
   std::vector<scoped_refptr<RTCVideoTrack>> video_tracks_;
   RTCPeerConnectionObserver* observer_ = nullptr;

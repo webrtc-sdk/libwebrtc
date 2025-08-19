@@ -6,7 +6,7 @@
 namespace libwebrtc {
 
 VideoTrackImpl::VideoTrackImpl(
-    rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track)
+    webrtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track)
     : rtc_track_(rtc_track),
       video_sink_(new RefCountedObject<VideoSinkAdapter>(rtc_track)) {
   RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";

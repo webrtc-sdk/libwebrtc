@@ -356,7 +356,7 @@ RTCMediaType RTCRtpCodecParametersImpl::kind() {
 }
 
 void RTCRtpCodecParametersImpl::set_kind(RTCMediaType value) {
-  rtp_codec_parameters_.kind = static_cast<cricket::MediaType>(value);
+  rtp_codec_parameters_.kind = static_cast<webrtc::MediaType>(value);
 }
 
 int RTCRtpCodecParametersImpl::payload_type() {

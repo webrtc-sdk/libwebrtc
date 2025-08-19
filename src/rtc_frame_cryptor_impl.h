@@ -23,7 +23,7 @@ class DefaultKeyProviderImpl : public KeyProvider {
     rtc_options.discard_frame_when_cryptor_not_ready =
         options->discard_frame_when_cryptor_not_ready;
     impl_ =
-        new rtc::RefCountedObject<webrtc::DefaultKeyProviderImpl>(rtc_options);
+        new webrtc::RefCountedObject<webrtc::DefaultKeyProviderImpl>(rtc_options);
   }
   ~DefaultKeyProviderImpl() {}
 
@@ -59,10 +59,10 @@ class DefaultKeyProviderImpl : public KeyProvider {
     impl_->SetSifTrailer(trailer.std_vector());
   }
 
-  rtc::scoped_refptr<webrtc::KeyProvider> rtc_key_provider() { return impl_; }
+  webrtc::scoped_refptr<webrtc::KeyProvider> rtc_key_provider() { return impl_; }
 
  private:
-  rtc::scoped_refptr<webrtc::DefaultKeyProviderImpl> impl_;
+  webrtc::scoped_refptr<webrtc::DefaultKeyProviderImpl> impl_;
 };
 
 class RTCFrameCryptorObserverAdapter
@@ -116,11 +116,11 @@ class RTCFrameCryptorImpl : public RTCFrameCryptor {
   mutable webrtc::Mutex mutex_;
   bool enabled_;
   int key_index_;
-  rtc::scoped_refptr<webrtc::FrameCryptorTransformer> e2ee_transformer_;
+  webrtc::scoped_refptr<webrtc::FrameCryptorTransformer> e2ee_transformer_;
   scoped_refptr<KeyProvider> key_provider_;
   scoped_refptr<RTCRtpSender> sender_;
   scoped_refptr<RTCRtpReceiver> receiver_;
-  rtc::scoped_refptr<RTCFrameCryptorObserverAdapter> observer_;
+  webrtc::scoped_refptr<RTCFrameCryptorObserverAdapter> observer_;
 };
 
 }  // namespace libwebrtc

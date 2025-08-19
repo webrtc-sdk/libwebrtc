@@ -24,8 +24,6 @@
 #endif
 #include <api/task_queue/default_task_queue_factory.h>
 
-#include "src/internal/custom_media_context.h"
-
 namespace libwebrtc {
 
 #if defined(USE_INTEL_MEDIA_SDK)
@@ -49,23 +47,20 @@ RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl() {}
 RTCPeerConnectionFactoryImpl::~RTCPeerConnectionFactoryImpl() {}
 
 bool RTCPeerConnectionFactoryImpl::Initialize() {
-  worker_thread_ = rtc::Thread::Create();
+  worker_thread_ = webrtc::Thread::Create();
   worker_thread_->SetName("worker_thread", nullptr);
   RTC_CHECK(worker_thread_->Start()) << "Failed to start thread";
 
-  signaling_thread_ = rtc::Thread::Create();
+  signaling_thread_ = webrtc::Thread::Create();
   signaling_thread_->SetName("signaling_thread", nullptr);
   RTC_CHECK(signaling_thread_->Start()) << "Failed to start thread";
 
-  custom_media_context_ = rtc::make_ref_counted<webrtc::CustomMediaContext>(
-      signaling_thread_.get());
-
-  network_thread_ = rtc::Thread::CreateWithSocketServer();
+  network_thread_ = webrtc::Thread::CreateWithSocketServer();
   network_thread_->SetName("network_thread", nullptr);
   RTC_CHECK(network_thread_->Start()) << "Failed to start thread";
   if (!audio_device_module_) {
     task_queue_factory_ = webrtc::CreateDefaultTaskQueueFactory();
-    worker_thread_->BlockingCall([=] { CreateAudioDeviceModule_w(); });
+    worker_thread_->BlockingCall([&] { CreateAudioDeviceModule_w(); });
   }
 
   if (!audio_processing_impl_) {
@@ -74,20 +69,26 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
     });
   }
 
+  if (!audio_transport_factory_) {
+    worker_thread_->BlockingCall([this] {
+      audio_transport_factory_ =
+          webrtc::make_ref_counted<CustomAudioTransportFactory>();
+    });
+  }
+
   if (!rtc_peerconnection_factory_) {
-    rtc_peerconnection_factory_ =
-        custom_media_context_->CreatePeerConnectionFactory(
-            network_thread_.get(), worker_thread_.get(),
-            signaling_thread_.get(), audio_device_module_,
-            webrtc::CreateBuiltinAudioEncoderFactory(),
-            webrtc::CreateBuiltinAudioDecoderFactory(),
+    rtc_peerconnection_factory_ = CreatePeerConnectionFactory(
+        network_thread_.get(), worker_thread_.get(), signaling_thread_.get(),
+        audio_device_module_, webrtc::CreateBuiltinAudioEncoderFactory(),
+        webrtc::CreateBuiltinAudioDecoderFactory(),
 #if defined(USE_INTEL_MEDIA_SDK)
-            CreateIntelVideoEncoderFactory(), CreateIntelVideoDecoderFactory(),
+        CreateIntelVideoEncoderFactory(), CreateIntelVideoDecoderFactory(),
 #else
-            webrtc::CreateBuiltinVideoEncoderFactory(),
-            webrtc::CreateBuiltinVideoDecoderFactory(),
+        webrtc::CreateBuiltinVideoEncoderFactory(),
+        webrtc::CreateBuiltinVideoDecoderFactory(),
 #endif
-            nullptr, audio_processing_impl_->GetAudioProcessing(), nullptr);
+        nullptr, audio_processing_impl_->GetAudioProcessing(), nullptr, nullptr,
+        audio_transport_factory_);
   }
 
   if (!rtc_peerconnection_factory_.get()) {
@@ -177,11 +178,35 @@ scoped_refptr<RTCVideoDevice> RTCPeerConnectionFactoryImpl::GetVideoDevice() {
   return video_device_impl_;
 }
 
+webrtc::scoped_refptr<libwebrtc::LocalAudioSource>
+RTCPeerConnectionFactoryImpl::CreateAudioSourceWithOptions(
+    webrtc::AudioOptions* options, bool is_custom_source) {
+  RTC_DCHECK(options);
+  // if is_custom_source == true, not using the default audio transport,
+  // you can put costom audio frame via LocalAudioSource::CaptureFrame(...)
+  // and the audio transport will be null.
+  // otherwise, use the default audio transport, audio transport will
+  // put audio frame from your platform adm to your
+  // LocalAudioSource::SendAudioData(...).
+  if (webrtc::Thread::Current() != signaling_thread_.get()) {
+    return signaling_thread_->BlockingCall([this, options, is_custom_source] {
+      return libwebrtc::LocalAudioSource::Create(
+          options, is_custom_source
+                       ? nullptr
+                       : audio_transport_factory_->audio_transport_impl());
+    });
+  }
+  return libwebrtc::LocalAudioSource::Create(
+      options, is_custom_source
+                   ? nullptr
+                   : audio_transport_factory_->audio_transport_impl());
+}
+
 scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
     const string audio_source_label, RTCAudioSource::SourceType source_type) {
-  auto options = cricket::AudioOptions();
-  rtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_source_track =
-      custom_media_context_->CreateAudioSource(&options);
+  auto options = webrtc::AudioOptions();
+  webrtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_source_track =
+      CreateAudioSourceWithOptions(&options);
   scoped_refptr<RTCAudioSourceImpl> source = scoped_refptr<RTCAudioSourceImpl>(
       new RefCountedObject<RTCAudioSourceImpl>(rtc_source_track, source_type));
   return source;
@@ -201,7 +226,7 @@ RTCPeerConnectionFactoryImpl::GetDesktopDevice() {
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource(
     scoped_refptr<RTCVideoCapturer> capturer, const string video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
-  if (rtc::Thread::Current() != signaling_thread_.get()) {
+  if (webrtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCVideoSource> source = signaling_thread_->BlockingCall(
         [this, capturer, video_source_label, constraints] {
           return CreateVideoSource_s(
@@ -221,9 +246,9 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
       static_cast<RTCVideoCapturerImpl*>(capturer.get());
   /*RTCMediaConstraintsImpl* media_constraints =
           static_cast<RTCMediaConstraintsImpl*>(constraints.get());*/
-  rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
-      rtc::scoped_refptr<webrtc::VideoTrackSourceInterface>(
-          new rtc::RefCountedObject<webrtc::internal::CapturerTrackSource>(
+  webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
+      webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface>(
+          new webrtc::RefCountedObject<webrtc::internal::CapturerTrackSource>(
               capturer_impl->video_capturer()));
   scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(
       new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
@@ -234,7 +259,7 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
 scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateDesktopSource(
     scoped_refptr<RTCDesktopCapturer> capturer, const string video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
-  if (rtc::Thread::Current() != signaling_thread_.get()) {
+  if (webrtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCVideoSource> source = signaling_thread_->BlockingCall(
         [this, capturer, video_source_label, constraints] {
           return CreateDesktopSource_d(
@@ -251,9 +276,9 @@ scoped_refptr<RTCVideoSource>
 RTCPeerConnectionFactoryImpl::CreateDesktopSource_d(
     scoped_refptr<RTCDesktopCapturer> capturer, const char* video_source_label,
     scoped_refptr<RTCMediaConstraints> constraints) {
-  rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
-      rtc::scoped_refptr<webrtc::VideoTrackSourceInterface>(
-          new rtc::RefCountedObject<ScreenCapturerTrackSource>(capturer));
+  webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
+      webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface>(
+          new webrtc::RefCountedObject<ScreenCapturerTrackSource>(capturer));
 
   scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(
       new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
@@ -264,7 +289,7 @@ RTCPeerConnectionFactoryImpl::CreateDesktopSource_d(
 
 scoped_refptr<RTCMediaStream> RTCPeerConnectionFactoryImpl::CreateStream(
     const string stream_id) {
-  rtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_stream =
+  webrtc::scoped_refptr<webrtc::MediaStreamInterface> rtc_stream =
       rtc_peerconnection_factory_->CreateLocalMediaStream(
           to_std_string(stream_id));
 
@@ -278,7 +303,7 @@ scoped_refptr<RTCVideoTrack> RTCPeerConnectionFactoryImpl::CreateVideoTrack(
     scoped_refptr<RTCVideoSource> source, const string track_id) {
   scoped_refptr<RTCVideoSourceImpl> source_adapter(
       static_cast<RTCVideoSourceImpl*>(source.get()));
-  rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_video_track =
+  webrtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_video_track =
       rtc_peerconnection_factory_->CreateVideoTrack(
           source_adapter->rtc_source_track(), track_id.std_string());
 
@@ -302,7 +327,7 @@ scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
   RTCAudioSourceImpl* source_impl =
       static_cast<RTCAudioSourceImpl*>(source.get());
 
-  rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track(
+  webrtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track(
       rtc_peerconnection_factory_->CreateAudioTrack(
           to_std_string(track_id), source_impl->rtc_audio_source().get()));
 
@@ -314,7 +339,7 @@ scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
 scoped_refptr<RTCRtpCapabilities>
 RTCPeerConnectionFactoryImpl::GetRtpSenderCapabilities(
     RTCMediaType media_type) {
-  if (rtc::Thread::Current() != signaling_thread_.get()) {
+  if (webrtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCRtpCapabilities> capabilities =
         signaling_thread_->BlockingCall([this, media_type] {
           return GetRtpSenderCapabilities(media_type);
@@ -322,13 +347,13 @@ RTCPeerConnectionFactoryImpl::GetRtpSenderCapabilities(
     return capabilities;
   }
 
-  cricket::MediaType type = cricket::MediaType::MEDIA_TYPE_AUDIO;
+  webrtc::MediaType type = webrtc::MediaType::AUDIO;
   switch (media_type) {
     case RTCMediaType::AUDIO:
-      type = cricket::MediaType::MEDIA_TYPE_AUDIO;
+      type = webrtc::MediaType::AUDIO;
       break;
     case RTCMediaType::VIDEO:
-      type = cricket::MediaType::MEDIA_TYPE_VIDEO;
+      type = webrtc::MediaType::VIDEO;
       break;
     default:
       break;
@@ -342,20 +367,20 @@ RTCPeerConnectionFactoryImpl::GetRtpSenderCapabilities(
 scoped_refptr<RTCRtpCapabilities>
 RTCPeerConnectionFactoryImpl::GetRtpReceiverCapabilities(
     RTCMediaType media_type) {
-  if (rtc::Thread::Current() != signaling_thread_.get()) {
+  if (webrtc::Thread::Current() != signaling_thread_.get()) {
     scoped_refptr<RTCRtpCapabilities> capabilities =
         signaling_thread_->BlockingCall([this, media_type] {
           return GetRtpSenderCapabilities(media_type);
         });
     return capabilities;
   }
-  cricket::MediaType type = cricket::MediaType::MEDIA_TYPE_AUDIO;
+  webrtc::MediaType type = webrtc::MediaType::AUDIO;
   switch (media_type) {
     case RTCMediaType::AUDIO:
-      type = cricket::MediaType::MEDIA_TYPE_AUDIO;
+      type = webrtc::MediaType::AUDIO;
       break;
     case RTCMediaType::VIDEO:
-      type = cricket::MediaType::MEDIA_TYPE_VIDEO;
+      type = webrtc::MediaType::VIDEO;
       break;
     default:
       break;
