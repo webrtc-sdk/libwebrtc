@@ -9,10 +9,10 @@
 
 namespace libwebrtc {
 
-class VideoSinkAdapter : public rtc::VideoSinkInterface<webrtc::VideoFrame>,
+class VideoSinkAdapter : public webrtc::VideoSinkInterface<webrtc::VideoFrame>,
                          public RefCountInterface {
  public:
-  VideoSinkAdapter(rtc::scoped_refptr<webrtc::VideoTrackInterface> track);
+  VideoSinkAdapter(webrtc::scoped_refptr<webrtc::VideoTrackInterface> track);
   ~VideoSinkAdapter() override;
 
   virtual void AddRenderer(
@@ -22,15 +22,15 @@ class VideoSinkAdapter : public rtc::VideoSinkInterface<webrtc::VideoFrame>,
       RTCVideoRenderer<scoped_refptr<RTCVideoFrame>>* renderer);
 
   virtual void AddRenderer(
-      rtc::VideoSinkInterface<webrtc::VideoFrame>* renderer);
+      webrtc::VideoSinkInterface<webrtc::VideoFrame>* renderer);
 
   virtual void RemoveRenderer(
-      rtc::VideoSinkInterface<webrtc::VideoFrame>* renderer);
+      webrtc::VideoSinkInterface<webrtc::VideoFrame>* renderer);
 
  protected:
   // VideoSinkInterface implementation
   void OnFrame(const webrtc::VideoFrame& frame) override;
-  rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track_;
+  webrtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track_;
   std::unique_ptr<webrtc::Mutex> crt_sec_;
   std::vector<RTCVideoRenderer<scoped_refptr<RTCVideoFrame>>*> renderers_;
 };

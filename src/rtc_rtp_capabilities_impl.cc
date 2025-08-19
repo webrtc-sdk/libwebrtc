@@ -94,13 +94,13 @@ string RTCRtpCodecCapabilityImpl::mime_type() const {
 void RTCRtpCodecCapabilityImpl::set_mime_type(const string& mime_type) {
   std::vector<std::string> mime_type_split = split(mime_type.std_string(), "/");
   rtp_codec_capability_.name = mime_type_split[1];
-  cricket::MediaType kind = cricket::MEDIA_TYPE_AUDIO;
+  webrtc::MediaType kind = webrtc::MediaType::ANY;
   if (mime_type_split[0] == "audio") {
-    kind = cricket::MEDIA_TYPE_AUDIO;
+    kind = webrtc::MediaType::AUDIO;
   } else if (mime_type_split[0] == "video") {
-    kind = cricket::MEDIA_TYPE_VIDEO;
-  } else {
-    kind = cricket::MEDIA_TYPE_DATA;
+    kind = webrtc::MediaType::VIDEO;
+  } else if (mime_type_split[0] == "data") {
+    kind = webrtc::MediaType::DATA;
   }
   rtp_codec_capability_.kind = kind;
 }

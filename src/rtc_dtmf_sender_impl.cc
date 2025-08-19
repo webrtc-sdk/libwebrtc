@@ -3,10 +3,10 @@
 namespace libwebrtc {
 
 RTCDtmfSenderImpl::RTCDtmfSenderImpl(
-    rtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender)
+    webrtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender)
     : dtmf_sender_(dtmf_sender), observer_(nullptr) {}
 
-rtc::scoped_refptr<webrtc::DtmfSenderInterface>
+webrtc::scoped_refptr<webrtc::DtmfSenderInterface>
 RTCDtmfSenderImpl::dtmf_sender() {
   return dtmf_sender_;
 }

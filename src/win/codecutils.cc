@@ -20,10 +20,10 @@ webrtc::SdpVideoFormat CreateH264Format(webrtc::H264Profile profile,
       webrtc::H264ProfileLevelIdToString(
           webrtc::H264ProfileLevelId(profile, level));
   return webrtc::SdpVideoFormat(
-      cricket::kH264CodecName,
-      {{cricket::kH264FmtpProfileLevelId, *profile_string},
-       {cricket::kH264FmtpLevelAsymmetryAllowed, "1"},
-       {cricket::kH264FmtpPacketizationMode, packetization_mode}});
+      webrtc::kH264CodecName,
+      {{webrtc::kH264FmtpProfileLevelId, *profile_string},
+       {webrtc::kH264FmtpLevelAsymmetryAllowed, "1"},
+       {webrtc::kH264FmtpPacketizationMode, packetization_mode}});
 }
 
 std::vector<webrtc::SdpVideoFormat> CodecUtils::SupportedH264Codecs() {
@@ -39,14 +39,14 @@ std::vector<webrtc::SdpVideoFormat> CodecUtils::SupportedH264Codecs() {
 
 webrtc::VideoCodecType CodecUtils::ConvertSdpFormatToCodecType(
     webrtc::SdpVideoFormat format) {
-  if (absl::EqualsIgnoreCase(format.name, cricket::kVp8CodecName)) {
+  if (absl::EqualsIgnoreCase(format.name, webrtc::kVp8CodecName)) {
     return webrtc::kVideoCodecVP8;
-  } else if (absl::EqualsIgnoreCase(format.name, cricket::kVp9CodecName)) {
+  } else if (absl::EqualsIgnoreCase(format.name, webrtc::kVp9CodecName)) {
     return webrtc::kVideoCodecVP9;
-  } else if (absl::EqualsIgnoreCase(format.name, cricket::kH264CodecName)) {
+  } else if (absl::EqualsIgnoreCase(format.name, webrtc::kH264CodecName)) {
     return webrtc::kVideoCodecH264;
 
-  } else if (absl::EqualsIgnoreCase(format.name, cricket::kAv1CodecName)) {
+  } else if (absl::EqualsIgnoreCase(format.name, webrtc::kAv1CodecName)) {
     return webrtc::kVideoCodecAV1;
   } else {
     return webrtc::kVideoCodecGeneric;

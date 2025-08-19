@@ -20,14 +20,14 @@ class RTCAudioProcessingImpl : public RTCAudioProcessing {
   void SetRenderPreProcessing(
       RTCAudioProcessing::CustomProcessing* render_pre_processing) override;
 
-  virtual rtc::scoped_refptr<webrtc::AudioProcessing> GetAudioProcessing() {
+  virtual webrtc::scoped_refptr<webrtc::AudioProcessing> GetAudioProcessing() {
     return apm_;
   }
 
  private:
   CustomProcessingAdapter* capture_post_processor_;
   CustomProcessingAdapter* render_pre_processor_;
-  rtc::scoped_refptr<webrtc::AudioProcessing> apm_;
+  webrtc::scoped_refptr<webrtc::AudioProcessing> apm_;
 };
 
 }  // namespace libwebrtc

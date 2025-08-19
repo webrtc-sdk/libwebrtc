@@ -9,11 +9,11 @@
 namespace libwebrtc {
 
 VideoFrameBufferImpl::VideoFrameBufferImpl(
-    rtc::scoped_refptr<webrtc::VideoFrameBuffer> frame_buffer)
+    webrtc::scoped_refptr<webrtc::VideoFrameBuffer> frame_buffer)
     : buffer_(frame_buffer) {}
 
 VideoFrameBufferImpl::VideoFrameBufferImpl(
-    rtc::scoped_refptr<webrtc::I420Buffer> frame_buffer)
+    webrtc::scoped_refptr<webrtc::I420Buffer> frame_buffer)
     : buffer_(frame_buffer) {}
 
 VideoFrameBufferImpl::~VideoFrameBufferImpl() {}
@@ -56,10 +56,10 @@ int VideoFrameBufferImpl::StrideV() const {
 int VideoFrameBufferImpl::ConvertToARGB(Type type, uint8_t* dst_buffer,
                                         int dst_stride, int dest_width,
                                         int dest_height) {
-  rtc::scoped_refptr<webrtc::I420Buffer> i420 =
+  webrtc::scoped_refptr<webrtc::I420Buffer> i420 =
       webrtc::I420Buffer::Rotate(*buffer_.get(), rotation_);
 
-  rtc::scoped_refptr<webrtc::I420Buffer> dest =
+  webrtc::scoped_refptr<webrtc::I420Buffer> dest =
       webrtc::I420Buffer::Create(dest_width, dest_height);
 
   dest->ScaleFrom(*i420.get());
@@ -127,7 +127,7 @@ scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width, int height,
   const uint8_t* data_u = buffer + size_y;
   const uint8_t* data_v = buffer + size_y + size_u;
 
-  rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Copy(
+  webrtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Copy(
       width, height, data_y, stride_y, data_u, stride_uv, data_v, stride_uv);
 
   scoped_refptr<VideoFrameBufferImpl> frame =
@@ -139,7 +139,7 @@ scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(int width, int height,
 scoped_refptr<RTCVideoFrame> RTCVideoFrame::Create(
     int width, int height, const uint8_t* data_y, int stride_y,
     const uint8_t* data_u, int stride_u, const uint8_t* data_v, int stride_v) {
-  rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Copy(
+  webrtc::scoped_refptr<webrtc::I420Buffer> i420_buffer = webrtc::I420Buffer::Copy(
       width, height, data_y, stride_y, data_u, stride_u, data_v, stride_v);
 
   scoped_refptr<VideoFrameBufferImpl> frame =

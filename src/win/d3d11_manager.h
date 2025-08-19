@@ -17,7 +17,7 @@
 namespace owt {
 namespace base {
 
-class D3D11Manager : public rtc::RefCountInterface {
+class D3D11Manager : public webrtc::RefCountInterface {
  public:
   D3D11Manager()
       : manager_(nullptr),

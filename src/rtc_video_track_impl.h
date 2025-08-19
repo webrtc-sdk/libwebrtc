@@ -10,11 +10,11 @@
 
 namespace libwebrtc {
 
-typedef std::vector<rtc::scoped_refptr<RTCVideoSource>> VideoSourceVector;
+typedef std::vector<webrtc::scoped_refptr<RTCVideoSource>> VideoSourceVector;
 
 class VideoTrackImpl : public RTCVideoTrack {
  public:
-  VideoTrackImpl(rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track);
+  VideoTrackImpl(webrtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track);
 
   virtual ~VideoTrackImpl();
 
@@ -34,7 +34,7 @@ class VideoTrackImpl : public RTCVideoTrack {
     return rtc_track_->set_enabled(enable);
   }
 
-  virtual rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track() {
+  virtual webrtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track() {
     return rtc_track_;
   }
 
@@ -43,7 +43,7 @@ class VideoTrackImpl : public RTCVideoTrack {
   }
 
  private:
-  rtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track_;
+  webrtc::scoped_refptr<webrtc::VideoTrackInterface> rtc_track_;
   scoped_refptr<RTCVideoSourceImpl> video_source_;
   scoped_refptr<VideoSinkAdapter> video_sink_;
   string id_, kind_;

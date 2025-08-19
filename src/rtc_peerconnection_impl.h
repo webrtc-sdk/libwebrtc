@@ -139,31 +139,31 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   RTCPeerConnectionImpl(
       const RTCConfiguration& configuration,
       scoped_refptr<RTCMediaConstraints> constraints,
-      rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
+      webrtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
           peer_connection_factory);
 
  protected:
   ~RTCPeerConnectionImpl();
 
   virtual void OnAddTrack(
-      rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
-      const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>&
+      webrtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
+      const std::vector<webrtc::scoped_refptr<webrtc::MediaStreamInterface>>&
           streams) override;
 
   virtual void OnTrack(
-      rtc::scoped_refptr<webrtc::RtpTransceiverInterface> transceiver) override;
+      webrtc::scoped_refptr<webrtc::RtpTransceiverInterface> transceiver) override;
 
   virtual void OnRemoveTrack(
-      rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) override;
+      webrtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) override;
 
   virtual void OnAddStream(
-      rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
+      webrtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 
   virtual void OnRemoveStream(
-      rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
+      webrtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 
   virtual void OnDataChannel(
-      rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel) override;
+      webrtc::scoped_refptr<webrtc::DataChannelInterface> data_channel) override;
 
   virtual void OnRenegotiationNeeded() override;
 
@@ -183,9 +183,9 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
       webrtc::PeerConnectionInterface::SignalingState new_state) override;
 
  protected:
-  rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
+  webrtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
       rtc_peerconnection_factory_;
-  rtc::scoped_refptr<webrtc::PeerConnectionInterface> rtc_peerconnection_;
+  webrtc::scoped_refptr<webrtc::PeerConnectionInterface> rtc_peerconnection_;
   const RTCConfiguration& configuration_;
   scoped_refptr<RTCMediaConstraints> constraints_;
   webrtc::PeerConnectionInterface::RTCOfferAnswerOptions offer_answer_options_;

@@ -63,7 +63,7 @@ class MediaSourceImpl : public MediaSource {
 
  private:
   std::vector<unsigned char> thumbnail_;
-  rtc::scoped_refptr<webrtc::I420Buffer> i420_buffer_;
+  webrtc::scoped_refptr<webrtc::I420Buffer> i420_buffer_;
   RTCDesktopMediaListImpl* mediaList_;
   DesktopType type_;
 };
@@ -73,7 +73,7 @@ class RTCDesktopMediaListImpl : public RTCDesktopMediaList {
   enum CaptureState { CS_RUNNING, CS_STOPPED, CS_FAILED };
 
  public:
-  RTCDesktopMediaListImpl(DesktopType type, rtc::Thread* signaling_thread);
+  RTCDesktopMediaListImpl(DesktopType type, webrtc::Thread* signaling_thread);
 
   virtual ~RTCDesktopMediaListImpl();
 
@@ -120,11 +120,11 @@ class RTCDesktopMediaListImpl : public RTCDesktopMediaList {
   std::unique_ptr<CallbackProxy> callback_;
   webrtc::DesktopCaptureOptions options_;
   std::unique_ptr<webrtc::DesktopCapturer> capturer_;
-  std::unique_ptr<rtc::Thread> thread_;
+  std::unique_ptr<webrtc::Thread> thread_;
   std::vector<scoped_refptr<MediaSourceImpl>> sources_;
   MediaListObserver* observer_ = nullptr;
   DesktopType type_;
-  rtc::Thread* signaling_thread_ = nullptr;
+  webrtc::Thread* signaling_thread_ = nullptr;
 };
 
 }  // namespace libwebrtc
