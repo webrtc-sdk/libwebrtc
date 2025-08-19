@@ -55,7 +55,7 @@ git clone https://github.com/webrtc-sdk/libwebrtc
 
 ### Apply audio custom source patch for m137_release.
 
-``bash
+```bash
 git apply libwebrtc/patchs/custom_audio_source_m137.patch 
 ```
 
