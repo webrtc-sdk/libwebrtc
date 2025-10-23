@@ -3,6 +3,7 @@ import("../webrtc.gni")
 declare_args() {
   libwebrtc_intel_media_sdk = false
   libwebrtc_desktop_capture = true
+  libwebrtc_export_capi = true
 }
 
 if (is_android) {
@@ -158,6 +159,20 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_logging.cc",
   ]
 
+  if(libwebrtc_export_capi) {
+    sources += [
+      "include/ref_counted_object_capi.h",
+      "include/rtc_types_capi.h",
+      "include/libwebrtc_capi.h",
+      "include/rtc_peerconnection_factory_capi.h",
+
+
+      "src/capi/libwebrtc_capi.cc",
+      "src/capi/ref_counted_object_capi.cc",
+      "src/capi/rtc_peerconnection_factory_capi.cc",
+    ]
+  }
+
   # intel media sdk
   if (is_win && libwebrtc_intel_media_sdk) {
     sources += [
@@ -273,3 +288,19 @@ rtc_shared_library("libwebrtc") {
     }
   }
 }
+
+  rtc_test("libwebrtc_unittests") {
+    testonly = true
+
+    sources = [
+      "test/peerconnection.test.cc",
+      "test/tests.cc",
+    ]
+
+    deps = [
+      ":libwebrtc",
+      "//testing/gtest",
+      "//test:test_support",
+      "//test:test_main",
+    ]
+  }
