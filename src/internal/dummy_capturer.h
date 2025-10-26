@@ -1,9 +1,3 @@
-/**
- * File provided for Reference Use Only by isoft (c) 2025.
- * Copyright (c) isoft. All rights reserved.
- * 
- */
-
 #ifndef LIB_WEBRTC_DUMMY_CAPTURER_IMPL_HXX
 #define LIB_WEBRTC_DUMMY_CAPTURER_IMPL_HXX
 

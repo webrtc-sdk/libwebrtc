@@ -1,9 +1,3 @@
-/**
- * File provided for Reference Use Only by isoft (c) 2025.
- * Copyright (c) isoft. All rights reserved.
- * 
- */
-
 #include "rtc_desktop_capturer.h"
 #include "src/rtc_desktop_capturer_impl.h"
 #include "interop_api.h"

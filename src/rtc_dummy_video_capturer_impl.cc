@@ -1,9 +1,3 @@
-/**
- * File provided for Reference Use Only by isoft (c) 2025.
- * Copyright (c) isoft. All rights reserved.
- * 
- */
-
 #include "src/rtc_dummy_video_capturer_impl.h"
 #include "rtc_video_frame.h"
 #include "third_party/libyuv/include/libyuv.h"

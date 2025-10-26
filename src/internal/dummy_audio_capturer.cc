@@ -1,9 +1,3 @@
-/**
- * File provided for Reference Use Only by isoft (c) 2025.
- * Copyright (c) isoft. All rights reserved.
- * 
- */
-
 #include "src/internal/dummy_audio_capturer.h"
 
 #include "rtc_base/logging.h"

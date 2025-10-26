@@ -1,9 +1,3 @@
-/**
- * File provided for Reference Use Only by isoft (c) 2025.
- * Copyright (c) isoft. All rights reserved.
- * 
- */
-
 #include "rtc_dummy_audio_source_impl.h"
 #include "rtc_base/logging.h"
 

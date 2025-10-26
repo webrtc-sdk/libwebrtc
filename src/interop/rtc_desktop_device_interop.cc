@@ -1,9 +1,3 @@
-/**
- * File provided for Reference Use Only by isoft (c) 2025.
- * Copyright (c) isoft. All rights reserved.
- * 
- */
-
 #include "rtc_desktop_media_list.h"
 #include "rtc_desktop_capturer.h"
 #include "rtc_desktop_device.h"
