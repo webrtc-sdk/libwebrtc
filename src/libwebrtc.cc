@@ -34,7 +34,6 @@ LibWebRTC::CreateRTCPeerConnectionFactory() {
   scoped_refptr<RTCPeerConnectionFactory> rtc_peerconnection_factory =
       scoped_refptr<RTCPeerConnectionFactory>(
           new RefCountedObject<RTCPeerConnectionFactoryImpl>());
-  rtc_peerconnection_factory->Initialize();
   return rtc_peerconnection_factory;
 }
 
