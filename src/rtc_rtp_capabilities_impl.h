@@ -44,6 +44,15 @@ class RTCRtpCodecCapabilityImpl : public RTCRtpCodecCapability {
   webrtc::RtpCodecCapability rtp_codec_capability_;
 };
 
+/**
+ * class RTCRtpCodecCapabilityListImpl
+ */
+class RTCRtpCodecCapabilityListImpl : public RTCRtpCodecCapabilityList {
+ public:
+  RTCRtpCodecCapabilityListImpl(const vector<scoped_refptr<RTCRtpCodecCapability>>& source);
+  ~RTCRtpCodecCapabilityListImpl();
+};
+
 class RTCRtpHeaderExtensionCapabilityImpl
     : public RTCRtpHeaderExtensionCapability {
  public:
@@ -62,6 +71,15 @@ class RTCRtpHeaderExtensionCapabilityImpl
 
  private:
   webrtc::RtpHeaderExtensionCapability rtp_header_extension_capability_;
+};
+
+/**
+ * class RTCRtpHeaderExtensionCapabilityListImpl
+ */
+class RTCRtpHeaderExtensionCapabilityListImpl : public RTCRtpHeaderExtensionCapabilityList {
+ public:
+  RTCRtpHeaderExtensionCapabilityListImpl(const vector<scoped_refptr<RTCRtpHeaderExtensionCapability>>& source);
+  ~RTCRtpHeaderExtensionCapabilityListImpl();
 };
 
 }  // namespace libwebrtc
