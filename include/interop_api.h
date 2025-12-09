@@ -283,6 +283,12 @@ enum class rtcLoggingSeverity : int {
   kNone = 4
 }; // end enum class rtcLoggingSeverity
 
+enum class rtcSdpType : int {
+  kOffer = 0,
+  kPrAnswer = 1,
+  kAnswer = 2
+}; // end enum class rtcSdpType
+
 struct rtcStringPair {
   const char* key = nullptr;
   const char* value = nullptr;
@@ -4175,6 +4181,89 @@ RTCLogging_SetLogSink(
  */
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCLogging_RemoveLogSink(
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCSessionDescription interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * @brief Creates a new RTCSessionDescription instance.
+ * 
+ * @param type - SDP type ("offer", "pranswer", "answer")
+ * @param sdp - SDP string
+ * @param error - Optional error handle for parsing errors
+ * @param pOutRetVal - Created session description handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCSessionDescription_Create(
+    const char* type,
+    const char* sdp,
+    rtcSdpParseErrorHandle error,
+    rtcSessionDescriptionHandle* pOutRetVal
+) noexcept;
+
+/**
+ * @brief Gets the SDP string from session description.
+ * 
+ * @param handle - Session description handle
+ * @param value - Buffer to store SDP string
+ * @param sz_value - Size of buffer
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCSessionDescription_GetSdp(
+    rtcSessionDescriptionHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+/**
+ * @brief Gets the SDP type string from session description.
+ * 
+ * @param handle - Session description handle
+ * @param value - Buffer to store type string
+ * @param sz_value - Size of buffer
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCSessionDescription_GetType(
+    rtcSessionDescriptionHandle handle,
+    char* value,
+    int sz_value
+) noexcept;
+
+/**
+ * @brief Gets the SDP type enum from session description.
+ * 
+ * @param handle - Session description handle
+ * @param pOutRetVal - SDP type enum value
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCSessionDescription_GetSdpType(
+    rtcSessionDescriptionHandle handle,
+    rtcSdpType* pOutRetVal
+) noexcept;
+
+/**
+ * @brief Converts session description to string.
+ * 
+ * @param handle - Session description handle
+ * @param value - Buffer to store string representation
+ * @param sz_value - Size of buffer
+ * @param pOutSuccess - Indicates if conversion was successful
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCSessionDescription_ToString(
+    rtcSessionDescriptionHandle handle,
+    char* value,
+    int sz_value,
+    rtcBool32* pOutSuccess
 ) noexcept;
 
 }  // extern "C"

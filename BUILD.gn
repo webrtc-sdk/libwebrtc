@@ -211,6 +211,7 @@ rtc_shared_library("libwebrtc") {
       "src/interop/rtc_rtp_receiver_interop.cc",
       "src/interop/rtc_rtp_sender_interop.cc",
       "src/interop/rtc_rtp_transceiver_interop.cc",
+      "src/interop/rtc_session_description_interop.cc",
       "src/interop/rtc_peerconnection_interop.cc",
     ]
 
