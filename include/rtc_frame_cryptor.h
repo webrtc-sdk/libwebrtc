@@ -14,8 +14,8 @@ enum class Algorithm {
   kAesCbc,
 };
 
-#define DEFAULT_KEYRING_SIZE 16
-#define MAX_KEYRING_SIZE 255
+//#define DEFAULT_KEYRING_SIZE 16
+//#define MAX_KEYRING_SIZE 255
 
 struct KeyProviderOptions {
   bool shared_key;
@@ -31,7 +31,7 @@ struct KeyProviderOptions {
         ratchet_salt(vector<uint8_t>()),
         ratchet_window_size(0),
         failure_tolerance(-1),
-        key_ring_size(DEFAULT_KEYRING_SIZE),
+        key_ring_size(16),
         discard_frame_when_cryptor_not_ready(false) {}
   KeyProviderOptions(KeyProviderOptions& copy)
       : shared_key(copy.shared_key),

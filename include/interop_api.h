@@ -554,6 +554,15 @@ using rtcAudioProcessingHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCAudioProcessing.CustomProcessing interop object.
 using rtcAudioProcessingCustomHandle = rtcObjectHandle;
 
+/// Opaque handle to a native KeyProvider interop object.
+using rtcKeyProviderHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCFrameCryptorObserver interop object.
+using rtcFrameCryptorObserverHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCFrameCryptor interop object.
+using rtcFrameCryptorHandle = rtcRefCountedObjectHandle;
+
 /* ---------------------------------------------------------------- */
 
 /**
@@ -819,6 +828,19 @@ struct rtcAudioProcessingCustomCallbacks {
     rtcAudioProcessingCustomResetDelegate Reset{};
     rtcAudioProcessingCustomReleaseDelegate Release{};
 }; // end struct rtcAudioProcessingCustomCallbacks
+
+using rtcFrameCryptorStateChangedDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data,
+    const char* participant_id,
+    rtcFrameCryptionState state);
+
+/**
+ * Callback delegate structure for RTCFrameCryptorObserver.
+ */
+struct rtcFrameCryptorObserverCallbacks {
+  rtcObjectHandle UserData{};
+  rtcFrameCryptorStateChangedDelegate StateChanged{};
+}; // end struct rtcFrameCryptorObserverCallbacks
 
 /*
  * ----------------------------------------------------------------------
@@ -4365,6 +4387,287 @@ RTCAudioProcessing_CreateCustom(
 LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCAudioProcessing_ReleaseCustom(
     rtcAudioProcessingCustomHandle customHandle
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * KeyProvider interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * @brief Creates a new KeyProvider instance.
+ * 
+ * @param options - Key provider options
+ * @param pOutRetVal - Handle to created key provider
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+KeyProvider_Create(
+    const rtcKeyProviderOptions* options,
+    rtcKeyProviderHandle* pOutRetVal
+) noexcept;
+
+/**
+ * @brief Sets a shared key at the specified index.
+ * 
+ * @param handle - Key provider handle
+ * @param index - Key index
+ * @param key - Key data
+ * @param key_len - Length of key data
+ * @return rtcBool32 - kTrue if successful, otherwise kFalse.
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+KeyProvider_SetSharedKey(
+    rtcKeyProviderHandle handle,
+    int index,
+    const unsigned char* key,
+    int key_len
+) noexcept;
+
+/**
+ * @brief Ratchets (updates) a shared key.
+ * 
+ * @param handle - Key provider handle
+ * @param key_index - Key index to ratchet
+ * @param pOutKey - Buffer for output key (can be NULL)
+ * @param pOutKeyLen - Pointer to buffer size, returns actual key length
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+KeyProvider_RatchetSharedKey(
+    rtcKeyProviderHandle handle,
+    int key_index,
+    unsigned char* pOutKey,
+    int* pOutKeyLen
+) noexcept;
+
+/**
+ * @brief Exports a shared key.
+ * 
+ * @param handle - Key provider handle
+ * @param key_index - Key index to export
+ * @param pOutKey - Buffer for output key
+ * @param pOutKeyLen - Pointer to buffer size, returns actual key length
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+KeyProvider_ExportSharedKey(
+    rtcKeyProviderHandle handle,
+    int key_index,
+    unsigned char* pOutKey,
+    int* pOutKeyLen
+) noexcept;
+
+/**
+ * @brief Sets a key for a specific participant.
+ * 
+ * @param handle - Key provider handle
+ * @param participant_id - Participant identifier
+ * @param index - Key index
+ * @param key - Key data
+ * @param key_len - Length of key data
+ * @return rtcBool32 - kTrue if successful, otherwise kFalse.
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+KeyProvider_SetKey(
+    rtcKeyProviderHandle handle,
+    const char* participant_id,
+    int index,
+    const unsigned char* key,
+    int key_len
+) noexcept;
+
+/**
+ * @brief Ratchets (updates) a key for a specific participant.
+ * 
+ * @param handle - Key provider handle
+ * @param participant_id - Participant identifier
+ * @param key_index - Key index to ratchet
+ * @param pOutKey - Buffer for output key (can be NULL)
+ * @param pOutKeyLen - Pointer to buffer size, returns actual key length
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+KeyProvider_RatchetKey(
+    rtcKeyProviderHandle handle,
+    const char* participant_id,
+    int key_index,
+    unsigned char* pOutKey,
+    int* pOutKeyLen
+) noexcept;
+
+/**
+ * @brief Exports a key for a specific participant.
+ * 
+ * @param handle - Key provider handle
+ * @param participant_id - Participant identifier
+ * @param key_index - Key index to export
+ * @param pOutKey - Buffer for output key
+ * @param pOutKeyLen - Pointer to buffer size, returns actual key length
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+KeyProvider_ExportKey(
+    rtcKeyProviderHandle handle,
+    const char* participant_id,
+    int key_index,
+    unsigned char* pOutKey,
+    int* pOutKeyLen
+) noexcept;
+
+/**
+ * @brief Sets SIF trailer data.
+ * 
+ * @param handle - Key provider handle
+ * @param trailer - Trailer data
+ * @param trailer_len - Length of trailer data
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+KeyProvider_SetSifTrailer(
+    rtcKeyProviderHandle handle,
+    const unsigned char* trailer,
+    int trailer_len
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCFrameCryptor interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * @brief Creates a frame cryptor for an RTCRtpSender.
+ * 
+ * @param factory - Peer connection factory handle
+ * @param participant_id - Participant identifier
+ * @param sender - RTP sender handle
+ * @param algorithm - Encryption algorithm
+ * @param key_provider - Key provider handle
+ * @param pOutRetVal - Created frame cryptor handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCFrameCryptor_CreateForSender(
+    rtcPeerConnectionFactoryHandle factory,
+    const char* participant_id,
+    rtcRtpSenderHandle sender,
+    rtcFrameCryptionAlgorithm algorithm,
+    rtcKeyProviderHandle key_provider,
+    rtcFrameCryptorHandle* pOutRetVal
+) noexcept;
+
+/**
+ * @brief Creates a frame cryptor for an RTCRtpReceiver.
+ * 
+ * @param factory - Peer connection factory handle
+ * @param participant_id - Participant identifier
+ * @param receiver - RTP receiver handle
+ * @param algorithm - Encryption algorithm
+ * @param key_provider - Key provider handle
+ * @param pOutRetVal - Created frame cryptor handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCFrameCryptor_CreateForReceiver(
+    rtcPeerConnectionFactoryHandle factory,
+    const char* participant_id,
+    rtcRtpReceiverHandle receiver,
+    rtcFrameCryptionAlgorithm algorithm,
+    rtcKeyProviderHandle key_provider,
+    rtcFrameCryptorHandle* pOutRetVal
+) noexcept;
+
+/**
+ * @brief Enables or disables frame encryption/decryption.
+ * 
+ * @param handle - Frame cryptor handle
+ * @param enabled - Enable/disable flag
+ * @return rtcBool32 - kTrue if successful, otherwise kFalse.
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+RTCFrameCryptor_SetEnabled(
+    rtcFrameCryptorHandle handle,
+    rtcBool32 enabled
+) noexcept;
+
+/**
+ * @brief Gets the enabled state.
+ * 
+ * @param handle - Frame cryptor handle
+ * @param pOutRetVal - Pointer to store enabled state
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCFrameCryptor_GetEnabled(
+    rtcFrameCryptorHandle handle,
+    rtcBool32* pOutRetVal
+) noexcept;
+
+/**
+ * @brief Sets the key index.
+ * 
+ * @param handle - Frame cryptor handle
+ * @param index - Key index
+ * @return rtcBool32 - kTrue if successful, otherwise kFalse.
+ */
+LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL
+RTCFrameCryptor_SetKeyIndex(
+    rtcFrameCryptorHandle handle,
+    int index
+) noexcept;
+
+/**
+ * @brief Gets the current key index.
+ * 
+ * @param handle - Frame cryptor handle
+ * @param pOutRetVal - Pointer to store key index
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCFrameCryptor_GetKeyIndex(
+    rtcFrameCryptorHandle handle,
+    int* pOutRetVal
+) noexcept;
+
+/**
+ * @brief Gets the participant ID.
+ * 
+ * @param handle - Frame cryptor handle
+ * @param pOutRetVal - Buffer for participant ID
+ * @param sz_value - Size of buffer
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCFrameCryptor_GetParticipantId(
+    rtcFrameCryptorHandle handle,
+    char* pOutRetVal,
+    int sz_value
+) noexcept;
+
+/**
+ * @brief Registers a frame cryptor observer.
+ * 
+ * @param handle - Frame cryptor handle
+ * @param callbacks - Observer callbacks
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCFrameCryptor_RegisterObserver(
+    rtcFrameCryptorHandle handle,
+    const rtcFrameCryptorObserverCallbacks* callbacks
+) noexcept;
+
+/**
+ * @brief Deregisters the frame cryptor observer.
+ * 
+ * @param handle - Frame cryptor handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCFrameCryptor_UnregisterObserver(
+    rtcFrameCryptorHandle handle
 ) noexcept;
 
 }  // extern "C"
