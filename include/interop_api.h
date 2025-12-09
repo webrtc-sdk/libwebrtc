@@ -548,6 +548,12 @@ using rtcRtpTransceiverListHandle = rtcRefCountedObjectHandle;
 /// Opaque handle to a native RTCSessionDescription interop object.
 using rtcSessionDescriptionHandle = rtcRefCountedObjectHandle;
 
+/// Opaque handle to a native RTCAudioProcessing interop object.
+using rtcAudioProcessingHandle = rtcRefCountedObjectHandle;
+
+/// Opaque handle to a native RTCAudioProcessing.CustomProcessing interop object.
+using rtcAudioProcessingCustomHandle = rtcObjectHandle;
+
 /* ---------------------------------------------------------------- */
 
 /**
@@ -785,6 +791,34 @@ using rtcOnSetSdpSuccessDelegate = void(LIB_WEBRTC_CALL*)(rtcObjectHandle user_d
 /// Callback delegate for logging
 using rtcLoggingMessageDelegate = void(LIB_WEBRTC_CALL*)(
     rtcObjectHandle user_data, const char* message);
+
+// Callback delegate for CustomProcessing.Initialize
+using rtcAudioProcessingCustomInitializeDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, int sample_rate_hz, int num_channels);
+
+// Callback delegate for CustomProcessing.Process
+using rtcAudioProcessingCustomProcessDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, int num_bands, int num_frames, 
+    int buffer_size, float* buffer);
+
+// Callback delegate for CustomProcessing.Reset
+using rtcAudioProcessingCustomResetDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, int new_rate);
+
+// Callback delegate for CustomProcessing.Release
+using rtcAudioProcessingCustomReleaseDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data);
+
+/**
+ * Callback delegate structure for RTCAudioProcessing.CustomProcessing
+ */
+struct rtcAudioProcessingCustomCallbacks {
+    rtcObjectHandle UserData{};
+    rtcAudioProcessingCustomInitializeDelegate Initialize{};
+    rtcAudioProcessingCustomProcessDelegate Process{};
+    rtcAudioProcessingCustomResetDelegate Reset{};
+    rtcAudioProcessingCustomReleaseDelegate Release{};
+}; // end struct rtcAudioProcessingCustomCallbacks
 
 /*
  * ----------------------------------------------------------------------
@@ -4264,6 +4298,62 @@ RTCSessionDescription_ToString(
     char* value,
     int sz_value,
     rtcBool32* pOutSuccess
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * RTCAudioProcessing interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * @brief Creates a new instance of RTCAudioProcessing.
+ * 
+ * @param pOutRetVal - Created audio processing handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioProcessing_Create(
+    rtcAudioProcessingHandle* pOutRetVal
+) noexcept;
+
+/**
+ * @brief Sets capture post-processing callback.
+ * 
+ * @param handle - Audio processing handle
+ * @param customHandle - Custom processing handle (created with RTCAudioProcessing_CreateCustom)
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioProcessing_SetCapturePostProcessing(
+    rtcAudioProcessingHandle handle,
+    rtcAudioProcessingCustomHandle customHandle
+) noexcept;
+
+/**
+ * @brief Sets render pre-processing callback.
+ * 
+ * @param handle - Audio processing handle
+ * @param customHandle - Custom processing handle (created with RTCAudioProcessing_CreateCustom)
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioProcessing_SetRenderPreProcessing(
+    rtcAudioProcessingHandle handle,
+    rtcAudioProcessingCustomHandle customHandle
+) noexcept;
+
+/**
+ * @brief Creates a custom audio processing callback wrapper.
+ * 
+ * @param callbacks - Callback structure with user data and function pointers
+ * @param pOutRetVal - Created custom processing handle
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioProcessing_CreateCustom(
+    rtcAudioProcessingCustomCallbacks* callbacks,
+    rtcAudioProcessingCustomHandle* pOutRetVal
 ) noexcept;
 
 }  // extern "C"
