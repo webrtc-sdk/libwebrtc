@@ -202,6 +202,7 @@ rtc_shared_library("libwebrtc") {
       "src/interop/rtc_dummy_video_capturer_interop.cc",
       "src/interop/rtc_data_channel_interop.cc",
       "src/interop/rtc_ice_candidate_interop.cc",
+      "src/interop/rtc_logging_interop.cc",
       "src/interop/rtc_media_stream_interop.cc",
       "src/interop/rtc_dtmf_sender_interop.cc",
       "src/interop/rtc_dtls_transport_interop.cc",

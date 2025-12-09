@@ -275,6 +275,14 @@ enum class rtcResultU4 : unsigned int {
   kInvalidPointer = 0x80004003,
 };  // end enum class rtcResultU4
 
+enum class rtcLoggingSeverity : int {
+  kVerbose = 0,
+  kInfo = 1,
+  kWarning = 2,
+  kError = 3,
+  kNone = 4
+}; // end enum class rtcLoggingSeverity
+
 struct rtcStringPair {
   const char* key = nullptr;
   const char* value = nullptr;
@@ -767,6 +775,10 @@ using rtcOnGetSdpSuccessDelegate = void(LIB_WEBRTC_CALL*)(
     rtcObjectHandle user_data, const char* sdp, const char* type);
 
 using rtcOnSetSdpSuccessDelegate = void(LIB_WEBRTC_CALL*)(rtcObjectHandle user_data);
+
+/// Callback delegate for logging
+using rtcLoggingMessageDelegate = void(LIB_WEBRTC_CALL*)(
+    rtcObjectHandle user_data, const char* message);
 
 /*
  * ----------------------------------------------------------------------
@@ -4122,6 +4134,47 @@ LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
 RTCPeerConnection_GetIceGatheringState (
     rtcPeerConnectionHandle handle,
     rtcIceGatheringState* pOutRetVal
+) noexcept;
+
+/*
+ * ----------------------------------------------------------------------
+ * Logging interop methods
+ * ----------------------------------------------------------------------
+ */
+
+/**
+ * @brief Sets the minimum debug log level.
+ * 
+ * @param severity - The minimum severity level to log
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCLogging_SetMinDebugLogLevel(
+    rtcLoggingSeverity severity
+) noexcept;
+
+/**
+ * @brief Sets a log sink with a callback for log messages.
+ * 
+ * @param severity - The minimum severity level to log
+ * @param userData - User data passed to the callback
+ * @param callback - Callback delegate for log messages
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCLogging_SetLogSink(
+    rtcLoggingSeverity severity,
+    rtcObjectHandle userData,
+    rtcLoggingMessageDelegate callback
+) noexcept;
+
+/**
+ * @brief Removes the previously set log sink.
+ * 
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCLogging_RemoveLogSink(
 ) noexcept;
 
 }  // extern "C"
