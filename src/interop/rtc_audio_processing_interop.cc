@@ -114,3 +114,16 @@ RTCAudioProcessing_CreateCustom(
     *pOutRetVal = static_cast<rtcAudioProcessingCustomHandle>(bridge);
     return rtcResultU4::kSuccess;
 }
+
+rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioProcessing_ReleaseCustom(
+    rtcAudioProcessingCustomHandle customHandle
+) noexcept {
+    CHECK_POINTER(customHandle);
+    
+    CustomProcessingBridge* bridge = 
+        static_cast<CustomProcessingBridge*>(customHandle);
+    
+    delete bridge;
+    return rtcResultU4::kSuccess;
+}

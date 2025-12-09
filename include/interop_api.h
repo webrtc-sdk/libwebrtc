@@ -4356,6 +4356,17 @@ RTCAudioProcessing_CreateCustom(
     rtcAudioProcessingCustomHandle* pOutRetVal
 ) noexcept;
 
+/**
+ * @brief Releases a custom audio processing callback wrapper.
+ * 
+ * @param customHandle - Custom processing handle to release
+ * @return rtcResultU4 - 0 if successful, otherwise an error code.
+ */
+LIB_WEBRTC_API rtcResultU4 LIB_WEBRTC_CALL
+RTCAudioProcessing_ReleaseCustom(
+    rtcAudioProcessingCustomHandle customHandle
+) noexcept;
+
 }  // extern "C"
 
 #endif  // LIB_WEBRTC_INTROP_API_HXX
