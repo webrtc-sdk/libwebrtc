@@ -108,6 +108,18 @@ struct SdpParseError {
 
 enum DesktopType { kScreen, kWindow };
 
+struct RTCAudioOptions {
+  RTCAudioOptions() {}
+
+  bool echo_cancellation = true;
+
+  bool auto_gain_control = true;
+
+  bool noise_suppression = true;
+
+  bool highpass_filter = false;
+};
+
 }  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_TYPES_HXX
