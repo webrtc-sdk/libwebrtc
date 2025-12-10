@@ -16,6 +16,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <sstream>
 
 /**
  * This file defines structures that can be passed across shared library/DLL
@@ -38,6 +39,9 @@ namespace portable {
 
 #define PORTABLE_STRING_BUF_SIZE 48
 
+template <typename T>
+class vector;
+
 class string {
  private:
   char m_buf[PORTABLE_STRING_BUF_SIZE];
@@ -49,7 +53,11 @@ class string {
   LIB_PORTABLE_API void init(const char* str, size_t len);
   LIB_PORTABLE_API void destroy();
 
-  inline string(const char* str) { init(str, strlen(str)); }
+  inline string(const char* str)
+  {
+    const char* strTemp = str ? str : "\0";
+    init(strTemp, strlen(strTemp));
+  }
 
   inline string(const std::string& str) { init(str.c_str(), str.length()); }
 
@@ -71,7 +79,7 @@ class string {
     return *this;
   }
 
-  inline size_t size() { return m_length; }
+  inline size_t size() const { return m_length; }
 
   inline const char* c_string() const {
     return m_dynamic == 0 ? m_buf : m_dynamic;
@@ -80,6 +88,52 @@ class string {
   inline std::string std_string() const {
     return std::string(m_dynamic == 0 ? m_buf : m_dynamic, m_length);
   }
+
+  /**
+   * Makes safe copies up to the size of the output buffer.
+   * 
+   * @param dest - Output buffer
+   * @param sz_dest - Size of the output buffer
+   * @return size_t - Number of characters copied. (excluding the ending character '\0')
+   */
+  inline size_t copy_to(char* dest, size_t sz_dest) const {
+    if (dest == 0) { return 0; }
+    *dest = '\0';
+    if (sz_dest == 0 || m_length == 0) { return 0; }
+    size_t cch_len = sz_dest - 1;
+    // safe copy
+    strncpy(dest, c_string(), cch_len);
+    dest[cch_len] = '\0';
+    return cch_len;
+  }
+
+  inline std::vector<string> split(string delimiter, bool removeEmptyEntries = true)
+  {
+    std::string input = std_string();
+    std::string item;
+    std::vector<string> tokens;
+    size_t start = 0;
+    size_t end = input.find(delimiter.c_string());
+
+    while (end != std::string::npos) {
+      item = input.substr(start, end - start);
+      if (!removeEmptyEntries || item.size() > 0) {
+        tokens.push_back(item);
+      }
+      start = end + delimiter.size();
+      end = input.find(delimiter.c_string(), start);
+    }
+
+    item = input.substr(start);
+    if (removeEmptyEntries && item.size() == 0) {
+      return tokens;
+    }
+
+    tokens.push_back(input.substr(start));
+    return tokens;
+  }
+
+  static std::string join(string separator, const vector<string>& values);
 };
 
 inline std::string to_std_string(const string& str) { return str.std_string(); }
@@ -212,6 +266,22 @@ class vector {
     m_size = 0;
   }
 };
+
+inline std::string string::join(string separator, const vector<string>& values)
+{
+    size_t count = values.size();
+    if (count == 0) {
+        return std::string();
+    }
+    std::string retVal;
+    for (size_t i = 0; i < count; i++) {
+        retVal += values[i].std_string();
+        if ((i + 1) < count) {
+            retVal += separator.std_string();
+        }
+    }
+    return retVal;
+}
 
 template <typename K, typename V>
 class pair {

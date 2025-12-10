@@ -1,5 +1,6 @@
 #include "rtc_rtp_parameters_impl.h"
 
+#include "rtc_base/logging.h"
 #include "base/refcountedobject.h"
 
 namespace libwebrtc {
@@ -129,6 +130,22 @@ bool RTCRtpEncodingParametersImpl::operator!=(
 webrtc::RtpEncodingParameters RTCRtpEncodingParametersImpl::rtp_parameters() {
   return rtp_encoding_parameters_;
 }
+
+scoped_refptr<RTCRtpEncodingParametersList> RTCRtpEncodingParametersList::Create(
+    const vector<scoped_refptr<RTCRtpEncodingParameters>>& source) {
+  return new RefCountedObject<RTCRtpEncodingParametersListImpl>(source);
+}
+
+RTCRtpEncodingParametersListImpl::RTCRtpEncodingParametersListImpl(
+    const vector<scoped_refptr<RTCRtpEncodingParameters>>& source)
+    : RTCRtpEncodingParametersList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpEncodingParametersListImpl::~RTCRtpEncodingParametersListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
 RTCRtpParametersImpl::RTCRtpParametersImpl(webrtc::RtpParameters rtp_parameters)
     : rtp_parameters_(rtp_parameters) {}
 webrtc::RtpParameters RTCRtpParametersImpl::rtp_parameters() {
@@ -303,6 +320,21 @@ webrtc::RtcpParameters RTCRtcpParametersImpl::rtcp_parameters() {
   return rtcp_parameters_;
 }
 
+scoped_refptr<RTCRtcpParametersList> RTCRtcpParametersList::Create(
+    const vector<scoped_refptr<RTCRtcpParameters>>& source) {
+  return new RefCountedObject<RTCRtcpParametersListImpl>(source);
+}
+
+RTCRtcpParametersListImpl::RTCRtcpParametersListImpl(
+    const vector<scoped_refptr<RTCRtcpParameters>>& source)
+    : RTCRtcpParametersList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtcpParametersListImpl::~RTCRtcpParametersListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
 RTCRtpExtensionImpl::RTCRtpExtensionImpl(webrtc::RtpExtension rtp_extension)
     : rtp_extension_(rtp_extension) {}
 
@@ -333,6 +365,80 @@ webrtc::RtpExtension RTCRtpExtensionImpl::rtp_extension() {
 
 const string RTCRtpExtensionImpl::ToString() const {
   return rtp_extension_.ToString();
+}
+
+scoped_refptr<RTCRtpExtensionList> RTCRtpExtensionList::Create(
+    const vector<scoped_refptr<RTCRtpExtension>>& source) {
+  return new RefCountedObject<RTCRtpExtensionListImpl>(source);
+}
+
+RTCRtpExtensionListImpl::RTCRtpExtensionListImpl(
+    const vector<scoped_refptr<RTCRtpExtension>>& source)
+    : RTCRtpExtensionList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpExtensionListImpl::~RTCRtpExtensionListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
+scoped_refptr<RTCRtpCodecParametersPair> RTCRtpCodecParametersPair::Create(
+  const std::pair<string, string>& source) {
+  return new RefCountedObject<RTCRtpCodecParametersPairImpl>(source);
+}
+
+scoped_refptr<RTCRtpCodecParametersPair> RTCRtpCodecParametersPair::Create() {
+  return new RefCountedObject<RTCRtpCodecParametersPairImpl>();
+}
+
+RTCRtpCodecParametersPairImpl::RTCRtpCodecParametersPairImpl()
+  : RTCRtpCodecParametersPair() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpCodecParametersPairImpl::RTCRtpCodecParametersPairImpl(
+  const std::pair<string, string>& source)
+  : RTCRtpCodecParametersPair(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpCodecParametersPairImpl::~RTCRtpCodecParametersPairImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
+scoped_refptr<RTCRtpCodecParametersMap> RTCRtpCodecParametersMap::Create(
+  const vector<scoped_refptr<RTCRtpCodecParametersPair>>& source) {
+  return new RefCountedObject<RTCRtpCodecParametersMapImpl>(source);
+}
+
+scoped_refptr<RTCRtpCodecParametersMap> RTCRtpCodecParametersMap::Create() {
+  return new RefCountedObject<RTCRtpCodecParametersMapImpl>();
+}
+
+RTCRtpCodecParametersMapImpl::RTCRtpCodecParametersMapImpl()
+  : RTCRtpCodecParametersMap() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpCodecParametersMapImpl::RTCRtpCodecParametersMapImpl(
+  const vector<scoped_refptr<RTCRtpCodecParametersPair>>& source)
+  : RTCRtpCodecParametersMap(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpCodecParametersMapImpl::~RTCRtpCodecParametersMapImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
+vector<std::pair<string, string>> RTCRtpCodecParametersMapImpl::to_parameters() {
+  std::vector<std::pair<string, string>> parameters;
+  size_t nCount = count();
+  parameters.reserve(nCount);
+  for (size_t i = 0; i < nCount; i++) {
+      scoped_refptr<RTCRtpCodecParametersPair> ipPair = item(i);
+      parameters.push_back(std::pair<string, string>(ipPair->key(), ipPair->value()));
+  }
+  return parameters;
 }
 
 RTCRtpCodecParametersImpl::RTCRtpCodecParametersImpl(
@@ -439,6 +545,15 @@ void RTCRtpCodecParametersImpl::set_parameters(
   rtp_codec_parameters_.parameters = parameters;
 }
 
+void RTCRtpCodecParametersImpl::set_parameters(
+    const vector<std::pair<string, string>> parameters_in) {
+  std::map<std::string, std::string> parameters;
+  for (auto item : parameters_in.std_vector()) {
+    parameters[to_std_string(item.first)] = to_std_string(item.second);
+  }
+  rtp_codec_parameters_.parameters = parameters;
+}
+
 bool RTCRtpCodecParametersImpl::operator==(
     scoped_refptr<RTCRtpCodecParameters> o) {
   RTCRtpCodecParametersImpl* impl =
@@ -455,6 +570,21 @@ bool RTCRtpCodecParametersImpl::operator!=(
 
 webrtc::RtpCodecParameters RTCRtpCodecParametersImpl::rtp_codec_parameters() {
   return rtp_codec_parameters_;
+}
+
+scoped_refptr<RTCRtpCodecParametersList> RTCRtpCodecParametersList::Create(
+    const vector<scoped_refptr<RTCRtpCodecParameters>>& source) {
+  return new RefCountedObject<RTCRtpCodecParametersListImpl>(source);
+}
+
+RTCRtpCodecParametersListImpl::RTCRtpCodecParametersListImpl(
+    const vector<scoped_refptr<RTCRtpCodecParameters>>& source)
+    : RTCRtpCodecParametersList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpCodecParametersListImpl::~RTCRtpCodecParametersListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
 }
 
 RTCRtcpFeedbackImpl::RTCRtcpFeedbackImpl(webrtc::RtcpFeedback rtcp_feedback)
@@ -490,6 +620,21 @@ bool RTCRtcpFeedbackImpl::operator==(scoped_refptr<RTCRtcpFeedback> o) {
 bool RTCRtcpFeedbackImpl::operator!=(scoped_refptr<RTCRtcpFeedback> o) {
   return rtcp_feedback_ !=
          static_cast<RTCRtcpFeedbackImpl*>(o.get())->rtcp_feedback();
+}
+
+scoped_refptr<RTCRtcpFeedbackList> RTCRtcpFeedbackList::Create(
+    const vector<scoped_refptr<RTCRtcpFeedback>>& source) {
+  return new RefCountedObject<RTCRtcpFeedbackListImpl>(source);
+}
+
+RTCRtcpFeedbackListImpl::RTCRtcpFeedbackListImpl(
+    const vector<scoped_refptr<RTCRtcpFeedback>>& source)
+    : RTCRtcpFeedbackList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtcpFeedbackListImpl::~RTCRtcpFeedbackListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
 }
 
 }  // namespace libwebrtc
