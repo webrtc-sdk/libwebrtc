@@ -15,15 +15,24 @@ bool LibWebRTC::Initialize() {
   if (!g_is_initialized) {
     webrtc::InitializeSSL();
     g_is_initialized = true;
+#ifdef WEBRTC_WIN
+  WSADATA data;
+  WSAStartup(MAKEWORD(1, 0), &data);
+#endif
   }
   return g_is_initialized;
 }
 
 // Stops and cleans up the threads and SSL.
 void LibWebRTC::Terminate() {
+  if(!g_is_initialized) {
+    return;
+  }
   webrtc::ThreadManager::Instance()->SetCurrentThread(NULL);
   webrtc::CleanupSSL();
-
+#ifdef WEBRTC_WIN
+  WSACleanup();
+#endif
   // Resets the static variable g_is_initialized to false.
   g_is_initialized = false;
 }

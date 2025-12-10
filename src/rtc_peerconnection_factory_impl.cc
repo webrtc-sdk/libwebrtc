@@ -47,6 +47,9 @@ RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl() {}
 RTCPeerConnectionFactoryImpl::~RTCPeerConnectionFactoryImpl() {}
 
 bool RTCPeerConnectionFactoryImpl::Initialize() {
+  
+  task_queue_factory_ = webrtc::CreateDefaultTaskQueueFactory();
+
   worker_thread_ = webrtc::Thread::Create();
   worker_thread_->SetName("worker_thread", nullptr);
   RTC_CHECK(worker_thread_->Start()) << "Failed to start thread";
@@ -59,7 +62,6 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
   network_thread_->SetName("network_thread", nullptr);
   RTC_CHECK(network_thread_->Start()) << "Failed to start thread";
   if (!audio_device_module_) {
-    task_queue_factory_ = webrtc::CreateDefaultTaskQueueFactory();
     worker_thread_->BlockingCall([&] { CreateAudioDeviceModule_w(); });
   }
 
@@ -105,11 +107,11 @@ bool RTCPeerConnectionFactoryImpl::Terminate() {
     video_device_impl_ = nullptr;
     audio_processing_impl_ = nullptr;
   });
-  rtc_peerconnection_factory_ = NULL;
+  
   if (audio_device_module_) {
     worker_thread_->BlockingCall([this] { DestroyAudioDeviceModule_w(); });
   }
-
+  rtc_peerconnection_factory_ = nullptr;
   return true;
 }
 
