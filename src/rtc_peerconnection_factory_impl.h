@@ -49,8 +49,8 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   scoped_refptr<RTCAudioProcessing> GetAudioProcessing() override;
 
   virtual scoped_refptr<RTCAudioSource> CreateAudioSource(
-      const string audio_source_label,
-      RTCAudioSource::SourceType source_type) override;
+      const string audio_source_label, RTCAudioSource::SourceType source_type,
+      RTCAudioOptions options) override;
       
   virtual scoped_refptr<RTCDummyAudioSource> CreateDummyAudioSource(
       const string audio_source_label,

@@ -144,6 +144,18 @@ struct RTCConfiguration {
 
 enum DesktopType { kScreen, kWindow };
 
+struct RTCAudioOptions {
+  RTCAudioOptions() {}
+
+  bool echo_cancellation = true;
+
+  bool auto_gain_control = true;
+
+  bool noise_suppression = true;
+
+  bool highpass_filter = false;
+};
+
 struct RTCVideoFrameARGB {
   RTCVideoFrameTypeARGB type = RTCVideoFrameTypeARGB::kARGB;
   int width = 0;

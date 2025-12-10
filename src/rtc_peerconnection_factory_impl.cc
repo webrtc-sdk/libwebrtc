@@ -210,10 +210,16 @@ RTCPeerConnectionFactoryImpl::CreateAudioSourceWithOptions(
 }
 
 scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
-    const string audio_source_label, RTCAudioSource::SourceType source_type) {
-  auto options = webrtc::AudioOptions();
+    const string audio_source_label, RTCAudioSource::SourceType source_type,
+    RTCAudioOptions options) {
+  auto rtc_options = webrtc::AudioOptions();
+  rtc_options.echo_cancellation = options.echo_cancellation;
+  rtc_options.auto_gain_control = options.auto_gain_control;
+  rtc_options.noise_suppression = options.noise_suppression;
+  rtc_options.highpass_filter = options.highpass_filter;
   webrtc::scoped_refptr<libwebrtc::LocalAudioSource> rtc_source_track =
-      CreateAudioSourceWithOptions(&options, source_type == RTCAudioSource::SourceType::kCustom);
+      CreateAudioSourceWithOptions(
+          &rtc_options, source_type == RTCAudioSource::SourceType::kCustom);
   scoped_refptr<RTCAudioSourceImpl> source = scoped_refptr<RTCAudioSourceImpl>(
       new RefCountedObject<RTCAudioSourceImpl>(rtc_source_track, source_type));
   return source;

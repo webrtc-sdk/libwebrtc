@@ -11,12 +11,10 @@ rtcBool32 LIB_WEBRTC_CALL LibWebRTC_Initialize() noexcept
         : rtcBool32::kFalse;
 }
 
-rtcPeerConnectionFactoryHandle LIB_WEBRTC_CALL LibWebRTC_CreateRTCPeerConnectionFactory(
-    rtcBool32 use_dummy_audio /*= rtcBool32::kFalse*/
-) noexcept
+rtcPeerConnectionFactoryHandle LIB_WEBRTC_CALL LibWebRTC_CreateRTCPeerConnectionFactory() noexcept
 {
     scoped_refptr<RTCPeerConnectionFactory> p = 
-        LibWebRTC::CreateRTCPeerConnectionFactory(use_dummy_audio != rtcBool32::kFalse);
+        LibWebRTC::CreateRTCPeerConnectionFactory();
     return static_cast<rtcPeerConnectionFactoryHandle>(p.release());
 }
 

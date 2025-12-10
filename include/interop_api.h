@@ -870,9 +870,7 @@ LIB_WEBRTC_API rtcBool32 LIB_WEBRTC_CALL LibWebRTC_Initialize() noexcept;
  * RTCPeerConnectionFactory.
  */
 LIB_WEBRTC_API rtcPeerConnectionFactoryHandle LIB_WEBRTC_CALL
-LibWebRTC_CreateRTCPeerConnectionFactory(
-    rtcBool32 use_dummy_audio = rtcBool32::kFalse
-) noexcept;
+LibWebRTC_CreateRTCPeerConnectionFactory() noexcept;
 
 /**
  * @brief Terminates the WebRTC PeerConnectionFactory and threads.
