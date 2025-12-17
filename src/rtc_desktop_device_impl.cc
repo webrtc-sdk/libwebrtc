@@ -13,10 +13,11 @@ RTCDesktopDeviceImpl::RTCDesktopDeviceImpl(webrtc::Thread* signaling_thread)
 RTCDesktopDeviceImpl::~RTCDesktopDeviceImpl() {}
 
 scoped_refptr<RTCDesktopCapturer> RTCDesktopDeviceImpl::CreateDesktopCapturer(
-    scoped_refptr<MediaSource> source) {
+    scoped_refptr<MediaSource> source, bool showCursor) {
   MediaSourceImpl* source_impl = static_cast<MediaSourceImpl*>(source.get());
   return new RefCountedObject<RTCDesktopCapturerImpl>(
-      source_impl->type(), source_impl->source_id(), signaling_thread_, source);
+      source_impl->type(), source_impl->source_id(), signaling_thread_, source,
+      showCursor);
 }
 
 scoped_refptr<RTCDesktopMediaList> RTCDesktopDeviceImpl::GetDesktopMediaList(

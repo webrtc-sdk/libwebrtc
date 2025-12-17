@@ -38,7 +38,7 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   RTCDesktopCapturerImpl(DesktopType type,
                          webrtc::DesktopCapturer::SourceId source_id,
                          webrtc::Thread* signaling_thread,
-                         scoped_refptr<MediaSource> source);
+                         scoped_refptr<MediaSource> source, bool showCursor = true);
   ~RTCDesktopCapturerImpl();
 
   void RegisterDesktopCapturerObserver(
