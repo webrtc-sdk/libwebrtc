@@ -1,4 +1,5 @@
 #include "rtc_rtp_receiver_impl.h"
+#include "interop_api.h"
 
 #include "base/refcountedobject.h"
 #include "rtc_audio_track_impl.h"
@@ -8,6 +9,44 @@
 #include "rtc_video_track_impl.h"
 
 namespace libwebrtc {
+
+/**
+ * class RTCRtpReceiverObserverImpl 
+ */
+
+RTCRtpReceiverObserverImpl::RTCRtpReceiverObserverImpl(
+  void* callbacks /* rtcRtpReceiverObserverCallbacks* */)
+  : callbacks_(nullptr)
+{
+  if (callbacks) {
+    size_t nSize = sizeof(rtcRtpReceiverObserverCallbacks);
+    callbacks_ = malloc(nSize);
+    memcpy(callbacks_, (const void*)callbacks, nSize);
+  }
+}
+
+RTCRtpReceiverObserverImpl::~RTCRtpReceiverObserverImpl()
+{
+  if (callbacks_) {
+    free(callbacks_);
+  }
+  callbacks_ = nullptr;
+}
+
+void RTCRtpReceiverObserverImpl::OnFirstPacketReceived(RTCMediaType media_type)
+{
+  if (callbacks_) {
+    rtcRtpReceiverObserverCallbacks* pCallbacks = reinterpret_cast<rtcRtpReceiverObserverCallbacks*>(callbacks_);
+    pCallbacks->FirstPacketReceived(
+      pCallbacks->UserData,
+      static_cast<rtcMediaType>(media_type));
+  }
+}
+
+/**
+ * class RTCRtpReceiverImpl 
+ */
+
 RTCRtpReceiverImpl::RTCRtpReceiverImpl(
     webrtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver)
     : rtp_receiver_(rtp_receiver), observer_(nullptr) {}
@@ -90,6 +129,21 @@ void RTCRtpReceiverImpl::SetObserver(RTCRtpReceiverObserver* observer) {
 
 void RTCRtpReceiverImpl::SetJitterBufferMinimumDelay(double delay_seconds) {
   rtp_receiver_->SetJitterBufferMinimumDelay(delay_seconds);
+}
+
+scoped_refptr<RTCRtpReceiverList> RTCRtpReceiverList::Create(
+    const vector<scoped_refptr<RTCRtpReceiver>>& source) {
+  return new RefCountedObject<RTCRtpReceiverListImpl>(source);
+}
+
+RTCRtpReceiverListImpl::RTCRtpReceiverListImpl(
+    const vector<scoped_refptr<RTCRtpReceiver>>& source)
+    : RTCRtpReceiverList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpReceiverListImpl::~RTCRtpReceiverListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
 }
 
 }  // namespace libwebrtc

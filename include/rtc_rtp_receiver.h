@@ -45,6 +45,8 @@ class RTCRtpReceiver : public RefCountInterface {
 
   virtual void SetJitterBufferMinimumDelay(double delay_seconds) = 0;
 
+  virtual RTCRtpReceiverObserver* GetObserver() = 0;
+
   // virtual Vector<RtpSource> GetSources() const = 0;
 
   // virtual void SetFrameDecryptor(
@@ -55,6 +57,22 @@ class RTCRtpReceiver : public RefCountInterface {
   // virtual void SetDepacketizerToDecoderFrameTransformer(
   //    scoped_refptr<FrameTransformerInterface> frame_transformer) = 0;
 };
+
+/**
+ * class RTCRtpReceiverList
+ */
+class RTCRtpReceiverList : public RTCBaseList<scoped_refptr<RTCRtpReceiver>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpReceiverList> Create(
+    const vector<scoped_refptr<RTCRtpReceiver>>& source);
+
+ protected:
+  RTCRtpReceiverList(const vector<scoped_refptr<RTCRtpReceiver>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtpReceiver>>(source)
+  {}
+
+  ~RTCRtpReceiverList() {}
+}; // end class RTCRtpReceiverList
 
 }  // namespace libwebrtc
 

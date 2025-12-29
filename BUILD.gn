@@ -1,6 +1,7 @@
 import("../webrtc.gni")
 
 declare_args() {
+  libwebrtc_interop = true
   libwebrtc_intel_media_sdk = false
   libwebrtc_desktop_capture = true
 }
@@ -68,6 +69,7 @@ rtc_shared_library("libwebrtc") {
     "include/base/refcountedobject.h",
     "include/base/scoped_ref_ptr.h",
     "include/libwebrtc.h",
+    "include/rtc_base_list.h",
     "include/rtc_audio_device.h",
     "include/rtc_audio_processing.h",
     "include/rtc_audio_source.h",
@@ -76,6 +78,7 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_dtls_transport.h",
     "include/rtc_dtmf_sender.h",
     "include/rtc_frame_cryptor.h",
+    "include/rtc_sdp_parse_error.h",
     "include/rtc_ice_candidate.h",
     "include/rtc_media_stream.h",
     "include/rtc_media_track.h",
@@ -95,9 +98,14 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_video_source.h",
     "include/rtc_video_track.h",
     "include/rtc_logging.h",
+    "include/rtc_dummy_video_capturer.h",
+    "include/rtc_audio_data.h",
+    "include/rtc_dummy_audio_source.h",
     "include/helper.h",
     "src/helper.cc",
     "src/base/portable.cc",
+    "src/internal/audio_util.cc",
+    "src/internal/audio_util.h",
     "src/internal/custom_audio_transport_impl.cc",
     "src/internal/custom_audio_transport_impl.h",
     "src/internal/local_audio_track.cc",
@@ -106,6 +114,10 @@ rtc_shared_library("libwebrtc") {
     "src/internal/vcm_capturer.h",
     "src/internal/video_capturer.cc",
     "src/internal/video_capturer.h",
+    "src/internal/dummy_capturer.cc",
+    "src/internal/dummy_capturer.h",
+    "src/internal/dummy_audio_capturer.cc",
+    "src/internal/dummy_audio_capturer.h",
     "src/libwebrtc.cc",
     "src/rtc_audio_device_impl.cc",
     "src/rtc_audio_device_impl.h",
@@ -123,6 +135,8 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_dtmf_sender_impl.h",
     "src/rtc_frame_cryptor_impl.cc",
     "src/rtc_frame_cryptor_impl.h",
+    "src/rtc_sdp_parse_error_impl.cc",
+    "src/rtc_sdp_parse_error_impl.h",
     "src/rtc_ice_candidate_impl.cc",
     "src/rtc_ice_candidate_impl.h",
     "src/rtc_media_stream_impl.cc",
@@ -149,6 +163,8 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_video_device_impl.h",
     "src/rtc_video_frame_impl.cc",
     "src/rtc_video_frame_impl.h",
+    "src/rtc_video_renderer_impl.cc",
+    "src/rtc_video_renderer_impl.h",
     "src/rtc_video_sink_adapter.cc",
     "src/rtc_video_sink_adapter.h",
     "src/rtc_video_source_impl.cc",
@@ -156,7 +172,59 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_video_track_impl.cc",
     "src/rtc_video_track_impl.h",
     "src/rtc_logging.cc",
+    "src/rtc_dummy_video_capturer_impl.cc",
+    "src/rtc_dummy_video_capturer_impl.h",
+    "src/rtc_audio_data_impl.cc",
+    "src/rtc_audio_data_impl.h",
+    "src/rtc_dummy_audio_source_impl.cc",
+    "src/rtc_dummy_audio_source_impl.h",
   ]
+  
+  # for interop methods
+  if (libwebrtc_interop) {
+    sources += [
+      "include/interop_macros.h",
+      "include/interop_api.h",
+      "src/interop/ref_counted_object_interop.cc",
+      "src/interop/libwebrtc_interop.cc",
+      "src/interop/rtc_sdp_parse_error_interop.cc",
+      "src/interop/rtc_mediaconstraints_interop.cc",
+      "src/interop/rtc_peerconnection_factory_interop.cc",
+      "src/interop/rtc_audio_data_interop.cc",
+      "src/interop/rtc_media_track_interop.cc",
+      "src/interop/rtc_audio_device_interop.cc",
+      "src/interop/rtc_audio_track_interop.cc",
+      "src/interop/rtc_dummy_audio_source_interop.cc",
+      "src/interop/rtc_video_device_interop.cc",
+      "src/interop/rtc_video_track_interop.cc",
+      "src/interop/rtc_video_frame_interop.cc",
+      "src/interop/rtc_video_renderer_interop.cc",
+      "src/interop/rtc_dummy_video_capturer_interop.cc",
+      "src/interop/rtc_data_channel_interop.cc",
+      "src/interop/rtc_ice_candidate_interop.cc",
+      "src/interop/rtc_logging_interop.cc",
+      "src/interop/rtc_media_stream_interop.cc",
+      "src/interop/rtc_dtmf_sender_interop.cc",
+      "src/interop/rtc_dtls_transport_interop.cc",
+      "src/interop/rtc_rtp_capabilities_interop.cc",
+      "src/interop/rtc_rtp_parameters_interop.cc",
+      "src/interop/rtc_rtp_receiver_interop.cc",
+      "src/interop/rtc_rtp_sender_interop.cc",
+      "src/interop/rtc_rtp_transceiver_interop.cc",
+      "src/interop/rtc_session_description_interop.cc",
+      "src/interop/rtc_peerconnection_interop.cc",
+      "src/interop/rtc_audio_processing_interop.cc",
+      "src/interop/rtc_frame_cryptor_interop.cc",
+    ]
+
+    if (libwebrtc_desktop_capture) {
+      sources += [
+        "src/interop/rtc_desktop_media_list_interop.cc",
+        "src/interop/rtc_desktop_capturer_interop.cc",
+        "src/interop/rtc_desktop_device_interop.cc",
+      ]
+    }
+  }
 
   # intel media sdk
   if (is_win && libwebrtc_intel_media_sdk) {
