@@ -5,6 +5,7 @@
 #include "base/scoped_ref_ptr.h"
 #include "rtc_rtp_parameters.h"
 #include "rtc_types.h"
+#include "rtc_base_list.h"
 
 namespace libwebrtc {
 
@@ -40,6 +41,22 @@ class RTCRtpSender : public RefCountInterface {
 
   virtual scoped_refptr<RTCDtmfSender> dtmf_sender() const = 0;
 };
+
+/**
+ * class RTCRtpSenderList
+ */
+class RTCRtpSenderList : public RTCBaseList<scoped_refptr<RTCRtpSender>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpSenderList> Create(
+    const vector<scoped_refptr<RTCRtpSender>>& source);
+
+ protected:
+  RTCRtpSenderList(const vector<scoped_refptr<RTCRtpSender>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtpSender>>(source)
+  {}
+
+  ~RTCRtpSenderList() {}
+}; // end class RTCRtpSenderList
 
 }  // namespace libwebrtc
 
