@@ -11,6 +11,7 @@
 #include "src/internal/video_capturer.h"
 
 #include <algorithm>
+#include <opencv2/opencv.hpp>
 
 #include "api/scoped_refptr.h"
 #include "api/video/i420_buffer.h"
@@ -83,3 +84,32 @@ void VideoCapturer::UpdateVideoAdapter() {
 
 }  // namespace internal
 }  // namespace webrtc
+// Function to convert I420Buffer to cv::Mat
+cv::Mat I420BufferToMat(const rtc::scoped_refptr<webrtc::I420Buffer>& i420_buffer) {
+    int width = i420_buffer->width();
+    int height = i420_buffer->height();
+    
+    // Create a single buffer to hold the YUV420 data
+    size_t y_size = width * height;
+    size_t uv_size = (width / 2) * (height / 2);
+    size_t buffer_size = y_size + 2 * uv_size;
+    std::vector<uint8_t> yuv420_data(buffer_size);
+
+    // Copy the data from the I420Buffer to the single buffer
+    uint8_t* y_plane = yuv420_data.data();
+    uint8_t* u_plane = y_plane + y_size;
+    uint8_t* v_plane = u_plane + uv_size;
+
+    memcpy(y_plane, i420_buffer->DataY(), y_size);
+    memcpy(u_plane, i420_buffer->DataU(), uv_size);
+    memcpy(v_plane, i420_buffer->DataV(), uv_size);
+
+    // Create a cv::Mat with the YUV420 data
+    cv::Mat yuv420_image(height + height / 2, width, CV_8UC1, yuv420_data.data());
+
+    // Convert YUV420 image to BGR
+    cv::Mat bgr_image;
+    cv::cvtColor(yuv420_image, bgr_image, cv::COLOR_YUV2BGR_I420);
+
+    return bgr_image;
+}
