@@ -1,11 +1,11 @@
 #include "rtc_session_description_impl.h"
-
+#include "rtc_sdp_parse_error.h"
 #include "api/jsep.h"
 
 namespace libwebrtc {
 
 scoped_refptr<RTCSessionDescription> RTCSessionDescription::Create(
-    const string type, const string sdp, SdpParseError* error) {
+    const string type, const string sdp, RTCSdpParseError* error) {
   webrtc::SdpParseError sdp_error;
   std::optional<webrtc::SdpType> maybe_type = webrtc::SdpTypeFromString(to_std_string(type));
   if (!maybe_type) {
@@ -14,8 +14,10 @@ scoped_refptr<RTCSessionDescription> RTCSessionDescription::Create(
   std::unique_ptr<webrtc::SessionDescriptionInterface> rtc_description(
       webrtc::CreateSessionDescription(*maybe_type, to_std_string(sdp),
                                        &sdp_error));
-  error->description = sdp_error.description;
-  error->line = sdp_error.line;
+  if (error) {
+    error->set_description(sdp_error.description);
+    error->set_line(sdp_error.line);
+  }                          
   if (rtc_description) {
     return scoped_refptr<RTCSessionDescriptionImpl>(
         new RefCountedObject<RTCSessionDescriptionImpl>(

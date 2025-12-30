@@ -1,6 +1,58 @@
 #include "rtc_dtmf_sender_impl.h"
+#include "interop_api.h"
 
 namespace libwebrtc {
+
+/**
+ * class RTCDtmfSenderObserverImpl 
+ */
+
+RTCDtmfSenderObserverImpl::RTCDtmfSenderObserverImpl(
+  void* callbacks /* rtcDtmfSenderObserverCallbacks* */)
+  : callbacks_(nullptr)
+{
+  if (callbacks) {
+    size_t nSize = sizeof(rtcDtmfSenderObserverCallbacks);
+    callbacks_ = malloc(nSize);
+    memcpy(callbacks_, (const void*)callbacks, nSize);
+  }
+}
+
+RTCDtmfSenderObserverImpl::~RTCDtmfSenderObserverImpl()
+{
+  if (callbacks_) {
+    free(callbacks_);
+  }
+  callbacks_ = nullptr;
+}
+
+void RTCDtmfSenderObserverImpl::OnToneChange(const string tone, const string tone_buffer)
+{
+  if (callbacks_) {
+    rtcDtmfSenderObserverCallbacks* pCallbacks = reinterpret_cast<rtcDtmfSenderObserverCallbacks*>(callbacks_);
+    pCallbacks->ToneChanged(
+      pCallbacks->UserData,
+      tone.c_string(),
+      tone_buffer.c_string()
+    );
+  }
+}
+
+void RTCDtmfSenderObserverImpl::OnToneChange(const string tone)
+{
+  if (callbacks_) {
+    rtcDtmfSenderObserverCallbacks* pCallbacks = reinterpret_cast<rtcDtmfSenderObserverCallbacks*>(callbacks_);
+    pCallbacks->ToneChanged(
+      pCallbacks->UserData,
+      tone.c_string(),
+      nullptr
+    );
+  }
+}
+
+/**
+ * class RTCDtmfSenderImpl
+ */
 
 RTCDtmfSenderImpl::RTCDtmfSenderImpl(
     webrtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender)
