@@ -435,6 +435,8 @@ bool RTCPeerConnectionImpl::Initialize() {
   if (configuration_.screencast_min_bitrate > 0)
     config.screencast_min_bitrate = configuration_.screencast_min_bitrate;
 
+  config.set_dscp(configuration_.enable_dscp);
+
   RTCMediaConstraintsImpl* media_constraints =
       static_cast<RTCMediaConstraintsImpl*>(constraints_.get());
   webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),

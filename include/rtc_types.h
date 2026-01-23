@@ -91,6 +91,7 @@ struct RTCConfiguration {
   int max_ipv6_networks = 5;
   bool disable_link_local_networks = false;
   int screencast_min_bitrate = -1;
+  bool enable_dscp = false;
 
   // private
   bool use_rtp_mux = true;
