@@ -18,6 +18,8 @@
 #include "src/win/mediacapabilities.h"
 #include "src/win/msdkvideodecoderfactory.h"
 #include "src/win/msdkvideoencoderfactory.h"
+#elif defined(WEBRTC_WIN) && defined(RTC_ENABLE_H265)
+#include "src/win/wmf_h265_factory.h"
 #endif
 #if defined(WEBRTC_IOS)
 #include "engine/sdk/objc/Framework/Classes/videotoolboxvideocodecfactory.h"
@@ -83,6 +85,11 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
         webrtc::CreateBuiltinAudioDecoderFactory(),
 #if defined(USE_INTEL_MEDIA_SDK)
         CreateIntelVideoEncoderFactory(), CreateIntelVideoDecoderFactory(),
+#elif defined(WEBRTC_WIN) && defined(RTC_ENABLE_H265)
+        webrtc::CreateWmfH265EncoderFactory(
+            webrtc::CreateBuiltinVideoEncoderFactory()),
+        webrtc::CreateWmfH265DecoderFactory(
+            webrtc::CreateBuiltinVideoDecoderFactory()),
 #else
         webrtc::CreateBuiltinVideoEncoderFactory(),
         webrtc::CreateBuiltinVideoDecoderFactory(),
