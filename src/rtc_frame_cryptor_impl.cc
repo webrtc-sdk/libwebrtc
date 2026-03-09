@@ -56,7 +56,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
           mediaType, AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_provider()));
   e2ee_transformer_->RegisterFrameCryptorTransformerObserver(observer_);
-  impl->rtc_rtp_sender()->SetEncoderToPacketizerFrameTransformer(
+  impl->rtc_rtp_sender()->SetFrameTransformer(
       e2ee_transformer_);
   e2ee_transformer_->SetEnabled(false);
 }
@@ -86,7 +86,7 @@ RTCFrameCryptorImpl::RTCFrameCryptorImpl(
           mediaType, AlgorithmToFrameCryptorAlgorithm(algorithm),
           keyImpl->rtc_key_provider()));
   e2ee_transformer_->RegisterFrameCryptorTransformerObserver(observer_);
-  impl->rtp_receiver()->SetDepacketizerToDecoderFrameTransformer(
+  impl->rtp_receiver()->SetFrameTransformer(
       e2ee_transformer_);
   e2ee_transformer_->SetEnabled(false);
 }
