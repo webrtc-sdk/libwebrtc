@@ -45,6 +45,7 @@ enum class RTCDegradationPreference {
   MAINTAIN_FRAMERATE,
   MAINTAIN_RESOLUTION,
   BALANCED,
+  MAINTAIN_FRAMERATE_AND_RESOLUTION,
 };
 
 class RTCRtcpFeedback : public RefCountInterface {

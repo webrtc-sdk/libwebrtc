@@ -9,6 +9,10 @@
 #include "rtc_rtp_sender_impl.h"
 
 namespace libwebrtc {
+
+ webrtc::FrameCryptorTransformer::Algorithm AlgorithmToFrameCryptorAlgorithm(
+    Algorithm algorithm);
+
 class DefaultKeyProviderImpl : public KeyProvider {
  public:
   DefaultKeyProviderImpl(KeyProviderOptions* options) {
@@ -22,6 +26,7 @@ class DefaultKeyProviderImpl : public KeyProvider {
     rtc_options.key_ring_size = options->key_ring_size;
     rtc_options.discard_frame_when_cryptor_not_ready =
         options->discard_frame_when_cryptor_not_ready;
+    rtc_options.key_derivation_algorithm = (webrtc::KeyDerivationAlgorithm)options->key_derivation_algorithm;
     impl_ =
         new webrtc::RefCountedObject<webrtc::DefaultKeyProviderImpl>(rtc_options);
   }
