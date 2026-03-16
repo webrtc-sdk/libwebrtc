@@ -35,45 +35,21 @@ class EncryptedPacketImpl : public EncryptedPacket {
 
 class RTCDataPacketCryptorImpl : public RTCDataPacketCryptor {
  public:
-  scoped_refptr<EncryptedPacket> encrypt(string participant_id, int key_index,
-                                         vector<uint8_t> data) {
-    webrtc::RTCErrorOr<webrtc::scoped_refptr<webrtc::EncryptedPacket>> value =
-        data_packet_cryptor_->Encrypt(participant_id.std_string(), key_index,
-                                      data.std_vector());
-    if (value.ok()) {
-      return new RefCountedObject<EncryptedPacketImpl>(value.value());
-    } else {
-      return nullptr;
-    }
-  }
-
-  vector<uint8_t> decrypt(string participant_id, int key_index,
-                          scoped_refptr<EncryptedPacket> encrypted_packet) {
-    EncryptedPacketImpl* encrypted_packet_impl =
-        static_cast<EncryptedPacketImpl*>(encrypted_packet.get());
-    webrtc::RTCErrorOr<std::vector<uint8_t>> value =
-        data_packet_cryptor_->Decrypt(
-            participant_id.std_string(),
-            encrypted_packet_impl->rtc_encrypted_packet());
-    if (value.ok()) {
-      return vector<uint8_t>(value.value());
-    } else {
-      return vector<uint8_t>();
-    }
-  }
-
   RTCDataPacketCryptorImpl(
-      webrtc::scoped_refptr<webrtc::KeyProvider> key_provider,
-      webrtc::FrameCryptorTransformer::Algorithm algorithm) {
-    data_packet_cryptor_ = webrtc::make_ref_counted<webrtc::DataPacketCryptor>(
-        algorithm, key_provider);
-    key_provider_ = key_provider;
-  }
+      scoped_refptr<KeyProvider> key_provider,
+      webrtc::FrameCryptorTransformer::Algorithm algorithm);
   ~RTCDataPacketCryptorImpl() {}
+
+  scoped_refptr<EncryptedPacket> encrypt(string participant_id, int key_index,
+                                         vector<uint8_t> data) override;
+
+  vector<uint8_t> decrypt(
+      string participant_id, int key_index,
+      scoped_refptr<EncryptedPacket> encrypted_packet) override;
 
  private:
   webrtc::scoped_refptr<webrtc::DataPacketCryptor> data_packet_cryptor_;
-  webrtc::scoped_refptr<webrtc::KeyProvider> key_provider_;
+  scoped_refptr<KeyProvider> key_provider_;
 };
 
 }  // namespace libwebrtc

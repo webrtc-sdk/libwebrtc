@@ -19,13 +19,15 @@ class EncryptedPacket : public RefCountInterface {
 class RTCDataPacketCryptor : public RefCountInterface {
  public:
   LIB_WEBRTC_API static scoped_refptr<RTCDataPacketCryptor> Create(
-      KeyProvider* key_provider, Algorithm algorithm);
+      scoped_refptr<KeyProvider> key_provider, FrameCryptorAlgorithm algorithm);
 
-  scoped_refptr<EncryptedPacket> encrypt(string participant_id, int key_index,
-                                         vector<uint8_t> data);
+  virtual scoped_refptr<EncryptedPacket> encrypt(string participant_id,
+                                                 int key_index,
+                                                 vector<uint8_t> data) = 0;
 
-  vector<uint8_t> decrypt(string participant_id, int key_index,
-                          scoped_refptr<EncryptedPacket> encrypted_packet);
+  virtual vector<uint8_t> decrypt(
+      string participant_id, int key_index,
+      scoped_refptr<EncryptedPacket> encrypted_packet) = 0;
 
  protected:
   virtual ~RTCDataPacketCryptor() {}

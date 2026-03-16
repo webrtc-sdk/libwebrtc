@@ -9,7 +9,7 @@
 
 namespace libwebrtc {
 
-enum class Algorithm {
+enum class FrameCryptorAlgorithm {
   kAesGcm = 0,
   kAesCbc,
 };
@@ -131,7 +131,7 @@ class FrameCryptorFactory {
   frameCryptorFromRtpSender(scoped_refptr<RTCPeerConnectionFactory> factory,
                             const string participant_id,
                             scoped_refptr<RTCRtpSender> sender,
-                            Algorithm algorithm,
+                            FrameCryptorAlgorithm algorithm,
                             scoped_refptr<KeyProvider> key_provider);
 
   /// Create a frame cyrptor for [RTCRtpReceiver].
@@ -139,7 +139,7 @@ class FrameCryptorFactory {
   frameCryptorFromRtpReceiver(scoped_refptr<RTCPeerConnectionFactory> factory,
                               const string participant_id,
                               scoped_refptr<RTCRtpReceiver> receiver,
-                              Algorithm algorithm,
+                              FrameCryptorAlgorithm algorithm,
                               scoped_refptr<KeyProvider> key_provider);
 };
 
