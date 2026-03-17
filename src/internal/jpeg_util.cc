@@ -1,5 +1,6 @@
 #include "jpeg_util.h"
 
+#include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 

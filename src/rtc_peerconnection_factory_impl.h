@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "api/environment/environment_factory.h"
 #include "api/media_stream_interface.h"
 #include "api/peer_connection_interface.h"
 #include "api/task_queue/task_queue_factory.h"
@@ -117,6 +118,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
   std::unique_ptr<webrtc::TaskQueueFactory> task_queue_factory_;
   webrtc::scoped_refptr<webrtc::CustomAudioTransportFactory>
       audio_transport_factory_;
+  webrtc::Environment env_;
 };
 
 }  // namespace libwebrtc

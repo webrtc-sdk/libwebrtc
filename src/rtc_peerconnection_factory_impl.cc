@@ -2,6 +2,7 @@
 
 #include "api/audio_codecs/builtin_audio_decoder_factory.h"
 #include "api/audio_codecs/builtin_audio_encoder_factory.h"
+#include "api/audio/create_audio_device_module.h"
 #include "api/create_peerconnection_factory.h"
 #include "api/media_stream_interface.h"
 #include "api/video_codecs/builtin_video_decoder_factory.h"
@@ -42,7 +43,8 @@ std::unique_ptr<webrtc::VideoDecoderFactory> CreateIntelVideoDecoderFactory() {
 }
 #endif
 
-RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl() {}
+RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl():
+env_(webrtc::EnvironmentFactory().Create()) {}
 
 RTCPeerConnectionFactoryImpl::~RTCPeerConnectionFactoryImpl() {}
 
@@ -115,9 +117,10 @@ bool RTCPeerConnectionFactoryImpl::Terminate() {
 
 void RTCPeerConnectionFactoryImpl::CreateAudioDeviceModule_w() {
   if (!audio_device_module_)
-    audio_device_module_ = webrtc::AudioDeviceModule::Create(
+    audio_device_module_ = webrtc::CreateAudioDeviceModule(
+        env_,
         webrtc::AudioDeviceModule::kPlatformDefaultAudio,
-        task_queue_factory_.get());
+        false);
 }
 
 void RTCPeerConnectionFactoryImpl::DestroyAudioDeviceModule_w() {

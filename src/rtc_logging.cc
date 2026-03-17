@@ -7,22 +7,22 @@ using std::unique_ptr;
 
 namespace libwebrtc {
 
-  inline rtc::LoggingSeverity getNativeLoggingSeverity(RTCLoggingSeverity severity) {
+  inline webrtc::LoggingSeverity getNativeLoggingSeverity(RTCLoggingSeverity severity) {
     switch (severity) {
       case Verbose:
-        return rtc::LS_VERBOSE;
+        return webrtc::LS_VERBOSE;
       case Info:
-        return rtc::LS_INFO;
+        return webrtc::LS_INFO;
       case Warning:
-        return rtc::LS_WARNING;
+        return webrtc::LS_WARNING;
       case Error:
-        return rtc::LS_ERROR;
+        return webrtc::LS_ERROR;
       case None:
-        return rtc::LS_NONE;
+        return webrtc::LS_NONE;
     }
   }
 
-  class CallbackLogSink final : public rtc::LogSink {
+  class CallbackLogSink final : public webrtc::LogSink {
     public:
       CallbackLogSink(RTCCallbackLoggerMessageHandler _callbackHandler)
           : callback_handler(_callbackHandler) {}
@@ -38,17 +38,17 @@ namespace libwebrtc {
   static std::unique_ptr<CallbackLogSink> log_sink;
 
   void LibWebRTCLogging::setMinDebugLogLevel(RTCLoggingSeverity severity) {
-    rtc::LogMessage::LogToDebug(getNativeLoggingSeverity(severity));
+    webrtc::LogMessage::LogToDebug(getNativeLoggingSeverity(severity));
   }
 
   void LibWebRTCLogging::setLogSink(RTCLoggingSeverity severity, RTCCallbackLoggerMessageHandler callbackHandler) {
     removeLogSink();
     log_sink.reset(new CallbackLogSink(callbackHandler));
-    rtc::LogMessage::AddLogToStream(log_sink.get(), getNativeLoggingSeverity(severity));
+    webrtc::LogMessage::AddLogToStream(log_sink.get(), getNativeLoggingSeverity(severity));
   }
 
   void LibWebRTCLogging::removeLogSink() {
     if(log_sink)
-      rtc::LogMessage::RemoveLogToStream(log_sink.get());
+      webrtc::LogMessage::RemoveLogToStream(log_sink.get());
   }
 }  // namespace libwebrtc

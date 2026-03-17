@@ -7,6 +7,7 @@
 #ifndef FIXED_SIZE_FUNCTION_HPP_INCLUDED
 #define FIXED_SIZE_FUNCTION_HPP_INCLUDED
 
+#include <cstddef>
 #include <functional>
 #include <stdexcept>
 #include <tuple>
