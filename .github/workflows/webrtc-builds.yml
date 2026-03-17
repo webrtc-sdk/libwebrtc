@@ -61,7 +61,7 @@ jobs:
         working-directory: build
       
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: webrtc-xcframework
           path: build/out-release/WebRTC.xcframework.zip*
