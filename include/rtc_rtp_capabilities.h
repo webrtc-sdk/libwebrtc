@@ -4,6 +4,7 @@
 #include "base/refcount.h"
 #include "base/scoped_ref_ptr.h"
 #include "rtc_rtp_parameters.h"
+#include "rtc_base_list.h"
 #include "rtc_types.h"
 
 namespace libwebrtc {
@@ -26,6 +27,22 @@ class RTCRtpCodecCapability : public RefCountInterface {
   virtual ~RTCRtpCodecCapability() {}
 };
 
+/**
+ * class RTCRtpCodecCapabilityList
+ */
+class RTCRtpCodecCapabilityList : public RTCBaseList<scoped_refptr<RTCRtpCodecCapability>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpCodecCapabilityList> Create(
+    const vector<scoped_refptr<RTCRtpCodecCapability>>& source);
+
+ protected:
+  RTCRtpCodecCapabilityList(const vector<scoped_refptr<RTCRtpCodecCapability>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtpCodecCapability>>(source)
+  {}
+
+  ~RTCRtpCodecCapabilityList() {}
+};
+
 class RTCRtpHeaderExtensionCapability : public RefCountInterface {
  public:
   virtual const string uri() = 0;
@@ -36,6 +53,22 @@ class RTCRtpHeaderExtensionCapability : public RefCountInterface {
 
   virtual bool preferred_encrypt() = 0;
   virtual void set_preferred_encrypt(bool value) = 0;
+};
+
+/**
+ * class RTCRtpHeaderExtensionCapabilityList
+ */
+class RTCRtpHeaderExtensionCapabilityList : public RTCBaseList<scoped_refptr<RTCRtpHeaderExtensionCapability>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpHeaderExtensionCapabilityList> Create(
+    const vector<scoped_refptr<RTCRtpHeaderExtensionCapability>>& source);
+
+ protected:
+  RTCRtpHeaderExtensionCapabilityList(const vector<scoped_refptr<RTCRtpHeaderExtensionCapability>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtpHeaderExtensionCapability>>(source)
+  {}
+
+  ~RTCRtpHeaderExtensionCapabilityList() {}
 };
 
 class RTCRtpCapabilities : public RefCountInterface {

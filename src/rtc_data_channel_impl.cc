@@ -1,6 +1,55 @@
 #include "rtc_data_channel_impl.h"
+#include "interop_api.h"
 
 namespace libwebrtc {
+
+/**
+ * class RTCDataChannelObserverImpl 
+ */
+
+RTCDataChannelObserverImpl::RTCDataChannelObserverImpl(void* callbacks /* rtcDataChannelObserverCallbacks* */)
+  : callbacks_(nullptr)
+{
+  if (callbacks) {
+    size_t nSize = sizeof(rtcDataChannelObserverCallbacks);
+    callbacks_ = malloc(nSize);
+    memcpy(callbacks_, (const void*)callbacks, nSize);
+  }
+}
+
+RTCDataChannelObserverImpl::~RTCDataChannelObserverImpl()
+{
+  if (callbacks_) {
+    free(callbacks_);
+  }
+  callbacks_ = nullptr;
+}
+
+void RTCDataChannelObserverImpl::OnStateChange(RTCDataChannelState state)
+{
+  if (callbacks_) {
+    rtcDataChannelObserverCallbacks* pCallbacks = reinterpret_cast<rtcDataChannelObserverCallbacks*>(callbacks_);
+    pCallbacks->StateChanged(
+      pCallbacks->UserData,
+      static_cast<rtcDataChannelState>(state));
+  }
+}
+
+void RTCDataChannelObserverImpl::OnMessage(const char* buffer, int length, bool binary)
+{
+  if (callbacks_) {
+    rtcDataChannelObserverCallbacks* pCallbacks = reinterpret_cast<rtcDataChannelObserverCallbacks*>(callbacks_);
+    pCallbacks->MessageReceived(
+      pCallbacks->UserData,
+      buffer,
+      length,
+      binary ? rtcBool32::kTrue : rtcBool32::kFalse);
+  }
+}
+
+/**
+ * class RTCDataChannelImpl 
+ */
 
 RTCDataChannelImpl::RTCDataChannelImpl(
     webrtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel)
