@@ -159,4 +159,19 @@ void MediaStreamImpl::OnChanged() {
   video_tracks_ = video_tracks;
 }
 
+scoped_refptr<RTCMediaStreamList> RTCMediaStreamList::Create(
+    const vector<scoped_refptr<RTCMediaStream>>& source) {
+  return new RefCountedObject<RTCMediaStreamListImpl>(source);
+}
+
+RTCMediaStreamListImpl::RTCMediaStreamListImpl(
+    const vector<scoped_refptr<RTCMediaStream>>& source)
+    : RTCMediaStreamList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCMediaStreamListImpl::~RTCMediaStreamListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
 }  // namespace libwebrtc

@@ -40,6 +40,8 @@ class RTCDtmfSender : public RefCountInterface {
   virtual int inter_tone_gap() const = 0;
 
   virtual int comma_delay() const = 0;
+
+  virtual RTCDtmfSenderObserver* GetObserver() const = 0;
 };
 
 }  // namespace libwebrtc
