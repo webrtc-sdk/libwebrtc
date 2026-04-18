@@ -209,6 +209,25 @@ rtc_shared_library("libwebrtc") {
     ]
   }
 
+  # WMF H.265 support (Windows without Intel Media SDK)
+  if (is_win && !libwebrtc_intel_media_sdk && rtc_use_h265) {
+    sources += [
+      "src/win/wmf_h265_encoder.cc",
+      "src/win/wmf_h265_encoder.h",
+      "src/win/wmf_h265_decoder.cc",
+      "src/win/wmf_h265_decoder.h",
+      "src/win/wmf_h265_factory.cc",
+      "src/win/wmf_h265_factory.h",
+    ]
+    libs += [
+      "mfplat.lib",
+      "mfuuid.lib",
+      "mf.lib",
+      "d3d11.lib",
+      "dxgi.lib",
+    ]
+  }
+
   if (is_win && is_clang) {
     cflags = [
       "-Wno-microsoft-extra-qualification",
@@ -229,6 +248,7 @@ rtc_shared_library("libwebrtc") {
     "../api/video:video_frame",
     "../api/video_codecs:builtin_video_decoder_factory",
     "../api/video_codecs:builtin_video_encoder_factory",
+    "../common_video",
     "../media:rtc_audio_video",
     "../media:rtc_internal_video_codecs",
     "../media:rtc_media",
