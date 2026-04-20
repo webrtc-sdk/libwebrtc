@@ -42,12 +42,6 @@ jobs:
       - name: Select Xcode 26.0
         run: sudo xcode-select --switch /Applications/Xcode_26.0.app/Contents/Developer
 
-      - uses: actions/setup-python@v4
-      - run: pip3 install setuptools
-
-      - name: Install macos dependencies
-        run: brew install ninja
-
       - name: Print ninja version
         run: ninja --version
 
