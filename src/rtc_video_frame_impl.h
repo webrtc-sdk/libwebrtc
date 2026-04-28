@@ -47,7 +47,7 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
 
   virtual RTCVideoFrame::VideoRotation rotation() override;
 
-  webrtc::VideoRotation rotation() const { return rotation_; }
+  webrtc::VideoRotation rtc_rotation() const { return rotation_; }
 
   void set_rotation(webrtc::VideoRotation rotation) { rotation_ = rotation; }
 

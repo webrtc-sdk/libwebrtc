@@ -255,13 +255,32 @@ scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateVideoSource_s(
       static_cast<RTCVideoCapturerImpl*>(capturer.get());
   /*RTCMediaConstraintsImpl* media_constraints =
           static_cast<RTCMediaConstraintsImpl*>(constraints.get());*/
+  std::shared_ptr<webrtc::internal::VideoCapturer> internal_capturer =
+      capturer_impl->video_capturer();
   webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track =
       webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface>(
           new webrtc::RefCountedObject<webrtc::internal::CapturerTrackSource>(
-              capturer_impl->video_capturer()));
+              internal_capturer));
+  // Pass the internal capturer through so RTCVideoSource::OnCapturedFrame can
+  // forward user-supplied frames into the same broadcast pipeline.
   scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(
-      new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
+      new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track,
+                                               internal_capturer));
   return source;
+}
+
+scoped_refptr<RTCVideoSource> RTCPeerConnectionFactoryImpl::CreateCustomVideoSource(
+  string video_source_label,
+  scoped_refptr<RTCMediaConstraints> constraints) {
+  // A vanilla internal::VideoCapturer is a complete passthrough: its default
+  // StartCapture/StopCapture/CaptureStarted are no-ops, but OnFrame still
+  // routes pushed frames through the video adapter and broadcaster, which is
+  // all OnCapturedFrame needs.
+  std::shared_ptr<webrtc::internal::VideoCapturer> internal_capturer =
+      std::make_shared<webrtc::internal::VideoCapturer>();
+  auto capture = scoped_refptr<RTCVideoCapturerImpl>(
+      new RefCountedObject<RTCVideoCapturerImpl>(internal_capturer));
+  return CreateVideoSource(capture, video_source_label, constraints);
 }
 
 #ifdef RTC_DESKTOP_DEVICE

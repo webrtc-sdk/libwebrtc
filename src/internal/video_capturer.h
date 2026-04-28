@@ -40,8 +40,12 @@ class VideoCapturer : public webrtc::VideoSourceInterface<VideoFrame> {
                        const webrtc::VideoSinkWants& wants) override;
   void RemoveSink(webrtc::VideoSinkInterface<VideoFrame>* sink) override;
 
- protected:
+  // Pushes a captured frame through the adaptation/broadcast pipeline.
+  // Made public so RTCVideoSourceImpl can forward user-supplied frames into
+  // the same path that camera/desktop subclasses feed.
   void OnFrame(const VideoFrame& frame);
+
+ protected:
   webrtc::VideoSinkWants GetSinkWants();
 
  private:

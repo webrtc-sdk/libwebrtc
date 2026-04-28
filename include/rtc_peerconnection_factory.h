@@ -49,6 +49,10 @@ class RTCPeerConnectionFactory : public RefCountInterface {
   virtual scoped_refptr<RTCVideoSource> CreateVideoSource(
       scoped_refptr<RTCVideoCapturer> capturer, const string video_source_label,
       scoped_refptr<RTCMediaConstraints> constraints) = 0;
+
+  virtual scoped_refptr<RTCVideoSource> CreateCustomVideoSource(string video_source_label,
+      scoped_refptr<RTCMediaConstraints> constraints) = 0;
+
 #ifdef RTC_DESKTOP_DEVICE
   virtual scoped_refptr<RTCVideoSource> CreateDesktopSource(
       scoped_refptr<RTCDesktopCapturer> capturer,
