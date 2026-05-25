@@ -33,7 +33,10 @@ jobs:
   build-linux:
     strategy:
       fail-fast: false
-    name: Build libwebrtc.so for linux
+      matrix:
+        arch: [x64, arm64]
+        profile: [release]
+    name: Build libwebrtc.so for linux (${{ matrix.arch }}-${{ matrix.profile }})
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -43,7 +46,7 @@ jobs:
       - name: install setuptools
         run: |
           pip3 install setuptools # pkg_resources is sometimes not found?
-  
+
       - name: Install linux dependencies
         run: |
             sudo apt update -y
@@ -53,13 +56,12 @@ jobs:
         run: ninja --version
 
       - name: Target OS
-        run: echo -e "\ntarget_os = [\"linux"]" >> .gclient
+        run: echo -e "\ntarget_os = [\"linux\"]" >> .gclient
         shell: bash
         working-directory: build
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be
-        if: ${{ matrix.target.os == 'ubuntu-latest' }}
         with:
           android: false
           tool-cache: true
@@ -70,24 +72,27 @@ jobs:
           swap-storage: true
 
       - name: Build WebRTC
-        run: ./libwebrtc_linux_build.sh --arch x64 --profile release
+        run: ./libwebrtc_linux_build.sh --arch ${{ matrix.arch }} --profile ${{ matrix.profile }}
         working-directory: build
 
       - name: Zip artifact (Unix)
         run: |
           cd build
-          zip ${{ github.workspace }}/libwebrtc-linux-x64-release.zip build/libwebrtc-x64-release -r
-      
+          zip ${{ github.workspace }}/libwebrtc-linux-${{ matrix.arch }}-${{ matrix.profile }}.zip linux-${{ matrix.arch }}-${{ matrix.profile }} -r
+
       - name: Upload artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: libwebrtc-linux-x64-release
-          path: build\libwebrtc-linux-x64-release.zip
+          name: libwebrtc-linux-${{ matrix.arch }}-${{ matrix.profile }}
+          path: libwebrtc-linux-${{ matrix.arch }}-${{ matrix.profile }}.zip
 
   build-win:
     strategy:
       fail-fast: false
-    name: Build libwebrtc.dll for windows
+      matrix:
+        arch: [x64, arm64]
+        profile: [release]
+    name: Build libwebrtc.dll for windows (${{ matrix.arch }}-${{ matrix.profile }})
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v5
@@ -109,17 +114,17 @@ jobs:
         working-directory: build
 
       - name: Build WebRTC
-        run: .\libwebrtc_win_build.cmd --arch x64 --profile release
+        run: .\libwebrtc_win_build.cmd --arch ${{ matrix.arch }} --profile ${{ matrix.profile }}
         working-directory: build
 
       - name: Zip artifact (Windows)
-        run: Compress-Archive -Path .\build\libwebrtc-x64-release -DestinationPath .\build\libwebrtc-win-x64-release.zip
+        run: Compress-Archive -Path .\build\libwebrtc-${{ matrix.arch }}-${{ matrix.profile }} -DestinationPath .\build\libwebrtc-win-${{ matrix.arch }}-${{ matrix.profile }}.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: libwebrtc-win-x64-release
-          path: build\libwebrtc-win-x64-release.zip
+          name: libwebrtc-win-${{ matrix.arch }}-${{ matrix.profile }}
+          path: build\libwebrtc-win-${{ matrix.arch }}-${{ matrix.profile }}.zip
 
   build-apple:
     strategy:

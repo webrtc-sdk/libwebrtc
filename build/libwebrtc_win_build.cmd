@@ -59,13 +59,15 @@ if not exist src/libwebrtc (
 )
 
 cd src
-call git apply "%COMMAND_DIR%/src/libwebrtc/patches/custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
-call git apply "%COMMAND_DIR%/src/libwebrtc/patches/add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+call git apply "libwebrtc\patchs\custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+call git apply "libwebrtc\patchs\add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+
 copy ".vpython3" "..\"
 
 cd ..
 
 mkdir "%ARTIFACTS_DIR%\lib"
+mkdir "%ARTIFACTS_DIR%\include"
 
 set "debug=false"
 if "!profile!" == "debug" (
