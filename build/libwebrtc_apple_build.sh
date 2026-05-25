@@ -170,7 +170,7 @@ ninja -C $OUT_DIR/xrOS-arm64-simulator ios_framework_bundle -j 10
 
 gn gen $OUT_DIR/catalyst-arm64 --root="src" --args="
       treat_warnings_as_errors = false
-      target_os = \"mac\"
+      target_os = \"ios\"
       ios_enable_code_signing = false
       is_component_build = false
       target_environment = \"catalyst\"
@@ -189,11 +189,11 @@ gn gen $OUT_DIR/catalyst-arm64 --root="src" --args="
       enable_dsyms = $DEBUG
       enable_stripping = true" --ide=xcode
 
-ninja -C $OUT_DIR/catalyst-arm64 mac_framework_bundle -j 10
+ninja -C $OUT_DIR/catalyst-arm64 ios_framework_bundle -j 10
 
 gn gen $OUT_DIR/catalyst-x64 --root="src" --args="
       treat_warnings_as_errors = false
-      target_os = \"mac\"
+      target_os = \"ios\"
       ios_enable_code_signing = false
       is_component_build = false
       target_environment = \"catalyst\"
@@ -212,7 +212,7 @@ gn gen $OUT_DIR/catalyst-x64 --root="src" --args="
       enable_dsyms = $DEBUG
       enable_stripping = true" --ide=xcode
 
-ninja -C $OUT_DIR/catalyst-x64 mac_framework_bundle -j 10
+ninja -C $OUT_DIR/catalyst-x64 ios_framework_bundle -j 10
 
 gn gen $OUT_DIR/iOS-arm64-device --root="src" --args="
       treat_warnings_as_errors = false
