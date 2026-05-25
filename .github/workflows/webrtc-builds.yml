@@ -97,11 +97,16 @@ jobs:
           cd build
           zip ${{ github.workspace }}/libwebrtc-linux-${{ matrix.arch }}-${{ matrix.profile }}.zip linux-${{ matrix.arch }}-${{ matrix.profile }} -r
 
+      - name: Generate shasum
+        run: |
+          cd ${{ github.workspace }}
+          shasum -a 256 libwebrtc-linux-${{ matrix.arch }}-${{ matrix.profile }}.zip > libwebrtc-linux-${{ matrix.arch }}-${{ matrix.profile }}.zip.shasum
+
       - name: Upload artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: libwebrtc-linux-${{ matrix.arch }}-${{ matrix.profile }}
-          path: libwebrtc-linux-${{ matrix.arch }}-${{ matrix.profile }}.zip
+          path: libwebrtc-linux-${{ matrix.arch }}-${{ matrix.profile }}.zip*
 
   build-win:
     if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_windows == 'true'
@@ -139,11 +144,19 @@ jobs:
       - name: Zip artifact (Windows)
         run: Compress-Archive -Path .\build\libwebrtc-${{ matrix.arch }}-${{ matrix.profile }} -DestinationPath .\build\libwebrtc-win-${{ matrix.arch }}-${{ matrix.profile }}.zip
 
+      - name: Generate shasum
+        shell: pwsh
+        run: |
+          $zip = "build\libwebrtc-win-${{ matrix.arch }}-${{ matrix.profile }}.zip"
+          $hash = (Get-FileHash -Algorithm SHA256 $zip).Hash.ToLower()
+          $name = Split-Path $zip -Leaf
+          "$hash  $name" | Out-File -Encoding ascii -NoNewline "$zip.shasum"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: libwebrtc-win-${{ matrix.arch }}-${{ matrix.profile }}
-          path: build\libwebrtc-win-${{ matrix.arch }}-${{ matrix.profile }}.zip
+          path: build\libwebrtc-win-${{ matrix.arch }}-${{ matrix.profile }}.zip*
 
   build-apple:
     if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_apple == 'true'
@@ -169,12 +182,17 @@ jobs:
       - name: Build WebRTC
         run: chmod +x ./libwebrtc_apple_build.sh && ./libwebrtc_apple_build.sh --profile ${{ github.event.inputs.configuration || 'release' }} --commit "${{ github.event.inputs.commitHash }}"
         working-directory: build
-      
+
+      - name: Generate shasum
+        run: |
+          cd build/out-${{ github.event.inputs.configuration || 'release' }}
+          shasum -a 256 WebRTC.xcframework.zip > WebRTC.xcframework.zip.shasum
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: webrtc-xcframework
-          path: build/out-release/WebRTC.xcframework.zip*
+          name: webrtc-xcframework-${{ github.event.inputs.configuration || 'release' }}
+          path: build/out-${{ github.event.inputs.configuration || 'release' }}/WebRTC.xcframework.zip*
 
   build-android:
     if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_android == 'true'
@@ -221,11 +239,19 @@ jobs:
         run: chmod +x ./libwebrtc_android_build.sh && ./libwebrtc_android_build.sh --profile ${{ matrix.profile }} --commit "${{ github.event.inputs.commitHash }}"
         working-directory: build
 
+      - name: Rename AAR
+        run: mv build/android-${{ matrix.profile }}/libwebrtc.aar build/android-${{ matrix.profile }}/libwebrtc-android-${{ matrix.profile }}.aar
+
+      - name: Generate shasum
+        run: |
+          cd build/android-${{ matrix.profile }}
+          shasum -a 256 libwebrtc-android-${{ matrix.profile }}.aar > libwebrtc-android-${{ matrix.profile }}.aar.shasum
+
       - name: Upload artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: libwebrtc-android-${{ matrix.profile }}
-          path: build/android-${{ matrix.profile }}/libwebrtc.aar
+          path: build/android-${{ matrix.profile }}/libwebrtc-android-${{ matrix.profile }}.aar*
 
   create-release:
     name: Release to GH (Draft)
@@ -233,19 +259,24 @@ jobs:
     needs:
       - build-apple
       - build-win
+      - build-linux
+      - build-android
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          name: webrtc-xcframework
-          path: ${{ github.workspace }}/webrtc-xcframework
-    
+          path: ${{ github.workspace }}/artifacts
+          merge-multiple: true
+
+      - name: List downloaded artifacts
+        run: ls -lR ${{ github.workspace }}/artifacts
+
       - name: Create draft release
         run: |
           gh release create ${{ github.ref_name }} --draft --title "${{ github.ref_name }}"
-          gh release upload ${{ github.ref_name }} ${{ github.workspace }}/webrtc-xcframework/*
+          gh release upload ${{ github.ref_name }} ${{ github.workspace }}/artifacts/*

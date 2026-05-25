@@ -377,7 +377,3 @@ mv WebRTC Versions/A/WebRTC
 ln -s Versions/Current/WebRTC WebRTC
 cd ../../../
 zip --symlinks -9 -r WebRTC.xcframework.zip WebRTC.xcframework
-
-# hash
-shasum -a 256 WebRTC.xcframework.zip > WebRTC.xcframework.zip.shasum
-cat WebRTC.xcframework.zip.shasum
