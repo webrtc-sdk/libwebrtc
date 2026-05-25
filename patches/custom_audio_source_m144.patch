@@ -314,7 +314,15 @@ index 762f9d584c..08131e6107 100644
      : env_(env),
        minimized_resampling_on_mobile_trial_enabled_(
            env_.field_trials().IsEnabled(
-@@ -503,6 +504,9 @@ WebRtcVoiceEngine::WebRtcVoiceEngine(
+@@ -484,6 +485,7 @@ WebRtcVoiceEngine::WebRtcVoiceEngine(
+       encoder_factory_(std::move(encoder_factory)),
+       decoder_factory_(std::move(decoder_factory)),
+       apm_(std::move(audio_processing)),
++      audio_transport_factory_(std::move(audio_transport_factory)),
+       legacy_send_codecs_(
+           LegacyCollectCodecs(encoder_factory_->GetSupportedEncoders(),
+                               !payload_types_in_transport_trial_enabled_)),
+@@ -503,6 +511,9 @@ WebRtcVoiceEngine::WebRtcVoiceEngine(
      } else {
        config.audio_mixer = AudioMixerImpl::Create();
      }
