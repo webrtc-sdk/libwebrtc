@@ -72,7 +72,7 @@ jobs:
           swap-storage: true
 
       - name: Build WebRTC
-        run: ./libwebrtc_linux_build.sh --arch ${{ matrix.arch }} --profile ${{ matrix.profile }}
+        run: chmod +x ./libwebrtc_linux_build.sh && ./libwebrtc_linux_build.sh --arch ${{ matrix.arch }} --profile ${{ matrix.profile }}
         working-directory: build
 
       - name: Zip artifact (Unix)
