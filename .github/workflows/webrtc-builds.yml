@@ -30,6 +30,43 @@ permissions:
   actions: read
 
 jobs:
+  build-win:
+    strategy:
+      fail-fast: false
+    name: Build libwebrtc.dll for windows
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+
+      - name: Install windows dependencies
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/ninja-build/ninja/releases/latest/download/ninja-win.zip" -OutFile ninja.zip
+          Expand-Archive -Path ninja.zip -DestinationPath ${{ github.workspace }}\ninja
+          echo "${{ github.workspace }}\ninja" | Out-File -Append -Encoding utf8 -FilePath $Env:GITHUB_PATH
+
+      - name: Print ninja version
+        run: ninja --version
+
+      - name: Target OS
+        run: echo -e "\ntarget_os = [\"win\"]" >> .gclient
+        shell: bash
+        working-directory: build
+
+      - name: Build WebRTC
+        run: libwebrtc_win_build.cmd --arch x64 --profile release
+        working-directory: build
+
+      - name: Zip artifact (Windows)
+        run: Compress-Archive -Path .\build\libwebrtc-x64-release -DestinationPath .\build\libwebrtc-x64-release.zip
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: libwebrtc-x64-release
+          path: build\libwebrtc-x64-release.zip
+
   build-apple:
     strategy:
       fail-fast: false
@@ -65,6 +102,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags')
     needs:
       - build-apple
+      - build-win
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
