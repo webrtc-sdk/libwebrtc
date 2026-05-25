@@ -82,8 +82,8 @@ rem build
 ninja.exe -C %OUTPUT_DIR% libwebrtc
 
 rem copy static library for release build
-copy "%OUTPUT_DIR%\obj\libwebrtc.dll.lib" "%ARTIFACTS_DIR%\lib"
-copy "%OUTPUT_DIR%\obj\libwebrtc.dll" "%ARTIFACTS_DIR%\lib"
+copy "%OUTPUT_DIR%\libwebrtc.dll.lib" "%ARTIFACTS_DIR%\lib"
+copy "%OUTPUT_DIR%\libwebrtc.dll" "%ARTIFACTS_DIR%\lib"
 
 rem generate license
 call python3 "%cd%\src\tools_webrtc\libs\generate_licenses.py" ^

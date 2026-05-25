@@ -79,11 +79,11 @@ fi
 cd src
 git apply "$COMMAND_DIR/src/libwebrtc/patches/custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 git apply "$COMMAND_DIR/src/libwebrtc/patches/add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
-
+cd ..
 
 mkdir -p "$ARTIFACTS_DIR/{include,lib}"
 
-python3 "./build/linux/sysroot_scripts/install-sysroot.py" --arch="$arch"
+python3 "./src/build/linux/sysroot_scripts/install-sysroot.py" --arch="$arch"
 
 debug="false"
 if [ "$profile" = "debug" ]; then
@@ -132,5 +132,4 @@ vpython3 "./src/tools_webrtc/libs/generate_licenses.py" \
 cp "$OUTPUT_DIR/libwebrtc.so" "$ARTIFACTS_DIR/lib"
 cp "$OUTPUT_DIR/LICENSE.md" "$ARTIFACTS_DIR"
 
-cd src
-cp -rf "libwebrtc/include/*" "$ARTIFACTS_DIR/include"
+cp -rf "./src/libwebrtc/include/*" "$ARTIFACTS_DIR/include"
