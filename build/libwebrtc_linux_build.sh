@@ -109,7 +109,7 @@ git apply "$COMMAND_DIR/src/libwebrtc/patches/add_libwebrtc_build_target.patch" 
 git apply "$COMMAND_DIR/src/libwebrtc/patches/fix_desktop_capture_compile.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
 
-mkdir -p "$ARTIFACTS_DIR/{include,lib}"
+mkdir -p "$ARTIFACTS_DIR/lib"
 
 python3 "./src/build/linux/sysroot_scripts/install-sysroot.py" --arch="$arch"
 
@@ -153,5 +153,5 @@ gn gen "$OUTPUT_DIR" --root="src" --args="${args}"
 ninja -C "$OUTPUT_DIR" libwebrtc
 
 cp "$OUTPUT_DIR/libwebrtc.so" "$ARTIFACTS_DIR/lib"
-cp -rf "./src/libwebrtc/LICENSE" "$ARTIFACTS_DIR/"
-cp -rf "./src/libwebrtc/include/*" "$ARTIFACTS_DIR/include"
+cp -rf "$COMMAND_DIR/src/libwebrtc/LICENSE" "$ARTIFACTS_DIR/"
+cp -rf "$COMMAND_DIR/src/libwebrtc/include" "$ARTIFACTS_DIR/"
