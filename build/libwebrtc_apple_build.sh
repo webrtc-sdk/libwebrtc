@@ -71,7 +71,7 @@ run_gclient_sync() {
     git clean -df
   )
 
-  gclient sync -D --force --reset --with_branch_heads --jobs=8
+  gclient sync --with_branch_heads --jobs=8
 }
 
 run_gclient_sync
@@ -85,7 +85,6 @@ gn gen $OUT_DIR/tvOS-arm64-device --root="src" --args="
       target_environment = \"appletv\"
       target_cpu = \"arm64\"
       ios_deployment_target = \"17.0\"
-      use_goma = false
       rtc_enable_symbol_export = true
       rtc_libvpx_build_vp9 = true
       rtc_include_tests = false
@@ -108,7 +107,6 @@ gn gen $OUT_DIR/tvOS-arm64-simulator --root="src" --args="
       target_environment = \"appletvsimulator\"
       target_cpu = \"arm64\"
       ios_deployment_target = \"17.0\"
-      use_goma = false
       rtc_enable_symbol_export = true
       rtc_libvpx_build_vp9 = true
       rtc_include_tests = false
@@ -131,8 +129,7 @@ gn gen $OUT_DIR/xrOS-arm64-device --root="src" --args="
       is_component_build = false
       target_environment = \"xrdevice\"
       target_cpu = \"arm64\"
-      ios_deployment_target = \"1.1.0\"
-      use_goma = false
+      ios_deployment_target = \"26.0\"
       rtc_enable_symbol_export = true
       rtc_libvpx_build_vp9 = true
       rtc_include_tests = false
@@ -155,8 +152,7 @@ gn gen $OUT_DIR/xrOS-arm64-simulator --root="src" --args="
       is_component_build = false
       target_environment = \"xrsimulator\"
       target_cpu = \"arm64\"
-      ios_deployment_target = \"1.1.0\"
-      use_goma = false
+      ios_deployment_target = \"26.0\"
       rtc_enable_symbol_export = true
       rtc_libvpx_build_vp9 = true
       rtc_include_tests = false
@@ -174,13 +170,12 @@ ninja -C $OUT_DIR/xrOS-arm64-simulator ios_framework_bundle -j 10
 
 gn gen $OUT_DIR/catalyst-arm64 --root="src" --args="
       treat_warnings_as_errors = false
-      target_os = \"ios\"
+      target_os = \"mac\"
       ios_enable_code_signing = false
       is_component_build = false
       target_environment = \"catalyst\"
       target_cpu = \"arm64\"
       ios_deployment_target = \"14.0\"
-      use_goma = false
       rtc_enable_symbol_export = true
       rtc_libvpx_build_vp9 = true
       rtc_include_tests = false
@@ -194,17 +189,16 @@ gn gen $OUT_DIR/catalyst-arm64 --root="src" --args="
       enable_dsyms = $DEBUG
       enable_stripping = true" --ide=xcode
 
-ninja -C $OUT_DIR/catalyst-arm64 ios_framework_bundle -j 10
+ninja -C $OUT_DIR/catalyst-arm64 mac_framework_bundle -j 10
 
 gn gen $OUT_DIR/catalyst-x64 --root="src" --args="
       treat_warnings_as_errors = false
-      target_os = \"ios\"
+      target_os = \"mac\"
       ios_enable_code_signing = false
       is_component_build = false
       target_environment = \"catalyst\"
       target_cpu = \"x64\"
       ios_deployment_target = \"14.0\"
-      use_goma = false
       rtc_enable_symbol_export = true
       rtc_libvpx_build_vp9 = true
       rtc_include_tests = false
@@ -218,7 +212,7 @@ gn gen $OUT_DIR/catalyst-x64 --root="src" --args="
       enable_dsyms = $DEBUG
       enable_stripping = true" --ide=xcode
 
-ninja -C $OUT_DIR/catalyst-x64 ios_framework_bundle -j 10
+ninja -C $OUT_DIR/catalyst-x64 mac_framework_bundle -j 10
 
 gn gen $OUT_DIR/iOS-arm64-device --root="src" --args="
       treat_warnings_as_errors = false
@@ -228,7 +222,6 @@ gn gen $OUT_DIR/iOS-arm64-device --root="src" --args="
       target_environment = \"device\"
       target_cpu = \"arm64\"
       ios_deployment_target = \"13.0\"
-      use_goma = false
       rtc_enable_symbol_export = true
       rtc_libvpx_build_vp9 = true
       rtc_include_tests = false
@@ -253,7 +246,6 @@ gn gen $OUT_DIR/iOS-x64-simulator --root="src" --args="
       target_cpu = \"x64\"
       ios_deployment_target = \"13.0\"
       rtc_libvpx_build_vp9 = true
-      use_goma = false
       rtc_enable_symbol_export = true
       rtc_include_tests = false
       rtc_build_examples = false
@@ -276,7 +268,6 @@ gn gen $OUT_DIR/iOS-arm64-simulator --root="src" --args="
       target_environment = \"simulator\"
       target_cpu = \"arm64\"
       ios_deployment_target = \"13.0\"
-      use_goma = false
       rtc_enable_symbol_export = true
       rtc_libvpx_build_vp9 = true
       rtc_include_tests = false
@@ -299,7 +290,6 @@ gn gen $OUT_DIR/macOS-x64 --root="src" --args="
       mac_deployment_target=\"10.14\"
       is_component_build = false
       target_cpu = \"x64\"
-      use_goma = false
       rtc_enable_symbol_export = true
       rtc_libvpx_build_vp9 = true
       rtc_include_tests = false
@@ -321,7 +311,6 @@ gn gen $OUT_DIR/macOS-arm64 --root="src" --args="
       mac_deployment_target=\"10.14\"
       is_component_build = false
       target_cpu = \"arm64\"
-      use_goma = false
       rtc_enable_symbol_export = true
       rtc_libvpx_build_vp9 = true
       rtc_include_tests = false
