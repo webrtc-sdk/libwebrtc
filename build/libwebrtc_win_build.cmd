@@ -79,7 +79,7 @@ call gn.bat gen %OUTPUT_DIR% --root="src" ^
   --args="is_debug=!debug! is_clang=true target_cpu=\"!arch!\" use_custom_libcxx=false rtc_libvpx_build_vp9=true enable_libaom=true rtc_include_tests=false rtc_build_examples=false rtc_build_tools=false is_component_build=false rtc_enable_protobuf=false rtc_use_h264=true ffmpeg_branding=\"Chrome\" symbol_level=0 enable_iterator_debugging=false"
 
 rem build
-ninja.exe -C %OUTPUT_DIR% :libwebrtc
+ninja.exe -C %OUTPUT_DIR% libwebrtc
 
 rem copy static library for release build
 copy "%OUTPUT_DIR%\obj\libwebrtc.dll.lib" "%ARTIFACTS_DIR%\lib"

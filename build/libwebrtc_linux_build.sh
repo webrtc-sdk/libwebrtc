@@ -122,7 +122,7 @@ args="is_debug=$debug  \
 gn gen "$OUTPUT_DIR" --root="src" --args="${args}"
 
 # build static library
-ninja -C "$OUTPUT_DIR" :libwebrtc
+ninja -C "$OUTPUT_DIR" libwebrtc
 
 # License generation is optional - may fail with some Python versions
 # Use vpython3 from depot_tools for consistent Python version
