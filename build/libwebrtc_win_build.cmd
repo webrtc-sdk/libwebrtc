@@ -28,7 +28,7 @@ if not "!profile!" == "debug" if not "!profile!" == "release" (
     exit /b 1
 )
 
-echo "Building LiveKit WebRTC - Windows"
+echo "Building  libwebrtc dll - Windows"
 echo "Arch: !arch!"
 echo "Profile: !profile!"
 
@@ -50,12 +50,12 @@ if not exist src (
 )
 
 if not exist src/libwebrtc (
-  md src\libwebrtc
-  xcopy "%COMMAND_DIR%..\include" "src\libwebrtc\include" /E /I /Y
-  xcopy "%COMMAND_DIR%..\src" "src\libwebrtc\src" /E /I /Y
-  xcopy "%COMMAND_DIR%..\patchs" "src\libwebrtc\patchs" /E /I /Y
-  copy "%COMMAND_DIR%..\BUILD.gn" "src\libwebrtc\"
-  copy "%COMMAND_DIR%..\LICENSE" "src\libwebrtc\"
+  md "%COMMAND_DIR%\src\libwebrtc"
+  xcopy "%COMMAND_DIR%..\include" "%COMMAND_DIR%\src\libwebrtc\include" /E /I /Y
+  xcopy "%COMMAND_DIR%..\src" "%COMMAND_DIR%\src\libwebrtc\src" /E /I /Y
+  xcopy "%COMMAND_DIR%..\patchs" "%COMMAND_DIR%\src\libwebrtc\patchs" /E /I /Y
+  copy "%COMMAND_DIR%..\BUILD.gn" "%COMMAND_DIR%\src\libwebrtc\"
+  copy "%COMMAND_DIR%..\LICENSE" "%COMMAND_DIR%\src\libwebrtc\"
 )
 
 cd src
