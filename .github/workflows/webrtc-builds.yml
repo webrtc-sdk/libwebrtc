@@ -35,7 +35,8 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x64, arm64]
-        profile: [release]
+        profile:
+          - ${{ github.event.inputs.configuration || 'release' }}
     name: Build libwebrtc.so for linux (${{ matrix.arch }}-${{ matrix.profile }})
     runs-on: ubuntu-latest
     steps:
@@ -91,7 +92,8 @@ jobs:
       fail-fast: false
       matrix:
         arch: [x64, arm64]
-        profile: [release]
+        profile:
+          - ${{ github.event.inputs.configuration || 'release' }}
     name: Build libwebrtc.dll for windows (${{ matrix.arch }}-${{ matrix.profile }})
     runs-on: windows-2022
     steps:

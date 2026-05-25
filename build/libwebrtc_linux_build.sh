@@ -83,7 +83,7 @@ git apply "$COMMAND_DIR/src/libwebrtc/patches/add_libwebrtc_build_target.patch" 
 
 mkdir -p "$ARTIFACTS_DIR/{include,lib}"
 
-python3 "./src/build/linux/sysroot_scripts/install-sysroot.py" --arch="$arch"
+python3 "./build/linux/sysroot_scripts/install-sysroot.py" --arch="$arch"
 
 debug="false"
 if [ "$profile" = "debug" ]; then
