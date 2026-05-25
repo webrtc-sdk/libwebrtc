@@ -22,6 +22,18 @@ on:
         options:
           - release
           - debug
+      build_linux:
+        description: 'Build Linux (x64 + arm64)'
+        type: boolean
+        default: true
+      build_windows:
+        description: 'Build Windows (x64 + arm64)'
+        type: boolean
+        default: true
+      build_apple:
+        description: 'Build Apple xcframework (mac/ios/tvos/visionos)'
+        type: boolean
+        default: true
 
 permissions:
   packages: write
@@ -30,6 +42,7 @@ permissions:
 
 jobs:
   build-linux:
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_linux == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -87,6 +100,7 @@ jobs:
           path: libwebrtc-linux-${{ matrix.arch }}-${{ matrix.profile }}.zip
 
   build-win:
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_windows == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -128,6 +142,7 @@ jobs:
           path: build\libwebrtc-win-${{ matrix.arch }}-${{ matrix.profile }}.zip
 
   build-apple:
+    if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_apple == 'true'
     strategy:
       fail-fast: false
     name: Build webrtc xcframework for apple
