@@ -1,4 +1,4 @@
-name: WebRTC xcframework builds
+name: LibWebRTC binary compilation/deployment.
 on:
   push:
     paths-ignore:
