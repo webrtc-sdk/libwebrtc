@@ -51,13 +51,32 @@ set OUTPUT_DIR=src\out-!arch!-!profile!
 set ARTIFACTS_DIR=%cd%\libwebrtc-!arch!-!profile!
 set vs2019_install=C:\Program Files\Microsoft Visual Studio\2022\Enterprise
 
-if not exist src (
-  if not "!commit!" == "" (
-    call gclient.bat sync --revision "src@!commit!" -D --with_branch_heads --with_tags
-  ) else (
-    call gclient.bat sync -D --with_branch_heads --with_tags
-  )
+set "default_branch="
+for /f "tokens=2 delims=@" %%i in ('findstr /c:"url" "%COMMAND_DIR%.gclient"') do (
+  for /f "tokens=1 delims='" %%j in ("%%i") do set "default_branch=%%j"
 )
+if "!default_branch!" == "" (
+  echo Error: cannot extract default branch from %COMMAND_DIR%.gclient
+  exit /b 1
+)
+if not "!commit!" == "" (
+  set "checkout_ref=!commit!"
+) else (
+  set "checkout_ref=!default_branch!"
+)
+echo "Checkout ref: !checkout_ref!"
+
+if not exist src (
+  call git clone https://github.com/webrtc-sdk/webrtc.git src
+)
+
+pushd src
+call git fetch
+call git checkout -f "!checkout_ref!"
+call git clean -df
+popd
+
+call gclient.bat sync -D --force --reset --with_branch_heads --jobs=8
 
 if not exist src/libwebrtc (
   md "%COMMAND_DIR%\src\libwebrtc"

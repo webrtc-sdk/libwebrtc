@@ -71,14 +71,31 @@ export PATH="$(pwd)/depot_tools:$PATH"
 export OUTPUT_DIR="$(pwd)/src/out-$arch-$profile"
 export ARTIFACTS_DIR="$(pwd)/linux-$arch-$profile"
 
-if [ ! -e "$(pwd)/src" ]
-then
-  if [ -n "$commit" ]; then
-    gclient sync --revision "src@$commit" -D --no-history
-  else
-    gclient sync -D --no-history
+run_gclient_sync() {
+  local default_branch
+  default_branch=$(sed -nE "s/.*\"url\":[[:space:]]*'[^@]+@([^']+)'.*/\1/p" "$COMMAND_DIR/.gclient")
+  if [ -z "$default_branch" ]; then
+    echo "Error: cannot extract default branch from $COMMAND_DIR/.gclient"
+    exit 1
   fi
-fi
+  local checkout_ref="${commit:-$default_branch}"
+  echo "Checkout ref: $checkout_ref"
+
+  if [ ! -e "$(pwd)/src" ]; then
+    git clone https://github.com/webrtc-sdk/webrtc.git src
+  fi
+
+  (
+    cd src
+    git fetch
+    git checkout -f "$checkout_ref"
+    git clean -df
+  )
+
+  gclient sync -D --force --reset --with_branch_heads --jobs=8
+}
+
+run_gclient_sync
 
 if [ ! -e "$(pwd)/src/libwebrtc" ]
 then

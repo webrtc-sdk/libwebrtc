@@ -49,14 +49,32 @@ fi
 
 export PATH="$(pwd)/depot_tools:$PATH"
 
-if [ ! -e "$(pwd)/src" ]
-then
-  if [ -n "$COMMIT" ]; then
-    gclient sync --revision "src@$COMMIT" -D --no-history
-  else
-    gclient sync -D --no-history
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+run_gclient_sync() {
+  default_branch=$(sed -nE "s/.*\"url\":[[:space:]]*'[^@]+@([^']+)'.*/\1/p" "$SCRIPT_DIR/.gclient")
+  if [ -z "$default_branch" ]; then
+    echo "Error: cannot extract default branch from $SCRIPT_DIR/.gclient"
+    exit 1
   fi
-fi
+  checkout_ref="${COMMIT:-$default_branch}"
+  echo "Checkout ref: $checkout_ref"
+
+  if [ ! -e "$(pwd)/src" ]; then
+    git clone https://github.com/webrtc-sdk/webrtc.git src
+  fi
+
+  (
+    cd src
+    git fetch
+    git checkout -f "$checkout_ref"
+    git clean -df
+  )
+
+  gclient sync -D --force --reset --with_branch_heads --jobs=8
+}
+
+run_gclient_sync
 
 echo "xcframework_dynamic_build.sh: MODE=$MODE, DEBUG=$DEBUG, COMMIT=$COMMIT"
 
