@@ -30,6 +30,60 @@ permissions:
   actions: read
 
 jobs:
+  build-linux:
+    strategy:
+      fail-fast: false
+    name: Build libwebrtc.so for linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+
+      - name: install setuptools
+        run: |
+          pip3 install setuptools # pkg_resources is sometimes not found?
+  
+      - name: Install linux dependencies
+        run: |
+            sudo apt update -y
+            sudo apt install -y ninja-build pkg-config openjdk-11-jdk
+
+      - name: Print ninja version
+        run: ninja --version
+
+      - name: Target OS
+        run: echo -e "\ntarget_os = [\"linux"]" >> .gclient
+        shell: bash
+        working-directory: build
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be
+        if: ${{ matrix.target.os == 'ubuntu-latest' }}
+        with:
+          android: false
+          tool-cache: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Build WebRTC
+        run: ./libwebrtc_linux_build.sh --arch x64 --profile release
+        working-directory: build
+
+      - name: Zip artifact (Unix)
+        run: |
+          cd build
+          zip ${{ github.workspace }}/libwebrtc-linux-x64-release.zip build/libwebrtc-x64-release -r
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: libwebrtc-linux-x64-release
+          path: build\libwebrtc-linux-x64-release.zip
+
   build-win:
     strategy:
       fail-fast: false
@@ -59,13 +113,13 @@ jobs:
         working-directory: build
 
       - name: Zip artifact (Windows)
-        run: Compress-Archive -Path .\build\libwebrtc-x64-release -DestinationPath .\build\libwebrtc-x64-release.zip
+        run: Compress-Archive -Path .\build\libwebrtc-x64-release -DestinationPath .\build\libwebrtc-win-x64-release.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: libwebrtc-x64-release
-          path: build\libwebrtc-x64-release.zip
+          name: libwebrtc-win-x64-release
+          path: build\libwebrtc-win-x64-release.zip
 
   build-apple:
     strategy:
