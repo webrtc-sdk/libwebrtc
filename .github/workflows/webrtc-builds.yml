@@ -1,4 +1,4 @@
-name: LibWebRTC binary compilation/deployment.
+name: libwebrtc binary build/release.
 on:
   push:
     paths-ignore:
@@ -49,7 +49,7 @@ jobs:
         arch: [x64, arm64]
         profile:
           - ${{ github.event.inputs.configuration || 'release' }}
-    name: Build libwebrtc.so for linux (${{ matrix.arch }}-${{ matrix.profile }})
+    name: Build libwebrtc.so for Linux (${{ matrix.arch }}-${{ matrix.profile }})
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -107,7 +107,7 @@ jobs:
         arch: [x64, arm64]
         profile:
           - ${{ github.event.inputs.configuration || 'release' }}
-    name: Build libwebrtc.dll for windows (${{ matrix.arch }}-${{ matrix.profile }})
+    name: Build libwebrtc.dll for Windows (${{ matrix.arch }}-${{ matrix.profile }})
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v5
