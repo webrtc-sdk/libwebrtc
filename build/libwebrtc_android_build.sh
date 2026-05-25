@@ -77,20 +77,21 @@ run_gclient_sync() {
     git clean -df
   )
 
-  gclient sync -D --force --reset --with_branch_heads --jobs=8
+  gclient sync --with_branch_heads --jobs=8
 }
 
 run_gclient_sync
 
-if [ ! -e "$(pwd)/src/libwebrtc" ]
+if [ ! -e "src/libwebrtc" ]
 then
-  mkdir -p $(pwd)/src/libwebrtc
-  cp -rf $(pwd)/../{include,src,patches,BUILD.gn,LICENSE} $(pwd)/src/libwebrtc
+  mkdir -p src/libwebrtc
+  cp -rf ../{include,src,patches,BUILD.gn,LICENSE} src/libwebrtc
 fi
 
 cd src
-git apply "$COMMAND_DIR/src/libwebrtc/patches/custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
-git apply "$COMMAND_DIR/src/libwebrtc/patches/add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+cp .vpython3 ..
+git apply "libwebrtc/patches/custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+git apply "libwebrtc/patches/add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
 
 mkdir -p "$ARTIFACTS_DIR"
@@ -124,4 +125,4 @@ python3 ./tools_webrtc/android/build_aar.py \
   --extra-gn-args "$extra_gn_args"
 cd ..
 
-cp -rf "./src/libwebrtc/LICENSE" "$ARTIFACTS_DIR/"
+cp -rf "src/libwebrtc/LICENSE" "$ARTIFACTS_DIR/"
