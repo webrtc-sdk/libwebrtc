@@ -114,11 +114,8 @@ rem copy static library for release build
 copy "%OUTPUT_DIR%\libwebrtc.dll.lib" "%ARTIFACTS_DIR%\lib"
 copy "%OUTPUT_DIR%\libwebrtc.dll" "%ARTIFACTS_DIR%\lib"
 
-rem generate license
-call python3 "%cd%\src\tools_webrtc\libs\generate_licenses.py" ^
-  --target :default %OUTPUT_DIR% %OUTPUT_DIR%
-
-copy "%OUTPUT_DIR%\LICENSE.md" "%ARTIFACTS_DIR%"
+rem copy license
+copy "src\libwebrtc\LICENSE" "%ARTIFACTS_DIR%\"
 
 rem copy header
 xcopy src\libwebrtc\include\*.h "%ARTIFACTS_DIR%\include" /C /S /I /F /H\
