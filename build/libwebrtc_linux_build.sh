@@ -73,7 +73,7 @@ fi
 if [ ! -e "$(pwd)/src/libwebrtc" ]
 then
   mkdir -p $(pwd)/src/libwebrtc
-  cp -rf $(pwd)/../{include,src,patchs,BUILD.gn,LICENSE} $(pwd)/src/libwebrtc
+  cp -rf $(pwd)/../{include,src,patches,BUILD.gn,LICENSE} $(pwd)/src/libwebrtc
 fi
 
 cd src

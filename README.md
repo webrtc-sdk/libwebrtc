@@ -11,7 +11,7 @@ possible supported platforms
 
 ## Note
 
-Use the https://github.com/webrtc-sdk/webrtc.git branch m137_release to compile.
+Use the https://github.com/webrtc-sdk/webrtc.git branch m144_release to compile.
 
 ## Usage
 
@@ -28,7 +28,7 @@ cd libwebrtc_build
 solutions = [
   {
     "name"        : 'src',
-    "url"         : 'https://github.com/webrtc-sdk/webrtc.git@m137_release',
+    "url"         : 'https://github.com/webrtc-sdk/webrtc.git@m144_release',
     "deps_file"   : 'DEPS',
     "managed"     : False,
     "custom_deps" : {
@@ -53,10 +53,10 @@ Confirm that it is currently in the `src`.
 git clone https://github.com/webrtc-sdk/libwebrtc
 ```
 
-### Apply audio custom source patch for m137_release.
+### Apply audio custom source patch for m144_release.
 
 ```bash
-git apply libwebrtc/patchs/custom_audio_source_m137.patch 
+git apply libwebrtc/patches/custom_audio_source_m144.patch 
 ```
 
 ### Modify webrtc's src/BUILD.gn file and add libwebrtc to group("default").

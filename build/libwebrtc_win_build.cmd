@@ -53,14 +53,14 @@ if not exist src/libwebrtc (
   md "%COMMAND_DIR%\src\libwebrtc"
   xcopy "%COMMAND_DIR%..\include" "%COMMAND_DIR%\src\libwebrtc\include" /E /I /Y
   xcopy "%COMMAND_DIR%..\src" "%COMMAND_DIR%\src\libwebrtc\src" /E /I /Y
-  xcopy "%COMMAND_DIR%..\patchs" "%COMMAND_DIR%\src\libwebrtc\patchs" /E /I /Y
+  xcopy "%COMMAND_DIR%..\patches" "%COMMAND_DIR%\src\libwebrtc\patches" /E /I /Y
   copy "%COMMAND_DIR%..\BUILD.gn" "%COMMAND_DIR%\src\libwebrtc\"
   copy "%COMMAND_DIR%..\LICENSE" "%COMMAND_DIR%\src\libwebrtc\"
 )
 
 cd src
-call git apply "libwebrtc\patchs\custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
-call git apply "libwebrtc\patchs\add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+call git apply "libwebrtc\patches\custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+call git apply "libwebrtc\patches\add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 
 copy ".vpython3" "..\"
 
