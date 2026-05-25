@@ -88,11 +88,8 @@ if not exist src/libwebrtc (
 )
 
 cd src
-call git apply ".\libwebrtc\patches\custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
-call git apply ".\libwebrtc\patches\add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
-
-copy ".vpython3" "..\"
-
+call git apply "%COMMAND_DIR%\src\libwebrtc\patches\custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+call git apply "%COMMAND_DIR%\src\libwebrtc\patches\add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
 
 mkdir "%ARTIFACTS_DIR%\lib"
