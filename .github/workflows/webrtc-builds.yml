@@ -55,7 +55,7 @@ jobs:
         working-directory: build
 
       - name: Build WebRTC
-        run: libwebrtc_win_build.cmd --arch x64 --profile release
+        run: .\libwebrtc_win_build.cmd --arch x64 --profile release
         working-directory: build
 
       - name: Zip artifact (Windows)
