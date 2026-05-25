@@ -49,7 +49,7 @@ set GYP_GENERATORS=ninja,msvs-ninja
 set GYP_MSVS_VERSION=2022
 set OUTPUT_DIR=src\out-!arch!-!profile!
 set ARTIFACTS_DIR=%cd%\libwebrtc-!arch!-!profile!
-set vs2019_install=C:\Program Files\Microsoft Visual Studio\2022\Enterprise
+set vs2019_install=C:\Program Files\Microsoft Visual Studio\2022\Community
 
 set "default_branch="
 for /f "tokens=2 delims=@" %%i in ('findstr /c:"url" "%COMMAND_DIR%.gclient"') do (
@@ -76,24 +76,31 @@ call git checkout -f "!checkout_ref!"
 call git clean -df
 popd
 
-call gclient.bat sync -D --force --reset --with_branch_heads --jobs=8
+call gclient.bat sync --with_branch_heads --jobs=8
+
 
 if not exist src/libwebrtc (
-  md "%COMMAND_DIR%\src\libwebrtc"
-  xcopy "%COMMAND_DIR%..\include" "%COMMAND_DIR%\src\libwebrtc\include" /E /I /Y
-  xcopy "%COMMAND_DIR%..\src" "%COMMAND_DIR%\src\libwebrtc\src" /E /I /Y
-  xcopy "%COMMAND_DIR%..\patches" "%COMMAND_DIR%\src\libwebrtc\patches" /E /I /Y
-  copy "%COMMAND_DIR%..\BUILD.gn" "%COMMAND_DIR%\src\libwebrtc\"
-  copy "%COMMAND_DIR%..\LICENSE" "%COMMAND_DIR%\src\libwebrtc\"
+  md "src/libwebrtc"
+  xcopy "%COMMAND_DIR%..\include" "src\libwebrtc\include" /E /I /Y
+  xcopy "%COMMAND_DIR%..\src" "src\libwebrtc\src" /E /I /Y
+  xcopy "%COMMAND_DIR%..\patches" "src\libwebrtc\patches" /E /I /Y
+  copy "%COMMAND_DIR%..\BUILD.gn" "src\libwebrtc\"
+  copy "%COMMAND_DIR%..\LICENSE" "src\libwebrtc\"
 )
 
 cd src
-call git apply "%COMMAND_DIR%\src\libwebrtc\patches\custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
-call git apply "%COMMAND_DIR%\src\libwebrtc\patches\add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+copy .vpython3 ..
+call git apply "libwebrtc\patches\custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+call git apply "libwebrtc\patches\add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
 
-mkdir "%ARTIFACTS_DIR%\lib"
-mkdir "%ARTIFACTS_DIR%\include"
+if not exist "%ARTIFACTS_DIR%\lib" (
+  mkdir "%ARTIFACTS_DIR%\lib"
+)
+
+if not exist "%ARTIFACTS_DIR%\include" (
+  mkdir "%ARTIFACTS_DIR%\include"
+)
 
 set "debug=false"
 if "!profile!" == "debug" (
@@ -115,4 +122,4 @@ rem copy license
 copy "src\libwebrtc\LICENSE" "%ARTIFACTS_DIR%\"
 
 rem copy header
-xcopy src\libwebrtc\include\*.h "%ARTIFACTS_DIR%\include" /C /S /I /F /H\
+xcopy "src\libwebrtc\include\*.h" "%ARTIFACTS_DIR%\include" /C /S /I /F /H
