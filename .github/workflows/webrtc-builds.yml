@@ -14,7 +14,6 @@ on:
       commitHash:
         description: 'webrtc-sdk commit hash'
         default: ''
-        required: true
       configuration:
         description: 'build configuration'
         default: 'release'
