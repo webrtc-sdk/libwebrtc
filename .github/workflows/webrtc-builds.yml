@@ -149,7 +149,7 @@ jobs:
     if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_apple == 'true'
     strategy:
       fail-fast: false
-    name: Build webrtc xcframework for apple
+    name: Build WebRTC xcframework for apple
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v5
@@ -167,7 +167,7 @@ jobs:
         working-directory: build
         
       - name: Build WebRTC
-        run: chmod +x ./xcframework_dynamic_build.sh && ./xcframework_dynamic_build.sh --profile ${{ github.event.inputs.configuration || 'release' }} --commit "${{ github.event.inputs.commitHash }}"
+        run: chmod +x ./libwebrtc_apple_build.sh && ./libwebrtc_apple_build.sh --profile ${{ github.event.inputs.configuration || 'release' }} --commit "${{ github.event.inputs.commitHash }}"
         working-directory: build
       
       - name: Upload artifacts
@@ -221,16 +221,11 @@ jobs:
         run: chmod +x ./libwebrtc_android_build.sh && ./libwebrtc_android_build.sh --profile ${{ matrix.profile }} --commit "${{ github.event.inputs.commitHash }}"
         working-directory: build
 
-      - name: Zip artifact
-        run: |
-          cd build
-          zip ${{ github.workspace }}/libwebrtc-android-${{ matrix.profile }}.zip android-${{ matrix.profile }} -r
-
       - name: Upload artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: libwebrtc-android-${{ matrix.profile }}
-          path: libwebrtc-android-${{ matrix.profile }}.zip
+          path: build/android-${{ matrix.profile }}/libwebrtc.aar
 
   create-release:
     name: Release to GH (Draft)
