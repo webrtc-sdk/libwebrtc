@@ -81,7 +81,7 @@ run_gclient_sync() {
   local checkout_ref="${commit:-$default_branch}"
   echo "Checkout ref: $checkout_ref"
 
-  if [ ! -e "$(pwd)/src" ]; then
+  if [ ! -e "src" ]; then
     git clone https://github.com/webrtc-sdk/webrtc.git src
   fi
 
@@ -92,26 +92,26 @@ run_gclient_sync() {
     git clean -df
   )
 
-  gclient sync -D --force --reset --with_branch_heads --jobs=8
+  gclient sync --with_branch_heads --jobs=8
 }
 
 run_gclient_sync
 
-if [ ! -e "$(pwd)/src/libwebrtc" ]
+if [ ! -e "src/libwebrtc" ]
 then
-  mkdir -p $(pwd)/src/libwebrtc
-  cp -rf $(pwd)/../{include,src,patches,BUILD.gn,LICENSE} $(pwd)/src/libwebrtc
+  mkdir -p src/libwebrtc
+  cp -rf ../{include,src,patches,BUILD.gn,LICENSE} src/libwebrtc
 fi
 
 cd src
-git apply "$COMMAND_DIR/src/libwebrtc/patches/custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
-git apply "$COMMAND_DIR/src/libwebrtc/patches/add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
-git apply "$COMMAND_DIR/src/libwebrtc/patches/fix_desktop_capture_compile.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+git apply "libwebrtc/patches/custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+git apply "libwebrtc/patches/add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+git apply "libwebrtc/patches/fix_desktop_capture_compile.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
 
 mkdir -p "$ARTIFACTS_DIR/lib"
 
-python3 "./src/build/linux/sysroot_scripts/install-sysroot.py" --arch="$arch"
+python3 "src/build/linux/sysroot_scripts/install-sysroot.py" --arch="$arch"
 
 debug="false"
 if [ "$profile" = "debug" ]; then
@@ -153,5 +153,5 @@ gn gen "$OUTPUT_DIR" --root="src" --args="${args}"
 ninja -C "$OUTPUT_DIR" libwebrtc
 
 cp "$OUTPUT_DIR/libwebrtc.so" "$ARTIFACTS_DIR/lib"
-cp -rf "$COMMAND_DIR/src/libwebrtc/LICENSE" "$ARTIFACTS_DIR/"
-cp -rf "$COMMAND_DIR/src/libwebrtc/include" "$ARTIFACTS_DIR/"
+cp -rf "src/libwebrtc/LICENSE" "$ARTIFACTS_DIR/"
+cp -rf "src/libwebrtc/include" "$ARTIFACTS_DIR/"
