@@ -4,15 +4,20 @@ setlocal enabledelayedexpansion
 
 set arch=
 set profile=release
+set commit=
 
 :arg_loop
 if "%1" == "" goto end_arg_loop
 if "%1" == "--arch" (
-    set "arch=%2"
+    set "arch=%~2"
     shift & shift & goto arg_loop
 )
 if "%1" == "--profile" (
-    set "profile=%2"
+    set "profile=%~2"
+    shift & shift & goto arg_loop
+)
+if "%1" == "--commit" (
+    set "commit=%~2"
     shift & shift & goto arg_loop
 )
 echo Error: Unknown argument '%1'
@@ -31,6 +36,7 @@ if not "!profile!" == "debug" if not "!profile!" == "release" (
 echo "Building  libwebrtc dll - Windows"
 echo "Arch: !arch!"
 echo "Profile: !profile!"
+echo "Commit: !commit!"
 
 if not exist depot_tools (
   git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
@@ -46,7 +52,11 @@ set ARTIFACTS_DIR=%cd%\libwebrtc-!arch!-!profile!
 set vs2019_install=C:\Program Files\Microsoft Visual Studio\2022\Enterprise
 
 if not exist src (
-  call gclient.bat sync -D --with_branch_heads --with_tags
+  if not "!commit!" == "" (
+    call gclient.bat sync --revision "src@!commit!" -D --with_branch_heads --with_tags
+  ) else (
+    call gclient.bat sync -D --with_branch_heads --with_tags
+  )
 )
 
 if not exist src/libwebrtc (

@@ -1,13 +1,43 @@
 #!/bin/sh
-if [ ! -n "$1" ]; then
-  echo "Usage: $0 'debug' | 'release'"
-  exit 0
+
+MODE=""
+COMMIT=""
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --profile)
+      MODE="$2"
+      shift 2
+      ;;
+    --commit)
+      COMMIT="$2"
+      shift 2
+      ;;
+    debug|release)
+      # Backwards-compatible positional form: $0 release [commit]
+      MODE="$1"
+      shift
+      if [ -n "$1" ] && [ "${1#--}" = "$1" ]; then
+        COMMIT="$1"
+        shift
+      fi
+      ;;
+    *)
+      echo "Error: Unknown argument '$1'"
+      echo "Usage: $0 --profile <debug|release> [--commit <hash>]"
+      exit 1
+      ;;
+  esac
+done
+
+if [ -z "$MODE" ]; then
+  echo "Usage: $0 --profile <debug|release> [--commit <hash>]"
+  exit 1
 fi
 
-MODE=$1
 OUT_DIR=./out-$MODE
 DEBUG="false"
-if [ "$MODE" == "debug" ]; then
+if [ "$MODE" = "debug" ]; then
   DEBUG="true"
 fi
 
@@ -21,10 +51,14 @@ export PATH="$(pwd)/depot_tools:$PATH"
 
 if [ ! -e "$(pwd)/src" ]
 then
-  gclient sync -D --no-history
+  if [ -n "$COMMIT" ]; then
+    gclient sync --revision "src@$COMMIT" -D --no-history
+  else
+    gclient sync -D --no-history
+  fi
 fi
 
-echo "xcframework_dynamic_build.sh: MODE=$MODE, DEBUG=$DEBUG"
+echo "xcframework_dynamic_build.sh: MODE=$MODE, DEBUG=$DEBUG, COMMIT=$COMMIT"
 
 gn gen $OUT_DIR/tvOS-arm64-device --root="src" --args="    
       target_os = \"ios\"

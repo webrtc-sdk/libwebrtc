@@ -72,7 +72,7 @@ jobs:
           swap-storage: true
 
       - name: Build WebRTC
-        run: chmod +x ./libwebrtc_linux_build.sh && ./libwebrtc_linux_build.sh --arch ${{ matrix.arch }} --profile ${{ matrix.profile }}
+        run: chmod +x ./libwebrtc_linux_build.sh && ./libwebrtc_linux_build.sh --arch ${{ matrix.arch }} --profile ${{ matrix.profile }} --commit "${{ github.event.inputs.commitHash }}"
         working-directory: build
 
       - name: Zip artifact (Unix)
@@ -115,7 +115,7 @@ jobs:
         working-directory: build
 
       - name: Build WebRTC
-        run: .\libwebrtc_win_build.cmd --arch ${{ matrix.arch }} --profile ${{ matrix.profile }}
+        run: .\libwebrtc_win_build.cmd --arch ${{ matrix.arch }} --profile ${{ matrix.profile }} --commit "${{ github.event.inputs.commitHash }}"
         working-directory: build
 
       - name: Zip artifact (Windows)
@@ -148,7 +148,7 @@ jobs:
         working-directory: build
         
       - name: Build WebRTC
-        run: chmod +x ./xcframework_dynamic_build.sh && ./xcframework_dynamic_build.sh release
+        run: chmod +x ./xcframework_dynamic_build.sh && ./xcframework_dynamic_build.sh --profile ${{ github.event.inputs.configuration || 'release' }} --commit "${{ github.event.inputs.commitHash }}"
         working-directory: build
       
       - name: Upload artifacts

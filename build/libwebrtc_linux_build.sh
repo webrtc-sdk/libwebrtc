@@ -20,6 +20,7 @@ set -e
 
 arch=""
 profile="release"
+commit=""
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -39,6 +40,10 @@ while [ "$#" -gt 0 ]; do
       fi
       shift 2
       ;;
+    --commit)
+      commit="$2"
+      shift 2
+      ;;
     *)
       echo "Error: Unknown argument '$1'"
       exit 1
@@ -54,6 +59,7 @@ fi
 echo "Building libwebrtc.so - Linux"
 echo "Arch: $arch"
 echo "Profile: $profile"
+echo "Commit: $commit"
 
 if [ ! -e "$(pwd)/depot_tools" ]
 then
@@ -67,7 +73,11 @@ export ARTIFACTS_DIR="$(pwd)/linux-$arch-$profile"
 
 if [ ! -e "$(pwd)/src" ]
 then
-  gclient sync -D --no-history
+  if [ -n "$commit" ]; then
+    gclient sync --revision "src@$commit" -D --no-history
+  else
+    gclient sync -D --no-history
+  fi
 fi
 
 if [ ! -e "$(pwd)/src/libwebrtc" ]
