@@ -49,7 +49,7 @@ set GYP_GENERATORS=ninja,msvs-ninja
 set GYP_MSVS_VERSION=2022
 set OUTPUT_DIR=src\out-!arch!-!profile!
 set ARTIFACTS_DIR=%cd%\libwebrtc-!arch!-!profile!
-set vs2019_install=C:\Program Files\Microsoft Visual Studio\2022\Community
+set vs2019_install=C:\Program Files\Microsoft Visual Studio\2022\Enterprise
 
 set "default_branch="
 for /f "tokens=2 delims=@" %%i in ('findstr /c:"url" "%COMMAND_DIR%.gclient"') do (
