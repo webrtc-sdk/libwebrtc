@@ -33,7 +33,7 @@ and the remote video is rendered into the window.
 This demo depends on three libwebrtc additions:
 
 - `RTCVideoSource::OnCapturedFrame(scoped_refptr<RTCVideoFrame>)` — push user-supplied frames.
-- `RTCPeerConnectionFactory::CreateCustomVideoCapturer()` — capturer not bound to any device.
+- `RTCPeerConnectionFactory::CreateCustomVideoSource(...)` — custom video source not bound to any device.
 - `internal::VideoCapturer::OnFrame` made public so the source can forward into the broadcaster.
 
 They ship in the current source tree but are **not** in older prebuilt
