@@ -422,6 +422,7 @@ class MainFrame : public wxFrame {
     factory_ = libwebrtc::LibWebRTC::CreateRTCPeerConnectionFactory();
     if (!factory_ || !factory_->Initialize()) {
       status_->SetLabel("Factory init failed");
+      TeardownLoopback();
       return;
     }
 
