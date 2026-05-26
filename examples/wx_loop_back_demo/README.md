@@ -105,16 +105,9 @@ otool -l build/wx_loop_back_demo.app/Contents/MacOS/wx_loop_back_demo \
 ### Resetting macOS TCC permissions while iterating
 
 ```bash
-tccutil reset Microphone io.livekit.wx_loop_back_demo
-tccutil reset Camera     io.livekit.wx_loop_back_demo
+tccutil reset Microphone io.github.webrtc-sdk.libwebrtc.wx_loop_back_demo
+tccutil reset Camera     io.github.webrtc-sdk.libwebrtc.wx_loop_back_demo
 ```
-
-### Debugging in VSCode
-
-A launch configuration `(lldb) 调试 wx_loop_back_demo` is provided in
-[`<repo>/src/.vscode/launch.json`](../../../../.vscode/launch.json); F5
-builds (via the `build wx_loop_back_demo` task) and attaches lldb to the
-bundle's executable.
 
 ## Troubleshooting
 
