@@ -69,7 +69,7 @@ if(APPLE)
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
         MACOSX_BUNDLE_BUNDLE_NAME "wx_loop_back_demo"
-        MACOSX_BUNDLE_GUI_IDENTIFIER "io.livekit.wx_loop_back_demo"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "io.github.webrtc-sdk.libwebrtc.wx_loop_back_demo"
         MACOSX_BUNDLE_BUNDLE_VERSION "1.0"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "1.0"
         BUILD_RPATH   "@executable_path/../Frameworks"
