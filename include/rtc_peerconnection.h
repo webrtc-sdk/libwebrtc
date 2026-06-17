@@ -1,8 +1,10 @@
 #ifndef LIB_WEBRTC_RTC_PEERCONNECTION_HXX
 #define LIB_WEBRTC_RTC_PEERCONNECTION_HXX
 
+#include "rtc_base_list.h"
 #include "rtc_audio_track.h"
 #include "rtc_data_channel.h"
+#include "rtc_sdp_parse_error.h"
 #include "rtc_ice_candidate.h"
 #include "rtc_media_stream.h"
 #include "rtc_mediaconstraints.h"
@@ -105,6 +107,22 @@ class RTCStatsMember : public RefCountInterface {
   virtual ~RTCStatsMember() {}
 };
 
+/**
+ * class RTCStatsMemberList
+ */
+class RTCStatsMemberList : public RTCBaseList<scoped_refptr<RTCStatsMember>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCStatsMemberList> Create(
+    const vector<scoped_refptr<RTCStatsMember>>& source);
+
+ protected:
+  RTCStatsMemberList(const vector<scoped_refptr<RTCStatsMember>>& source)
+    : RTCBaseList<scoped_refptr<RTCStatsMember>>(source)
+  {}
+
+  ~RTCStatsMemberList() {}
+}; // end class RTCStatsMemberList
+
 class MediaRTCStats : public RefCountInterface {
  public:
   virtual const string id() = 0;
@@ -117,6 +135,22 @@ class MediaRTCStats : public RefCountInterface {
 
   virtual const vector<scoped_refptr<RTCStatsMember>> Members() = 0;
 };
+
+/**
+ * class MediaRTCStatsList
+ */
+class MediaRTCStatsList : public RTCBaseList<scoped_refptr<MediaRTCStats>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<MediaRTCStatsList> Create(
+    const vector<scoped_refptr<MediaRTCStats>>& source);
+
+ protected:
+  MediaRTCStatsList(const vector<scoped_refptr<MediaRTCStats>>& source)
+    : RTCBaseList<scoped_refptr<MediaRTCStats>>(source)
+  {}
+
+  ~MediaRTCStatsList() {}
+}; // end class MediaRTCStatsList
 
 typedef fixed_size_function<void(
     const vector<scoped_refptr<MediaRTCStats>> reports)>
@@ -171,6 +205,8 @@ class RTCPeerConnectionObserver {
 
 class RTCPeerConnection : public RefCountInterface {
  public:
+  virtual bool IsInitialized() const = 0;
+
   virtual int AddStream(scoped_refptr<RTCMediaStream> stream) = 0;
 
   virtual int RemoveStream(scoped_refptr<RTCMediaStream> stream) = 0;
@@ -263,6 +299,8 @@ class RTCPeerConnection : public RefCountInterface {
   virtual RTCPeerConnectionState peer_connection_state() = 0;
 
   virtual RTCIceGatheringState ice_gathering_state() = 0;
+
+  virtual RTCPeerConnectionObserver* GetObserver() = 0;
 
  protected:
   virtual ~RTCPeerConnection() {}

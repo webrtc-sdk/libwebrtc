@@ -234,5 +234,11 @@ class MediaStreamImpl : public RTCMediaStream,
   string label_, id_;
 };
 
+class RTCMediaStreamListImpl : public RTCMediaStreamList {
+ public:
+  RTCMediaStreamListImpl(const vector<scoped_refptr<RTCMediaStream>>& source);
+  ~RTCMediaStreamListImpl();
+};
+
 }  // namespace libwebrtc
 #endif  //! LIB_WEBRTC_MEDIA_STREAM_IMPL_HXX

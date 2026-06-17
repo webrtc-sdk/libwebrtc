@@ -28,6 +28,10 @@ class AudioFrame : public RefCountInterface {
                                            size_t samples_per_channel,
                                            int sample_rate_hz,
                                            size_t num_channels = 1);
+  /**
+   * @brief Releases the memory of this AudioFrame.
+   */
+  virtual void Release() = 0;
 
  public:
   /**

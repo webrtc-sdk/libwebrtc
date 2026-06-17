@@ -1,17 +1,20 @@
 #include "rtc_ice_candidate_impl.h"
+#include "rtc_sdp_parse_error.h"
 
 namespace libwebrtc {
 
 scoped_refptr<RTCIceCandidate> RTCIceCandidate::Create(const string sdp,
                                                        const string sdp_mid,
                                                        int sdp_mline_index,
-                                                       SdpParseError* error) {
+                                                       RTCSdpParseError* error) {
   webrtc::SdpParseError sdp_error;
   std::unique_ptr<webrtc::IceCandidateInterface> rtc_candidate(
       webrtc::CreateIceCandidate(to_std_string(sdp_mid), sdp_mline_index,
                                  to_std_string(sdp), &sdp_error));
-  error->description = sdp_error.description;
-  error->line = sdp_error.line;
+  if (error) {
+    error->set_description(sdp_error.description);
+    error->set_line(sdp_error.line);
+  }
   if (rtc_candidate) {
     return scoped_refptr<RTCIceCandidateImpl>(
         new RefCountedObject<RTCIceCandidateImpl>(std::move(rtc_candidate)));

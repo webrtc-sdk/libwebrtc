@@ -1,4 +1,5 @@
 #include "rtc_rtp_capabilities_impl.h"
+#include "rtc_base/logging.h"
 
 namespace libwebrtc {
 
@@ -149,6 +150,21 @@ webrtc::RtpCodecCapability RTCRtpCodecCapabilityImpl::rtp_codec_capability() {
   return rtp_codec_capability_;
 }
 
+scoped_refptr<RTCRtpCodecCapabilityList> RTCRtpCodecCapabilityList::Create(
+    const vector<scoped_refptr<RTCRtpCodecCapability>>& source) {
+  return new RefCountedObject<RTCRtpCodecCapabilityListImpl>(source);
+}
+
+RTCRtpCodecCapabilityListImpl::RTCRtpCodecCapabilityListImpl(
+    const vector<scoped_refptr<RTCRtpCodecCapability>>& source)
+    : RTCRtpCodecCapabilityList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpCodecCapabilityListImpl::~RTCRtpCodecCapabilityListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
 RTCRtpHeaderExtensionCapabilityImpl::RTCRtpHeaderExtensionCapabilityImpl(
     webrtc::RtpHeaderExtensionCapability rtp_header_extension_capability)
     : rtp_header_extension_capability_(rtp_header_extension_capability) {}
@@ -179,6 +195,21 @@ bool RTCRtpHeaderExtensionCapabilityImpl::preferred_encrypt() {
 }
 void RTCRtpHeaderExtensionCapabilityImpl::set_preferred_encrypt(bool value) {
   rtp_header_extension_capability_.preferred_encrypt = value;
+}
+
+scoped_refptr<RTCRtpHeaderExtensionCapabilityList> RTCRtpHeaderExtensionCapabilityList::Create(
+    const vector<scoped_refptr<RTCRtpHeaderExtensionCapability>>& source) {
+  return new RefCountedObject<RTCRtpHeaderExtensionCapabilityListImpl>(source);
+}
+
+RTCRtpHeaderExtensionCapabilityListImpl::RTCRtpHeaderExtensionCapabilityListImpl(
+    const vector<scoped_refptr<RTCRtpHeaderExtensionCapability>>& source)
+    : RTCRtpHeaderExtensionCapabilityList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpHeaderExtensionCapabilityListImpl::~RTCRtpHeaderExtensionCapabilityListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
 }
 
 }  // namespace libwebrtc

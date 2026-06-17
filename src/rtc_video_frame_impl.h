@@ -23,6 +23,8 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
   int width() const override;
 
   int height() const override;
+  
+  int size() const override;
 
   const uint8_t* DataY() const override;
 
@@ -36,14 +38,21 @@ class VideoFrameBufferImpl : public RTCVideoFrame {
 
   int StrideV() const override;
 
-  int ConvertToARGB(Type type, uint8_t* dst_argb, int dst_stride_argb,
-                    int dest_width, int dest_height) override;
+  int ConvertToARGB(RTCVideoFrameARGB* pDest) override;
+
+  int ScaleFrom(scoped_refptr<RTCVideoFrame> source) override;
+
+  int ScaleFrom(RTCVideoFrameARGB* source) override;
+
+  int ScaleFrom(RTCVideoFrameYUV* source) override;
+
+  int Clear(RTCVideoFrameClearType clearType) override;
 
   webrtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer() { return buffer_; }
 
   // System monotonic clock, same timebase as webrtc::TimeMicros().
-  int64_t timestamp_us() const { return timestamp_us_; }
-  void set_timestamp_us(int64_t timestamp_us) { timestamp_us_ = timestamp_us; }
+  int64_t timestamp_us() const override{ return timestamp_us_; }
+  void set_timestamp_us(int64_t timestamp_us) override { timestamp_us_ = timestamp_us; }
 
   virtual RTCVideoFrame::VideoRotation rotation() override;
 

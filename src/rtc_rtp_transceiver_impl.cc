@@ -166,4 +166,19 @@ const string RTCRtpTransceiverImpl::transceiver_id() const {
   return ss.str();
 }
 
+scoped_refptr<RTCRtpTransceiverList> RTCRtpTransceiverList::Create(
+    const vector<scoped_refptr<RTCRtpTransceiver>>& source) {
+  return new RefCountedObject<RTCRtpTransceiverListImpl>(source);
+}
+
+RTCRtpTransceiverListImpl::RTCRtpTransceiverListImpl(
+    const vector<scoped_refptr<RTCRtpTransceiver>>& source)
+    : RTCRtpTransceiverList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpTransceiverListImpl::~RTCRtpTransceiverListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
 }  // namespace libwebrtc

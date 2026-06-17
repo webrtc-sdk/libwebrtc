@@ -18,7 +18,9 @@ class CustomProcessingAdapter : public webrtc::CustomProcessing {
       RTCAudioProcessing::CustomProcessing* processor) {
     webrtc::MutexLock lock(&mutex_);
     custom_processor_ = processor;
-    if (initialized_) {
+    // Detaching (processor == nullptr) must not dereference it; only forward
+    // Initialize when a processor is actually attached.
+    if (initialized_ && custom_processor_) {
       custom_processor_->Initialize(sample_rate_hz_, num_channels_);
     }
   }
@@ -67,7 +69,7 @@ class CustomProcessingAdapter : public webrtc::CustomProcessing {
 
  private:
   mutable webrtc::Mutex mutex_;
-  RTCAudioProcessing::CustomProcessing* custom_processor_;
+  RTCAudioProcessing::CustomProcessing* custom_processor_ = nullptr;
   bool bypass_flag_ = false;
   bool initialized_ = false;
   int sample_rate_hz_ = 0;

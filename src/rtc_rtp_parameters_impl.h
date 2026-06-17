@@ -23,6 +23,37 @@ class RTCRtcpFeedbackImpl : public RTCRtcpFeedback {
   webrtc::RtcpFeedback rtcp_feedback_;
 };
 
+/**
+ * class RTCRtcpFeedbackListImpl
+ */
+class RTCRtcpFeedbackListImpl : public RTCRtcpFeedbackList {
+ public:
+  RTCRtcpFeedbackListImpl(const vector<scoped_refptr<RTCRtcpFeedback>>& source);
+  ~RTCRtcpFeedbackListImpl();
+};
+
+/**
+ * class RTCRtpCodecParametersPairImpl
+ */
+class RTCRtpCodecParametersPairImpl : public RTCRtpCodecParametersPair {
+ public:
+  RTCRtpCodecParametersPairImpl();
+  RTCRtpCodecParametersPairImpl(const std::pair<string, string>& source);
+  ~RTCRtpCodecParametersPairImpl();
+};
+
+/**
+ * class RTCRtpCodecParametersMapImpl
+ */
+class RTCRtpCodecParametersMapImpl : public RTCRtpCodecParametersMap {
+ public:
+  RTCRtpCodecParametersMapImpl();
+  RTCRtpCodecParametersMapImpl(const vector<scoped_refptr<RTCRtpCodecParametersPair>>& source);
+  ~RTCRtpCodecParametersMapImpl();
+
+  virtual vector<std::pair<string, string>> to_parameters() override;
+};
+
 class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
  public:
   RTCRtpCodecParametersImpl(webrtc::RtpCodecParameters rtp_codec_parameters);
@@ -45,7 +76,8 @@ class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
   virtual void set_rtcp_feedback(
       vector<scoped_refptr<RTCRtcpFeedback>> rtcp_feedbacks) override;
   virtual const vector<std::pair<string, string>> parameters() override;
-  virtual void set_parameters(map<string, string> parameters) override;
+  virtual void set_parameters(const map<string, string> parameters) override;
+  virtual void set_parameters(const vector<std::pair<string, string>> parameters) override;
   virtual bool operator==(scoped_refptr<RTCRtpCodecParameters> o) override;
   virtual bool operator!=(scoped_refptr<RTCRtpCodecParameters> o) override;
 
@@ -53,6 +85,15 @@ class RTCRtpCodecParametersImpl : public RTCRtpCodecParameters {
 
  private:
   webrtc::RtpCodecParameters rtp_codec_parameters_;
+};
+
+/**
+ * class RTCRtpCodecParametersListImpl
+ */
+class RTCRtpCodecParametersListImpl : public RTCRtpCodecParametersList {
+ public:
+  RTCRtpCodecParametersListImpl(const vector<scoped_refptr<RTCRtpCodecParameters>>& source);
+  ~RTCRtpCodecParametersListImpl();
 };
 
 class RTCRtpExtensionImpl : public RTCRtpExtension {
@@ -71,6 +112,15 @@ class RTCRtpExtensionImpl : public RTCRtpExtension {
 
  private:
   webrtc::RtpExtension rtp_extension_;
+};
+
+/**
+ * class RTCRtpExtensionListImpl
+ */
+class RTCRtpExtensionListImpl : public RTCRtpExtensionList {
+ public:
+  RTCRtpExtensionListImpl(const vector<scoped_refptr<RTCRtpExtension>>& source);
+  ~RTCRtpExtensionListImpl();
 };
 
 class RTCRtcpParametersImpl : public RTCRtcpParameters {
@@ -92,6 +142,15 @@ class RTCRtcpParametersImpl : public RTCRtcpParameters {
 
  private:
   webrtc::RtcpParameters rtcp_parameters_;
+};
+
+/**
+ * class RTCRtcpParametersListImpl
+ */
+class RTCRtcpParametersListImpl : public RTCRtcpParametersList {
+ public:
+  RTCRtcpParametersListImpl(const vector<scoped_refptr<RTCRtcpParameters>>& source);
+  ~RTCRtcpParametersListImpl();
 };
 
 class RTCRtpParametersImpl : public RTCRtpParameters {
@@ -182,6 +241,15 @@ class RTCRtpEncodingParametersImpl : public RTCRtpEncodingParameters {
 
  private:
   webrtc::RtpEncodingParameters rtp_encoding_parameters_;
+};
+
+/**
+ * class RTCRtpEncodingParametersListImpl
+ */
+class RTCRtpEncodingParametersListImpl : public RTCRtpEncodingParametersList {
+ public:
+  RTCRtpEncodingParametersListImpl(const vector<scoped_refptr<RTCRtpEncodingParameters>>& source);
+  ~RTCRtpEncodingParametersListImpl();
 };
 
 }  // namespace libwebrtc

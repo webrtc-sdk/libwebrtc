@@ -49,7 +49,7 @@ class RTCDesktopCapturer : public RefCountInterface {
    *
    * @return The current capture state after attempting to start capture.
    */
-  virtual CaptureState Start(uint32_t fps) = 0;
+  virtual RTCCaptureState Start(uint32_t fps) = 0;
 
   /**
    * @brief Starts desktop capture with the given frame rate and capture
@@ -63,7 +63,7 @@ class RTCDesktopCapturer : public RefCountInterface {
    *
    * @return The current capture state after attempting to start capture.
    */
-  virtual CaptureState Start(uint32_t fps, uint32_t x, uint32_t y, uint32_t w,
+  virtual RTCCaptureState Start(uint32_t fps, uint32_t x, uint32_t y, uint32_t w,
                              uint32_t h) = 0;
 
   /**
@@ -85,6 +85,8 @@ class RTCDesktopCapturer : public RefCountInterface {
    *         media source.
    */
   virtual scoped_refptr<MediaSource> source() = 0;
+
+  virtual DesktopCapturerObserver* GetObserver() = 0;
 
   /**
    * @brief Destroys the RTCDesktopCapturer object.
@@ -130,7 +132,7 @@ class DesktopCapturerObserver {
   virtual void OnError(scoped_refptr<RTCDesktopCapturer> capturer) = 0;
 
  protected:
-  ~DesktopCapturerObserver() {}
+  virtual ~DesktopCapturerObserver() {}
 };
 
 }  // namespace libwebrtc

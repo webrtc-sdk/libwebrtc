@@ -1,3 +1,7 @@
+Porting CAPI-Interop WebRTC M125 to the current LibWebRTC M137
+CAPI-Interop repo: https://github.com/GERD0GDU/libwebrtc author: GERD0GDU
+
+
 # libwebrtc-{windows,linux}-{amd64,x86,armv7,arm64}.{dll,so}
 
 WebRTC C++ wrapper

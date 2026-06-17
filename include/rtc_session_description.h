@@ -2,6 +2,7 @@
 #define LIB_WEBRTC_RTC_SESSION_DESCRIPTION_HXX
 
 #include "rtc_types.h"
+#include "rtc_sdp_parse_error.h"
 
 namespace libwebrtc {
 
@@ -9,8 +10,8 @@ class RTCSessionDescription : public RefCountInterface {
  public:
   enum SdpType { kOffer = 0, kPrAnswer, kAnswer };
 
-  static LIB_WEBRTC_API scoped_refptr<RTCSessionDescription> Create(
-      const string type, const string sdp, SdpParseError* error);
+  LIB_WEBRTC_API static scoped_refptr<RTCSessionDescription> Create(
+      const string type, const string sdp, RTCSdpParseError* error);
 
  public:
   virtual const string sdp() const = 0;

@@ -6,6 +6,22 @@
 #include "rtc_rtp_receiver.h"
 
 namespace libwebrtc {
+
+/**
+ * class RTCRtpReceiverObserverImpl
+ */
+class RTCRtpReceiverObserverImpl : public RTCRtpReceiverObserver
+{
+ public:
+   RTCRtpReceiverObserverImpl(void* callbacks /* rtcRtpReceiverObserverCallbacks* */);
+   ~RTCRtpReceiverObserverImpl();
+
+   void OnFirstPacketReceived(RTCMediaType media_type) override;
+
+ private:
+   void* callbacks_ /* rtcRtpReceiverObserverCallbacks* */;
+}; // end class RTCRtpReceiverObserverImpl
+
 class RTCRtpReceiverImpl : public RTCRtpReceiver,
                            webrtc::RtpReceiverObserverInterface {
  public:
@@ -24,6 +40,7 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
   virtual void SetObserver(RTCRtpReceiverObserver* observer) override;
   virtual void SetJitterBufferMinimumDelay(double delay_seconds) override;
   webrtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver();
+  virtual RTCRtpReceiverObserver* GetObserver() override { return observer_; }
 
  private:
   webrtc::scoped_refptr<webrtc::RtpReceiverInterface> rtp_receiver_;
@@ -32,6 +49,15 @@ class RTCRtpReceiverImpl : public RTCRtpReceiver,
   virtual void OnFirstPacketReceived(webrtc::MediaType media_type) override;
 
 };  // namespace libwebrtc
+
+/**
+ * class RTCRtpReceiverListImpl
+ */
+class RTCRtpReceiverListImpl : public RTCRtpReceiverList {
+ public:
+  RTCRtpReceiverListImpl(const vector<scoped_refptr<RTCRtpReceiver>>& source);
+  ~RTCRtpReceiverListImpl();
+}; // end class RTCRtpReceiverListImpl
 
 }  // namespace libwebrtc
 

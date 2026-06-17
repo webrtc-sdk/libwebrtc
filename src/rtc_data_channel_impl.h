@@ -8,6 +8,19 @@
 
 namespace libwebrtc {
 
+class RTCDataChannelObserverImpl : public RTCDataChannelObserver
+{
+ public:
+   RTCDataChannelObserverImpl(void* callbacks /* rtcDataChannelObserverCallbacks* */);
+   ~RTCDataChannelObserverImpl();
+
+   void OnStateChange(RTCDataChannelState state) override;
+   void OnMessage(const char* buffer, int length, bool binary) override;
+
+ private:
+   void* callbacks_ /* rtcDataChannelObserverCallbacks* */;
+};
+
 class RTCDataChannelImpl : public RTCDataChannel,
                            public webrtc::DataChannelObserver {
  public:
@@ -34,6 +47,8 @@ class RTCDataChannelImpl : public RTCDataChannel,
   webrtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel() {
     return rtc_data_channel_;
   }
+
+  RTCDataChannelObserver* GetObserver() { return observer_; }
 
  protected:
   virtual ~RTCDataChannelImpl();
