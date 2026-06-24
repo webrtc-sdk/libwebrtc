@@ -276,3 +276,18 @@ rtc_shared_library("libwebrtc") {
     }
   }
 }
+
+rtc_test("libwebrtc_cpp_api_unittests") {
+  testonly = true
+
+  sources = [
+     "test/peerconnection_factory.test.cc",
+  ]
+
+   deps = [
+    ":libwebrtc",
+    "//testing/gtest",
+    "//test:test_support",
+    "//test:test_main",
+  ]
+}

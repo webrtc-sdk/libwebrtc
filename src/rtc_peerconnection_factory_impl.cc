@@ -116,11 +116,19 @@ bool RTCPeerConnectionFactoryImpl::Terminate() {
 }
 
 void RTCPeerConnectionFactoryImpl::CreateAudioDeviceModule_w() {
-  if (!audio_device_module_)
+  if (!audio_device_module_) {
     audio_device_module_ = webrtc::CreateAudioDeviceModule(
         env_,
         webrtc::AudioDeviceModule::kPlatformDefaultAudio,
         false);
+    // Initialize the ADM eagerly so device enumeration (RecordingDevices/
+    // PlayoutDevices) works before a PeerConnection has been created. On
+    // desktop these queries return early unless the module is initialized,
+    // and the voice engine otherwise defers Init() until the audio pipeline
+    // is set up. Init() is idempotent, so the later engine call is a no-op.
+    if (audio_device_module_)
+      audio_device_module_->Init();
+  }
 }
 
 void RTCPeerConnectionFactoryImpl::DestroyAudioDeviceModule_w() {
