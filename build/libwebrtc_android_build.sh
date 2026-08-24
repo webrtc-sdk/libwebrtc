@@ -115,4 +115,3 @@ python3 ./tools_webrtc/android/build_aar.py \
   --output "$ARTIFACTS_DIR/libwebrtc.aar" \
   --arch armeabi-v7a arm64-v8a x86_64 x86 \
   --extra-gn-args "$extra_gn_args"
-cd ..
