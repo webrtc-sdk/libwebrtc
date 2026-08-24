@@ -91,17 +91,18 @@ if not exist src/libwebrtc (
 
 cd src
 copy .vpython3 ..
-call git apply "libwebrtc\patches\custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+call git apply "libwebrtc\patches\custom_audio_source_m150.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 call git apply "libwebrtc\patches\add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
 
-if not exist "%ARTIFACTS_DIR%\lib" (
-  mkdir "%ARTIFACTS_DIR%\lib"
+
+rem Start from a clean artifacts directory so stale outputs are not shipped.
+if exist "%ARTIFACTS_DIR%" (
+  rmdir /s /q "%ARTIFACTS_DIR%"
 )
 
-if not exist "%ARTIFACTS_DIR%\include" (
-  mkdir "%ARTIFACTS_DIR%\include"
-)
+mkdir "%ARTIFACTS_DIR%\lib"
+mkdir "%ARTIFACTS_DIR%\include"
 
 set "debug=false"
 if "!profile!" == "debug" (
