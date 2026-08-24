@@ -1,0 +1,20 @@
+--- a/modules/audio_device/win/audio_device_core_win.cc
++++ b/modules/audio_device/win/audio_device_core_win.cc
+@@ -1867,7 +1867,7 @@
+   Wfx.wBitsPerSample = 16;
+   Wfx.cbSize = 0;
+ 
+-  const int freqs[] = {48000, 44100, 16000, 96000, 32000, 8000};
++  const int freqs[] = {48000, 44100, 16000, 96000, 32000, 8000, 176400, 192000};
+   hr = S_FALSE;
+ 
+   // Iterate over frequencies and channels, in order of priority
+@@ -2185,7 +2185,7 @@
+   Wfx.Samples.wValidBitsPerSample = Wfx.Format.wBitsPerSample;
+   Wfx.SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
+ 
+-  const int freqs[6] = {48000, 44100, 16000, 96000, 32000, 8000};
++  const int freqs[] = {48000, 44100, 16000, 96000, 32000, 8000, 176400, 192000};
+   hr = S_FALSE;
+ 
+   // Iterate over frequencies and channels, in order of priority
