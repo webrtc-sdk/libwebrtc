@@ -8,6 +8,7 @@
 #include <wmcodecdsp.h>
 
 #include <algorithm>
+#include <span>
 
 #include "api/video/encoded_image.h"
 #include "api/video/i420_buffer.h"
@@ -310,7 +311,7 @@ int WmfH265Encoder::InitEncode(const VideoCodec* codec_settings,
 }
 
 HRESULT WmfH265Encoder::ProcessInput(const VideoFrame& frame) {
-  rtc::scoped_refptr<I420BufferInterface> i420_buffer =
+  webrtc::scoped_refptr<I420BufferInterface> i420_buffer =
       frame.video_frame_buffer()->ToI420();
 
   int y_stride = i420_buffer->StrideY();
@@ -489,7 +490,7 @@ HRESULT WmfH265Encoder::ProcessOutput(int64_t timestamp_us,
 
     // Parse bitstream for QP
     bitstream_parser_.ParseBitstream(
-        rtc::ArrayView<const uint8_t>(data, data_length));
+        std::span<const uint8_t>(data, data_length));
     
     std::optional<int> qp = bitstream_parser_.GetLastSliceQp();
     if (qp.has_value()) {
