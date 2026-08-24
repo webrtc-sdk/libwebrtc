@@ -1,17 +1,46 @@
 diff --git a/modules/desktop_capture/linux/wayland/shared_screencast_stream.cc b/modules/desktop_capture/linux/wayland/shared_screencast_stream.cc
-index 070257f072..61fd0c8f3b 100644
+index 7366fd5b73..d23505877a 100644
 --- a/modules/desktop_capture/linux/wayland/shared_screencast_stream.cc
 +++ b/modules/desktop_capture/linux/wayland/shared_screencast_stream.cc
-@@ -71,10 +71,10 @@ constexpr int CursorMetaSize(int w, int h) {
-           w * h * kCursorBpp);
+@@ -74,12 +74,15 @@ constexpr int CursorMetaSize(int w, int h) {
+           w * h * kBytesPerPixel);
  }
  
 -constexpr PipeWireVersion kDmaBufModifierMinVersion = {.major = 0,
-+const PipeWireVersion kDmaBufModifierMinVersion = {.major = 0,
-                                                        .minor = 3,
-                                                        .micro = 33};
+-                                                       .minor = 3,
+-                                                       .micro = 33};
 -constexpr PipeWireVersion kDropSingleModifierMinVersion = {.major = 0,
-+const PipeWireVersion kDropSingleModifierMinVersion = {.major = 0,
-                                                            .minor = 3,
-                                                            .micro = 40};
+-                                                           .minor = 3,
+-                                                           .micro = 40};
++// Not constexpr constants: PipeWireVersion holds a std::string, so it is only
++// a literal type with a C++20 standard library (libstdc++ >= 12), and
++// namespace-scope instances would need static initializers.
++PipeWireVersion DmaBufModifierMinVersion() {
++  return {.major = 0, .minor = 3, .micro = 33};
++}
++PipeWireVersion DropSingleModifierMinVersion() {
++  return {.major = 0, .minor = 3, .micro = 40};
++}
  
+ class SharedScreenCastStreamPrivate {
+  public:
+@@ -558,8 +561,8 @@ bool SharedScreenCastStreamPrivate::StartScreenCastStream(
+ 
+     // Modifiers can be used with PipeWire >= 0.3.33
+     const bool has_dmabuf_support =
+-        egl_dmabuf_ && pw_client_version_ >= kDmaBufModifierMinVersion &&
+-        pw_server_version_ >= kDmaBufModifierMinVersion;
++        egl_dmabuf_ && pw_client_version_ >= DmaBufModifierMinVersion() &&
++        pw_server_version_ >= DmaBufModifierMinVersion();
+ 
+     struct spa_fraction default_frame_rate = SPA_FRACTION(frame_rate_, 1);
+     struct spa_rectangle resolution;
+@@ -1084,7 +1087,7 @@ bool SharedScreenCastStreamPrivate::ProcessDMABuffer(
+                                     spa_video_format_.format)
+         << "), marking as failed and renegotiating stream parameters";
+ 
+-    if (pw_server_version_ >= kDropSingleModifierMinVersion) {
++    if (pw_server_version_ >= DropSingleModifierMinVersion()) {
+       render_device->MarkModifierFailed(spa_video_format_.format, modifier_);
+     } else {
+       // For older PipeWire versions, mark all modifiers as failed for this
