@@ -93,6 +93,7 @@ cd src
 copy .vpython3 ..
 call git apply "libwebrtc\patches\custom_audio_source_m150.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 call git apply "libwebrtc\patches\add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+call git apply "libwebrtc\patches\allow_176k4_192k_shared_mode_formats.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
 
 
