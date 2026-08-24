@@ -127,8 +127,8 @@ args="is_debug=$debug  \
   rtc_enable_protobuf=false \
   treat_warnings_as_errors=false \
   use_llvm_libatomic=false \
-  use_custom_libcxx=false \
-  use_custom_libcxx_for_host=false \
+  use_custom_libcxx=true \
+  use_custom_libcxx_for_host=true \
   use_clang_modules=false \
   rtc_include_tests=true \
   rtc_build_tools=false \
