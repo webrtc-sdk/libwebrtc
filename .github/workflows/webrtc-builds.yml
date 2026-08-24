@@ -33,11 +33,11 @@ on:
       build_apple:
         description: 'Build Apple xcframework (mac/ios/tvos/visionos)'
         type: boolean
-        default: true
+        default: false
       build_android:
         description: 'Build Android AAR (multi-arch)'
         type: boolean
-        default: true
+        default: false
 
 permissions:
   packages: write
