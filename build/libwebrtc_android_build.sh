@@ -82,15 +82,8 @@ run_gclient_sync() {
 
 run_gclient_sync
 
-if [ ! -e "src/libwebrtc" ]
-then
-  mkdir -p src/libwebrtc
-  cp -rf ../{include,src,patches,BUILD.gn,LICENSE} src/libwebrtc
-fi
-
 cd src
 cp .vpython3 ..
-git apply "libwebrtc/patches/add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
 
 mkdir -p "$ARTIFACTS_DIR"
