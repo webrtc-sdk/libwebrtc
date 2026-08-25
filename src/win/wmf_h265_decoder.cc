@@ -398,7 +398,7 @@ HRESULT WmfH265Decoder::ProcessOutput(int64_t timestamp_us,
   }
 
   // Convert to I420
-  rtc::scoped_refptr<I420Buffer> i420_buffer =
+  webrtc::scoped_refptr<I420Buffer> i420_buffer =
       I420Buffer::Create(out_width, out_height);
 
   if (out_subtype == MFVideoFormat_NV12) {

@@ -91,18 +91,19 @@ if not exist src/libwebrtc (
 
 cd src
 copy .vpython3 ..
-call git apply "libwebrtc\patches\custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+call git apply "libwebrtc\patches\custom_audio_source_m150.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 call git apply "libwebrtc\patches\add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 call git apply "libwebrtc\patches\allow_176k4_192k_shared_mode_formats.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
 
-if not exist "%ARTIFACTS_DIR%\lib" (
-  mkdir "%ARTIFACTS_DIR%\lib"
+
+rem Start from a clean artifacts directory so stale outputs are not shipped.
+if exist "%ARTIFACTS_DIR%" (
+  rmdir /s /q "%ARTIFACTS_DIR%"
 )
 
-if not exist "%ARTIFACTS_DIR%\include" (
-  mkdir "%ARTIFACTS_DIR%\include"
-)
+mkdir "%ARTIFACTS_DIR%\lib"
+mkdir "%ARTIFACTS_DIR%\include"
 
 set "debug=false"
 if "!profile!" == "debug" (
@@ -111,10 +112,12 @@ if "!profile!" == "debug" (
 
 rem generate ninja for release
 call gn.bat gen %OUTPUT_DIR% --root="src" ^
-  --args="is_debug=!debug! is_clang=true target_cpu=\"!arch!\" use_custom_libcxx=false rtc_libvpx_build_vp9=true enable_libaom=true rtc_include_tests=true rtc_build_examples=false rtc_build_tools=false is_component_build=false rtc_enable_protobuf=false rtc_use_h264=true ffmpeg_branding=\"Chrome\" symbol_level=0 enable_iterator_debugging=false"
+  --args="is_debug=!debug! is_clang=true target_cpu=\"!arch!\" use_custom_libcxx=false rtc_libvpx_build_vp9=true enable_libaom=true rtc_include_tests=true rtc_build_examples=false rtc_build_tools=false is_component_build=false rtc_enable_protobuf=false rtc_use_h264=true ffmpeg_branding=\"Chrome\" rtc_use_h265=true symbol_level=0 enable_iterator_debugging=false"
 
 rem build
 ninja.exe -C %OUTPUT_DIR% libwebrtc libwebrtc_cpp_api_unittests
+
+if errorlevel 1 exit /b 1
 
 rem copy static library for release build
 copy "%OUTPUT_DIR%\libwebrtc.dll.lib" "%ARTIFACTS_DIR%\lib"

@@ -104,7 +104,7 @@ then
 fi
 
 cd src
-git apply "libwebrtc/patches/custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+git apply "libwebrtc/patches/custom_audio_source_m150.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 git apply "libwebrtc/patches/add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 git apply "libwebrtc/patches/fix_desktop_capture_compile.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
@@ -127,8 +127,8 @@ args="is_debug=$debug  \
   rtc_enable_protobuf=false \
   treat_warnings_as_errors=false \
   use_llvm_libatomic=false \
-  use_custom_libcxx=false \
-  use_custom_libcxx_for_host=false \
+  use_custom_libcxx=true \
+  use_custom_libcxx_for_host=true \
   use_clang_modules=false \
   rtc_include_tests=true \
   rtc_build_tools=false \

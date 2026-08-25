@@ -11,7 +11,9 @@
 #include <mfreadwrite.h>
 #include <wrl/client.h>
 
+#include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "api/video/video_frame.h"
@@ -46,10 +48,22 @@ class WmfH265Encoder : public VideoEncoder {
   HRESULT ConfigureOutputType();
   HRESULT ConfigureRateControl();
   HRESULT ProcessInput(const VideoFrame& frame);
-  HRESULT ProcessOutput(int64_t timestamp_us, int64_t ntp_time_ms,
-                        uint32_t rtp_timestamp);
+  HRESULT ProcessOutput();
+  // Async (hardware) MFT helpers. Hardware HEVC encoders are asynchronous
+  // MFTs: they must be unlocked and driven through their event queue instead
+  // of the plain ProcessInput()/ProcessOutput() polling loop.
+  HRESULT PumpEvent(bool wait);
+  HRESULT EncodeAsync(const VideoFrame& frame);
   int32_t NextNaluPosition(uint8_t* buffer, size_t buffer_size,
                            uint8_t* sc_length);
+
+  // Timing metadata for a frame handed to the MFT, keyed by the sample time
+  // so that output samples can be matched back to their input frame.
+  struct FrameTiming {
+    int64_t timestamp_us = 0;
+    int64_t ntp_time_ms = 0;
+    uint32_t rtp_timestamp = 0;
+  };
 
   EncodedImageCallback* callback_ = nullptr;
   VideoCodec codec_settings_;
@@ -63,8 +77,16 @@ class WmfH265Encoder : public VideoEncoder {
   bool com_initialized_ = false;
 
   Microsoft::WRL::ComPtr<IMFTransform> encoder_;
+  Microsoft::WRL::ComPtr<IMFMediaEventGenerator> event_generator_;
   Microsoft::WRL::ComPtr<IMFMediaType> input_type_;
   Microsoft::WRL::ComPtr<IMFMediaType> output_type_;
+
+  // True when the activated MFT is an asynchronous (hardware) transform.
+  bool is_async_ = false;
+  // Number of METransformNeedInput events received but not yet consumed.
+  int pending_input_requests_ = 0;
+  std::map<LONGLONG, FrameTiming> frame_timing_;
+  FrameTiming last_timing_;
 
   DWORD input_stream_id_ = 0;
   DWORD output_stream_id_ = 0;

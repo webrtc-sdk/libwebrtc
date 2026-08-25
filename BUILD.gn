@@ -34,6 +34,7 @@ config("external_config") {
 
 rtc_shared_library("libwebrtc") {
   libs = []
+  cflags = []
   include_dirs = [
     ".",
     "include",
@@ -229,14 +230,22 @@ rtc_shared_library("libwebrtc") {
   }
 
   if (is_win && is_clang) {
-    cflags = [
+    cflags += [
       "-Wno-microsoft-extra-qualification",
       "-Wno-reorder",
     ]
   }
+
   if (is_clang) {
     # Suppress warnings from the Chromium Clang plugin (bugs.webrtc.org/163).
     #suppressed_configs += [ "//build/config/clang:find_bad_constructs" ]
+
+    # Since m150 the unsafe-buffers clang plugin is enabled tree-wide (see
+    # //unsafe_buffers_paths.txt). The plugin re-raises the diagnostic as an
+    # error on its own, so -Wno-unsafe-buffer-usage alone is not enough; the
+    # config has to be dropped for this target.
+    suppressed_configs += [ "//build/config/clang:unsafe_buffers" ]
+    cflags += [ "-Wno-deprecated-declarations" ]
   }
 
   deps = [
@@ -303,6 +312,12 @@ rtc_test("libwebrtc_cpp_api_unittests") {
   sources = [
      "test/peerconnection_factory.test.cc",
   ]
+
+  if (is_clang) {
+    # See the comment in the "libwebrtc" target above.
+    suppressed_configs = [ "//build/config/clang:unsafe_buffers" ]
+    cflags = [ "-Wno-deprecated-declarations" ]
+  }
 
    deps = [
     ":libwebrtc",

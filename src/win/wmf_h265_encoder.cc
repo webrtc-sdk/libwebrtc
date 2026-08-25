@@ -8,6 +8,10 @@
 #include <wmcodecdsp.h>
 
 #include <algorithm>
+#include <cstdio>
+#include <iterator>
+#include <span>
+#include <string>
 
 #include "api/video/encoded_image.h"
 #include "api/video/i420_buffer.h"
@@ -26,6 +30,22 @@
 #pragma comment(lib, "mf.lib")
 
 namespace webrtc {
+namespace {
+
+// Media Foundation HRESULTs are only recognizable in hex.
+std::string HrStr(HRESULT hr) {
+  char buf[16];
+  std::snprintf(buf, sizeof(buf), "0x%08lX", static_cast<unsigned long>(hr));
+  return std::string(buf);
+}
+
+// Upper bound on events serviced in a single Encode() call, so a misbehaving
+// MFT can never spin the encoder thread forever.
+constexpr int kMaxEventsPerEncode = 256;
+// Upper bound on frames in flight inside the MFT that we keep timing for.
+constexpr size_t kMaxPendingFrameTimings = 64;
+
+}  // namespace
 
 WmfH265Encoder::WmfH265Encoder(const VideoCodec& codec)
     : codec_settings_(codec) {}
@@ -145,17 +165,47 @@ HRESULT WmfH265Encoder::CreateHEVCEncoder() {
   CoTaskMemFree(activate);
 
   if (FAILED(hr)) {
-    RTC_LOG(LS_ERROR) << "Failed to activate HEVC encoder MFT: " << static_cast<int>(hr);
+    RTC_LOG(LS_ERROR) << "Failed to activate HEVC encoder MFT: " << HrStr(hr);
     return hr;
   }
-  // Set low-latency mode for real-time encoding
+
   Microsoft::WRL::ComPtr<IMFAttributes> attributes;
   hr = encoder_->GetAttributes(&attributes);
-  if (SUCCEEDED(hr)) {
+  if (SUCCEEDED(hr) && attributes) {
+    // Hardware encoders are asynchronous MFTs and stay locked until the
+    // client opts in. Every call on a locked MFT (SetInputType included)
+    // fails with MF_E_TRANSFORM_ASYNC_LOCKED (0xC00D6D77).
+    UINT32 is_async = 0;
+    if (FAILED(attributes->GetUINT32(MF_TRANSFORM_ASYNC, &is_async))) {
+      is_async = 0;
+    }
+    if (is_async) {
+      hr = attributes->SetUINT32(MF_TRANSFORM_ASYNC_UNLOCK, TRUE);
+      if (FAILED(hr)) {
+        RTC_LOG(LS_ERROR) << "Failed to unlock async HEVC encoder MFT: "
+                          << HrStr(hr);
+        return hr;
+      }
+      is_async_ = true;
+    }
+    // Set low-latency mode for real-time encoding.
     attributes->SetUINT32(MF_LOW_LATENCY, TRUE);
   }
 
-  RTC_LOG(LS_INFO) << "HEVC encoder MFT activated successfully.";
+  if (is_async_) {
+    hr = encoder_.As(&event_generator_);
+    if (FAILED(hr)) {
+      RTC_LOG(LS_ERROR) << "Async HEVC MFT has no event generator: "
+                        << HrStr(hr);
+      return hr;
+    }
+    // Tell the hardware MFT that no DXGI device manager will be supplied, so
+    // it configures itself for system-memory input.
+    encoder_->ProcessMessage(MFT_MESSAGE_SET_D3D_MANAGER, 0);
+  }
+
+  RTC_LOG(LS_INFO) << "HEVC encoder MFT activated successfully ("
+                   << (is_async_ ? "async/hardware" : "sync") << ").";
   return S_OK;
 }
 
@@ -198,9 +248,11 @@ HRESULT WmfH265Encoder::ConfigureOutputType() {
   output_type_->SetUINT32(MF_MT_MPEG2_PROFILE, 1);  // Main profile
   output_type_->SetUINT32(MF_MT_MPEG2_LEVEL, 120);   // Level 4.0
 
+  RTC_LOG(LS_INFO) << "SetOutputType output_type_: " << output_type_.Get();
+
   hr = encoder_->SetOutputType(output_stream_id_, output_type_.Get(), 0);
   if (FAILED(hr)) {
-    RTC_LOG(LS_ERROR) << "SetOutputType failed: " << static_cast<int>(hr);
+    RTC_LOG(LS_ERROR) << "SetOutputType failed: " << HrStr(hr);
     return hr;
   }
 
@@ -221,7 +273,7 @@ HRESULT WmfH265Encoder::ConfigureInputType() {
 
   hr = encoder_->SetInputType(input_stream_id_, input_type_.Get(), 0);
   if (FAILED(hr)) {
-    RTC_LOG(LS_ERROR) << "SetInputType failed: " << static_cast<int>(hr);
+    RTC_LOG(LS_ERROR) << "SetInputType failed: " << HrStr(hr);
     return hr;
   }
 
@@ -292,12 +344,16 @@ int WmfH265Encoder::InitEncode(const VideoCodec* codec_settings,
   // Pre-allocate NV12 conversion buffer
   nv12_buffer_.resize(width_ * height_ * 3 / 2);
 
+  pending_input_requests_ = 0;
+  frame_timing_.clear();
+  last_timing_ = FrameTiming();
+
   // Start processing
   hr = encoder_->ProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0);
   hr = encoder_->ProcessMessage(MFT_MESSAGE_NOTIFY_BEGIN_STREAMING, 0);
   hr = encoder_->ProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, 0);
   if (FAILED(hr)) {
-    RTC_LOG(LS_ERROR) << "Failed to start encoder streaming: " << static_cast<int>(hr);
+    RTC_LOG(LS_ERROR) << "Failed to start encoder streaming: " << HrStr(hr);
     return WEBRTC_VIDEO_CODEC_ERROR;
   }
 
@@ -310,7 +366,7 @@ int WmfH265Encoder::InitEncode(const VideoCodec* codec_settings,
 }
 
 HRESULT WmfH265Encoder::ProcessInput(const VideoFrame& frame) {
-  rtc::scoped_refptr<I420BufferInterface> i420_buffer =
+  webrtc::scoped_refptr<I420BufferInterface> i420_buffer =
       frame.video_frame_buffer()->ToI420();
 
   int y_stride = i420_buffer->StrideY();
@@ -356,7 +412,20 @@ HRESULT WmfH265Encoder::ProcessInput(const VideoFrame& frame) {
   sample->SetSampleDuration(static_cast<LONGLONG>(10000000.0 / frame_rate_));
 
   hr = encoder_->ProcessInput(input_stream_id_, sample.Get(), 0);
-  return hr;
+  if (FAILED(hr)) return hr;
+
+  // Remember the frame timing so the matching output sample can carry the
+  // upstream RTP timestamp even while the MFT keeps frames in flight.
+  FrameTiming timing;
+  timing.timestamp_us = frame.timestamp_us();
+  timing.ntp_time_ms = frame.ntp_time_ms();
+  timing.rtp_timestamp = frame.rtp_timestamp();
+  frame_timing_[sample_time] = timing;
+  last_timing_ = timing;
+  while (frame_timing_.size() > kMaxPendingFrameTimings) {
+    frame_timing_.erase(frame_timing_.begin());
+  }
+  return S_OK;
 }
 
 int32_t WmfH265Encoder::NextNaluPosition(uint8_t* buffer,
@@ -380,9 +449,7 @@ int32_t WmfH265Encoder::NextNaluPosition(uint8_t* buffer,
   return -1;
 }
 
-HRESULT WmfH265Encoder::ProcessOutput(int64_t timestamp_us,
-                                       int64_t ntp_time_ms,
-                                       uint32_t rtp_timestamp) {
+HRESULT WmfH265Encoder::ProcessOutput() {
   MFT_OUTPUT_DATA_BUFFER output_data = {};
   output_data.dwStreamID = output_stream_id_;
 
@@ -419,7 +486,7 @@ HRESULT WmfH265Encoder::ProcessOutput(int64_t timestamp_us,
   }
 
   if (FAILED(hr)) {
-    RTC_LOG(LS_ERROR) << "ProcessOutput failed: " << static_cast<int>(hr);
+    RTC_LOG(LS_ERROR) << "ProcessOutput failed: " << HrStr(hr);
     if (output_data.pEvents) output_data.pEvents->Release();
     return hr;
   }
@@ -445,6 +512,20 @@ HRESULT WmfH265Encoder::ProcessOutput(int64_t timestamp_us,
   if (FAILED(hr)) {
     if (output_data.pEvents) output_data.pEvents->Release();
     return hr;
+  }
+
+  // Match the output sample back to the frame it was produced from; the MFT
+  // may hold several frames in flight, so the newest input is not necessarily
+  // the frame coming out here.
+  FrameTiming timing = last_timing_;
+  LONGLONG out_sample_time = 0;
+  if (SUCCEEDED(result_sample->GetSampleTime(&out_sample_time))) {
+    auto it = frame_timing_.find(out_sample_time);
+    if (it != frame_timing_.end()) {
+      timing = it->second;
+      // Anything older was dropped by the encoder and will never come out.
+      frame_timing_.erase(frame_timing_.begin(), std::next(it));
+    }
   }
 
   if (data_length > 0 && callback_) {
@@ -479,9 +560,9 @@ HRESULT WmfH265Encoder::ProcessOutput(int64_t timestamp_us,
     encoded_image._encodedHeight = height_;
     // Preserve the RTP timestamp from the upstream WebRTC frame
     // to avoid drift between encoder and RTP sender.
-    encoded_image.SetRtpTimestamp(rtp_timestamp);
-    encoded_image.capture_time_ms_ = timestamp_us / 1000;
-    encoded_image.ntp_time_ms_ = ntp_time_ms;
+    encoded_image.SetRtpTimestamp(timing.rtp_timestamp);
+    encoded_image.capture_time_ms_ = timing.timestamp_us / 1000;
+    encoded_image.ntp_time_ms_ = timing.ntp_time_ms;
     encoded_image._frameType =
         is_keyframe ? VideoFrameType::kVideoFrameKey
                     : VideoFrameType::kVideoFrameDelta;
@@ -489,7 +570,7 @@ HRESULT WmfH265Encoder::ProcessOutput(int64_t timestamp_us,
 
     // Parse bitstream for QP
     bitstream_parser_.ParseBitstream(
-        rtc::ArrayView<const uint8_t>(data, data_length));
+        std::span<const uint8_t>(data, data_length));
     
     std::optional<int> qp = bitstream_parser_.GetLastSliceQp();
     if (qp.has_value()) {
@@ -510,6 +591,66 @@ HRESULT WmfH265Encoder::ProcessOutput(int64_t timestamp_us,
     output_data.pEvents->Release();
   }
 
+  return S_OK;
+}
+
+HRESULT WmfH265Encoder::PumpEvent(bool wait) {
+  Microsoft::WRL::ComPtr<IMFMediaEvent> event;
+  HRESULT hr =
+      event_generator_->GetEvent(wait ? 0 : MF_EVENT_FLAG_NO_WAIT, &event);
+  if (FAILED(hr)) return hr;  // Includes MF_E_NO_EVENTS_AVAILABLE.
+
+  MediaEventType type = MEUnknown;
+  hr = event->GetType(&type);
+  if (FAILED(hr)) return hr;
+
+  switch (type) {
+    case METransformNeedInput:
+      ++pending_input_requests_;
+      return S_OK;
+    case METransformHaveOutput:
+      hr = ProcessOutput();
+      // The MFT is allowed to retract an output request; not an error.
+      return hr == MF_E_TRANSFORM_NEED_MORE_INPUT ? S_OK : hr;
+    case MEError: {
+      HRESULT status = S_OK;
+      event->GetStatus(&status);
+      RTC_LOG(LS_ERROR) << "HEVC MFT reported MEError: " << HrStr(status);
+      return FAILED(status) ? status : E_FAIL;
+    }
+    default:
+      // METransformDrainComplete, METransformMarker, ... nothing to do.
+      return S_OK;
+  }
+}
+
+HRESULT WmfH265Encoder::EncodeAsync(const VideoFrame& frame) {
+  int serviced = 0;
+
+  // Wait for the MFT to ask for input, servicing output it produces meanwhile.
+  while (pending_input_requests_ == 0) {
+    if (++serviced > kMaxEventsPerEncode) {
+      RTC_LOG(LS_ERROR) << "HEVC MFT never requested input; dropping frame.";
+      return MF_E_NOTACCEPTING;
+    }
+    HRESULT hr = PumpEvent(/*wait=*/true);
+    if (FAILED(hr)) {
+      RTC_LOG(LS_ERROR) << "Waiting for HEVC MFT input request failed: "
+                        << HrStr(hr);
+      return hr;
+    }
+  }
+
+  --pending_input_requests_;
+  HRESULT hr = ProcessInput(frame);
+  if (FAILED(hr)) return hr;
+
+  // Collect everything already queued, without blocking.
+  while (++serviced <= kMaxEventsPerEncode) {
+    hr = PumpEvent(/*wait=*/false);
+    if (hr == MF_E_NO_EVENTS_AVAILABLE) break;
+    if (FAILED(hr)) return hr;
+  }
   return S_OK;
 }
 
@@ -543,27 +684,33 @@ int WmfH265Encoder::Encode(const VideoFrame& input_image,
     }
   }
 
+  if (is_async_) {
+    HRESULT async_hr = EncodeAsync(input_image);
+    if (FAILED(async_hr)) {
+      RTC_LOG(LS_ERROR) << "Async HEVC encode failed: " << HrStr(async_hr);
+      return WEBRTC_VIDEO_CODEC_ERROR;
+    }
+    return WEBRTC_VIDEO_CODEC_OK;
+  }
+
   // Process input
   HRESULT hr = ProcessInput(input_image);
   if (hr == MF_E_NOTACCEPTING) {
     // MFT input buffer full — drain output first, then retry
     while (true) {
-      HRESULT out_hr = ProcessOutput(input_image.timestamp_us(),
-                                     input_image.ntp_time_ms(),
-                                     input_image.rtp_timestamp());
+      HRESULT out_hr = ProcessOutput();
       if (out_hr == MF_E_TRANSFORM_NEED_MORE_INPUT || FAILED(out_hr)) break;
     }
     hr = ProcessInput(input_image);
   }
   if (FAILED(hr)) {
-    RTC_LOG(LS_ERROR) << "ProcessInput failed: " << static_cast<int>(hr);
+    RTC_LOG(LS_ERROR) << "ProcessInput failed: " << HrStr(hr);
     return WEBRTC_VIDEO_CODEC_ERROR;
   }
 
   // Try to get output
   while (true) {
-    hr = ProcessOutput(input_image.timestamp_us(), input_image.ntp_time_ms(),
-                        input_image.rtp_timestamp());
+    hr = ProcessOutput();
     if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT) {
       break;  // Need more input before getting output
     }
@@ -612,13 +759,22 @@ VideoEncoder::EncoderInfo WmfH265Encoder::GetEncoderInfo() const {
 
 int WmfH265Encoder::Release() {
   if (encoder_) {
+    // Flush before ending the stream so no trailing output is handed to a
+    // callback that may already be gone.
+    encoder_->ProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0);
     encoder_->ProcessMessage(MFT_MESSAGE_NOTIFY_END_OF_STREAM, 0);
-    encoder_->ProcessMessage(MFT_MESSAGE_COMMAND_DRAIN, 0);
+    encoder_->ProcessMessage(MFT_MESSAGE_NOTIFY_END_STREAMING, 0);
     encoder_.Reset();
   }
 
+  event_generator_.Reset();
   input_type_.Reset();
   output_type_.Reset();
+
+  is_async_ = false;
+  pending_input_requests_ = 0;
+  frame_timing_.clear();
+  last_timing_ = FrameTiming();
 
   if (mf_started_) {
     MFShutdown();
