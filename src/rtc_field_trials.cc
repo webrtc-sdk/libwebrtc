@@ -8,7 +8,6 @@
 #include "api/field_trials.h"
 #include "rtc_base/logging.h"
 #include "rtc_field_trials_impl.h"
-#include "system_wrappers/include/field_trial.h"
 
 namespace libwebrtc {
 
@@ -75,25 +74,6 @@ bool RTCFieldTrials::InitFieldTrialsFromString(const string& trials_string) {
   std::lock_guard<std::mutex> lock(FieldTrialsLock());
   GlobalFieldTrials() = std::move(parsed);
   FieldTrialsString() = trials;
-
-  // Keep the legacy webrtc::field_trial::FindFullName() lookups in sync. That
-  // API only keeps a pointer to the string, which therefore has to outlive the
-  // application, hence the deliberately leaked copy.
-  const std::string* leaked = new std::string(trials);
-#if defined(__clang__) || defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#endif
-  webrtc::field_trial::InitFieldTrialsFromString(leaked->c_str());
-#if defined(__clang__) || defined(__GNUC__)
-#pragma GCC diagnostic pop
-#elif defined(_MSC_VER)
-#pragma warning(pop)
-#endif
-
   RTC_LOG(LS_INFO) << "Field trials set to: " << trials;
   return true;
 }

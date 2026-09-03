@@ -273,7 +273,6 @@ rtc_shared_library("libwebrtc") {
     "../pc:libjingle_peerconnection",
     "../rtc_base:threading",
     "../sdk:media_constraints",
-    "../system_wrappers:field_trial",
     "//third_party/abseil-cpp/absl/memory",
     "//third_party/boringssl:boringssl",
     "//third_party/libyuv",
