@@ -77,6 +77,7 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_data_packet_cryptor.h",
     "include/rtc_dtls_transport.h",
     "include/rtc_dtmf_sender.h",
+    "include/rtc_field_trials.h",
     "include/rtc_frame_cryptor.h",
     "include/rtc_ice_candidate.h",
     "include/rtc_media_stream.h",
@@ -125,6 +126,8 @@ rtc_shared_library("libwebrtc") {
     "src/rtc_dtls_transport_impl.h",
     "src/rtc_dtmf_sender_impl.cc",
     "src/rtc_dtmf_sender_impl.h",
+    "src/rtc_field_trials.cc",
+    "src/rtc_field_trials_impl.h",
     "src/rtc_frame_cryptor_impl.cc",
     "src/rtc_frame_cryptor_impl.h",
     "src/rtc_ice_candidate_impl.cc",
@@ -250,6 +253,7 @@ rtc_shared_library("libwebrtc") {
 
   deps = [
     "../api:create_peerconnection_factory",
+    "../api:field_trials",
     "../api:libjingle_peerconnection_api",
     "../api/audio_codecs:builtin_audio_decoder_factory",
     "../api/audio_codecs:builtin_audio_encoder_factory",
@@ -310,6 +314,7 @@ rtc_test("libwebrtc_cpp_api_unittests") {
   testonly = true
 
   sources = [
+     "test/field_trials.test.cc",
      "test/peerconnection_factory.test.cc",
   ]
 
