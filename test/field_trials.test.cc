@@ -18,6 +18,13 @@ constexpr char kTrialA[] = "WebRTC-LibWebRTC-UnitTestTrialA";
 constexpr char kTrialB[] = "WebRTC-LibWebRTC-UnitTestTrialB";
 constexpr char kUnconfiguredTrial[] = "WebRTC-LibWebRTC-UnitTestTrialUnknown";
 
+// A parameterized trial, i.e. one whose group carries "key:value" pairs
+// instead of just "Enabled"/"Disabled". WebRTC does look this one up, but only
+// when a video receive stream is created, which none of these tests do, and
+// TearDown() clears it again before the next test runs.
+constexpr char kForcePlayoutDelayTrial[] = "WebRTC-ForcePlayoutDelay";
+constexpr char kForcePlayoutDelayGroup[] = "min_ms:0,max_ms:0";
+
 std::string ToStd(const libwebrtc::string& value) { return value.std_string(); }
 
 libwebrtc::vector<libwebrtc::string> Trials(
@@ -122,6 +129,59 @@ TEST_F(FieldTrialsTest, WellKnownKeysAreAccepted) {
       RTCFieldTrials::IsEnabled(libwebrtc::kRTCFieldTrialH264HighProfileKey));
   EXPECT_TRUE(
       RTCFieldTrials::IsEnabled(libwebrtc::kRTCFieldTrialIceHandshakeDtlsKey));
+}
+
+TEST_F(FieldTrialsTest, ForcePlayoutDelayIsAppliedFromString) {
+  const std::string trials = std::string(kForcePlayoutDelayTrial) + "/" +
+                             kForcePlayoutDelayGroup + "/";
+  ASSERT_TRUE(RTCFieldTrials::InitFieldTrialsFromString(trials));
+
+  EXPECT_EQ(trials, ToStd(RTCFieldTrials::GetFieldTrialsString()));
+
+  // The whole group is returned verbatim, separators inside it included.
+  EXPECT_EQ(kForcePlayoutDelayGroup,
+            ToStd(RTCFieldTrials::Lookup(kForcePlayoutDelayTrial)));
+
+  // A parameterized group is neither "Enabled" nor "Disabled".
+  EXPECT_FALSE(RTCFieldTrials::IsEnabled(kForcePlayoutDelayTrial));
+  EXPECT_FALSE(RTCFieldTrials::IsDisabled(kForcePlayoutDelayTrial));
+}
+
+TEST_F(FieldTrialsTest, ForcePlayoutDelayIsAppliedFromEntries) {
+  // Without the trailing separator, so that BuildFieldTrialsString() has to
+  // append it after the parameter list.
+  ASSERT_TRUE(RTCFieldTrials::InitFieldTrials(Trials(
+      {std::string(kForcePlayoutDelayTrial) + "/" + kForcePlayoutDelayGroup})));
+
+  EXPECT_EQ(std::string(kForcePlayoutDelayTrial) + "/" +
+                kForcePlayoutDelayGroup + "/",
+            ToStd(RTCFieldTrials::GetFieldTrialsString()));
+  EXPECT_EQ(kForcePlayoutDelayGroup,
+            ToStd(RTCFieldTrials::Lookup(kForcePlayoutDelayTrial)));
+}
+
+TEST_F(FieldTrialsTest, ForcePlayoutDelayCoexistsWithOtherTrials) {
+  ASSERT_TRUE(RTCFieldTrials::InitFieldTrials(Trials({
+      std::string(kTrialA) + "/" + libwebrtc::kRTCFieldTrialEnabledValue,
+      std::string(kForcePlayoutDelayTrial) + "/" + kForcePlayoutDelayGroup,
+      std::string(kTrialB) + "/" + libwebrtc::kRTCFieldTrialDisabledValue,
+  })));
+
+  EXPECT_TRUE(RTCFieldTrials::IsEnabled(kTrialA));
+  EXPECT_EQ(kForcePlayoutDelayGroup,
+            ToStd(RTCFieldTrials::Lookup(kForcePlayoutDelayTrial)));
+  EXPECT_TRUE(RTCFieldTrials::IsDisabled(kTrialB));
+}
+
+TEST_F(FieldTrialsTest, ForcePlayoutDelayIsClearedByEmptyString) {
+  ASSERT_TRUE(RTCFieldTrials::InitFieldTrialsFromString(
+      std::string(kForcePlayoutDelayTrial) + "/" + kForcePlayoutDelayGroup +
+      "/"));
+  ASSERT_EQ(kForcePlayoutDelayGroup,
+            ToStd(RTCFieldTrials::Lookup(kForcePlayoutDelayTrial)));
+
+  EXPECT_TRUE(RTCFieldTrials::InitFieldTrialsFromString(""));
+  EXPECT_EQ("", ToStd(RTCFieldTrials::Lookup(kForcePlayoutDelayTrial)));
 }
 
 TEST_F(FieldTrialsTest, InvalidStringIsRejectedAndKeepsPreviousTrials) {
