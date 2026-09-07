@@ -31,6 +31,23 @@ class LibWebRTC {
   LIB_WEBRTC_API static bool Initialize();
 
   /**
+   * @brief Applies the given field trials and initializes WebRTC.
+   *
+   * Configures the global WebRTC field trials and then performs the same
+   * initialization as Initialize(). Field trials are read when objects are
+   * created, so this must be called before any other call into WebRTC, in
+   * particular before CreateRTCPeerConnectionFactory().
+   *
+   * Each entry is either "Key/Value" or "Key/Value/", e.g.
+   * "WebRTC-FlexFEC-03/Enabled/". See rtc_field_trials.h for the well known
+   * keys and for finer grained control over the field trials.
+   *
+   * @param field_trials The field trial entries to apply.
+   */
+  LIB_WEBRTC_API static void InitializeWithFieldTrials(
+      vector<string> field_trials);
+
+  /**
    * @brief Creates a new WebRTC PeerConnectionFactory.
    *
    * Creates a new WebRTC PeerConnectionFactory. This method is thread-safe and

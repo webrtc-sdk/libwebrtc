@@ -9,6 +9,7 @@
 #include "api/video_codecs/builtin_video_encoder_factory.h"
 #include "modules/audio_device/audio_device_impl.h"
 #include "rtc_audio_source_impl.h"
+#include "rtc_field_trials_impl.h"
 #include "rtc_media_stream_impl.h"
 #include "rtc_mediaconstraints_impl.h"
 #include "rtc_peerconnection_impl.h"
@@ -45,8 +46,20 @@ std::unique_ptr<webrtc::VideoDecoderFactory> CreateIntelVideoDecoderFactory() {
 }
 #endif
 
+namespace {
+
+// Builds the environment shared by everything this factory creates, applying
+// the field trials configured through RTCFieldTrials, if any.
+webrtc::Environment CreateEnvironmentWithFieldTrials() {
+  webrtc::EnvironmentFactory factory;
+  factory.Set(CopyGlobalFieldTrials());
+  return factory.Create();
+}
+
+}  // namespace
+
 RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl():
-env_(webrtc::EnvironmentFactory().Create()) {}
+env_(CreateEnvironmentWithFieldTrials()) {}
 
 RTCPeerConnectionFactoryImpl::~RTCPeerConnectionFactoryImpl() {}
 
