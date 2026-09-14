@@ -109,8 +109,13 @@ bool RTCPeerConnectionFactoryImpl::Initialize() {
         webrtc::CreateBuiltinVideoEncoderFactory(),
         webrtc::CreateBuiltinVideoDecoderFactory(),
 #endif
-        nullptr, audio_processing_impl_->GetAudioProcessing(), nullptr, nullptr,
-        audio_transport_factory_);
+        nullptr, audio_processing_impl_->GetAudioProcessing(), nullptr,
+        // The field trials configured through RTCFieldTrials, e.g. WARP's
+        // `WebRTC-IceHandshakeDtls`. Passing nullptr here makes the factory
+        // build its environment from the deprecated global field trial
+        // string instead, so everything set through InitFieldTrials() is
+        // silently ignored.
+        CopyGlobalFieldTrials(), audio_transport_factory_);
   }
 
   if (!rtc_peerconnection_factory_.get()) {
