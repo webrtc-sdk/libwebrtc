@@ -159,7 +159,7 @@ jobs:
           path: build\libwebrtc-win-${{ matrix.arch }}-${{ matrix.profile }}.zip*
 
   build-apple:
-    if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_apple == 'true'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_apple == 'true'
     strategy:
       fail-fast: false
     name: Build WebRTC xcframework for apple
@@ -195,7 +195,7 @@ jobs:
           path: build/out-${{ github.event.inputs.configuration || 'release' }}/WebRTC.xcframework.zip*
 
   build-android:
-    if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_android == 'true'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_android == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -257,10 +257,8 @@ jobs:
     name: Release to GH (Draft)
     if: startsWith(github.ref, 'refs/tags')
     needs:
-      - build-apple
       - build-win
       - build-linux
-      - build-android
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
