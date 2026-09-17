@@ -92,6 +92,9 @@ struct RTCConfiguration {
   bool disable_link_local_networks = false;
   int screencast_min_bitrate = -1;
   bool enable_dscp = false;
+  // Enable SNAP (SCTP INIT in SDP), part of WARP.
+  // see https://www.ietf.org/archive/id/draft-hancke-tsvwg-snap-00.html
+  bool enable_sctp_snap = false;
 
   // private
   bool use_rtp_mux = true;
