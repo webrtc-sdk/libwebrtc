@@ -301,7 +301,11 @@ rtc_shared_library("libwebrtc") {
       "../modules/desktop_capture",
     ]
     if (is_win) {
-      deps += [ "../rtc_base/win:scoped_com_initializer" ]
+      deps += [
+        "../rtc_base/win:get_activation_factory",
+        "../rtc_base/win:hstring",
+        "../rtc_base/win:scoped_com_initializer",
+      ]
     }
     if (is_linux) {
       configs += [ ":gio" ]

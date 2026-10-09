@@ -67,6 +67,8 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
 
   scoped_refptr<MediaSource> source() override { return source_; }
 
+  bool IsCaptureBorderHidden() override { return border_hidden_; }
+
  protected:
   virtual void OnCaptureResult(
       webrtc::DesktopCapturer::Result result,
@@ -97,6 +99,8 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   // Whether capturer_ captures with Windows.Graphics.Capture. Set on thread_
   // in the constructor.
   bool use_wgc_ = false;
+  // Whether the WGC capture border is off. Set on thread_ in the constructor.
+  bool border_hidden_ = false;
 #ifdef WEBRTC_WIN
   // WGC needs COM on the thread it runs on. Created and destroyed on thread_.
   std::unique_ptr<webrtc::ScopedCOMInitializer> com_initializer_;

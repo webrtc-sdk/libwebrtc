@@ -38,10 +38,11 @@ struct RTCDesktopCapturerOptions {
 
   /**
    * Windows, WGC only: whether Windows draws its capture border around the
-   * shared window. Turning it off takes effect on Windows 11, and only after
-   * the app has been granted borderless capture
+   * shared window. When off, the capturer asks for borderless capture
    * (GraphicsCaptureAccess::RequestAccessAsync with
-   * GraphicsCaptureAccessKind::Borderless); otherwise the border stays.
+   * GraphicsCaptureAccessKind::Borderless) and removes the border only if
+   * that is allowed and the system supports it (Windows 11); otherwise the
+   * border stays. RTCDesktopCapturer::IsCaptureBorderHidden() tells which.
    */
   bool wgc_border_required = true;
 };

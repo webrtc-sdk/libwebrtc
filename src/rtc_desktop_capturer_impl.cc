@@ -17,6 +17,7 @@
 #include "rtc_desktop_capturer_impl.h"
 
 #include <algorithm>
+#include <memory>
 
 #include "api/sequence_checker.h"
 #include "rtc_base/checks.h"
@@ -25,7 +26,17 @@
 #ifdef WEBRTC_WIN
 #include "modules/desktop_capture/win/window_capture_utils.h"
 #if defined(RTC_ENABLE_WIN_WGC)
+#include <windows.foundation.metadata.h>
+#include <windows.graphics.capture.h>
+#include <windows.security.authorization.appcapabilityaccess.h>
+#include <wrl/client.h>
+#include <wrl/event.h>
+
+#include <cwchar>
+
 #include "modules/desktop_capture/win/wgc_capturer_win.h"
+#include "rtc_base/win/get_activation_factory.h"
+#include "rtc_base/win/hstring.h"
 #endif
 #endif
 
@@ -40,6 +51,92 @@ RTCDesktopCapturerOptions OptionsWithCursor(bool show_cursor) {
   options.show_cursor = show_cursor;
   return options;
 }
+
+#if defined(WEBRTC_WIN) && defined(RTC_ENABLE_WIN_WGC)
+// Whether Windows lets this app capture without the WGC capture border: the
+// system has GraphicsCaptureSession.IsBorderRequired (Windows 11) and
+// GraphicsCaptureAccess grants borderless capture. Runs on a COM initialized
+// thread.
+bool CanCaptureWithoutBorder() {
+  using Microsoft::WRL::ComPtr;
+  namespace WGC = ABI::Windows::Graphics::Capture;
+  namespace Access = ABI::Windows::Security::Authorization::AppCapabilityAccess;
+  namespace WF = ABI::Windows::Foundation;
+
+  if (!webrtc::ResolveCoreWinRTDelayload() ||
+      !webrtc::ResolveCoreWinRTStringDelayload()) {
+    return false;
+  }
+
+  ComPtr<WF::Metadata::IApiInformationStatics> api_info;
+  HRESULT hr = webrtc::GetActivationFactory<
+      WF::Metadata::IApiInformationStatics,
+      RuntimeClass_Windows_Foundation_Metadata_ApiInformation>(&api_info);
+  if (FAILED(hr)) {
+    return false;
+  }
+  static const wchar_t kSessionType[] =
+      L"Windows.Graphics.Capture.GraphicsCaptureSession";
+  static const wchar_t kBorderProperty[] = L"IsBorderRequired";
+  HSTRING session_type = nullptr;
+  HSTRING border_property = nullptr;
+  boolean has_border_property = false;
+  if (SUCCEEDED(webrtc::CreateHstring(kSessionType, wcslen(kSessionType),
+                                      &session_type)) &&
+      SUCCEEDED(webrtc::CreateHstring(kBorderProperty, wcslen(kBorderProperty),
+                                      &border_property))) {
+    if (FAILED(api_info->IsPropertyPresent(session_type, border_property,
+                                           &has_border_property))) {
+      has_border_property = false;
+    }
+  }
+  if (session_type) {
+    webrtc::DeleteHstring(session_type);
+  }
+  if (border_property) {
+    webrtc::DeleteHstring(border_property);
+  }
+  if (!has_border_property) {
+    return false;
+  }
+
+  ComPtr<WGC::IGraphicsCaptureAccessStatics> access;
+  hr = webrtc::GetActivationFactory<
+      WGC::IGraphicsCaptureAccessStatics,
+      RuntimeClass_Windows_Graphics_Capture_GraphicsCaptureAccess>(&access);
+  if (FAILED(hr)) {
+    return false;
+  }
+  ComPtr<WF::IAsyncOperation<Access::AppCapabilityAccessStatus>> request;
+  if (FAILED(access->RequestAccessAsync(
+          WGC::GraphicsCaptureAccessKind_Borderless, &request))) {
+    return false;
+  }
+  // Desktop apps get an answer without a prompt. The event is shared with
+  // the completion handler, which may run after a timeout here.
+  auto done = std::make_shared<Microsoft::WRL::Wrappers::Event>(
+      CreateEventEx(nullptr, nullptr, 0, EVENT_ALL_ACCESS));
+  if (!done->IsValid()) {
+    return false;
+  }
+  auto handler = Microsoft::WRL::Callback<
+      WF::IAsyncOperationCompletedHandler<Access::AppCapabilityAccessStatus>>(
+      [done](WF::IAsyncOperation<Access::AppCapabilityAccessStatus>*,
+             WF::AsyncStatus) {
+        SetEvent(done->Get());
+        return S_OK;
+      });
+  if (!handler || FAILED(request->put_Completed(handler.Get())) ||
+      WaitForSingleObject(done->Get(), 5000) != WAIT_OBJECT_0) {
+    return false;
+  }
+  Access::AppCapabilityAccessStatus status;
+  if (FAILED(request->GetResults(&status))) {
+    return false;
+  }
+  return status == Access::AppCapabilityAccessStatus_Allowed;
+}
+#endif
 
 }  // namespace
 
@@ -79,7 +176,8 @@ RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
   }
 #endif
   const bool showCursor = options.show_cursor;
-  thread_->BlockingCall([this, type, showCursor] {
+  const bool wants_borderless = !options.wgc_border_required;
+  thread_->BlockingCall([this, type, showCursor, wants_borderless] {
 #if defined(WEBRTC_WIN) && defined(RTC_ENABLE_WIN_WGC)
     if (options_.allow_wgc_window_capturer()) {
       // WGC creates WinRT objects and a DispatcherQueue on the thread it
@@ -91,10 +189,19 @@ RTCDesktopCapturerImpl::RTCDesktopCapturerImpl(
       if (!use_wgc_) {
         options_.set_allow_wgc_window_capturer(false);
       }
+      // Ask WGC to drop its border only when Windows allows it, so the
+      // border state is known rather than a request that may silently fail.
+      border_hidden_ =
+          use_wgc_ && wants_borderless && CanCaptureWithoutBorder();
+      options_.set_wgc_require_border(!border_hidden_);
       RTC_LOG(LS_INFO) << "RTCDesktopCapturerImpl: window capture with "
                        << (use_wgc_ ? "Windows.Graphics.Capture"
-                                    : "the default capturer");
+                                    : "the default capturer")
+                       << (border_hidden_ ? ", without the capture border"
+                                          : "");
     }
+#else
+    (void)wants_borderless;
 #endif
     if (type == kScreen) {
       if (showCursor) {
