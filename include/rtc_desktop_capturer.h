@@ -90,6 +90,17 @@ class RTCDesktopCapturer : public RefCountInterface {
    * @brief Destroys the RTCDesktopCapturer object.
    */
   virtual ~RTCDesktopCapturer() {}
+
+  /**
+   * @brief Whether the capture border Windows draws around a shared window
+   *        is off for this capturer. True only when the capturer was created
+   *        with wgc_border_required off, captures with
+   *        Windows.Graphics.Capture, the system can remove the border
+   *        (Windows 11), and the app was granted borderless capture. False
+   *        everywhere else. Declared last so the existing vtable slots keep
+   *        their order.
+   */
+  virtual bool IsCaptureBorderHidden() = 0;
 };
 
 /**
