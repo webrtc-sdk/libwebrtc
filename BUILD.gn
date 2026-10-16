@@ -324,6 +324,7 @@ rtc_test("libwebrtc_cpp_api_unittests") {
   sources = [
      "test/field_trials.test.cc",
      "test/peerconnection_factory.test.cc",
+     "test/video_processor.test.cc",
   ]
 
   if (is_clang) {
