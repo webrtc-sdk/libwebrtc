@@ -27,8 +27,15 @@ if (is_linux) {
 
 config("external_config") {
   include_dirs = [ "include" ]
+  defines = []
   if (is_win) {
-    defines = [ "LIB_WEBRTC_API_DLL" ]
+    defines += [ "LIB_WEBRTC_API_DLL" ]
+  }
+
+  # The public headers declare extra virtual methods under this define, so
+  # dependents need it too to agree on the vtable layout.
+  if (libwebrtc_desktop_capture) {
+    defines += [ "RTC_DESKTOP_DEVICE" ]
   }
 }
 
@@ -281,7 +288,6 @@ rtc_shared_library("libwebrtc") {
 
   # screen capture device
   if (libwebrtc_desktop_capture) {
-    defines += [ "RTC_DESKTOP_DEVICE" ]
     sources += [
       "include/rtc_desktop_capturer.h",
       "include/rtc_desktop_device.h",
