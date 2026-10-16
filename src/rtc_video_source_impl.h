@@ -16,11 +16,12 @@ namespace libwebrtc {
 
 class RTCVideoSourceImpl : public RTCVideoSource {
  public:
-  // For sources that wrap a VideoTrackSourceInterface only (e.g. desktop
-  // sources). OnCapturedFrame is a no-op for instances created via this
-  // constructor since there is no internal capturer to push into.
+  // For desktop sources. `capturer` is owned by `video_source_track` and only
+  // runs processors. OnCapturedFrame is a no-op for instances created via this
+  // constructor since the frames come from the screen.
   RTCVideoSourceImpl(
-      webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_source_track);
+      webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> video_source_track,
+      webrtc::internal::VideoCapturer* capturer);
 
   // For sources backed by a libwebrtc internal::VideoCapturer (the regular
   // CapturerTrackSource path). OnCapturedFrame forwards user-supplied frames
@@ -50,7 +51,7 @@ class RTCVideoSourceImpl : public RTCVideoSource {
   webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track_;
   // Receives frames from OnCapturedFrame. Null for desktop sources.
   std::shared_ptr<webrtc::internal::VideoCapturer> capturer_;
-  // Runs the processors. Null for desktop sources.
+  // Runs the processors.
   webrtc::internal::VideoCapturer* processing_capturer_ = nullptr;
   SourceType type_ = SourceType::kPlatformDevice;
 };

@@ -9,8 +9,9 @@
 namespace libwebrtc {
 
 RTCVideoSourceImpl::RTCVideoSourceImpl(
-    webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track)
-    : rtc_source_track_(rtc_source_track) {
+    webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track,
+    webrtc::internal::VideoCapturer* capturer)
+    : rtc_source_track_(rtc_source_track), processing_capturer_(capturer) {
   RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
 }
 

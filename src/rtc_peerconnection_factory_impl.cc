@@ -342,7 +342,9 @@ RTCPeerConnectionFactoryImpl::CreateDesktopSource_d(
           new webrtc::RefCountedObject<ScreenCapturerTrackSource>(capturer));
 
   scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(
-      new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
+      new RefCountedObject<RTCVideoSourceImpl>(
+          rtc_source_track,
+          static_cast<RTCDesktopCapturerImpl*>(capturer.get())));
 
   return source;
 }
