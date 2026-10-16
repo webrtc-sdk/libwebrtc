@@ -42,9 +42,16 @@ class RTCVideoSourceImpl : public RTCVideoSource {
     return type_;
   }
 
+  void AddProcessor(RTCVideoProcessor* processor) override;
+
+  void RemoveProcessor(RTCVideoProcessor* processor) override;
+
  private:
   webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track_;
+  // Receives frames from OnCapturedFrame. Null for desktop sources.
   std::shared_ptr<webrtc::internal::VideoCapturer> capturer_;
+  // Runs the processors. Null for desktop sources.
+  webrtc::internal::VideoCapturer* processing_capturer_ = nullptr;
   SourceType type_ = SourceType::kPlatformDevice;
 };
 }  // namespace libwebrtc

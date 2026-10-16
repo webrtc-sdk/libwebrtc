@@ -3,6 +3,7 @@
 
 #include "rtc_types.h"
 #include "rtc_video_frame.h"
+#include "rtc_video_processor.h"
 
 namespace libwebrtc {
 
@@ -21,6 +22,15 @@ class RTCVideoSource : public RefCountInterface {
   virtual void OnCapturedFrame(scoped_refptr<RTCVideoFrame> frame)  = 0;
 
   virtual SourceType GetSourceType() const = 0;
+
+  // Runs `processor` on every frame of this source before the frame is
+  // encoded or rendered. Processors run in the order they were added. The
+  // caller owns `processor` and must keep it alive until RemoveProcessor()
+  // returns. Once RemoveProcessor() returns, `processor` is not called again.
+  // Do not call these from inside RTCVideoProcessor::Process().
+  virtual void AddProcessor(RTCVideoProcessor* processor) = 0;
+
+  virtual void RemoveProcessor(RTCVideoProcessor* processor) = 0;
 
   ~RTCVideoSource() {}
 };

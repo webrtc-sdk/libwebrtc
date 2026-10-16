@@ -16,6 +16,7 @@
 #include "api/video/i420_buffer.h"
 #include "api/video/video_frame_buffer.h"
 #include "api/video/video_rotation.h"
+#include "src/rtc_video_frame_impl.h"
 
 namespace webrtc {
 namespace internal {
@@ -41,16 +42,66 @@ void VideoCapturer::OnFrame(const VideoFrame& frame) {
     webrtc::scoped_refptr<I420Buffer> scaled_buffer =
         I420Buffer::Create(out_width, out_height);
     scaled_buffer->ScaleFrom(*frame.video_frame_buffer()->ToI420());
-    broadcaster_.OnFrame(VideoFrame::Builder()
-                             .set_video_frame_buffer(scaled_buffer)
-                             .set_rotation(kVideoRotation_0)
-                             .set_timestamp_us(frame.timestamp_us())
-                             .set_id(frame.id())
-                             .build());
+    DeliverFrame(VideoFrame::Builder()
+                     .set_video_frame_buffer(scaled_buffer)
+                     .set_rotation(kVideoRotation_0)
+                     .set_timestamp_us(frame.timestamp_us())
+                     .set_id(frame.id())
+                     .build());
   } else {
     // No adaptations needed, just return the frame as is.
+    DeliverFrame(frame);
+  }
+}
+
+void VideoCapturer::AddProcessor(libwebrtc::RTCVideoProcessor* processor) {
+  MutexLock lock(&processors_lock_);
+  processors_.push_back(processor);
+}
+
+void VideoCapturer::RemoveProcessor(libwebrtc::RTCVideoProcessor* processor) {
+  MutexLock lock(&processors_lock_);
+  processors_.erase(
+      std::remove(processors_.begin(), processors_.end(), processor),
+      processors_.end());
+}
+
+void VideoCapturer::DeliverFrame(VideoFrame frame) {
+  if (ApplyProcessors(frame)) {
     broadcaster_.OnFrame(frame);
   }
+}
+
+bool VideoCapturer::ApplyProcessors(VideoFrame& frame) {
+  // Held for the whole pass so that RemoveProcessor() waits for an in-flight
+  // Process() call before the caller can free the processor.
+  MutexLock lock(&processors_lock_);
+  if (processors_.empty()) {
+    return true;
+  }
+
+  libwebrtc::scoped_refptr<libwebrtc::VideoFrameBufferImpl> input(
+      new libwebrtc::RefCountedObject<libwebrtc::VideoFrameBufferImpl>(
+          scoped_refptr<VideoFrameBuffer>(
+              frame.video_frame_buffer()->ToI420())));
+  input->set_rotation(frame.rotation());
+  input->set_timestamp_us(frame.timestamp_us());
+
+  libwebrtc::scoped_refptr<libwebrtc::RTCVideoFrame> output = input;
+  for (libwebrtc::RTCVideoProcessor* processor : processors_) {
+    output = processor->Process(output);
+    if (!output) {
+      return false;
+    }
+  }
+
+  if (output.get() != input.get()) {
+    // Every RTCVideoFrame is a VideoFrameBufferImpl.
+    frame.set_video_frame_buffer(
+        static_cast<libwebrtc::VideoFrameBufferImpl*>(output.get())->buffer());
+    frame.clear_update_rect();
+  }
+  return true;
 }
 
 webrtc::VideoSinkWants VideoCapturer::GetSinkWants() {
