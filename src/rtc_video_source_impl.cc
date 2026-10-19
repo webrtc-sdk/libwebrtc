@@ -9,15 +9,18 @@
 namespace libwebrtc {
 
 RTCVideoSourceImpl::RTCVideoSourceImpl(
-    webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track)
-    : rtc_source_track_(rtc_source_track) {
+    webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track,
+    webrtc::internal::VideoCapturer* capturer)
+    : rtc_source_track_(rtc_source_track), processing_capturer_(capturer) {
   RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
 }
 
 RTCVideoSourceImpl::RTCVideoSourceImpl(
     webrtc::scoped_refptr<webrtc::VideoTrackSourceInterface> rtc_source_track,
     std::shared_ptr<webrtc::internal::VideoCapturer> capturer)
-    : rtc_source_track_(rtc_source_track), capturer_(std::move(capturer)) {
+    : rtc_source_track_(rtc_source_track),
+      capturer_(std::move(capturer)),
+      processing_capturer_(capturer_.get()) {
   type_ = SourceType::kCustom;
   RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor (with capturer)";
 }
@@ -46,6 +49,18 @@ void RTCVideoSourceImpl::OnCapturedFrame(scoped_refptr<RTCVideoFrame> frame) {
                                        .set_timestamp_us(timestamp_us)
                                        .build();
   capturer_->OnFrame(video_frame);
+}
+
+void RTCVideoSourceImpl::AddProcessor(RTCVideoProcessor* processor) {
+  if (processor && processing_capturer_) {
+    processing_capturer_->AddProcessor(processor);
+  }
+}
+
+void RTCVideoSourceImpl::RemoveProcessor(RTCVideoProcessor* processor) {
+  if (processing_capturer_) {
+    processing_capturer_->RemoveProcessor(processor);
+  }
 }
 
 }  // namespace libwebrtc

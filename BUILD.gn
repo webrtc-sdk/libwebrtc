@@ -27,8 +27,15 @@ if (is_linux) {
 
 config("external_config") {
   include_dirs = [ "include" ]
+  defines = []
   if (is_win) {
-    defines = [ "LIB_WEBRTC_API_DLL" ]
+    defines += [ "LIB_WEBRTC_API_DLL" ]
+  }
+
+  # The public headers declare extra virtual methods under this define, so
+  # dependents need it too to agree on the vtable layout.
+  if (libwebrtc_desktop_capture) {
+    defines += [ "RTC_DESKTOP_DEVICE" ]
   }
 }
 
@@ -94,6 +101,7 @@ rtc_shared_library("libwebrtc") {
     "include/rtc_types.h",
     "include/rtc_video_device.h",
     "include/rtc_video_frame.h",
+    "include/rtc_video_processor.h",
     "include/rtc_video_renderer.h",
     "include/rtc_video_source.h",
     "include/rtc_video_track.h",
@@ -281,7 +289,6 @@ rtc_shared_library("libwebrtc") {
 
   # screen capture device
   if (libwebrtc_desktop_capture) {
-    defines += [ "RTC_DESKTOP_DEVICE" ]
     sources += [
       "include/rtc_desktop_capturer.h",
       "include/rtc_desktop_device.h",
@@ -317,6 +324,7 @@ rtc_test("libwebrtc_cpp_api_unittests") {
   sources = [
      "test/field_trials.test.cc",
      "test/peerconnection_factory.test.cc",
+     "test/video_processor.test.cc",
   ]
 
   if (is_clang) {
