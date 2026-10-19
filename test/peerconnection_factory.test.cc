@@ -5,6 +5,7 @@
 #include "rtc_mediaconstraints.h"
 #include "rtc_peerconnection.h"
 #include "rtc_peerconnection_factory.h"
+#include "rtc_rtp_sender.h"
 
 using libwebrtc::LibWebRTC;
 using libwebrtc::scoped_refptr;
@@ -63,6 +64,102 @@ TEST(AudioDevice, EnumerationWorksBeforePeerConnection) {
   factory->Delete(pc);
   pc = nullptr;
   audio_device = nullptr;
+  factory->Terminate();
+  factory = nullptr;
+  LibWebRTC::Terminate();
+}
+
+TEST(AudioDevice, ExternalOnlyFactoryRejectsMicrophoneAndAllowsCustomSources) {
+  ASSERT_TRUE(LibWebRTC::Initialize());
+  libwebrtc::RTCPeerConnectionFactoryOptions options;
+  options.external_audio_input_only = true;
+  auto factory = LibWebRTC::CreateRTCPeerConnectionFactory(options);
+  ASSERT_TRUE(factory->Initialize());
+  EXPECT_EQ(factory->CreateAudioSource("mic").get(), nullptr);
+  auto source = factory->CreateAudioSource(
+      "external", libwebrtc::RTCAudioSource::SourceType::kCustom);
+  ASSERT_NE(source.get(), nullptr);
+  auto track = factory->CreateAudioTrack(source, "external-track");
+  ASSERT_NE(track.get(), nullptr);
+
+  libwebrtc::RTCConfiguration config{};
+  auto constraints = libwebrtc::RTCMediaConstraints::Create();
+  auto first = factory->Create(config, constraints);
+  auto second = factory->Create(config, constraints);
+  ASSERT_NE(first.get(), nullptr);
+  ASSERT_NE(second.get(), nullptr);
+  auto first_sender = first->AddTrack(track, {});
+  auto second_sender = second->AddTrack(track, {});
+  ASSERT_NE(first_sender.get(), nullptr);
+  ASSERT_NE(second_sender.get(), nullptr);
+  EXPECT_TRUE(first->RemoveTrack(first_sender));
+  EXPECT_TRUE(second->RemoveTrack(second_sender));
+  first_sender = nullptr;
+  second_sender = nullptr;
+  first->Close();
+  second->Close();
+  factory->Delete(first);
+  factory->Delete(second);
+  first = nullptr;
+  second = nullptr;
+  track = nullptr;
+  source = nullptr;
+  factory->Terminate();
+  factory = nullptr;
+  LibWebRTC::Terminate();
+}
+
+TEST(AudioDevice, ExternalOnlyPolicyIsCopiedAndDefaultFactoryStaysIndependent) {
+  ASSERT_TRUE(LibWebRTC::Initialize());
+  libwebrtc::RTCPeerConnectionFactoryOptions options;
+  options.external_audio_input_only = true;
+  auto external = LibWebRTC::CreateRTCPeerConnectionFactory(options);
+  options.external_audio_input_only = false;
+  auto ordinary = LibWebRTC::CreateRTCPeerConnectionFactory();
+  ASSERT_TRUE(external->Initialize());
+  ASSERT_TRUE(ordinary->Initialize());
+  EXPECT_EQ(external->CreateAudioSource("external-mic").get(), nullptr);
+  auto mic = ordinary->CreateAudioSource("ordinary-mic");
+  auto custom = ordinary->CreateAudioSource(
+      "ordinary-custom", libwebrtc::RTCAudioSource::SourceType::kCustom);
+  ASSERT_NE(mic.get(), nullptr);
+  ASSERT_NE(custom.get(), nullptr);
+  EXPECT_EQ(external->CreateAudioTrack(mic, "foreign-mic").get(), nullptr);
+
+  libwebrtc::RTCConfiguration config{};
+  auto constraints = libwebrtc::RTCMediaConstraints::Create();
+  auto external_pc = external->Create(config, constraints);
+  auto ordinary_pc = ordinary->Create(config, constraints);
+  ASSERT_NE(external_pc.get(), nullptr);
+  ASSERT_NE(ordinary_pc.get(), nullptr);
+  external_pc->Close();
+  ordinary_pc->Close();
+  external->Delete(external_pc);
+  ordinary->Delete(ordinary_pc);
+  external_pc = nullptr;
+  ordinary_pc = nullptr;
+  custom = nullptr;
+  mic = nullptr;
+  external->Terminate();
+  ordinary->Terminate();
+  external = nullptr;
+  ordinary = nullptr;
+  LibWebRTC::Terminate();
+}
+
+TEST(AudioDevice, DefaultOptionsAllowMicrophoneAndRejectNullSource) {
+  ASSERT_TRUE(LibWebRTC::Initialize());
+  libwebrtc::RTCPeerConnectionFactoryOptions options;
+  EXPECT_FALSE(options.external_audio_input_only);
+  auto factory = LibWebRTC::CreateRTCPeerConnectionFactory(options);
+  ASSERT_TRUE(factory->Initialize());
+  auto source = factory->CreateAudioSource("ordinary-mic");
+  ASSERT_NE(source.get(), nullptr);
+  auto track = factory->CreateAudioTrack(source, "ordinary-track");
+  EXPECT_NE(track.get(), nullptr);
+  EXPECT_EQ(factory->CreateAudioTrack(nullptr, "null-source").get(), nullptr);
+  track = nullptr;
+  source = nullptr;
   factory->Terminate();
   factory = nullptr;
   LibWebRTC::Terminate();

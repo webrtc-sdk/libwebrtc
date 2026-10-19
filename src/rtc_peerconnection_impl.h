@@ -140,7 +140,8 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
       const RTCConfiguration& configuration,
       scoped_refptr<RTCMediaConstraints> constraints,
       webrtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
-          peer_connection_factory);
+          peer_connection_factory,
+      bool external_audio_input_only = false);
 
  protected:
   ~RTCPeerConnectionImpl();
@@ -186,6 +187,7 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   webrtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
       rtc_peerconnection_factory_;
   webrtc::scoped_refptr<webrtc::PeerConnectionInterface> rtc_peerconnection_;
+  const bool external_audio_input_only_;
   const RTCConfiguration& configuration_;
   scoped_refptr<RTCMediaConstraints> constraints_;
   webrtc::PeerConnectionInterface::RTCOfferAnswerOptions offer_answer_options_;

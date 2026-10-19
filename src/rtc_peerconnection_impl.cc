@@ -214,8 +214,10 @@ RTCPeerConnectionImpl::RTCPeerConnectionImpl(
     const RTCConfiguration& configuration,
     scoped_refptr<RTCMediaConstraints> constraints,
     webrtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
-        peer_connection_factory)
+        peer_connection_factory,
+    bool external_audio_input_only)
     : rtc_peerconnection_factory_(peer_connection_factory),
+      external_audio_input_only_(external_audio_input_only),
       configuration_(configuration),
       constraints_(constraints),
       callback_crt_sec_(new webrtc::Mutex()) {
@@ -462,6 +464,11 @@ bool RTCPeerConnectionImpl::Initialize() {
   }
 
   rtc_peerconnection_ = result.MoveValue();
+  if (external_audio_input_only_) {
+    // AudioState is shared by this factory. Apply the immutable policy before
+    // exposing the connection to AddTrack, negotiation or sender operations.
+    rtc_peerconnection_->SetAudioRecording(false);
+  }
   return true;
 }
 

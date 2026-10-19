@@ -60,6 +60,11 @@ class LibWebRTC {
   LIB_WEBRTC_API static scoped_refptr<RTCPeerConnectionFactory>
   CreateRTCPeerConnectionFactory();
 
+  // External-only factories reject microphone sources (returning nullptr).
+  // The default no-argument factory retains ordinary capture behavior.
+  LIB_WEBRTC_API static scoped_refptr<RTCPeerConnectionFactory>
+  CreateRTCPeerConnectionFactory(const RTCPeerConnectionFactoryOptions& options);
+
   /**
    * @brief Terminates the WebRTC PeerConnectionFactory and threads.
    *
