@@ -61,6 +61,22 @@ class RTCRtpTransceiver : public RefCountInterface {
   virtual const string transceiver_id() const = 0;
 };
 
+/**
+ * class RTCRtpTransceiverList
+ */
+class RTCRtpTransceiverList : public RTCBaseList<scoped_refptr<RTCRtpTransceiver>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCRtpTransceiverList> Create(
+    const vector<scoped_refptr<RTCRtpTransceiver>>& source);
+
+ protected:
+  RTCRtpTransceiverList(const vector<scoped_refptr<RTCRtpTransceiver>>& source)
+    : RTCBaseList<scoped_refptr<RTCRtpTransceiver>>(source)
+  {}
+
+  ~RTCRtpTransceiverList() {}
+}; // end class RTCRtpTransceiverList
+
 }  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_TYPES_HXX

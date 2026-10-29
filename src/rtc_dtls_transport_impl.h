@@ -28,6 +28,22 @@ class RTCDtlsTransportInformationImpl : public RTCDtlsTransportInformation {
   webrtc::DtlsTransportInformation dtls_transport_information_;
 };
 
+/**
+ * class RTCDtlsTransportObserverImpl
+ */
+class RTCDtlsTransportObserverImpl : public RTCDtlsTransportObserver
+{
+ public:
+   RTCDtlsTransportObserverImpl(void* callbacks /* rtcDtlsTransportObserverCallbacks* */);
+   ~RTCDtlsTransportObserverImpl();
+
+   void OnStateChange(scoped_refptr<RTCDtlsTransportInformation> info) override;
+   void OnError(const int type, const char* message) override;
+
+ private:
+   void* callbacks_ /* rtcDtlsTransportObserverCallbacks* */;
+}; // end class RTCDtlsTransportObserverImpl
+
 class RTCDtlsTransportImpl : public RTCDtlsTransport,
                              public webrtc::DtlsTransportObserverInterface {
  public:
@@ -39,6 +55,8 @@ class RTCDtlsTransportImpl : public RTCDtlsTransport,
   virtual void RegisterObserver(RTCDtlsTransportObserver* observer) override;
 
   virtual void UnregisterObserver() override;
+
+  virtual RTCDtlsTransportObserver* GetObserver() const override { return observer_; }
 
  public:
   virtual void OnStateChange(webrtc::DtlsTransportInformation info) override;

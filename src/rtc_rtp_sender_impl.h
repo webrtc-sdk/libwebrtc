@@ -33,6 +33,16 @@ class RTCRtpSenderImpl : public RTCRtpSender {
  private:
   webrtc::scoped_refptr<webrtc::RtpSenderInterface> rtp_sender_;
 };
+
+/**
+ * class RTCRtpSenderListImpl
+ */
+class RTCRtpSenderListImpl : public RTCRtpSenderList {
+ public:
+  RTCRtpSenderListImpl(const vector<scoped_refptr<RTCRtpSender>>& source);
+  ~RTCRtpSenderListImpl();
+}; // end class RTCRtpSenderListImpl
+
 }  // namespace libwebrtc
 
 #endif  // LIB_WEBRTC_RTC_RTP_SENDER_IMPL_HXX

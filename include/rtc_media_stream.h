@@ -4,6 +4,7 @@
 #include "rtc_audio_track.h"
 #include "rtc_types.h"
 #include "rtc_video_track.h"
+#include "rtc_base_list.h"
 
 namespace libwebrtc {
 
@@ -35,6 +36,22 @@ class RTCMediaStream : public RefCountInterface {
 
  protected:
   ~RTCMediaStream() {}
+};
+
+/**
+ * class RTCMediaStreamList
+ */
+class RTCMediaStreamList : public RTCBaseList<scoped_refptr<RTCMediaStream>> {
+ public:
+  LIB_WEBRTC_API static scoped_refptr<RTCMediaStreamList> Create(
+    const vector<scoped_refptr<RTCMediaStream>>& source);
+
+ protected:
+  RTCMediaStreamList(const vector<scoped_refptr<RTCMediaStream>>& source)
+    : RTCBaseList<scoped_refptr<RTCMediaStream>>(source)
+  {}
+
+  ~RTCMediaStreamList() {}
 };
 
 }  // namespace libwebrtc

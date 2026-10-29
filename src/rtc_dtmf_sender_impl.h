@@ -10,6 +10,22 @@
 
 namespace libwebrtc {
 
+/**
+ * class RTCDtmfSenderObserverImpl
+ */
+class RTCDtmfSenderObserverImpl : public RTCDtmfSenderObserver
+{
+ public:
+   RTCDtmfSenderObserverImpl(void* callbacks /* rtcDtmfSenderObserverCallbacks* */);
+   ~RTCDtmfSenderObserverImpl();
+
+   void OnToneChange(const string tone, const string tone_buffer) override;
+   void OnToneChange(const string tone) override;
+
+ private:
+   void* callbacks_ /* rtcDtmfSenderObserverCallbacks* */;
+}; // end class RTCDtmfSenderObserverImpl
+
 class RTCDtmfSenderImpl : public RTCDtmfSender,
                           public webrtc::DtmfSenderObserverInterface {
  public:
@@ -34,6 +50,8 @@ class RTCDtmfSenderImpl : public RTCDtmfSender,
   virtual void OnToneChange(const std::string& tone) override;
 
   webrtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender();
+
+  virtual RTCDtmfSenderObserver* GetObserver() const override { return observer_; }
 
  private:
   webrtc::scoped_refptr<webrtc::DtmfSenderInterface> dtmf_sender_;
