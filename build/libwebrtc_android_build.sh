@@ -82,16 +82,8 @@ run_gclient_sync() {
 
 run_gclient_sync
 
-if [ ! -e "src/libwebrtc" ]
-then
-  mkdir -p src/libwebrtc
-  cp -rf ../{include,src,patches,BUILD.gn,LICENSE} src/libwebrtc
-fi
-
 cd src
 cp .vpython3 ..
-git apply "libwebrtc/patches/custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
-git apply "libwebrtc/patches/add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
 
 mkdir -p "$ARTIFACTS_DIR"
@@ -123,6 +115,3 @@ python3 ./tools_webrtc/android/build_aar.py \
   --output "$ARTIFACTS_DIR/libwebrtc.aar" \
   --arch armeabi-v7a arm64-v8a x86_64 x86 \
   --extra-gn-args "$extra_gn_args"
-cd ..
-
-cp -rf "src/libwebrtc/LICENSE" "$ARTIFACTS_DIR/"

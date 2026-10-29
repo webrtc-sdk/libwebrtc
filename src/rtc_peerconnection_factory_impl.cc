@@ -9,6 +9,7 @@
 #include "api/video_codecs/builtin_video_encoder_factory.h"
 #include "modules/audio_device/audio_device_impl.h"
 #include "rtc_audio_source_impl.h"
+#include "rtc_field_trials_impl.h"
 #include "rtc_media_stream_impl.h"
 #include "rtc_mediaconstraints_impl.h"
 #include "rtc_peerconnection_impl.h"
@@ -23,6 +24,8 @@
 #include "src/win/mediacapabilities.h"
 #include "src/win/msdkvideodecoderfactory.h"
 #include "src/win/msdkvideoencoderfactory.h"
+#elif defined(WEBRTC_WIN) && defined(RTC_ENABLE_H265)
+#include "src/win/wmf_h265_factory.h"
 #endif
 #if defined(WEBRTC_IOS)
 #include "engine/sdk/objc/Framework/Classes/videotoolboxvideocodecfactory.h"
@@ -47,8 +50,20 @@ std::unique_ptr<webrtc::VideoDecoderFactory> CreateIntelVideoDecoderFactory() {
 }
 #endif
 
+namespace {
+
+// Builds the environment shared by everything this factory creates, applying
+// the field trials configured through RTCFieldTrials, if any.
+webrtc::Environment CreateEnvironmentWithFieldTrials() {
+  webrtc::EnvironmentFactory factory;
+  factory.Set(CopyGlobalFieldTrials());
+  return factory.Create();
+}
+
+}  // namespace
+
 RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl():
-env_(webrtc::EnvironmentFactory().Create()) {}
+env_(CreateEnvironmentWithFieldTrials()) {}
 
 RTCPeerConnectionFactoryImpl::~RTCPeerConnectionFactoryImpl() {}
 
@@ -90,12 +105,22 @@ bool RTCPeerConnectionFactoryImpl::Initialize(bool use_dummy_audio /*= false*/) 
         webrtc::CreateBuiltinAudioDecoderFactory(),
 #if defined(USE_INTEL_MEDIA_SDK)
         CreateIntelVideoEncoderFactory(), CreateIntelVideoDecoderFactory(),
+#elif defined(WEBRTC_WIN) && defined(RTC_ENABLE_H265)
+        webrtc::CreateWmfH265EncoderFactory(
+            webrtc::CreateBuiltinVideoEncoderFactory()),
+        webrtc::CreateWmfH265DecoderFactory(
+            webrtc::CreateBuiltinVideoDecoderFactory()),
 #else
         webrtc::CreateBuiltinVideoEncoderFactory(),
         webrtc::CreateBuiltinVideoDecoderFactory(),
 #endif
-        nullptr, audio_processing_impl_->GetAudioProcessing(), nullptr, nullptr,
-        audio_transport_factory_);
+        nullptr, audio_processing_impl_->GetAudioProcessing(), nullptr,
+        // The field trials configured through RTCFieldTrials, e.g. WARP's
+        // `WebRTC-IceHandshakeDtls`. Passing nullptr here makes the factory
+        // build its environment from the deprecated global field trial
+        // string instead, so everything set through InitFieldTrials() is
+        // silently ignored.
+        CopyGlobalFieldTrials(), audio_transport_factory_);
   }
 
   if (!rtc_peerconnection_factory_.get()) {
@@ -121,13 +146,21 @@ bool RTCPeerConnectionFactoryImpl::Terminate() {
 }
 
 void RTCPeerConnectionFactoryImpl::CreateAudioDeviceModule_w() {
-  if (!audio_device_module_)
+  if (!audio_device_module_) {
     audio_device_module_ = webrtc::CreateAudioDeviceModule(
         env_,
         use_dummy_audio_ 
           ? webrtc::AudioDeviceModule::kDummyAudio
           : webrtc::AudioDeviceModule::kPlatformDefaultAudio,
         false);
+    // Initialize the ADM eagerly so device enumeration (RecordingDevices/
+    // PlayoutDevices) works before a PeerConnection has been created. On
+    // desktop these queries return early unless the module is initialized,
+    // and the voice engine otherwise defers Init() until the audio pipeline
+    // is set up. Init() is idempotent, so the later engine call is a no-op.
+    if (audio_device_module_)
+      audio_device_module_->Init();
+  }
 }
 
 void RTCPeerConnectionFactoryImpl::DestroyAudioDeviceModule_w() {
@@ -356,7 +389,9 @@ RTCPeerConnectionFactoryImpl::CreateDesktopSource_d(
           new webrtc::RefCountedObject<ScreenCapturerTrackSource>(capturer));
 
   scoped_refptr<RTCVideoSourceImpl> source = scoped_refptr<RTCVideoSourceImpl>(
-      new RefCountedObject<RTCVideoSourceImpl>(rtc_source_track));
+      new RefCountedObject<RTCVideoSourceImpl>(
+          rtc_source_track,
+          static_cast<RTCDesktopCapturerImpl*>(capturer.get())));
 
   return source;
 }

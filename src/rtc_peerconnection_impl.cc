@@ -615,6 +615,8 @@ bool RTCPeerConnectionImpl::Initialize() {
 
   config.set_dscp(configuration_.enable_dscp);
 
+  config.enable_sctp_snap = configuration_.enable_sctp_snap;
+
   RTCMediaConstraintsImpl* media_constraints =
       static_cast<RTCMediaConstraintsImpl*>(constraints_.get());
   webrtc::MediaConstraints rtc_constraints(media_constraints->GetMandatory(),

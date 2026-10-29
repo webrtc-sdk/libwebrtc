@@ -13,6 +13,7 @@
 #include <stddef.h>
 
 #include <memory>
+#include <vector>
 
 #include "api/video/video_frame.h"
 #include "api/video/video_source_interface.h"
@@ -21,6 +22,9 @@
 #include "modules/video_capture/video_capture.h"
 #include "modules/video_capture/video_capture_factory.h"
 #include "pc/video_track_source.h"
+#include "rtc_base/synchronization/mutex.h"
+#include "rtc_base/thread_annotations.h"
+#include "rtc_video_processor.h"
 
 namespace webrtc {
 namespace internal {
@@ -45,14 +49,23 @@ class VideoCapturer : public webrtc::VideoSourceInterface<VideoFrame> {
   // the same path that camera/desktop subclasses feed.
   void OnFrame(const VideoFrame& frame);
 
+  void AddProcessor(libwebrtc::RTCVideoProcessor* processor);
+  void RemoveProcessor(libwebrtc::RTCVideoProcessor* processor);
+
  protected:
   webrtc::VideoSinkWants GetSinkWants();
 
  private:
   void UpdateVideoAdapter();
+  void DeliverFrame(VideoFrame frame);
+  // Returns false when a processor dropped the frame.
+  bool ApplyProcessors(VideoFrame& frame);
 
   webrtc::VideoBroadcaster broadcaster_;
   webrtc::VideoAdapter video_adapter_;
+  webrtc::Mutex processors_lock_;
+  std::vector<libwebrtc::RTCVideoProcessor*> processors_
+      RTC_GUARDED_BY(processors_lock_);
 };
 }  // namespace internal
 }  // namespace webrtc

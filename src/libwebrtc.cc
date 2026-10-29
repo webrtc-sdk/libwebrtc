@@ -3,6 +3,8 @@
 #include "api/scoped_refptr.h"
 #include "rtc_base/ssl_adapter.h"
 #include "rtc_base/thread.h"
+#include "rtc_field_trials.h"
+#include "rtc_logging_impl.h"
 #include "rtc_peerconnection_factory_impl.h"
 
 namespace libwebrtc {
@@ -10,13 +12,23 @@ namespace libwebrtc {
 // Initialize static variable g_is_initialized to false.
 static bool g_is_initialized = false;
 
-// Initializes SSL, if not initialized.
+// Initializes logging and SSL, if not initialized.
 bool LibWebRTC::Initialize() {
+  EnsureLoggingInitialized();
   if (!g_is_initialized) {
     webrtc::InitializeSSL();
     g_is_initialized = true;
   }
   return g_is_initialized;
+}
+
+// Applies the field trials before initializing SSL, so that everything created
+// afterwards picks them up.
+void LibWebRTC::InitializeWithFieldTrials(vector<string> field_trials) {
+  // InitFieldTrials() logs, which would fix the default logging configuration.
+  EnsureLoggingInitialized();
+  RTCFieldTrials::InitFieldTrials(field_trials);
+  Initialize();
 }
 
 // Stops and cleans up the threads and SSL.

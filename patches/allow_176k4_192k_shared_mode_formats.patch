@@ -1,0 +1,20 @@
+--- a/modules/audio_device/win/audio_device_core_win.cc
++++ b/modules/audio_device/win/audio_device_core_win.cc
+@@ -1835,7 +1835,7 @@ int32_t AudioDeviceWindowsCore::InitPlayout() {
+   WAVEFORMATEX Wfx = WAVEFORMATEX();
+   WAVEFORMATEX* pWfxClosestMatch = NULL;
+   UINT bufferFrameCount = 0;
+-  constexpr int freqs[] = {48000, 44100, 16000, 96000, 32000, 8000};
++  constexpr int freqs[] = {48000, 44100, 16000, 96000, 32000, 8000, 176400, 192000};
+   REFERENCE_TIME hnsBufferDuration = 0;
+ 
+   // Create COM object with IAudioClient interface.
+@@ -2149,7 +2149,7 @@ int32_t AudioDeviceWindowsCore::InitRecording() {
+   WAVEFORMATEXTENSIBLE Wfx = WAVEFORMATEXTENSIBLE();
+   WAVEFORMATEX* pWfxClosestMatch = NULL;
+   UINT bufferFrameCount = 0;
+-  constexpr int freqs[6] = {48000, 44100, 16000, 96000, 32000, 8000};
++  constexpr int freqs[] = {48000, 44100, 16000, 96000, 32000, 8000, 176400, 192000};
+ 
+   // Create COM object with IAudioClient interface.
+   SAFE_RELEASE(_ptrClientIn);

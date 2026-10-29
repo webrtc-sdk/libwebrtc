@@ -25,6 +25,10 @@ class RTCDesktopDeviceImpl : public RTCDesktopDevice {
   scoped_refptr<RTCDesktopMediaList> GetDesktopMediaList(
       DesktopType type) override;
 
+  scoped_refptr<RTCDesktopCapturer> CreateDesktopCapturerWithOptions(
+      scoped_refptr<MediaSource> source,
+      const RTCDesktopCapturerOptions& options) override;
+
  private:
   webrtc::Thread* signaling_thread_ = nullptr;
   std::map<DesktopType, scoped_refptr<RTCDesktopMediaListImpl>>

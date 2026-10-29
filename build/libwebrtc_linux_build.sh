@@ -100,11 +100,11 @@ run_gclient_sync
 if [ ! -e "src/libwebrtc" ]
 then
   mkdir -p src/libwebrtc
-  cp -rf ../{include,src,patches,BUILD.gn,LICENSE} src/libwebrtc
+  cp -rf ../{include,src,patches,BUILD.gn,LICENSE,test} src/libwebrtc
 fi
 
 cd src
-git apply "libwebrtc/patches/custom_audio_source_m144.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
+git apply "libwebrtc/patches/custom_audio_source_m150.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 git apply "libwebrtc/patches/add_libwebrtc_build_target.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 git apply "libwebrtc/patches/fix_desktop_capture_compile.patch" -v --ignore-space-change --ignore-whitespace --whitespace=nowarn
 cd ..
@@ -127,10 +127,10 @@ args="is_debug=$debug  \
   rtc_enable_protobuf=false \
   treat_warnings_as_errors=false \
   use_llvm_libatomic=false \
-  use_custom_libcxx=false \
-  use_custom_libcxx_for_host=false \
+  use_custom_libcxx=true \
+  use_custom_libcxx_for_host=true \
   use_clang_modules=false \
-  rtc_include_tests=false \
+  rtc_include_tests=true \
   rtc_build_tools=false \
   rtc_build_examples=false \
   rtc_libvpx_build_vp9=true \
@@ -150,7 +150,7 @@ args="is_debug=$debug  \
 gn gen "$OUTPUT_DIR" --root="src" --args="${args}"
 
 # build static library
-ninja -C "$OUTPUT_DIR" libwebrtc
+ninja -C "$OUTPUT_DIR" libwebrtc libwebrtc_cpp_api_unittests
 
 cp "$OUTPUT_DIR/libwebrtc.so" "$ARTIFACTS_DIR/lib"
 cp -rf "src/libwebrtc/LICENSE" "$ARTIFACTS_DIR/"

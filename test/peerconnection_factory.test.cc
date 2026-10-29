@@ -143,4 +143,26 @@ TEST_F(RTCPeerConnectionFactoryTest, GetUseDummyAudioReportsFalseByDefault) {
   EXPECT_FALSE(factory_->GetUseDummyAudio());
 }
 
+TEST_F(RTCPeerConnectionFactoryTest,
+       AudioDeviceEnumerationWorksBeforePeerConnection) {
+  scoped_refptr<RTCAudioDevice> audio_device = factory_->GetAudioDevice();
+  ASSERT_TRUE(audio_device.get() != nullptr);
+
+  const int16_t recording_before = audio_device->RecordingDevices();
+  const int16_t playout_before = audio_device->PlayoutDevices();
+  EXPECT_GE(recording_before, 0);
+  EXPECT_GE(playout_before, 0);
+
+  RTCConfiguration config{};
+  scoped_refptr<RTCMediaConstraints> constraints = RTCMediaConstraints::Create();
+  scoped_refptr<RTCPeerConnection> pc = factory_->Create(config, constraints);
+  ASSERT_TRUE(pc.get() != nullptr);
+
+  EXPECT_EQ(audio_device->RecordingDevices(), recording_before);
+  EXPECT_EQ(audio_device->PlayoutDevices(), playout_before);
+
+  pc->Close();
+  factory_->Delete(pc);
+}
+
 }  // namespace libwebrtc
