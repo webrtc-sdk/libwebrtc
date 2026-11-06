@@ -24,7 +24,6 @@ class WebRTCStatsCollectorCallback : public webrtc::RTCStatsCollectorCallback {
         webrtc::scoped_refptr<WebRTCStatsCollectorCallback>(
             new webrtc::RefCountedObject<WebRTCStatsCollectorCallback>(success,
                                                                     failure));
-    rtc_stats_observer->AddRef();
     return rtc_stats_observer;
   }
 
