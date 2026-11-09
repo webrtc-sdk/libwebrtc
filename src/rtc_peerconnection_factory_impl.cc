@@ -58,8 +58,9 @@ webrtc::Environment CreateEnvironmentWithFieldTrials() {
 
 }  // namespace
 
-RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl():
-env_(CreateEnvironmentWithFieldTrials()) {}
+RTCPeerConnectionFactoryImpl::RTCPeerConnectionFactoryImpl(
+    const RTCPeerConnectionFactoryOptions& options)
+    : options_(options), env_(CreateEnvironmentWithFieldTrials()) {}
 
 RTCPeerConnectionFactoryImpl::~RTCPeerConnectionFactoryImpl() {}
 
@@ -166,7 +167,8 @@ scoped_refptr<RTCPeerConnection> RTCPeerConnectionFactoryImpl::Create(
   scoped_refptr<RTCPeerConnection> peerconnection =
       scoped_refptr<RTCPeerConnectionImpl>(
           new RefCountedObject<RTCPeerConnectionImpl>(
-              configuration, constraints, rtc_peerconnection_factory_));
+              configuration, constraints, rtc_peerconnection_factory_,
+              options_.external_audio_input_only));
   peerconnections_.push_back(peerconnection);
   return peerconnection;
 }
@@ -241,6 +243,11 @@ RTCPeerConnectionFactoryImpl::CreateAudioSourceWithOptions(
 scoped_refptr<RTCAudioSource> RTCPeerConnectionFactoryImpl::CreateAudioSource(
     const string audio_source_label, RTCAudioSource::SourceType source_type,
     RTCAudioOptions options) {
+  if (options_.external_audio_input_only &&
+      source_type != RTCAudioSource::SourceType::kCustom) {
+    RTC_LOG(LS_ERROR) << "Microphone sources are disabled for this factory";
+    return nullptr;
+  }
   auto rtc_options = webrtc::AudioOptions();
   rtc_options.echo_cancellation = options.echo_cancellation;
   rtc_options.auto_gain_control = options.auto_gain_control;
@@ -387,6 +394,10 @@ scoped_refptr<RTCVideoTrack> RTCPeerConnectionFactoryImpl::CreateVideoTrack(
 
 scoped_refptr<RTCAudioTrack> RTCPeerConnectionFactoryImpl::CreateAudioTrack(
     scoped_refptr<RTCAudioSource> source, const string track_id) {
+  if (!source || (options_.external_audio_input_only &&
+                  source->GetSourceType() != RTCAudioSource::SourceType::kCustom)) {
+    return nullptr;
+  }
   RTCAudioSourceImpl* source_impl =
       static_cast<RTCAudioSourceImpl*>(source.get());
 

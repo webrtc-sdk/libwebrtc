@@ -43,9 +43,15 @@ void LibWebRTC::Terminate() {
 // Creates and returns an instance of RTCPeerConnectionFactory.
 scoped_refptr<RTCPeerConnectionFactory>
 LibWebRTC::CreateRTCPeerConnectionFactory() {
+  return CreateRTCPeerConnectionFactory(RTCPeerConnectionFactoryOptions{});
+}
+
+scoped_refptr<RTCPeerConnectionFactory>
+LibWebRTC::CreateRTCPeerConnectionFactory(
+    const RTCPeerConnectionFactoryOptions& options) {
   scoped_refptr<RTCPeerConnectionFactory> rtc_peerconnection_factory =
       scoped_refptr<RTCPeerConnectionFactory>(
-          new RefCountedObject<RTCPeerConnectionFactoryImpl>());
+          new RefCountedObject<RTCPeerConnectionFactoryImpl>(options));
   return rtc_peerconnection_factory;
 }
 

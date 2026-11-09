@@ -20,6 +20,15 @@ class RTCAudioProcessing;
 class RTCVideoDevice;
 class RTCRtpCapabilities;
 
+// Options are copied when the factory is created and cannot change afterward.
+// Audio tracks/sources must be created by the factory they are used with.
+struct RTCPeerConnectionFactoryOptions {
+  // Accept only custom audio input and disable device recording for every
+  // connection in this factory. Requires the core recording-policy fix.
+  // Separate factories may still capture. Playout is unaffected.
+  bool external_audio_input_only = false;
+};
+
 class RTCPeerConnectionFactory : public RefCountInterface {
  public:
   virtual bool Initialize() = 0;

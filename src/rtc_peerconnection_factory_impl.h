@@ -27,7 +27,8 @@ namespace libwebrtc {
 
 class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
  public:
-  RTCPeerConnectionFactoryImpl();
+  explicit RTCPeerConnectionFactoryImpl(
+      const RTCPeerConnectionFactoryOptions& options = {});
 
   virtual ~RTCPeerConnectionFactoryImpl();
 
@@ -106,6 +107,7 @@ class RTCPeerConnectionFactoryImpl : public RTCPeerConnectionFactory {
       scoped_refptr<RTCMediaConstraints> constraints);
 #endif
  private:
+  const RTCPeerConnectionFactoryOptions options_;
   std::unique_ptr<webrtc::Thread> worker_thread_;
   std::unique_ptr<webrtc::Thread> signaling_thread_;
   std::unique_ptr<webrtc::Thread> network_thread_;
