@@ -42,6 +42,8 @@ class RTCDataChannelImpl : public RTCDataChannel,
 
   virtual void OnMessage(const webrtc::DataBuffer& buffer) override;
 
+  virtual void OnBufferedAmountChange(uint64_t sent_data_size) override;
+
  private:
   webrtc::scoped_refptr<webrtc::DataChannelInterface> rtc_data_channel_;
   RTCDataChannelObserver* observer_ = nullptr;

@@ -54,6 +54,14 @@ class RTCDataChannelObserver {
    */
   virtual void OnMessage(const char* buffer, int length, bool binary) = 0;
 
+  /**
+   * Called when the data channel's buffered amount changes, after bytes were
+   * sent on the wire or the queue drained. The number of bytes just sent is
+   * passed as a parameter. Read buffered_amount() on the channel for the
+   * current level. Optional, the default does nothing.
+   */
+  virtual void OnBufferedAmountChange(uint64_t sent_data_size) {}
+
  protected:
   /**
    * The destructor for the RTCDataChannelObserver class.
