@@ -31,10 +31,70 @@ class VideoRenderer;
 
 namespace libwebrtc {
 
+/**
+ * class RTCStatsMemberListImpl
+ */
+class RTCStatsMemberListImpl : public RTCStatsMemberList {
+ public:
+  RTCStatsMemberListImpl(const vector<scoped_refptr<RTCStatsMember>>& source);
+  ~RTCStatsMemberListImpl();
+}; // end class RTCStatsMemberListImpl
+
+/**
+ * class MediaRTCStatsListImpl
+ */
+class MediaRTCStatsListImpl : public MediaRTCStatsList {
+ public:
+  MediaRTCStatsListImpl(const vector<scoped_refptr<MediaRTCStats>>& source);
+  ~MediaRTCStatsListImpl();
+}; // end class MediaRTCStatsListImpl
+
+/**
+ * class RTCPeerConnectionObserverImpl
+ */
+class RTCPeerConnectionObserverImpl : public RTCPeerConnectionObserver
+{
+ public:
+   RTCPeerConnectionObserverImpl(void* callbacks /* rtcPeerConnectionObserverCallbacks* */);
+   ~RTCPeerConnectionObserverImpl();
+
+   void OnSignalingState(RTCSignalingState state) override;
+
+   void OnPeerConnectionState(RTCPeerConnectionState state) override;
+
+   void OnIceGatheringState(RTCIceGatheringState state) override;
+
+   void OnIceConnectionState(RTCIceConnectionState state) override;
+
+   void OnIceCandidate(scoped_refptr<RTCIceCandidate> candidate) override;
+
+   void OnAddStream(scoped_refptr<RTCMediaStream> stream) override;
+
+   void OnRemoveStream(scoped_refptr<RTCMediaStream> stream) override;
+
+   void OnDataChannel(scoped_refptr<RTCDataChannel> data_channel) override;
+
+   void OnRenegotiationNeeded() override;
+
+   void OnTrack(scoped_refptr<RTCRtpTransceiver> transceiver) override;
+
+   void OnAddTrack(vector<scoped_refptr<RTCMediaStream>> streams,
+                          scoped_refptr<RTCRtpReceiver> receiver) override;
+
+   void OnRemoveTrack(scoped_refptr<RTCRtpReceiver> receiver) override;
+
+ private:
+   void* callbacks_ /* rtcPeerConnectionObserverCallbacks* */;
+}; // end class RTCPeerConnectionObserverImpl
+
+/**
+ * class RTCPeerConnectionImpl
+ */
 class RTCPeerConnectionImpl : public RTCPeerConnection,
                               public webrtc::PeerConnectionObserver {
  public:
   virtual bool Initialize();
+  virtual bool IsInitialized() const override;
 
   virtual void CreateOffer(
       OnSdpCreateSuccess success, OnSdpCreateFailure failure,
@@ -182,6 +242,8 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   virtual void OnSignalingChange(
       webrtc::PeerConnectionInterface::SignalingState new_state) override;
 
+  virtual RTCPeerConnectionObserver* GetObserver() override { return observer_; }
+
  protected:
   webrtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
       rtc_peerconnection_factory_;
@@ -191,7 +253,9 @@ class RTCPeerConnectionImpl : public RTCPeerConnection,
   webrtc::PeerConnectionInterface::RTCOfferAnswerOptions offer_answer_options_;
   RTCPeerConnectionObserver* observer_ = nullptr;
   std::unique_ptr<webrtc::Mutex> callback_crt_sec_;
+  std::unique_ptr<webrtc::Mutex> initialize_crt_sec_;
   bool initialize_offer_sent = false;
+  bool initialized_ = false;
   std::vector<scoped_refptr<RTCMediaStream>> local_streams_;
   std::vector<scoped_refptr<RTCMediaStream>> remote_streams_;
   scoped_refptr<RTCDataChannel> data_channel_;

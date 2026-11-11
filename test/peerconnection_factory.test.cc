@@ -1,69 +1,168 @@
+#include <memory>
+#include <string>
+
+#include "test/gmock.h"
 #include "test/gtest.h"
 
-#include "libwebrtc.h"
-#include "rtc_audio_device.h"
-#include "rtc_mediaconstraints.h"
-#include "rtc_peerconnection.h"
+#include "rtc_base/logging.h"
+
 #include "rtc_peerconnection_factory.h"
+#include "rtc_peerconnection.h"
+#include "rtc_audio_device.h"
+#include "rtc_audio_processing.h"
+#include "rtc_audio_source.h"
+#include "rtc_audio_track.h"
+#include "rtc_video_device.h"
+#include "rtc_video_source.h"
+#include "rtc_video_track.h"
+#include "rtc_dummy_video_capturer.h"
+#include "rtc_media_stream.h"
+#include "rtc_mediaconstraints.h"
+#include "libwebrtc.h"
 
-using libwebrtc::LibWebRTC;
-using libwebrtc::scoped_refptr;
+namespace libwebrtc {
 
-// Audio device enumeration must work immediately after the factory is
-// initialised, WITHOUT first creating an RTCPeerConnection.
-//
-// Background: on desktop platforms the underlying webrtc::AudioDeviceModule
-// returns the "uninitialized" sentinel (-1) from RecordingDevices()/
-// PlayoutDevices() until AudioDeviceModule::Init() has been called. That call
-// used to be deferred until the voice engine spun up during PeerConnection
-// creation, so enumeration silently returned nothing beforehand. The factory
-// now calls Init() eagerly when it creates the ADM, so the device count must:
-//   1. not be the -1 uninitialized sentinel before any PeerConnection exists,
-//      and
-//   2. be identical before and after a PeerConnection is created (enumeration
-//      must not depend on the PeerConnection lifecycle).
-//
-// Both checks are robust on headless machines: with no audio hardware the
-// count is simply 0 both times, which still satisfies (1) and (2). The
-// pre-fix behaviour (-1 before, real count after) fails both.
-TEST(AudioDevice, EnumerationWorksBeforePeerConnection) {
-  ASSERT_TRUE(LibWebRTC::Initialize());
+// Fixture that owns an initialized factory for the duration of each test.
+// Mirrors test/c_interop/peerconnection_factory.test.cc but exercises the
+// C++ class API directly.
+class RTCPeerConnectionFactoryTest : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    ASSERT_TRUE(LibWebRTC::Initialize());
+    factory_ = LibWebRTC::CreateRTCPeerConnectionFactory();
+    ASSERT_TRUE(factory_.get() != nullptr);
+    ASSERT_TRUE(factory_->Initialize());
+  }
 
-  scoped_refptr<libwebrtc::RTCPeerConnectionFactory> factory =
-      LibWebRTC::CreateRTCPeerConnectionFactory();
-  ASSERT_TRUE(factory.get() != nullptr);
-  ASSERT_TRUE(factory->Initialize());
+  void TearDown() override {
+    if (factory_) {
+      EXPECT_TRUE(factory_->Terminate());
+      factory_ = nullptr;
+    }
+    LibWebRTC::Terminate();
+  }
 
-  scoped_refptr<libwebrtc::RTCAudioDevice> audio_device =
-      factory->GetAudioDevice();
-  ASSERT_TRUE(audio_device.get() != nullptr);
+  scoped_refptr<RTCPeerConnectionFactory> factory_;
+};
 
-  // (1) Enumeration before any PeerConnection has been created.
-  const int16_t recording_before = audio_device->RecordingDevices();
-  const int16_t playout_before = audio_device->PlayoutDevices();
-  EXPECT_GE(recording_before, 0);  // not the -1 uninitialized sentinel
-  EXPECT_GE(playout_before, 0);
+TEST_F(RTCPeerConnectionFactoryTest, CreatePeerConnectionWithDefaultConfig) {
+  RTCConfiguration config;
+  scoped_refptr<RTCMediaConstraints> constraints = RTCMediaConstraints::Create();
+  ASSERT_TRUE(constraints.get() != nullptr);
 
-  // Create a PeerConnection, which is what historically triggered the ADM
-  // initialization.
-  libwebrtc::RTCConfiguration config{};
-  scoped_refptr<libwebrtc::RTCMediaConstraints> constraints =
-      libwebrtc::RTCMediaConstraints::Create();
-  scoped_refptr<libwebrtc::RTCPeerConnection> pc =
-      factory->Create(config, constraints);
+  scoped_refptr<RTCPeerConnection> pc = factory_->Create(config, constraints);
+  ASSERT_TRUE(pc.get() != nullptr);
+  EXPECT_TRUE(pc->IsInitialized());
+
+  pc->Close();
+  factory_->Delete(pc);
+}
+
+TEST_F(RTCPeerConnectionFactoryTest, CreatePeerConnectionWithMediaConstraints) {
+  RTCConfiguration config;
+  scoped_refptr<RTCMediaConstraints> constraints = RTCMediaConstraints::Create();
+  ASSERT_TRUE(constraints.get() != nullptr);
+  constraints->AddMandatoryConstraint(RTCMediaConstraints::kOfferToReceiveAudio,
+                                      RTCMediaConstraints::kValueTrue);
+
+  scoped_refptr<RTCPeerConnection> pc = factory_->Create(config, constraints);
   ASSERT_TRUE(pc.get() != nullptr);
 
-  // (2) Enumeration after a PeerConnection exists must match the earlier
-  // result — the device set does not depend on the PeerConnection.
-  const int16_t recording_after = audio_device->RecordingDevices();
-  const int16_t playout_after = audio_device->PlayoutDevices();
-  EXPECT_EQ(recording_before, recording_after);
-  EXPECT_EQ(playout_before, playout_after);
-
-  factory->Delete(pc);
-  pc = nullptr;
-  audio_device = nullptr;
-  factory->Terminate();
-  factory = nullptr;
-  LibWebRTC::Terminate();
+  pc->Close();
+  factory_->Delete(pc);
 }
+
+TEST_F(RTCPeerConnectionFactoryTest, GetAudioDeviceReturnsObject) {
+  scoped_refptr<RTCAudioDevice> device = factory_->GetAudioDevice();
+  EXPECT_NE(device.get(), nullptr);
+}
+
+TEST_F(RTCPeerConnectionFactoryTest, GetVideoDeviceReturnsObject) {
+  scoped_refptr<RTCVideoDevice> device = factory_->GetVideoDevice();
+  EXPECT_NE(device.get(), nullptr);
+}
+
+TEST_F(RTCPeerConnectionFactoryTest, GetAudioProcessingReturnsObject) {
+  scoped_refptr<RTCAudioProcessing> ap = factory_->GetAudioProcessing();
+  EXPECT_NE(ap.get(), nullptr);
+}
+
+TEST_F(RTCPeerConnectionFactoryTest, CreateAudioSourceAndAudioTrack) {
+  scoped_refptr<RTCAudioSource> source =
+      factory_->CreateAudioSource("test-audio-source");
+  ASSERT_TRUE(source.get() != nullptr);
+
+  scoped_refptr<RTCAudioTrack> track =
+      factory_->CreateAudioTrack(source, "test-audio-track");
+  ASSERT_TRUE(track.get() != nullptr);
+  EXPECT_EQ(track->id().std_string(), "test-audio-track");
+}
+
+TEST_F(RTCPeerConnectionFactoryTest, CreateDummyVideoSourceAndVideoTrack) {
+  scoped_refptr<RTCDummyVideoCapturer> capturer =
+      factory_->CreateDummyVideoCapturer(30, 640, 480);
+  ASSERT_TRUE(capturer.get() != nullptr);
+
+  scoped_refptr<RTCVideoSource> source =
+      factory_->CreateDummyVideoSource(capturer, "test-video-source");
+  ASSERT_TRUE(source.get() != nullptr);
+
+  scoped_refptr<RTCVideoTrack> track =
+      factory_->CreateVideoTrack(source, "test-video-track");
+  ASSERT_TRUE(track.get() != nullptr);
+  EXPECT_EQ(track->id().std_string(), "test-video-track");
+}
+
+TEST_F(RTCPeerConnectionFactoryTest, CreateStreamReturnsObject) {
+  scoped_refptr<RTCMediaStream> stream = factory_->CreateStream("test-stream-id");
+  ASSERT_TRUE(stream.get() != nullptr);
+  EXPECT_EQ(stream->id().std_string(), "test-stream-id");
+}
+
+TEST_F(RTCPeerConnectionFactoryTest, GetRtpSenderCapabilitiesAudioAndVideo) {
+  scoped_refptr<RTCRtpCapabilities> audio_caps =
+      factory_->GetRtpSenderCapabilities(RTCMediaType::AUDIO);
+  EXPECT_NE(audio_caps.get(), nullptr);
+
+  scoped_refptr<RTCRtpCapabilities> video_caps =
+      factory_->GetRtpSenderCapabilities(RTCMediaType::VIDEO);
+  EXPECT_NE(video_caps.get(), nullptr);
+}
+
+TEST_F(RTCPeerConnectionFactoryTest, GetRtpReceiverCapabilitiesAudioAndVideo) {
+  scoped_refptr<RTCRtpCapabilities> audio_caps =
+      factory_->GetRtpReceiverCapabilities(RTCMediaType::AUDIO);
+  EXPECT_NE(audio_caps.get(), nullptr);
+
+  scoped_refptr<RTCRtpCapabilities> video_caps =
+      factory_->GetRtpReceiverCapabilities(RTCMediaType::VIDEO);
+  EXPECT_NE(video_caps.get(), nullptr);
+}
+
+TEST_F(RTCPeerConnectionFactoryTest, GetUseDummyAudioReportsFalseByDefault) {
+  EXPECT_FALSE(factory_->GetUseDummyAudio());
+}
+
+TEST_F(RTCPeerConnectionFactoryTest,
+       AudioDeviceEnumerationWorksBeforePeerConnection) {
+  scoped_refptr<RTCAudioDevice> audio_device = factory_->GetAudioDevice();
+  ASSERT_TRUE(audio_device.get() != nullptr);
+
+  const int16_t recording_before = audio_device->RecordingDevices();
+  const int16_t playout_before = audio_device->PlayoutDevices();
+  EXPECT_GE(recording_before, 0);
+  EXPECT_GE(playout_before, 0);
+
+  RTCConfiguration config{};
+  scoped_refptr<RTCMediaConstraints> constraints = RTCMediaConstraints::Create();
+  scoped_refptr<RTCPeerConnection> pc = factory_->Create(config, constraints);
+  ASSERT_TRUE(pc.get() != nullptr);
+
+  EXPECT_EQ(audio_device->RecordingDevices(), recording_before);
+  EXPECT_EQ(audio_device->PlayoutDevices(), playout_before);
+
+  pc->Close();
+  factory_->Delete(pc);
+}
+
+}  // namespace libwebrtc

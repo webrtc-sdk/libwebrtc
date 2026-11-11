@@ -109,4 +109,19 @@ scoped_refptr<RTCDtmfSender> RTCRtpSenderImpl::dtmf_sender() const {
   return new RefCountedObject<RTCDtmfSenderImpl>(rtp_sender_->GetDtmfSender());
 }
 
+scoped_refptr<RTCRtpSenderList> RTCRtpSenderList::Create(
+    const vector<scoped_refptr<RTCRtpSender>>& source) {
+  return new RefCountedObject<RTCRtpSenderListImpl>(source);
+}
+
+RTCRtpSenderListImpl::RTCRtpSenderListImpl(
+    const vector<scoped_refptr<RTCRtpSender>>& source)
+    : RTCRtpSenderList(source) {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": ctor ";
+}
+
+RTCRtpSenderListImpl::~RTCRtpSenderListImpl() {
+  RTC_LOG(LS_INFO) << __FUNCTION__ << ": dtor ";
+}
+
 }  // namespace libwebrtc

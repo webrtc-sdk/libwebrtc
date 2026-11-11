@@ -40,9 +40,69 @@
 #endif
 #endif
 
+#include "interop_api.h"
+
 namespace libwebrtc {
 
 enum { kCaptureDelay = 33, kCaptureMessageId = 1000 };
+
+/**
+ * DesktopCapturerObserverImpl
+ */
+
+DesktopCapturerObserverImpl::DesktopCapturerObserverImpl(void* callbacks /* rtcDesktopCapturerObserverCallbacks* */)
+  : callbacks_(nullptr)
+{
+  if (callbacks) {
+    size_t nSize = sizeof(rtcDesktopCapturerObserverCallbacks);
+    callbacks_ = malloc(nSize);
+    memcpy(callbacks_, (const void*)callbacks, nSize);
+  }
+}
+
+DesktopCapturerObserverImpl::~DesktopCapturerObserverImpl()
+{
+  if (callbacks_) {
+    free(callbacks_);
+  }
+  callbacks_ = nullptr;
+}
+
+void DesktopCapturerObserverImpl::OnStart(scoped_refptr<RTCDesktopCapturer> capturer)
+{
+  if (callbacks_) {
+    rtcDesktopCapturerObserverCallbacks* pCallbacks = reinterpret_cast<rtcDesktopCapturerObserverCallbacks*>(callbacks_);
+    pCallbacks->Started(pCallbacks->UserData);
+  }
+}
+
+void DesktopCapturerObserverImpl::OnPaused(scoped_refptr<RTCDesktopCapturer> capturer)
+{
+  if (callbacks_) {
+    rtcDesktopCapturerObserverCallbacks* pCallbacks = reinterpret_cast<rtcDesktopCapturerObserverCallbacks*>(callbacks_);
+    pCallbacks->Paused(pCallbacks->UserData);
+  }
+}
+
+void DesktopCapturerObserverImpl::OnStop(scoped_refptr<RTCDesktopCapturer> capturer)
+{
+  if (callbacks_) {
+    rtcDesktopCapturerObserverCallbacks* pCallbacks = reinterpret_cast<rtcDesktopCapturerObserverCallbacks*>(callbacks_);
+    pCallbacks->Stopped(pCallbacks->UserData);
+  }
+}
+
+void DesktopCapturerObserverImpl::OnError(scoped_refptr<RTCDesktopCapturer> capturer)
+{
+  if (callbacks_) {
+    rtcDesktopCapturerObserverCallbacks* pCallbacks = reinterpret_cast<rtcDesktopCapturerObserverCallbacks*>(callbacks_);
+    pCallbacks->Failed(pCallbacks->UserData);
+  }
+}
+
+/**
+ * class RTCDesktopCapturerImpl
+ */
 
 namespace {
 
@@ -234,7 +294,7 @@ RTCDesktopCapturerImpl::~RTCDesktopCapturerImpl() {
   capturer_.reset();
 }
 
-RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
+RTCCaptureState RTCDesktopCapturerImpl::Start(
     uint32_t fps, uint32_t x, uint32_t y, uint32_t w, uint32_t h) {
   x_ = x;
   y_ = y;
@@ -247,14 +307,14 @@ RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
   return Start(fps);
 }
 
-RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
+RTCCaptureState RTCDesktopCapturerImpl::Start(
     uint32_t fps) {
-  if (capture_state_ == CS_RUNNING) {
+  if (capture_state_ == RTCCaptureState::CS_RUNNING) {
     return capture_state_;
   }
 
   if (fps == 0) {
-    capture_state_ = CS_FAILED;
+    capture_state_ = RTCCaptureState::CS_FAILED;
     return capture_state_;
   }
 
@@ -272,22 +332,24 @@ RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
     })
                                    : capturer_->SelectSource(source_id_);
     if (!selected) {
-      capture_state_ = CS_FAILED;
+      capture_state_ = RTCCaptureState::CS_FAILED;
       return capture_state_;
     }
     if (type_ == kWindow && focus_window_) {
       if (!capturer_->FocusOnSelectedSource()) {
-        capture_state_ = CS_FAILED;
+        capture_state_ = RTCCaptureState::CS_FAILED;
         return capture_state_;
       }
     }
   }
 
   thread_->BlockingCall([this] { capturer_->Start(this); });
-  capture_state_ = CS_RUNNING;
+  capture_state_ = RTCCaptureState::CS_RUNNING;
   thread_->PostTask([this] { CaptureFrame(); });
   if (observer_) {
-    signaling_thread_->BlockingCall([&, this]() { observer_->OnStart(this); });
+    signaling_thread_->BlockingCall([&, this]() { 
+      if (observer_) { observer_->OnStart(this); }
+    });
   }
   return capture_state_;
 }
@@ -295,16 +357,18 @@ RTCDesktopCapturerImpl::CaptureState RTCDesktopCapturerImpl::Start(
 void RTCDesktopCapturerImpl::Stop() {
   if (observer_) {
     if (!signaling_thread_->IsCurrent()) {
-      signaling_thread_->BlockingCall([&, this]() { observer_->OnStop(this); });
+      signaling_thread_->BlockingCall([&, this]() { 
+        if (observer_) { observer_->OnStop(this); }
+      });
     } else {
       observer_->OnStop(this);
     }
   }
-  capture_state_ = CS_STOPPED;
+  capture_state_ = RTCCaptureState::CS_STOPPED;
 }
 
 bool RTCDesktopCapturerImpl::IsRunning() {
-  return capture_state_ == CS_RUNNING;
+  return capture_state_ == RTCCaptureState::CS_RUNNING;
 }
 
 #ifdef WEBRTC_WIN
@@ -319,18 +383,20 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
   if (result != result_) {
     if (result == webrtc::DesktopCapturer::Result::ERROR_PERMANENT) {
       if (observer_) {
-        signaling_thread_->BlockingCall(
-            [&, this]() { observer_->OnError(this); });
+        signaling_thread_->BlockingCall([&, this]() {
+          if (observer_) { observer_->OnError(this); }
+        });
       }
-      capture_state_ = CS_FAILED;
+      capture_state_ = RTCCaptureState::CS_FAILED;
       return;
     }
 
     if (result == webrtc::DesktopCapturer::Result::ERROR_TEMPORARY) {
       result_ = result;
       if (observer_) {
-        signaling_thread_->BlockingCall(
-            [&, this]() { observer_->OnPaused(this); });
+        signaling_thread_->BlockingCall([&, this]() {
+          if (observer_) { observer_->OnPaused(this); }
+        });
       }
       return;
     }
@@ -338,8 +404,9 @@ void RTCDesktopCapturerImpl::OnCaptureResult(
     if (result == webrtc::DesktopCapturer::Result::SUCCESS) {
       result_ = result;
       if (observer_) {
-        signaling_thread_->BlockingCall(
-            [&, this]() { observer_->OnStart(this); });
+        signaling_thread_->BlockingCall([&, this]() {
+          if (observer_) { observer_->OnStart(this); }
+        });
       }
     }
   }
@@ -423,7 +490,7 @@ void RTCDesktopCapturerImpl::OnWgcFrame(const webrtc::DesktopFrame& frame) {
 
 void RTCDesktopCapturerImpl::CaptureFrame() {
   RTC_DCHECK_RUN_ON(thread_.get());
-  if (capture_state_ == CS_RUNNING) {
+  if (capture_state_ == RTCCaptureState::CS_RUNNING) {
     capturer_->CaptureFrame();
     thread_->PostDelayedHighPrecisionTask(
         [this]() { CaptureFrame(); },

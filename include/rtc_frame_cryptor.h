@@ -19,9 +19,6 @@ enum class KeyDerivationAlgorithm {
   kHKDF,
 };
 
-#define DEFAULT_KEYRING_SIZE 16
-#define MAX_KEYRING_SIZE 255
-
 struct KeyProviderOptions {
   bool shared_key;
   vector<uint8_t> ratchet_salt;
@@ -37,7 +34,7 @@ struct KeyProviderOptions {
         ratchet_salt(vector<uint8_t>()),
         ratchet_window_size(0),
         failure_tolerance(-1),
-        key_ring_size(DEFAULT_KEYRING_SIZE),
+        key_ring_size(16),
         discard_frame_when_cryptor_not_ready(false),
         key_derivation_algorithm(KeyDerivationAlgorithm::kPBKDF2) {}
   KeyProviderOptions(KeyProviderOptions& copy)

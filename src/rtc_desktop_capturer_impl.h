@@ -35,6 +35,24 @@
 
 namespace libwebrtc {
 
+/**
+ * class DesktopCapturerObserverImpl
+ */
+class DesktopCapturerObserverImpl : public DesktopCapturerObserver
+{
+ public:
+   DesktopCapturerObserverImpl(void* callbacks /* rtcDesktopCapturerObserverCallbacks* */);
+   ~DesktopCapturerObserverImpl();
+
+  void OnStart(scoped_refptr<RTCDesktopCapturer> capturer) override;
+  void OnPaused(scoped_refptr<RTCDesktopCapturer> capturer) override;
+  void OnStop(scoped_refptr<RTCDesktopCapturer> capturer) override;
+  void OnError(scoped_refptr<RTCDesktopCapturer> capturer) override;
+
+ private:
+   void* callbacks_ /* rtcDesktopCapturerObserverCallbacks* */;
+}; // end class DesktopCapturerObserverImpl
+
 class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
                                public webrtc::DesktopCapturer::Callback,
                                public webrtc::internal::VideoCapturer {
@@ -56,9 +74,9 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   }
 
   void DeRegisterDesktopCapturerObserver() override { observer_ = nullptr; }
-  CaptureState Start(uint32_t fps) override;
+  RTCCaptureState Start(uint32_t fps) override;
 
-  CaptureState Start(uint32_t fps, uint32_t x, uint32_t y, uint32_t w,
+  RTCCaptureState Start(uint32_t fps, uint32_t x, uint32_t y, uint32_t w,
                      uint32_t h) override;
 
   void Stop() override;
@@ -67,6 +85,7 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
 
   scoped_refptr<MediaSource> source() override { return source_; }
 
+  DesktopCapturerObserver* GetObserver() override { return observer_; }
   bool IsCaptureBorderHidden() override { return border_hidden_; }
 
  protected:
@@ -82,7 +101,7 @@ class RTCDesktopCapturerImpl : public RTCDesktopCapturer,
   std::unique_ptr<webrtc::DesktopCapturer> capturer_;
   std::unique_ptr<webrtc::Thread> thread_;
   webrtc::scoped_refptr<webrtc::I420Buffer> i420_buffer_;
-  CaptureState capture_state_ = CS_STOPPED;
+  RTCCaptureState capture_state_ = RTCCaptureState::CS_STOPPED;
   DesktopType type_;
   webrtc::DesktopCapturer::SourceId source_id_;
   DesktopCapturerObserver* observer_ = nullptr;
